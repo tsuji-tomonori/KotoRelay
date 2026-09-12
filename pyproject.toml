@@ -1,0 +1,36 @@
+[project]
+name = "kotorelay"
+version = "0.1.0"
+description = "承認済みの知識を人とAIへ引き継ぐ文書管理"
+requires-python = ">=3.12,<3.14"
+dependencies = ["fastapi>=0.115,<1", "uvicorn[standard]>=0.34,<1", "pydantic-settings>=2.7,<3", "psycopg[binary]>=3.2,<4", "aurora-dsql-psycopg>=0.2", "boto3>=1.40,<2", "PyJWT[crypto]>=2.10,<3", "pillow>=11,<13", "python-multipart>=0.0.20", "mangum>=0.19,<1"]
+[dependency-groups]
+dev = ["pytest>=8,<10", "pytest-cov>=6,<8", "httpx>=0.28,<1", "ruff>=0.11", "mypy>=1.15,<2", "boto3-stubs[s3,bedrock-runtime,s3vectors]>=1.40", "sqlglot>=26", "sqlfluff>=3.3,<5", "aws-cdk-lib>=2.220,<3", "constructs>=10,<11", "cdk-nag>=2.35,<3", "syrupy>=4.9,<6"]
+[tool.uv]
+package = false
+[tool.pytest.ini_options]
+pythonpath = ["backend/src", "infra/src"]
+testpaths = ["backend/tests", "infra/tests", "tools/project/tests"]
+addopts = "--strict-markers"
+[tool.coverage.run]
+branch = true
+source = ["backend/src/kotorelay", "infra/src/kotorelay_infra"]
+[tool.coverage.report]
+show_missing = true
+fail_under = 95
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+include = ["backend/**/*.py", "infra/**/*.py", "tools/project/**/*.py"]
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106"]
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = ["backend/src", "infra/src"]
+files = ["backend/src", "infra/src"]
+[[tool.mypy.overrides]]
+module = ["aurora_dsql_psycopg", "mangum"]
+ignore_missing_imports = true

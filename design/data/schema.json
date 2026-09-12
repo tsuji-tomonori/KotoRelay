@@ -1,0 +1,4466 @@
+{
+  "project": "KotoRelay",
+  "version": "0.2",
+  "stats": {
+    "tables": 33,
+    "columns": 387,
+    "foreign_keys": 90,
+    "secondary_indexes": 21,
+    "unique_constraints": 77
+  },
+  "tables": [
+    {
+      "name": "organizations",
+      "purpose": "導入組織。初期は一組織。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "code",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "URLや運用で用いる組織コード。"
+        },
+        {
+          "name": "name",
+          "type": "varchar(200)",
+          "nullable": false,
+          "description": "組織表示名。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "active / suspended。"
+        },
+        {
+          "name": "auth_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "組織停止等の認可世代。1から単調増加。"
+        },
+        {
+          "name": "report_timezone",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "日次集計のIANA時刻帯。初期案 Asia/Tokyo。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "作成時刻 UTC。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "code"
+        ]
+      ],
+      "checks": [
+        "status IN ('active','suspended')",
+        "auth_revision > 0"
+      ],
+      "indexes": [],
+      "foreign_keys": [],
+      "rules": ""
+    },
+    {
+      "name": "users",
+      "purpose": "Cognitoの本人とアプリ利用者の対応。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "cognito_subject",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "検証済みJWTのsub。メールは主キーにしない。"
+        },
+        {
+          "name": "display_name",
+          "type": "varchar(200)",
+          "nullable": false,
+          "description": "画面表示用氏名。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "active / disabled。"
+        },
+        {
+          "name": "auth_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "アカウント状態変更時の認可世代。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "作成時刻。"
+        },
+        {
+          "name": "disabled_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "無効化時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "cognito_subject"
+        ]
+      ],
+      "checks": [
+        "status IN ('active','disabled')",
+        "auth_revision > 0"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "rules": ""
+    },
+    {
+      "name": "departments",
+      "purpose": "部署。初期の公開・管理境界。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "code",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "組織内で一意の部署コード。"
+        },
+        {
+          "name": "name",
+          "type": "varchar(200)",
+          "nullable": false,
+          "description": "部署名。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "active / archived。"
+        },
+        {
+          "name": "auth_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "部署状態変更時の認可世代。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "作成時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "code"
+        ]
+      ],
+      "checks": [
+        "status IN ('active','archived')",
+        "auth_revision > 0"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "rules": "初期版はフラットな部署。親部署からの権限自動継承は行わない。廃止前に所有文書と所属を処理する。"
+    },
+    {
+      "name": "department_memberships",
+      "purpose": "兼務を含む利用者と部署の所属・操作権限。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "department_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属部署。"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "利用者。"
+        },
+        {
+          "name": "role",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "member / leader。"
+        },
+        {
+          "name": "can_author",
+          "type": "boolean",
+          "nullable": false,
+          "description": "所有部署の文書の執筆権限。"
+        },
+        {
+          "name": "can_review",
+          "type": "boolean",
+          "nullable": false,
+          "description": "所有部署の文書の審査権限。leaderとは独立。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "active / revoked。"
+        },
+        {
+          "name": "auth_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "所属・権限変更時に増分。"
+        },
+        {
+          "name": "joined_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "所属開始時刻。"
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "失効時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "department_id",
+          "user_id"
+        ]
+      ],
+      "checks": [
+        "role IN ('member','leader')",
+        "status IN ('active','revoked')",
+        "auth_revision > 0"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "user_id",
+          "status",
+          "department_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "department_id"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "user_id"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "同部署への再所属では同じ行を再有効化して世代を増やし、前歴は監査に残す。can_author/can_reviewは部署所有の全文書に適用する初期案。個別担当者制限は後続拡張。"
+    },
+    {
+      "name": "documents",
+      "purpose": "版をまたぐ文書ID、所有部署、現行認可。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "owner_department_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "管理と削除を行える所有部署。共有先とは別。"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false,
+          "description": "初回作成者。"
+        },
+        {
+          "name": "visibility",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "department / selected / organization。"
+        },
+        {
+          "name": "search_scope_token",
+          "type": "uuid",
+          "nullable": false,
+          "description": "文書ACL変更ごとに更新する検索フィルター識別子。秘密鍵ではない。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "active / withdrawn / deleted。"
+        },
+        {
+          "name": "next_version_no",
+          "type": "bigint",
+          "nullable": false,
+          "description": "次の版確定で払い出す番号。CAS更新。"
+        },
+        {
+          "name": "auth_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "公開範囲・削除・公開停止・所属境界変更時に増分。"
+        },
+        {
+          "name": "row_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "書込み競合検知用の更新番号。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "作成時刻。"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "メタデータ更新時刻。"
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "論理削除時刻。"
+        },
+        {
+          "name": "deleted_by",
+          "type": "uuid",
+          "nullable": true,
+          "description": "削除実行者。論理削除時に必須。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "search_scope_token"
+        ]
+      ],
+      "checks": [
+        "visibility IN ('department','selected','organization')",
+        "status IN ('active','withdrawn','deleted')",
+        "next_version_no > 0 AND auth_revision > 0 AND row_revision > 0",
+        "(status = 'deleted' AND deleted_at IS NOT NULL AND deleted_by IS NOT NULL) OR (status <> 'deleted' AND deleted_at IS NULL AND deleted_by IS NULL)"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "owner_department_id",
+          "status",
+          "updated_at",
+          "id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "owner_department_id"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "created_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "deleted_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "未承認タイトルを共通一覧へ漏らさないため、タイトルは下書き・版に保持。所有部署の変更は初期UI対象外。必要なら専用移管フローで認可世代と統計の帰属を扱う。"
+    },
+    {
+      "name": "document_department_grants",
+      "purpose": "文書を追加公開する部署。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "共有される文書。"
+        },
+        {
+          "name": "department_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "追加の閲覧許可先。"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false,
+          "description": "共有設定者。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "設定時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "department_id"
+        ]
+      ],
+      "checks": [],
+      "indexes": [
+        [
+          "organization_id",
+          "department_id",
+          "document_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id"
+          ],
+          "target": "documents",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "department_id"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "created_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "visibility=selectedのときに使用するread許可。編集・審査・削除は付与しない。所有部署の読取りは文書の基本規則で判定する。追加・削除とdocuments.auth_revision増分を同一トランザクションで確定。"
+    },
+    {
+      "name": "document_versions",
+      "purpose": "本文と画像/OCR manifestを凍結した文書版。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "論理文書。"
+        },
+        {
+          "name": "version_no",
+          "type": "bigint",
+          "nullable": false,
+          "description": "文書内で単調増加する版番号。"
+        },
+        {
+          "name": "title",
+          "type": "varchar(500)",
+          "nullable": false,
+          "description": "この版のタイトル。"
+        },
+        {
+          "name": "body_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "非公開S3上のMarkdownキー。"
+        },
+        {
+          "name": "body_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "S3の厳密なオブジェクト版。"
+        },
+        {
+          "name": "body_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "Markdown UTF-8バイト列のSHA-256。"
+        },
+        {
+          "name": "manifest_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "画像配置・画像hash・OCR runを含むmanifestのS3キー。"
+        },
+        {
+          "name": "manifest_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "manifestのS3版。"
+        },
+        {
+          "name": "manifest_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "承認対象全体の正規化manifest hash。"
+        },
+        {
+          "name": "freeze_status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "staging / sealed。sealed後に申請可能。"
+        },
+        {
+          "name": "image_count",
+          "type": "integer",
+          "nullable": false,
+          "description": "画像配置の件数。同一画像の複数配置も数える。"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false,
+          "description": "版確定者。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "版生成開始時刻。"
+        },
+        {
+          "name": "sealed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "全配置の保存・検証完了時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "version_no"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "version_no > 0 AND image_count >= 0",
+        "freeze_status IN ('staging','sealed')",
+        "(freeze_status = 'sealed') = (sealed_at IS NOT NULL)"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id"
+          ],
+          "target": "documents",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "created_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "sealed版の本文・配置・OCR参照をUPDATEしない。大量の画像配置はstagingに分割登録し、manifest検証後の短いトランザクションでsealedにする。stagingは申請・閲覧・索引対象外。"
+    },
+    {
+      "name": "document_drafts",
+      "purpose": "一文書一つの作業コピー。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "編集中の文書。"
+        },
+        {
+          "name": "base_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "編集開始の元版。新規時NULL。"
+        },
+        {
+          "name": "title",
+          "type": "varchar(500)",
+          "nullable": false,
+          "description": "作業中タイトル。"
+        },
+        {
+          "name": "body_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "保存済みMarkdownのS3キー。"
+        },
+        {
+          "name": "body_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "保存済みオブジェクト版。"
+        },
+        {
+          "name": "body_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "保存済み本文hash。"
+        },
+        {
+          "name": "row_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "保存時If-Matchで照合する版番号。"
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid",
+          "nullable": false,
+          "description": "最終保存者。"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "最終保存時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "row_revision > 0"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id"
+          ],
+          "target": "documents",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "base_version_id"
+          ],
+          "target": "document_versions",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "updated_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "編集中の未保存文字はブラウザ側。本文と画像配置変更は同じ下書きrow_revisionでCASする。審査待ち版とは別に編集できる。"
+    },
+    {
+      "name": "review_requests",
+      "purpose": "版ごとに一回の審査申請と最終決定。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "対象文書。"
+        },
+        {
+          "name": "version_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "sealed版。"
+        },
+        {
+          "name": "requested_by",
+          "type": "uuid",
+          "nullable": false,
+          "description": "申請者。"
+        },
+        {
+          "name": "requested_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "申請時刻。"
+        },
+        {
+          "name": "manifest_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "審査で確認した承認対象hash。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "pending / approved / rejected / withdrawn。"
+        },
+        {
+          "name": "decided_by",
+          "type": "uuid",
+          "nullable": true,
+          "description": "承認・却下・取下げ実行者。"
+        },
+        {
+          "name": "decided_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "決定時刻。"
+        },
+        {
+          "name": "decision_reason",
+          "type": "text",
+          "nullable": true,
+          "description": "却下時に必須。機密扱い。"
+        },
+        {
+          "name": "policy_version",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "自己承認や審査段階の運用方針版。"
+        },
+        {
+          "name": "row_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "競合検知。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "version_id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "status IN ('pending','approved','rejected','withdrawn')",
+        "row_revision > 0",
+        "(status = 'pending' AND decided_by IS NULL AND decided_at IS NULL) OR (status <> 'pending' AND decided_by IS NOT NULL AND decided_at IS NOT NULL)",
+        "status <> 'rejected' OR (decision_reason IS NOT NULL AND length(trim(decision_reason)) > 0)"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "status",
+          "requested_at",
+          "id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id"
+          ],
+          "target": "document_versions",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "requested_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "decided_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "pending以外を再決定しない。修正は新しい文書版と申請。申請・決定・取下げの時系列はaudit_eventsにも同一トランザクションで追記。"
+    },
+    {
+      "name": "document_review_slots",
+      "purpose": "一文書一件の審査待ちを担保する予約行。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "予約対象文書。"
+        },
+        {
+          "name": "review_request_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "現在pendingの申請。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "申請開始時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id"
+        ],
+        [
+          "organization_id",
+          "review_request_id"
+        ]
+      ],
+      "checks": [],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "review_request_id"
+          ],
+          "target": "review_requests",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "pending化と同時INSERT、終端決定と同時DELETE。UNIQUE競合で二重申請を拒否。申請状態との一致は業務トランザクションと照合で検証。"
+    },
+    {
+      "name": "image_assets",
+      "purpose": "アップロードされた画像原本。文書所有で不変。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。別文書への無断参照を禁止。"
+        },
+        {
+          "name": "original_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "隔離領域S3の原本キー。"
+        },
+        {
+          "name": "original_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "原本S3版。"
+        },
+        {
+          "name": "original_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "原本バイナリhash。"
+        },
+        {
+          "name": "original_filename",
+          "type": "varchar(500)",
+          "nullable": false,
+          "description": "元ファイル名。表示時エスケープ。"
+        },
+        {
+          "name": "media_type",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "検査後の実際のMIME。"
+        },
+        {
+          "name": "byte_size",
+          "type": "bigint",
+          "nullable": false,
+          "description": "原本サイズ。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "quarantined / ready / rejected。"
+        },
+        {
+          "name": "uploaded_by",
+          "type": "uuid",
+          "nullable": false,
+          "description": "アップロード者。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "受信時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "byte_size > 0",
+        "status IN ('quarantined','ready','rejected')"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "document_id",
+          "status"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id"
+          ],
+          "target": "documents",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "uploaded_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "同じ画像の再利用は文書内に限定。原本は上書きせず、新しいファイルは新ID。検疫とデコード検証を通るまではOCR・通常表示しない。"
+    },
+    {
+      "name": "image_variants",
+      "purpose": "正規化画像・モデル入力画像の不変な派生版。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "asset_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "原本画像。"
+        },
+        {
+          "name": "variant_kind",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "canonical / model。"
+        },
+        {
+          "name": "object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "非公開S3の実体キー。"
+        },
+        {
+          "name": "s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "S3の厳密な版。"
+        },
+        {
+          "name": "sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "派生画像hash。"
+        },
+        {
+          "name": "media_type",
+          "type": "varchar(32)",
+          "nullable": false,
+          "description": "image/png / image/jpeg。"
+        },
+        {
+          "name": "byte_size",
+          "type": "bigint",
+          "nullable": false,
+          "description": "派生画像バイト数。"
+        },
+        {
+          "name": "width_px",
+          "type": "integer",
+          "nullable": false,
+          "description": "EXIF回転適用後の幅。"
+        },
+        {
+          "name": "height_px",
+          "type": "integer",
+          "nullable": false,
+          "description": "EXIF回転適用後の高さ。"
+        },
+        {
+          "name": "transform_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "原本→この画像の回転・拡縮・crop・変換行列。"
+        },
+        {
+          "name": "processor_version",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "画像変換設定・ライブラリ・コード版。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "生成時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "asset_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "asset_id",
+          "variant_kind",
+          "processor_version"
+        ]
+      ],
+      "checks": [
+        "variant_kind IN ('canonical','model')",
+        "media_type IN ('image/png','image/jpeg')",
+        "byte_size > 0 AND width_px > 0 AND height_px > 0"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id"
+          ],
+          "target": "image_assets",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "OCR座標はcanonical基準。model版で縮小してもcanonicalとの変換を追える。読取不能になる縮小を禁止。base64は保存しない。"
+    },
+    {
+      "name": "ocr_runs",
+      "purpose": "画像ごとのOCR実行・訂正結果の不変スナップショット。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "asset_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "対象画像。"
+        },
+        {
+          "name": "variant_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "OCRしたcanonical画像。"
+        },
+        {
+          "name": "engine",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "例 paddleocr / human_correction。"
+        },
+        {
+          "name": "engine_version",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "ライブラリ・モデル重み識別子。"
+        },
+        {
+          "name": "config_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "言語・閾値・モデルchecksumを含む設定hash。"
+        },
+        {
+          "name": "source_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "再OCR・訂正の元run。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "queued / running / succeeded / no_text / failed。"
+        },
+        {
+          "name": "region_count",
+          "type": "integer",
+          "nullable": false,
+          "description": "認識領域数。"
+        },
+        {
+          "name": "raw_result_key",
+          "type": "text",
+          "nullable": true,
+          "description": "全文JSONのS3キー。入力画像は含めない。"
+        },
+        {
+          "name": "raw_result_s3_version_id",
+          "type": "text",
+          "nullable": true,
+          "description": "結果JSONのS3版。"
+        },
+        {
+          "name": "result_sha256",
+          "type": "varchar(64)",
+          "nullable": true,
+          "description": "完了したOCR結果全体のhash。"
+        },
+        {
+          "name": "review_status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "unchecked / accepted / needs_fix。"
+        },
+        {
+          "name": "reviewed_by",
+          "type": "uuid",
+          "nullable": true,
+          "description": "OCR結果を確認した編集者。"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "OCR確認時刻。"
+        },
+        {
+          "name": "error_code",
+          "type": "varchar(64)",
+          "nullable": true,
+          "description": "機密文字を含めない失敗コード。"
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "実行開始。"
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "実行完了。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "受付時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "asset_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "status IN ('queued','running','succeeded','no_text','failed')",
+        "review_status IN ('unchecked','accepted','needs_fix')",
+        "region_count >= 0",
+        "status NOT IN ('succeeded','no_text') OR (result_sha256 IS NOT NULL AND finished_at IS NOT NULL)",
+        "review_status <> 'accepted' OR (reviewed_by IS NOT NULL AND reviewed_at IS NOT NULL AND status IN ('succeeded','no_text'))"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "asset_id",
+          "created_at"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "variant_id"
+          ],
+          "target": "image_variants",
+          "references": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "source_run_id"
+          ],
+          "target": "ocr_runs",
+          "references": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "reviewed_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "完了後の文字・座標は上書きしない。人の訂正も新runとして旧runを参照。no_textは文字のない図の正常結果で、failedとは区別。"
+    },
+    {
+      "name": "ocr_regions",
+      "purpose": "OCRの文字列・読み順・画像内座標。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "asset_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "画像。"
+        },
+        {
+          "name": "ocr_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "結果スナップショット。"
+        },
+        {
+          "name": "region_no",
+          "type": "integer",
+          "nullable": false,
+          "description": "run内で一意の領域番号。"
+        },
+        {
+          "name": "reading_order",
+          "type": "integer",
+          "nullable": false,
+          "description": "論理的な読み順。0から。"
+        },
+        {
+          "name": "text_content",
+          "type": "text",
+          "nullable": false,
+          "description": "領域の文字起こし。上限をアプリで検証。"
+        },
+        {
+          "name": "x",
+          "type": "numeric(8,6)",
+          "nullable": false,
+          "description": "左端。canonical幅で正規化した0〜1。"
+        },
+        {
+          "name": "y",
+          "type": "numeric(8,6)",
+          "nullable": false,
+          "description": "上端。canonical高さで正規化した0〜1。"
+        },
+        {
+          "name": "width",
+          "type": "numeric(8,6)",
+          "nullable": false,
+          "description": "正規化した矩形幅。"
+        },
+        {
+          "name": "height",
+          "type": "numeric(8,6)",
+          "nullable": false,
+          "description": "正規化した矩形高さ。"
+        },
+        {
+          "name": "polygon_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "左上原点、時計回りの正規化頂点 [[x,y],...]。"
+        },
+        {
+          "name": "confidence",
+          "type": "numeric(8,6)",
+          "nullable": true,
+          "description": "OCR信頼度を0〜1に正規化。人による訂正はNULL可。"
+        },
+        {
+          "name": "region_kind",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "line / word / paragraph。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "ocr_run_id",
+          "region_no"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "asset_id",
+          "ocr_run_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "region_no >= 0 AND reading_order >= 0",
+        "x >= 0 AND y >= 0 AND width > 0 AND height > 0 AND x + width <= 1 AND y + height <= 1",
+        "confidence IS NULL OR (confidence >= 0 AND confidence <= 1)",
+        "region_kind IN ('line','word','paragraph')"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "ocr_run_id",
+          "reading_order"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "ocr_run_id"
+          ],
+          "target": "ocr_runs",
+          "references": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "polygonの頂点数・値域・自己交差・bboxとの整合はアプリ検証。保存文字列と座標を審査画面で画像に重ねて確認。"
+    },
+    {
+      "name": "draft_image_placements",
+      "purpose": "下書きMarkdownへの画像挿入箇所。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "draft_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "編集中の下書き。"
+        },
+        {
+          "name": "asset_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "添付画像。"
+        },
+        {
+          "name": "ocr_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "編集中に採用するOCR結果。未完了時NULL。"
+        },
+        {
+          "name": "anchor_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "エディターASTの安定した画像ノードID。"
+        },
+        {
+          "name": "ordinal",
+          "type": "integer",
+          "nullable": false,
+          "description": "文書内の画像出現順。"
+        },
+        {
+          "name": "source_start_byte",
+          "type": "integer",
+          "nullable": false,
+          "description": "保存済みMarkdownの画像記法開始UTF-8バイト位置。"
+        },
+        {
+          "name": "source_end_byte",
+          "type": "integer",
+          "nullable": false,
+          "description": "終了位置。半開区間。"
+        },
+        {
+          "name": "alt_text",
+          "type": "text",
+          "nullable": false,
+          "description": "代替テキスト。"
+        },
+        {
+          "name": "caption",
+          "type": "text",
+          "nullable": true,
+          "description": "図の説明。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "draft_id",
+          "anchor_id"
+        ]
+      ],
+      "checks": [
+        "ordinal >= 0 AND source_start_byte >= 0 AND source_end_byte > source_start_byte"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "draft_id"
+          ],
+          "target": "document_drafts",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id"
+          ],
+          "target": "image_assets",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "ocr_run_id"
+          ],
+          "target": "ocr_runs",
+          "references": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "配置の挿入・移動・削除は下書きCASと同一トランザクション。offsetだけに頼らずanchor_idで編集時の位置を追う。"
+    },
+    {
+      "name": "version_image_placements",
+      "purpose": "承認対象版に固定された画像配置とOCR。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "version_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "変更不能な文書版。"
+        },
+        {
+          "name": "asset_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "添付原本。"
+        },
+        {
+          "name": "ocr_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "審査対象に含める完了・確認済みOCR。"
+        },
+        {
+          "name": "anchor_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "この版に凍結したASTノードID。"
+        },
+        {
+          "name": "ordinal",
+          "type": "integer",
+          "nullable": false,
+          "description": "画像出現順。"
+        },
+        {
+          "name": "source_start_byte",
+          "type": "integer",
+          "nullable": false,
+          "description": "この版本文のUTF-8バイト開始位置。"
+        },
+        {
+          "name": "source_end_byte",
+          "type": "integer",
+          "nullable": false,
+          "description": "半開区間の終了位置。"
+        },
+        {
+          "name": "heading_path_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "画像が属する見出し階層。"
+        },
+        {
+          "name": "alt_text",
+          "type": "text",
+          "nullable": false,
+          "description": "この版の代替テキスト。"
+        },
+        {
+          "name": "caption",
+          "type": "text",
+          "nullable": true,
+          "description": "この版の説明。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "version_id",
+          "anchor_id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "version_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "version_id",
+          "id",
+          "asset_id",
+          "ocr_run_id"
+        ]
+      ],
+      "checks": [
+        "ordinal >= 0 AND source_start_byte >= 0 AND source_end_byte > source_start_byte"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id"
+          ],
+          "target": "document_versions",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "ocr_run_id"
+          ],
+          "target": "ocr_runs",
+          "references": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "同じassetの二箇所への添付は別id/anchor。sealed後は削除・差替え不可。画像・OCRの訂正には新しい文書版の承認が必要。"
+    },
+    {
+      "name": "index_builds",
+      "purpose": "承認版の検索索引を構築する世代と実行状態。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "version_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "承認済み対象版。"
+        },
+        {
+          "name": "generation_no",
+          "type": "bigint",
+          "nullable": false,
+          "description": "版内の索引構築世代。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "queued / processing / verifying / ready / failed / obsolete。"
+        },
+        {
+          "name": "manifest_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "入力の承認対象hash。"
+        },
+        {
+          "name": "search_scope_token",
+          "type": "uuid",
+          "nullable": false,
+          "description": "構築時の文書検索scope世代。過去値保持のためこの値へのFKは張らない。"
+        },
+        {
+          "name": "pipeline_version",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "パーサ・chunker・OCR結合の設定版。"
+        },
+        {
+          "name": "embedding_model_id",
+          "type": "varchar(200)",
+          "nullable": false,
+          "description": "埋め込みモデル識別子。"
+        },
+        {
+          "name": "kb_job_id",
+          "type": "varchar(200)",
+          "nullable": true,
+          "description": "KB取り込みジョブID。"
+        },
+        {
+          "name": "expected_chunk_count",
+          "type": "integer",
+          "nullable": false,
+          "description": "作成予定チャンク数。"
+        },
+        {
+          "name": "verified_chunk_count",
+          "type": "integer",
+          "nullable": false,
+          "description": "出所・件数・取得を検証済みの件数。"
+        },
+        {
+          "name": "error_code",
+          "type": "varchar(64)",
+          "nullable": true,
+          "description": "安全な失敗分類。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "起動時刻。"
+        },
+        {
+          "name": "ready_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "反映検証完了時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "version_id",
+          "generation_no"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "version_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "generation_no > 0 AND expected_chunk_count >= 0 AND verified_chunk_count >= 0",
+        "status IN ('queued','processing','verifying','ready','failed','obsolete')",
+        "status <> 'ready' OR (ready_at IS NOT NULL AND expected_chunk_count > 0 AND expected_chunk_count = verified_chunk_count)"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "status",
+          "created_at"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id"
+          ],
+          "target": "document_versions",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "KBのCOMPLETEだけでreadyにしない。索引自体はS3 Vectors。DSQLは検索許可と来歴の正本でありベクトルDBとして用いない。"
+    },
+    {
+      "name": "document_publications",
+      "purpose": "最新承認版とRAGで使える索引世代の参照。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "一文書一行。"
+        },
+        {
+          "name": "latest_approved_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "版番号が最大の承認済み版。"
+        },
+        {
+          "name": "active_index_build_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "利用可能な同じ版の索引。未反映時NULL。"
+        },
+        {
+          "name": "row_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "承認・索引切替のCAS世代。"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "公開制御更新時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id"
+        ]
+      ],
+      "checks": [
+        "row_revision > 0"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "latest_approved_version_id"
+          ],
+          "target": "document_versions",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "latest_approved_version_id",
+            "active_index_build_id"
+          ],
+          "target": "index_builds",
+          "references": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "承認時にreview_requestsと同時更新。新版が承認されたらactive_index_build_idをNULLにし、旧版へのfallbackを防ぐ。公開停止・削除はdocuments側も必ず判定する。"
+    },
+    {
+      "name": "chunks",
+      "purpose": "検索単位のテキストと出所。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "version_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "承認済み版。"
+        },
+        {
+          "name": "index_build_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "構築世代。"
+        },
+        {
+          "name": "chunk_no",
+          "type": "integer",
+          "nullable": false,
+          "description": "build内のチャンク順。"
+        },
+        {
+          "name": "text_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "MarkdownとOCR文字を結合したS3検索入力。"
+        },
+        {
+          "name": "text_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "検索入力S3版。"
+        },
+        {
+          "name": "text_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "結合テキストhash。"
+        },
+        {
+          "name": "source_start_byte",
+          "type": "integer",
+          "nullable": false,
+          "description": "原Markdownの対応範囲先頭。"
+        },
+        {
+          "name": "source_end_byte",
+          "type": "integer",
+          "nullable": false,
+          "description": "原Markdown範囲の半開区間末尾。"
+        },
+        {
+          "name": "heading_path_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "見出し階層。"
+        },
+        {
+          "name": "token_count",
+          "type": "integer",
+          "nullable": false,
+          "description": "使用tokenizerによるトークン数。"
+        },
+        {
+          "name": "vector_record_key",
+          "type": "varchar(200)",
+          "nullable": false,
+          "description": "索引側の識別子。必須metadata chunk_idと対応。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "生成時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "index_build_id",
+          "chunk_no"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "version_id",
+          "id"
+        ]
+      ],
+      "checks": [
+        "chunk_no >= 0 AND token_count >= 0",
+        "source_start_byte >= 0 AND source_end_byte >= source_start_byte"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "index_build_id"
+          ],
+          "target": "index_builds",
+          "references": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "一チャンク一入力オブジェクト、KBの追加chunkingなしを第一候補。OCRだけの補助chunkは元画像記法の位置を保持。UTF-8バイトoffsetは本文にのみ適用し、OCR位置は領域リンクで表す。"
+    },
+    {
+      "name": "chunk_images",
+      "purpose": "チャンクと画像配置の多対多関係。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "version_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書版。"
+        },
+        {
+          "name": "chunk_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "画像を含むチャンク。"
+        },
+        {
+          "name": "placement_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "同版の画像出現箇所。"
+        },
+        {
+          "name": "asset_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "配置が参照する画像。"
+        },
+        {
+          "name": "ocr_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "配置が参照するOCR。"
+        },
+        {
+          "name": "link_reason",
+          "type": "varchar(24)",
+          "nullable": false,
+          "description": "source_overlap / ocr_evidence / contextual。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "chunk_id",
+          "placement_id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "chunk_id",
+          "placement_id",
+          "asset_id",
+          "ocr_run_id"
+        ]
+      ],
+      "checks": [
+        "link_reason IN ('source_overlap','ocr_evidence','contextual')"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "chunk_id"
+          ],
+          "target": "chunks",
+          "references": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "placement_id",
+            "asset_id",
+            "ocr_run_id"
+          ],
+          "target": "version_image_placements",
+          "references": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "id",
+            "asset_id",
+            "ocr_run_id"
+          ]
+        }
+      ],
+      "rules": "画像挿入箇所を含むchunk、OCR文字の分割chunk、図への直接参照chunkに明示的に結び付ける。採用chunkの全リンク画像をモデルへ送る。"
+    },
+    {
+      "name": "chunk_ocr_regions",
+      "purpose": "チャンクに採用したOCR領域の正確な来歴。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "親文書。"
+        },
+        {
+          "name": "chunk_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "検索チャンク。"
+        },
+        {
+          "name": "placement_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "文書内の画像配置。"
+        },
+        {
+          "name": "asset_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "画像。"
+        },
+        {
+          "name": "ocr_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "OCR結果。"
+        },
+        {
+          "name": "region_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "その結果中の文字・座標領域。"
+        },
+        {
+          "name": "text_start_char",
+          "type": "integer",
+          "nullable": false,
+          "description": "領域文字列で採用したUnicode code point先頭。"
+        },
+        {
+          "name": "text_end_char",
+          "type": "integer",
+          "nullable": false,
+          "description": "採用した文字の半開区間末尾。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "chunk_id",
+          "placement_id",
+          "region_id",
+          "text_start_char"
+        ]
+      ],
+      "checks": [
+        "text_start_char >= 0 AND text_end_char > text_start_char"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "chunk_id",
+            "placement_id",
+            "asset_id",
+            "ocr_run_id"
+          ],
+          "target": "chunk_images",
+          "references": [
+            "organization_id",
+            "document_id",
+            "chunk_id",
+            "placement_id",
+            "asset_id",
+            "ocr_run_id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "ocr_run_id",
+            "region_id"
+          ],
+          "target": "ocr_regions",
+          "references": [
+            "organization_id",
+            "document_id",
+            "asset_id",
+            "ocr_run_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "OCRの一領域が長く二分されても元regionと文字範囲を復元できる。DB文字長と上限の照合はアプリ。JS UTF-16 offsetを無変換で格納しない。"
+    },
+    {
+      "name": "rag_conversations",
+      "purpose": "利用者所有の短期チャットセッション。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "会話所有者。"
+        },
+        {
+          "name": "acting_department_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "この会話の利用部署。開始時に現在所属を検証。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "開始時刻。"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "会話本文の保持期限。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "active / deleted / expired。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "id",
+          "owner_user_id",
+          "acting_department_id"
+        ]
+      ],
+      "checks": [
+        "status IN ('active','deleted','expired')",
+        "expires_at > created_at"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "owner_user_id",
+          "created_at"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "owner_user_id"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "acting_department_id"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "利用部署の切替は新会話。追質問・取得ごとに所有者と現在所属を再認可。他人の会話本文をリーダーへ開示しない。"
+    },
+    {
+      "name": "rag_requests",
+      "purpose": "一回のユーザー質問。利用数の基準。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "conversation_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "会話。"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "質問者。"
+        },
+        {
+          "name": "acting_department_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "消費側部署の履歴スナップショット。"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "同じ質問再送を識別するキー。"
+        },
+        {
+          "name": "question_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "暗号化・短期保持する質問S3キー。"
+        },
+        {
+          "name": "question_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "質問オブジェクト版。"
+        },
+        {
+          "name": "question_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "同一キーで異なる質問を拒否するhash。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "accepted / running / answered / abstained / failed / cancelled。"
+        },
+        {
+          "name": "policy_version",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "認可・prompt方針版。"
+        },
+        {
+          "name": "retrieval_config_version",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "検索設定版。"
+        },
+        {
+          "name": "auth_snapshot_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "認可時の組織・ユーザー・所属のIDと世代。権限の現行正本ではない。"
+        },
+        {
+          "name": "accepted_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "認証・上限確認後に受付が確定した時刻。"
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "終端状態確定時刻。"
+        },
+        {
+          "name": "error_code",
+          "type": "varchar(64)",
+          "nullable": true,
+          "description": "本文を含めない失敗分類。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "user_id",
+          "idempotency_key"
+        ]
+      ],
+      "checks": [
+        "status IN ('accepted','running','answered','abstained','failed','cancelled')"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "acting_department_id",
+          "accepted_at",
+          "id"
+        ],
+        [
+          "organization_id",
+          "conversation_id",
+          "accepted_at"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "conversation_id",
+            "user_id",
+            "acting_department_id"
+          ],
+          "target": "rag_conversations",
+          "references": [
+            "organization_id",
+            "id",
+            "owner_user_id",
+            "acting_department_id"
+          ]
+        }
+      ],
+      "rules": "利用数はacceptedの質問IDを一件とする。モデル再試行で新しい質問行を作らない。モデルに送る直前はsnapshotを信用せず最新認可を取り直す。"
+    },
+    {
+      "name": "rag_answers",
+      "purpose": "確定した回答と根拠manifest。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "対応質問。一質問につき確定結果一件。"
+        },
+        {
+          "name": "outcome",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "answered / abstained。"
+        },
+        {
+          "name": "body_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "暗号化した回答S3キー。"
+        },
+        {
+          "name": "body_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "回答S3版。"
+        },
+        {
+          "name": "body_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "回答hash。"
+        },
+        {
+          "name": "evidence_manifest_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "引用版・chunk・画像の集合hash。"
+        },
+        {
+          "name": "auth_fence_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "確定時に確認した認可・公開制御世代。"
+        },
+        {
+          "name": "finalized_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "回答の確定点。"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "本文保持期限。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "request_id"
+        ]
+      ],
+      "checks": [
+        "outcome IN ('answered','abstained')",
+        "expires_at > finalized_at"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "request_id"
+          ],
+          "target": "rag_requests",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "履歴・再配信ごとにevidenceの現在ACLと公開版を照合。無効な根拠を含む回答全体を隠す。送信済み情報を回収する保証はしない。"
+    },
+    {
+      "name": "rag_evidence",
+      "purpose": "確定回答に使ったチャンク、引用、送信画像の記録。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "answer_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "回答。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "引用文書。"
+        },
+        {
+          "name": "version_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "実際に使った版。"
+        },
+        {
+          "name": "chunk_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "実際に使ったチャンク。"
+        },
+        {
+          "name": "citation_no",
+          "type": "integer",
+          "nullable": false,
+          "description": "サーバー発行の引用番号。"
+        },
+        {
+          "name": "rank_no",
+          "type": "integer",
+          "nullable": false,
+          "description": "モデル入力内の根拠順。"
+        },
+        {
+          "name": "owner_department_id_snapshot",
+          "type": "uuid",
+          "nullable": false,
+          "description": "利用時の文書所有部署。貢献集計用。"
+        },
+        {
+          "name": "image_inputs_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "入力画像のasset/variant/placement ID・hash・形式・サイズ・順序。base64や本文を含めない。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "answer_id",
+          "chunk_id"
+        ],
+        [
+          "organization_id",
+          "answer_id",
+          "citation_no"
+        ]
+      ],
+      "checks": [
+        "citation_no > 0 AND rank_no > 0"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "document_id",
+          "answer_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "answer_id"
+          ],
+          "target": "rag_answers",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "chunk_id"
+          ],
+          "target": "chunks",
+          "references": [
+            "organization_id",
+            "document_id",
+            "version_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "owner_department_id_snapshot"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "image_inputs_jsonは監査用の不変manifestであり検索用マスターではない。image_variants/chunk_imagesとの完全一致をアプリで検証し、未登録の画像を生成へ送らない。出典URLはIDからサーバーが生成する。"
+    },
+    {
+      "name": "model_invocations",
+      "purpose": "質問に紐づく各モデル呼出し。再試行も別記録。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ユーザー質問。"
+        },
+        {
+          "name": "phase",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "rewrite / rerank / generate。"
+        },
+        {
+          "name": "attempt_no",
+          "type": "integer",
+          "nullable": false,
+          "description": "工程内の試行番号。"
+        },
+        {
+          "name": "model_id",
+          "type": "varchar(200)",
+          "nullable": false,
+          "description": "実際のモデルまたはinference profile。"
+        },
+        {
+          "name": "input_tokens",
+          "type": "bigint",
+          "nullable": true,
+          "description": "実測入力トークン。"
+        },
+        {
+          "name": "output_tokens",
+          "type": "bigint",
+          "nullable": true,
+          "description": "実測出力トークン。"
+        },
+        {
+          "name": "image_count",
+          "type": "integer",
+          "nullable": false,
+          "description": "実際のユニーク入力画像数。"
+        },
+        {
+          "name": "image_bytes",
+          "type": "bigint",
+          "nullable": false,
+          "description": "base64変換前の合計バイト数。"
+        },
+        {
+          "name": "input_manifest_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "呼出し全入力の追跡用hash。本文は記録しない。"
+        },
+        {
+          "name": "input_manifest_object_key",
+          "type": "text",
+          "nullable": false,
+          "description": "暗号化監査S3の入力ID/hash対応manifestキー。"
+        },
+        {
+          "name": "input_manifest_s3_version_id",
+          "type": "text",
+          "nullable": false,
+          "description": "入力manifestのS3版。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "started / succeeded / failed。"
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "モデル送信直前。"
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "完了時刻。"
+        },
+        {
+          "name": "provider_request_id",
+          "type": "varchar(200)",
+          "nullable": true,
+          "description": "Bedrockの要求ID。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "request_id",
+          "phase",
+          "attempt_no"
+        ]
+      ],
+      "checks": [
+        "phase IN ('rewrite','rerank','generate')",
+        "status IN ('started','succeeded','failed')",
+        "attempt_no > 0 AND image_count >= 0 AND image_bytes >= 0",
+        "input_tokens IS NULL OR input_tokens >= 0",
+        "output_tokens IS NULL OR output_tokens >= 0"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "request_id"
+          ],
+          "target": "rag_requests",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "入力manifestの追跡先は暗号化S3の許可済み監査領域。本文・base64を通常ログへ残さない。RAG利用数とモデル呼出し数を区別する。"
+    },
+    {
+      "name": "usage_events",
+      "purpose": "二重計上を防ぐ利用イベントの正本。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "event_kind",
+          "type": "varchar(24)",
+          "nullable": false,
+          "description": "rag_accepted / rag_answered / rag_abstained / rag_failed / rag_cancelled / document_view。"
+        },
+        {
+          "name": "dedup_key",
+          "type": "varchar(200)",
+          "nullable": false,
+          "description": "イベント種別と質問IDまたはview IDから作る一意キー。"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "利用者。リーダー向け集計APIへ個人列を返さない。"
+        },
+        {
+          "name": "acting_department_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "イベント時の消費部署。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "document_viewの文書。"
+        },
+        {
+          "name": "version_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "document_viewで実際に表示した承認版。"
+        },
+        {
+          "name": "owner_department_id_snapshot",
+          "type": "uuid",
+          "nullable": true,
+          "description": "表示時の文書所有部署。"
+        },
+        {
+          "name": "rag_request_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "rag系イベントの質問。"
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "サーバー確定時刻。"
+        },
+        {
+          "name": "ingested_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "DBへの記録時刻。"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "イベント詳細の保持期限。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "dedup_key"
+        ]
+      ],
+      "checks": [
+        "event_kind IN ('rag_accepted','rag_answered','rag_abstained','rag_failed','rag_cancelled','document_view')",
+        "(event_kind = 'document_view' AND document_id IS NOT NULL AND version_id IS NOT NULL AND owner_department_id_snapshot IS NOT NULL AND rag_request_id IS NULL) OR (event_kind <> 'document_view' AND rag_request_id IS NOT NULL AND document_id IS NULL AND version_id IS NULL AND owner_department_id_snapshot IS NULL)"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "acting_department_id",
+          "occurred_at",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "occurred_at",
+          "id"
+        ],
+        [
+          "organization_id",
+          "ingested_at",
+          "id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "actor_user_id"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "acting_department_id"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id",
+            "version_id"
+          ],
+          "target": "document_versions",
+          "references": [
+            "organization_id",
+            "document_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "owner_department_id_snapshot"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "rag_request_id"
+          ],
+          "target": "rag_requests",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "表示確認は認可済み本文取得に結び付くサーバー発行view IDのackで記録。通信再送は同じdedup_key。一度の表示で画像取得・preview・RAG参照は閲覧として数えない。"
+    },
+    {
+      "name": "department_daily_usage",
+      "purpose": "部署が消費したRAG・閲覧の再計算可能な日次集計。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "department_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "利用部署。"
+        },
+        {
+          "name": "usage_date",
+          "type": "date",
+          "nullable": false,
+          "description": "固定したreport_timezoneの日付。"
+        },
+        {
+          "name": "metric",
+          "type": "varchar(32)",
+          "nullable": false,
+          "description": "rag_accepted / rag_answered / rag_abstained / rag_failed / rag_cancelled / document_views / active_users。"
+        },
+        {
+          "name": "metric_value",
+          "type": "bigint",
+          "nullable": false,
+          "description": "確定件数または日次のユニーク利用者数。"
+        },
+        {
+          "name": "aggregation_version",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "集計式版。"
+        },
+        {
+          "name": "source_watermark",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "この取込時刻まで再計算済み。"
+        },
+        {
+          "name": "computed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "集計更新時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "department_id",
+          "usage_date",
+          "metric"
+        ]
+      ],
+      "checks": [
+        "metric_value >= 0",
+        "metric IN ('rag_accepted','rag_answered','rag_abstained','rag_failed','rag_cancelled','document_views','active_users')"
+      ],
+      "indexes": [],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "department_id"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "raw eventsから窓単位に再計算して上書き。毎要求の同一行加算をしない。active_usersは日次値で、月次ユニーク数は日次を足さず原イベントから再算出。"
+    },
+    {
+      "name": "document_daily_usage",
+      "purpose": "所有部署が確認する文書別の閲覧とRAG貢献。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "対象文書。"
+        },
+        {
+          "name": "owner_department_id_snapshot",
+          "type": "uuid",
+          "nullable": false,
+          "description": "利用時点の所有部署。"
+        },
+        {
+          "name": "usage_date",
+          "type": "date",
+          "nullable": false,
+          "description": "集計日。"
+        },
+        {
+          "name": "metric",
+          "type": "varchar(32)",
+          "nullable": false,
+          "description": "document_views / cited_answers。"
+        },
+        {
+          "name": "metric_value",
+          "type": "bigint",
+          "nullable": false,
+          "description": "閲覧件数、または当該文書を根拠に使った一意な確定回答数。"
+        },
+        {
+          "name": "aggregation_version",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "集計式版。"
+        },
+        {
+          "name": "source_watermark",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "集計元データの取込境界。"
+        },
+        {
+          "name": "computed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "集計時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id",
+          "owner_department_id_snapshot",
+          "usage_date",
+          "metric"
+        ]
+      ],
+      "checks": [
+        "metric_value >= 0",
+        "metric IN ('document_views','cited_answers')"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "owner_department_id_snapshot",
+          "usage_date",
+          "document_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id"
+          ],
+          "target": "documents",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "owner_department_id_snapshot"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "cited_answersはoutcome=answeredの確定回答のみ。同じ回答で文書の3chunkを使っても1件。複数文書の件数を足した値を部署の質問数として表示しない。共有先の質問本文や利用者名は返さない。"
+    },
+    {
+      "name": "audit_events",
+      "purpose": "権限・審査・削除等の改変を制限した業務監査。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "人操作の主体。systemイベントではNULL。"
+        },
+        {
+          "name": "actor_kind",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "user / system。"
+        },
+        {
+          "name": "acting_department_id",
+          "type": "uuid",
+          "nullable": true,
+          "description": "操作部署。"
+        },
+        {
+          "name": "action",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "例 review.approve / document.delete / membership.revoke。"
+        },
+        {
+          "name": "target_type",
+          "type": "varchar(32)",
+          "nullable": false,
+          "description": "対象種別。"
+        },
+        {
+          "name": "target_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "対象ID。削除後も保持するためFKを張らない。"
+        },
+        {
+          "name": "operation_key",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "業務操作の冪等な識別子。"
+        },
+        {
+          "name": "before_revision",
+          "type": "bigint",
+          "nullable": true,
+          "description": "遷移前世代。"
+        },
+        {
+          "name": "after_revision",
+          "type": "bigint",
+          "nullable": true,
+          "description": "遷移後世代。"
+        },
+        {
+          "name": "details_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "状態・版・理由の安全な監査項目。本文・base64・token禁止。"
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "確定時刻。"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "監査保持期限。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "operation_key",
+          "action",
+          "target_id"
+        ]
+      ],
+      "checks": [
+        "actor_kind IN ('user','system')",
+        "(actor_kind = 'user') = (actor_user_id IS NOT NULL)"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "target_type",
+          "target_id",
+          "occurred_at"
+        ],
+        [
+          "organization_id",
+          "acting_department_id",
+          "occurred_at"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "actor_user_id"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "acting_department_id"
+          ],
+          "target": "departments",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "アプリ通常ロールにはINSERTのみ。削除担当は本文を消しても監査を保持期限まで保つ。UUID主体のマスターは無効化・匿名化しFK先を残す。"
+    },
+    {
+      "name": "outbox_events",
+      "purpose": "業務更新と同時に確定する非同期配送予定。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "aggregate_type",
+          "type": "varchar(32)",
+          "nullable": false,
+          "description": "document / image / request 等。"
+        },
+        {
+          "name": "aggregate_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "対象ID。多態のためFKなし。"
+        },
+        {
+          "name": "aggregate_revision",
+          "type": "bigint",
+          "nullable": false,
+          "description": "当該更新世代。"
+        },
+        {
+          "name": "event_type",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "index.requested / ocr.requested / purge.requested 等。"
+        },
+        {
+          "name": "payload_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "対象ID・版・設定参照。本文・画像バイトを入れない。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "pending / leased / dispatched / dead。"
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false,
+          "description": "配送試行数。"
+        },
+        {
+          "name": "available_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "次回配送可能時刻。"
+        },
+        {
+          "name": "lease_owner",
+          "type": "varchar(128)",
+          "nullable": true,
+          "description": "短期配送leaseの所有者。"
+        },
+        {
+          "name": "lease_until",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "再取得可能になる時刻。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "業務確定時刻。"
+        },
+        {
+          "name": "dispatched_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "SQS受領確認時刻。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "aggregate_type",
+          "aggregate_id",
+          "aggregate_revision",
+          "event_type"
+        ]
+      ],
+      "checks": [
+        "status IN ('pending','leased','dispatched','dead')",
+        "aggregate_revision > 0 AND attempts >= 0"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "status",
+          "available_at",
+          "id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "rules": "DSQL tx内でSQS送信しない。短期leaseをCAS取得→送信→完了更新。重複配送前提で消費側は対象ID/世代に冪等。書込み後の配送起動と定期掃引を併用。"
+    },
+    {
+      "name": "idempotency_records",
+      "purpose": "編集・申請・審査・削除APIの再送結果。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "認証済み実行者。"
+        },
+        {
+          "name": "operation",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "操作種別。"
+        },
+        {
+          "name": "request_key",
+          "type": "varchar(128)",
+          "nullable": false,
+          "description": "クライアントの冪等キー。"
+        },
+        {
+          "name": "request_sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "description": "正規化入力hash。同一キー異内容は409。"
+        },
+        {
+          "name": "result_type",
+          "type": "varchar(32)",
+          "nullable": false,
+          "description": "結果の資源種別。"
+        },
+        {
+          "name": "result_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "確定した版・申請・削除ジョブ等。多態参照。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "結果確定時刻。"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "キー保持期限。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "actor_user_id",
+          "operation",
+          "request_key"
+        ]
+      ],
+      "checks": [],
+      "indexes": [
+        [
+          "organization_id",
+          "expires_at",
+          "id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "actor_user_id"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "業務結果と同一トランザクションで確定。期限後も版UNIQUEや審査状態遷移で二重の意味的更新を防ぐ。再送結果を返す前にも現在認可を確認。"
+    },
+    {
+      "name": "deletion_jobs",
+      "purpose": "論理削除後の段階的な物理削除。",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "ランダムUUID。アプリが発行する主キー。"
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所属組織。認証済みコンテキストから決める。"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid",
+          "nullable": false,
+          "description": "削除対象。最後までtombstone文書行を保持。"
+        },
+        {
+          "name": "requested_by",
+          "type": "uuid",
+          "nullable": false,
+          "description": "所有部署のリーダー等、削除権限者。"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "description": "削除理由。"
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "description": "waiting / purging / completed / failed / held。"
+        },
+        {
+          "name": "purge_after",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "保留期間後の物理削除可能時刻。"
+        },
+        {
+          "name": "legal_hold",
+          "type": "boolean",
+          "nullable": false,
+          "description": "保全理由によるpurge停止。"
+        },
+        {
+          "name": "progress_json",
+          "type": "jsonb",
+          "nullable": false,
+          "description": "索引・S3版・DB子テーブルごとの再開cursorと実績。"
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false,
+          "description": "再実行回数。"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "description": "論理削除確定時刻。"
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "description": "実体削除完了時刻。"
+        },
+        {
+          "name": "error_code",
+          "type": "varchar(64)",
+          "nullable": true,
+          "description": "機密情報を含めない失敗分類。"
+        }
+      ],
+      "primary": [
+        "id"
+      ],
+      "unique": [
+        [
+          "organization_id",
+          "id"
+        ],
+        [
+          "organization_id",
+          "document_id"
+        ]
+      ],
+      "checks": [
+        "status IN ('waiting','purging','completed','failed','held')",
+        "attempts >= 0",
+        "status <> 'completed' OR completed_at IS NOT NULL"
+      ],
+      "indexes": [
+        [
+          "organization_id",
+          "status",
+          "purge_after"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "columns": [
+            "organization_id"
+          ],
+          "target": "organizations",
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "document_id"
+          ],
+          "target": "documents",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "organization_id",
+            "requested_by"
+          ],
+          "target": "users",
+          "references": [
+            "organization_id",
+            "id"
+          ]
+        }
+      ],
+      "rules": "文書は直ちに利用停止。依存関係の末端から小分けpurgeし、大規模CASCADEを使わない。統計・監査は別保持。DSQLでは参照識別子と必要最小のhashをtombstoneとして残せる。"
+    }
+  ]
+}

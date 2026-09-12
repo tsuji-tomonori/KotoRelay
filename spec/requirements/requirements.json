@@ -1,0 +1,3501 @@
+{
+  "schema_version": 1,
+  "catalog_revision": 2,
+  "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
+  "updated_at": "2026-09-12",
+  "requirements": [
+    {
+      "id": "REQ-DOC-01",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "ブラウザでMarkdownを編集する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "Markdown本文の編集",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u01"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-01",
+          "given": "担当文書の編集権限がある",
+          "when": "ブラウザで本文を編集して保存する",
+          "then": "Markdownの内容が保存され、再読込後も同じ内容を編集できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "initial-requirements-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-DOC-02",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "Markdownの表示を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "Markdownの表示確認",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u01"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-02",
+          "given": "編集可能なMarkdownがある",
+          "when": "プレビューを開く",
+          "then": "見出し・段落・箇条書き・リンク・表・コードブロックが確認できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "initial-requirements-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-DOC-03",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "保存結果を明示する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "保存状態の表示",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u01"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-03",
+          "given": "本文に未保存変更がある",
+          "when": "保存要求が成功または失敗する",
+          "then": "成功時だけ保存済みと表示し、失敗時は未保存変更を保持して再試行できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "initial-requirements-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-DOC-04",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "文書と文書版を識別する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "文書IDと文書版IDの分離",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u02"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-04",
+          "given": "同じ文書に複数の版がある",
+          "when": "版を追加する",
+          "then": "文書IDは維持され、変更不能な新しい文書版IDと文書内で一意の版番号が発行される"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-DOC-05",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "確定した版を改変させない",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "文書版の不変性",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u02"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-05",
+          "given": "保存された確定版または申請対象版がある",
+          "when": "同じ版IDの本文を変更しようとする",
+          "then": "変更を拒否し、改訂内容には別の版IDを割り当てる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-DOC-06",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "版の履歴を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "版履歴の閲覧",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u02"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-06",
+          "given": "履歴閲覧権限がある",
+          "when": "文書の版履歴を開く",
+          "then": "版番号・作成者・作成日時・審査状態を版ごとに確認できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-DOC-07",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "版の差分を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "版間差分の表示",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u02"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-07",
+          "given": "比較対象の両方の版に閲覧権限がある",
+          "when": "二つの版を指定して比較する",
+          "then": "追加・削除・変更箇所を比較対象の版IDとともに表示する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-DOC-08",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "編集競合を検出する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "同時編集の更新競合検出",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u02"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DOC-08",
+          "given": "二人が同じ下書き更新番号から編集した",
+          "when": "先行保存後に後続保存が到着する",
+          "then": "後続保存を競合として拒否し、先行内容を黙って上書きせず、後続の入力を失わない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-WF-01",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "特定の版を承認申請する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "文書版の承認申請",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03",
+        "docs/planning/REQUESTS.md#u12",
+        "docs/planning/REQUESTS.md#u13"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-WF-01",
+          "given": "執筆者が確定版を作成した",
+          "when": "承認申請する",
+          "then": "版ID・本文・画像・OCRを含む承認manifestハッシュ・申請者・申請日時を結び付けて審査待ちにする"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-WF-02",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "権限のある承認者が版を承認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "版単位の承認",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03",
+        "docs/planning/REQUESTS.md#u12",
+        "docs/planning/REQUESTS.md#u13"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-WF-02",
+          "given": "対象版が審査待ちで承認権限がある",
+          "when": "承認する",
+          "then": "確認した版IDと承認manifestハッシュの版だけを承認済みにし、承認者と日時を記録する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-WF-03",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "却下理由を残す",
+      "subject": "システム",
+      "action": "provide",
+      "object": "版単位の却下",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-WF-03",
+          "given": "対象版が審査待ちで承認権限がある",
+          "when": "理由を入力して却下する",
+          "then": "対象版を却下とし、理由・実行者・日時を執筆者が確認できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-WF-04",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "却下後に改訂して再申請する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "再申請の履歴維持",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-WF-04",
+          "given": "却下された版がある",
+          "when": "執筆者が修正して再申請する",
+          "then": "却下履歴を残し、修正内容を別の版IDで申請する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-WF-05",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "審査結果の競合を防ぐ",
+      "subject": "システム",
+      "action": "provide",
+      "object": "承認と却下の競合制御",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-WF-05",
+          "given": "同じ申請を複数の承認者が開いている",
+          "when": "承認と却下が競合する",
+          "then": "有効な審査遷移は一つだけ成立し、後続に最新状態と競合を返す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-WF-06",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "審査操作を重複適用しない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "審査要求の冪等性",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-WF-06",
+          "given": "通信断により同じ審査要求が再送される",
+          "when": "同じ要求識別子で再試行する",
+          "then": "承認履歴・公開版更新・連携要求を重複作成せず、成立済みの結果を返す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-WF-07",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "審査操作の認可を強制する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "サーバーによる審査認可",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-WF-07",
+          "given": "承認権限のない利用者または審査対象外の版がある",
+          "when": "APIから直接承認や却下を要求する",
+          "then": "処理を拒否し、版状態と公開状態を変更しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-01",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "利用者の本人性を検証する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "保護された操作の認証",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-01",
+          "given": "未認証または無効な認証情報の要求が来る",
+          "when": "文書閲覧・編集・審査・検索・チャットを要求する",
+          "then": "保護された内容を返さず、認証が必要であることを返す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-02",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "操作権限と公開範囲を別々に適用する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "役割と資源権限の組合せ",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-02",
+          "given": "役割が同じでも文書の公開範囲が異なる",
+          "when": "文書操作または検索を要求する",
+          "then": "その操作を許す役割と対象文書の権限を両方満たす場合だけ許可する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-03",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "下書きの閲覧を制限する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "未承認版へのアクセス制御",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u05"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-03",
+          "given": "文書に下書き・審査待ち・却下版がある",
+          "when": "一般利用者と文書担当者がそれぞれアクセスする",
+          "then": "一般利用者を拒否し、対象文書の下書き閲覧権限を持つ執筆者や承認者だけに表示する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-04",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "一般利用者には承認済み版だけを表示する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "未承認内容の非公開",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u04"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-04",
+          "given": "未承認内容が承認済み版と同じ文書にある",
+          "when": "一般利用者が本文・履歴・差分を開く",
+          "then": "権限を満たす承認済み版だけを表示し、未承認内容を含む差分も返さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-05",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "権限欠損時に拒否する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "認可失敗時の閉鎖",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-05",
+          "given": "公開範囲が未設定、不正または認可情報を取得できない",
+          "when": "文書・検索・生成へのアクセスを要求する",
+          "then": "公開扱いに補完せず拒否または一時利用不可とする"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-ACL-06",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "文書の存在情報も保護する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "検索結果と補助表示の認可",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-06",
+          "given": "権限外の文書が存在する",
+          "when": "一覧・検索・候補補完・件数・タグ集計を見る",
+          "then": "権限外のタイトル・抜粋・存在を示す個別情報を表示しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-07",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "直接URLや識別子でも認可する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "全取得経路でのアクセス制御",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-07",
+          "given": "他文書・他利用者のIDや引用URLを知っている",
+          "when": "API・版URL・ダウンロード先へ直接アクセスする",
+          "then": "現在の権限を再判定し、権限外の内容を返さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-08",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "クライアントに権限を決めさせない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "信頼できる属性による認可",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-08",
+          "given": "利用者が役割・所属・公開範囲・検索フィルターを改ざんする",
+          "when": "改ざん値をAPIへ送る",
+          "then": "認証済みIDとサーバー管理の最新権限から許可範囲を決め、権限を拡大しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-09",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "権限剥奪を索引更新から独立させる",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "最新権限によるアクセス停止",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-09",
+          "given": "アカウント無効化・所属削除・文書範囲縮小が正本へ確定した",
+          "when": "確定後に新しい閲覧・検索・生成を要求する",
+          "then": "古いトークンや古い索引の許可を採用せず、剥奪対象を拒否する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-ACL-10",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "親文書の制限を断片へ引き継ぐ",
+      "subject": "システム",
+      "action": "provide",
+      "object": "チャンクと添付の権限継承",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-10",
+          "given": "文書を検索断片や表示用データへ変換する",
+          "when": "断片または関連コンテンツを利用する",
+          "then": "元文書より広い公開範囲にならず、出所と現在権限を再確認できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-11",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "会話を利用者に結び付ける",
+      "subject": "システム",
+      "action": "provide",
+      "object": "会話の所有者境界",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-11",
+          "given": "別利用者の会話IDを知っている",
+          "when": "会話取得・追質問・削除を要求する",
+          "then": "その会話への権限がない要求を拒否する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-12",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "履歴とキャッシュにも現在権限を適用する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "保存された回答の再認可",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-12",
+          "given": "過去回答の参照文書への権限を後から失った",
+          "when": "履歴を再表示またはキャッシュを再利用する",
+          "then": "失効した根拠由来の回答本文を再配信・再利用せず、非表示の理由だけを権限に配慮して示す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-PUB-01",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "文書ごとの最新承認版を一意に決める",
+      "subject": "システム",
+      "action": "provide",
+      "object": "最新承認版の決定",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PUB-01",
+          "given": "同じ文書に複数の承認済み版がある",
+          "when": "最新承認版を求める",
+          "then": "文書内の版順で最も新しい承認済み版を一つだけ選び、承認操作の到着順で古い版に戻さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-PUB-02",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "未承認の新版は公開版へ影響させない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "審査中の公開継続",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u04"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PUB-02",
+          "given": "v1が承認済みでv2が下書き・審査待ちまたは却下である",
+          "when": "一般閲覧またはRAG検索を行う",
+          "then": "v2を公開・回答根拠へ混ぜず、有効なv1を利用できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-PUB-03",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "新版承認後に旧版で回答しない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "旧承認版の回答利用停止",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PUB-03",
+          "given": "v2の承認が確定しv1の検索データが残っている",
+          "when": "新しい回答根拠を選ぶ",
+          "then": "v1を除外し、v2の検索準備が未完了ならその文書を一時的に根拠から除く"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-PUB-04",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "索引未反映を利用者へ説明する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "文書公開とRAG準備状態の分離",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PUB-04",
+          "given": "最新版は承認済みだが検索準備待ちまたは失敗である",
+          "when": "権限のある利用者が文書を閲覧する",
+          "then": "最新版本文を閲覧でき、RAGへの反映状態を区別して確認できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-PUB-05",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "非公開化を回答根拠へ反映する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "公開停止文書の利用停止",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PUB-05",
+          "given": "文書の公開停止が確定した",
+          "when": "閲覧・検索・引用または回答送信を行う",
+          "then": "公開停止文書を利用せず、旧承認版へ自動的に戻さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-PUB-06",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "古い連携ジョブで公開状態を戻さない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "非同期処理の版順保証",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PUB-06",
+          "given": "新版の処理後に旧版ジョブが遅着する",
+          "when": "旧版ジョブの結果を反映する",
+          "then": "最新承認版の指示を上書きせず、旧ジョブを失効として扱う"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IDX-01",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "未承認本文を本番RAGの索引へ入れない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "検索用データの入力制限",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IDX-01",
+          "given": "下書き領域と承認済み領域がある",
+          "when": "本番の索引作成処理を実行する",
+          "then": "対象は承認済みの検索用データだけとなり、未承認本文を取得できない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IDX-02",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "索引の来歴を保持する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "根拠断片の出所記録",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IDX-02",
+          "given": "文書を検索断片へ変換する",
+          "when": "断片を保存する",
+          "then": "文書ID・版ID・本文ハッシュ・断片ID・見出し位置・処理設定版を追跡できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IDX-03",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "検索準備完了を実データで判定する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "索引反映の公開判定",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IDX-03",
+          "given": "取り込みジョブが完了と報告された",
+          "when": "RAG利用可能へ切り替える",
+          "then": "対象版の件数・必須属性・取得可能性を検証し、一部失敗や反映遅延だけでは完了扱いにしない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IDX-04",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "検索断片の欠損を拒否する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "必須属性の検証",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IDX-04",
+          "given": "版IDや権限識別情報が欠けた検索データがある",
+          "when": "取り込みまたは根拠選択する",
+          "then": "欠損値を推測せず対象を隔離し、生成へ渡さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IDX-05",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "検索反映の失敗を再処理する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "失敗した索引反映の回復",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IDX-05",
+          "given": "一時エラーまたは恒久エラーで取り込みに失敗した",
+          "when": "再試行または運用者の再処理を行う",
+          "then": "重複した有効断片を作らず回復でき、失敗理由と対象版を運用者が確認できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IDX-06",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "正本と索引の不一致を検出する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "反映漏れの照合",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IDX-06",
+          "given": "更新イベントが欠落または重複した",
+          "when": "正本と索引の照合を実行する",
+          "then": "未反映・旧版残留・公開停止残留を検出し、安全な利用制限を維持したまま修復対象にする"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-01",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "質問に対してチャットで回答する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "根拠に基づくチャット回答",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-01",
+          "given": "閲覧可能な最新承認版に回答根拠がある",
+          "when": "利用者が質問する",
+          "then": "質問に対応した日本語の回答をチャット画面へ返す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-02",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "検索時に公開範囲を強制する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "必須検索条件の適用",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-02",
+          "given": "複数の公開範囲が索引に存在する",
+          "when": "候補を検索する",
+          "then": "認証済み利用者の許可範囲を検索前または検索中に適用し、候補不足でも条件を解除しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-03",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "モデルへ渡す前に根拠を再検証する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "生成入力の有効性検証",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-03",
+          "given": "検索候補に旧版や権限変更前の断片が含まれ得る",
+          "when": "候補を再順位付け器・圧縮器・生成モデルへ渡す",
+          "then": "現行ACL・最新承認版・公開状態・承認manifestとchunk/画像hashが一致する本文・OCR・画像だけを渡す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-04",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "回答の送信直前に再検証する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "処理中の権限と版変更の反映",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-04",
+          "given": "検索後から回答確定前までに権限または承認版が変化する",
+          "when": "回答を確定して送信する",
+          "then": "確定時の根拠再検証に失敗した回答を送らず、新状態で再生成するか回答を保留する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-05",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "利用した文書版を引用する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "回答と根拠の対応表示",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-05",
+          "given": "根拠付きの回答を返す",
+          "when": "利用者が出典を見る",
+          "then": "実際に使用した文書名・版ID・見出し・到達可能な引用先を確認でき、モデルが架空の引用先を付けても採用しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-06",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "根拠不足時に回答を保留する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "未裏付け回答の抑止",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-06",
+          "given": "根拠がない、不足する、または矛盾を解決できない",
+          "when": "質問に回答する",
+          "then": "不足や確認事項を示し、未承認版・旧版・権限外資料・一般知識で業務事実を補って断定しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-07",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "追質問でも根拠を取り直す",
+      "subject": "システム",
+      "action": "provide",
+      "object": "会話継続時の根拠更新",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-07",
+          "given": "過去の回答後に文書版または権限が変わった",
+          "when": "続けて質問する",
+          "then": "過去のAI回答を正本として使わず、現在利用可能な根拠を再取得する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-08",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "文書内の命令で権限を変えさせない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "プロンプトインジェクションへの境界維持",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-08",
+          "given": "文書や質問に権限無視・秘密開示・外部送信を指示する文がある",
+          "when": "RAG処理する",
+          "then": "その指示によって検索範囲・権限・外部操作を変えず、文書内容を情報として扱う"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-RAG-09",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "機密本文を処理ログへ残さない",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "診断データの保護",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-RAG-09",
+          "given": "文書や質問に機密情報が含まれる",
+          "when": "通常ログやエラーを記録する",
+          "then": "認可前の候補本文や認証トークンを記録せず、許可された監査情報と本文の保存先を分離する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-OPS-01",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "AWS上で提供する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "AWS上の実行基盤",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u08"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-01",
+          "given": "システムを構築する",
+          "when": "運用構成を選定する",
+          "then": "フロント・API・文書保存・認証・RAGの主要機能をAWS上のサービスで提供する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-OPS-02",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "待機用計算資源の固定費を避ける",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "利用量に連動する運用費",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u08"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-02",
+          "given": "通常運用のサービス構成を選定する",
+          "when": "無アクセス時と通常利用時を見積もる",
+          "then": "常時起動サーバーや最低計算容量の常設を必須にせず、保存費・付帯費・利用時の従量費を明示する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-OPS-03",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "人による審査履歴を監査できる",
+      "subject": "システム",
+      "action": "provide",
+      "object": "承認の追跡可能性",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u03"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-03",
+          "given": "版が申請・承認・却下された",
+          "when": "権限を持つ監査担当が履歴を確認する",
+          "then": "対象版・実行主体・時刻・前後状態・却下理由を追跡でき、一般編集者が履歴を改変できない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-OPS-04",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "回答経路を追跡できる",
+      "subject": "システム",
+      "action": "provide",
+      "object": "回答の再現に必要な識別情報",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u06"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-04",
+          "given": "回答または回答保留が発生した",
+          "when": "運用者が原因を調査する",
+          "then": "要求IDから利用した版・方針版・モデル版・検索設定・処理結果へ到達できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-OPS-05",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "高額な処理を制限する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "生成と取り込みの利用制限",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u08"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-05",
+          "given": "利用者またはジョブが上限を超える",
+          "when": "質問や再取り込みを要求する",
+          "then": "設定された回数・同時実行・入力長・出力長・再試行上限を超えた処理を停止し、利用者へ理由を示す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-OPS-06",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "承認と権限の正本を復旧できる",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "文書版と制御情報の復旧",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u02"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-06",
+          "given": "保存データや索引の復旧が必要となる",
+          "when": "バックアップから復旧する",
+          "then": "文書版と審査履歴を結び付けて復旧し、最新の失効情報が未検証の状態では閲覧とRAGを再開しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-OPS-07",
+      "revision": 2,
+      "status": "active",
+      "type": "functional",
+      "title": "費用を工程別に確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "費用の可視化",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u08"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-07",
+          "given": "検索・生成・取り込み処理が稼働する",
+          "when": "運用費を確認する",
+          "then": "保存・検索・埋め込み・生成・API等の費用と利用量を分けて把握できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-ACL-13",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "Markdown表示で実行コードを動かさない",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "編集・閲覧・回答画面での安全な描画",
+      "rationale": "優先度: Must（初期版の必須）。U01のブラウザ執筆とU07の権限を、保存型スクリプトによって迂回させないための派生条件。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u01",
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-ACL-13",
+          "given": "本文・タイトル・回答にscript、イベント属性、危険なURLが含まれる",
+          "when": "エディターのプレビュー、文書、引用または回答を表示する",
+          "then": "埋め込まれたコードを実行せず、認証情報へのアクセスや意図しない外部通信を発生させない"
+        }
+      ],
+      "verification": {
+        "method": "セキュリティ・E2E試験（製品試験は未実施）",
+        "evidence": "保存型XSSの入力を各描画経路へ渡し、コード実行と外部通信が発生しないことを確認する。"
+      },
+      "traces": {
+        "design": [],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "initial-requirements-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-OPS-08",
+      "revision": 2,
+      "status": "active",
+      "type": "constraint",
+      "title": "保護対象の通信と保存を暗号化する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "文書・権限・会話・監査情報の暗号化",
+      "rationale": "優先度: Must（初期版の必須）。公開範囲を設けた情報を通信と保存の経路でも保護する、U07からの派生条件。具体的な鍵方式は設計で決定する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u07"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-OPS-08",
+          "given": "保護対象データを通信または保存する",
+          "when": "通信経路と保存設定を検証する",
+          "then": "保護対象の通信は暗号化され、文書・索引・制御情報・バックアップ・保存する会話と監査情報には保存時暗号化が適用される"
+        }
+      ],
+      "verification": {
+        "method": "設定レビュー・構成試験（製品試験は未実施）",
+        "evidence": "実際の通信経路と各保存先の暗号化設定を確認する。鍵の権限と復旧手順は詳細設計で追跡する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-PRJ-01",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "要件を一つの正本から更新する",
+      "subject": "開発担当",
+      "action": "enforce",
+      "object": "要求と受入条件の一貫した保守",
+      "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u09"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PRJ-01",
+          "given": "要件が追加・変更・廃止される",
+          "when": "開発担当が文書を更新する",
+          "then": "Quintの原子的要件を更新し、JSONとMarkdownを再生成して差分検査し、廃止時は理由を残す"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "initial-requirements-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "project",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-PRJ-02",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "実装と検証の対応を追跡する",
+      "subject": "開発担当",
+      "action": "enforce",
+      "object": "要件と下流成果物の対応",
+      "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u09"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PRJ-02",
+          "given": "要件に対応する実装・検証が作成された",
+          "when": "開発担当が要件との対応を更新する",
+          "then": "実在する実装と検証への参照を追加し、未作成の成果物を完成済みとして記録しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。"
+      },
+      "traces": {
+        "design": [],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "initial-requirements-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "project",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-DAT-01",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "Aurora DSQLを業務データの正本にする",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "部署・文書・審査・利用管理データ",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u11"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DAT-01",
+          "given": "AWS上に業務データを保存する",
+          "when": "データ保存先を実装する",
+          "then": "文書版・審査・現行権限・部署・利用記録をAurora DSQLで管理し、本文と画像実体は参照hash付きの非公開オブジェクトとして分離する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-DAT-02",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "別組織・別文書への誤参照を防ぐ",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "主キー・一意制約・複合外部キー",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u11"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DAT-02",
+          "given": "別文書または別組織の版・画像・OCRのIDを指定する",
+          "when": "関係データを登録する",
+          "then": "定義した複合FKで不整合な登録を拒否し、FKだけで閲覧認可が済んだとは扱わない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-DAT-03",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "非同期要求を業務更新と一緒に確定する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "DSQLと非同期処理の連携",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u11"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DAT-03",
+          "given": "承認・画像処理・削除で非同期処理が必要",
+          "when": "正本状態を更新する",
+          "then": "配送予定を同一transactionで記録し、重複配送・配送中断・遅着を冪等性と再照合で回復する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-DAT-04",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "DSQLの上限内で大量データを処理する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "OCR領域・チャンク・削除の分割処理",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u11"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-DAT-04",
+          "given": "一回ではDBの更新行数やバイト上限を超える",
+          "when": "作成または破棄する",
+          "then": "上限内のバッチで再開可能に処理し、部分完了をsealed・ready・削除完了として扱わない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-IMG-01",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "文書に画像を添付して編集する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "ブラウザの画像付きMarkdown編集",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u12"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-01",
+          "given": "対象文書の執筆権限がある",
+          "when": "対応画像を添付・移動・削除し保存する",
+          "then": "本文中の挿入位置と画像IDが保持され、再表示して本文と画像を確認できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-02",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "画像の文字をOCRで抽出する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "画像中の日本語を含む文字起こし",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u13"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-02",
+          "given": "対応画像に認識対象の文字がある",
+          "when": "OCRを実行する",
+          "then": "文字列・読み順・信頼度・OCR方式版を保存し、失敗と文字のない正常画像を区別する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-03",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "OCR文字の画像内位置を保持する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "画像内の矩形と多角形座標",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u13"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-03",
+          "given": "OCR文字領域が検出された",
+          "when": "結果を保存・表示する",
+          "then": "canonical画像の寸法と正規化bbox/polygonを対応付け、画面サイズや回転が変わっても同じ文字領域を示せる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-04",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "画像の文書内挿入位置を保持する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "画像ノードの安定IDと原文範囲",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u13"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-04",
+          "given": "同じ画像が複数箇所に配置されている",
+          "when": "編集・版確定・引用を行う",
+          "then": "配置ごとに識別し、版ID・見出し・本文中の位置から正しい挿入箇所へ到達できる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-05",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "本文と画像とOCRを一つの承認対象にする",
+      "subject": "システム",
+      "action": "provide",
+      "object": "不変な画像付き版manifest",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u12"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-05",
+          "given": "画像付きの版を申請する",
+          "when": "申請および承認を確定する",
+          "then": "本文・画像hash・配置・OCR run/hashを同じmanifestに固定し、OCR未完了または未確認の配置があれば申請を拒否する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-06",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "OCRを訂正しても承認済み版を改変しない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "OCR確認と訂正の版管理",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u13"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-06",
+          "given": "編集者がOCR誤りを発見する",
+          "when": "文字や領域を訂正して採用する",
+          "then": "旧結果を保持した新OCR runを作り、承認版へ反映するには新しい文書版の審査を要する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-07",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "チャンクから対応する画像とOCR領域を復元する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "chunkと画像配置・OCR領域の対応",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u13"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-07",
+          "given": "本文・画像・OCR文字を分割する",
+          "when": "検索用chunkを生成する",
+          "then": "画像を含むchunkごとに画像配置とOCR領域を関連付け、OCRが複数chunkへ分かれても元画像と領域へ戻れる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-08",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "画像付き根拠をモデルの画像入力へ渡す",
+      "subject": "システム",
+      "action": "provide",
+      "object": "文字と画像を組み合わせた生成入力",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u14"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-08",
+          "given": "採用された根拠chunkに画像の関連がある",
+          "when": "生成モデルを呼び出す",
+          "then": "同じ承認manifestの認可済み画像を構造化image入力へ含め、HTTPではBase64・SDKでは適切なbytesを用いて二重変換しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-09",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "画像を渡せない根拠を黙って使わない",
+      "subject": "システム",
+      "action": "provide",
+      "object": "画像入力予算と根拠の完全性",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u14"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-09",
+          "given": "選択chunkの画像が枚数・サイズ・解像度・token予算に収まらない",
+          "when": "生成入力を組み立てる",
+          "then": "予算内へ再選定する際は画像を渡せないchunkを全体として外し、必要根拠が不足すれば質問を絞るか回答を保留する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-IMG-10",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "画像・OCRにも文書の現行認可を適用する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "派生画像・OCR・モデル入力の保護",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u14"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-10",
+          "given": "画像取得前または回答確定前に公開版や権限が変わる",
+          "when": "画像表示・OCR取得・生成・引用を行う",
+          "then": "現在許可される版と画像hashだけを利用し、旧版・未承認・権限外の画像やOCR文字を渡さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-IMG-11",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "添付画像の不正入力を隔離する",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "画像ファイルと外部参照の検証",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u12"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-11",
+          "given": "画像のMIME偽装・破損・過大サイズ・外部URLが入力される",
+          "when": "アップロードまたは画像処理を行う",
+          "then": "許可形式・内容・サイズを検証し、不正画像を通常表示・OCR・生成に渡さず、任意外部URLを取得しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-IMG-12",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "画像バイナリを通常ログへ残さない",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "Base64とOCR内容の診断情報保護",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u14"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-IMG-12",
+          "given": "画像付き生成が成功または失敗する",
+          "when": "保存・配送・ログを記録する",
+          "then": "画像実体は非公開S3、DSQLと通常ログは必要な識別子・hash・サイズに限定し、Base64やOCR全文を通常ログへ書かない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-GRP-01",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "部署単位の所属と権限を管理する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "部署・構成員・リーダー・兼務",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-GRP-01",
+          "given": "利用者が一つ以上の部署に所属する",
+          "when": "所属または役割を登録・更新・失効する",
+          "then": "部署ごとの役割と執筆・審査権限を区別して管理し、認可で現行状態を用いる"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-GRP-02",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "文書の所有部署と公開先を分ける",
+      "subject": "システム",
+      "action": "provide",
+      "object": "部署所有と部署間共有",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-GRP-02",
+          "given": "部署Aの文書を部署Bへ公開する",
+          "when": "Bの利用者が閲覧や管理を要求する",
+          "then": "承認済み内容のreadを許可できるが、共有だけでは編集・承認・削除権限を与えない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-GRP-03",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "リーダーが自部署の文書一覧を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "部署文書の管理一覧",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-GRP-03",
+          "given": "現在の所属でleaderである",
+          "when": "部署管理一覧を開く",
+          "then": "自部署所有文書の管理用タイトル・更新・版・公開範囲・審査と反映状態をページングして確認でき、他部署管理情報を返さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-GRP-04",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "リーダーが審査状況を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "部署文書の申請・決定状況",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-GRP-04",
+          "given": "自部署所有文書に審査履歴がある",
+          "when": "リーダーが審査状況を見る",
+          "then": "申請版・申請日時・状態・決定日時・却下理由を確認でき、本文閲覧と承認操作は別の権限で判定する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-GRP-05",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "リーダーが自部署の文書を削除する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "部署文書の削除",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-GRP-05",
+          "given": "対象文書を所有する部署の現行leaderである",
+          "when": "対象と理由を確認して削除を要求する",
+          "then": "文書を論理削除し監査に残し、直後の認可から本文・画像・検索・生成・引用・過去回答の再配信を停止する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-GRP-06",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "削除を再開可能に完了させる",
+      "subject": "システム",
+      "action": "provide",
+      "object": "保持と物理削除ジョブ",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-GRP-06",
+          "given": "削除済み文書の保持期限と保全条件が満たされた",
+          "when": "物理削除を進める",
+          "then": "索引・S3オブジェクト版・OCR・派生データを依存順に削除し、失敗時に再開でき、未完了を完了と表示しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-GRP-07",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "リーダーに承認権限を自動付与しない",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "管理と審査の職務境界",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-GRP-07",
+          "given": "leaderだがcan_reviewがない",
+          "when": "審査APIを直接呼ぶ",
+          "then": "拒否する。管理一覧権限だけで下書き本文や他人の会話本文を取得する要求も拒否する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-MET-01",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "部署リーダーがRAG利用数を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "部署の質問数と処理結果",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-MET-01",
+          "given": "自部署の質問が受け付けられた",
+          "when": "期間を指定して集計を見る",
+          "then": "一意な質問受付数と回答・保留・失敗・取消を区別して表示し、モデル再試行や通信再送を質問数へ二重計上しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-MET-02",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "部署リーダーが閲覧数を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "部署別・所有文書別の表示件数",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-MET-02",
+          "given": "利用者が承認版本文を表示した",
+          "when": "表示確認を記録して集計する",
+          "then": "同一view IDの再送を一件とし、消費部署別と所有文書別に確認でき、preview・画像取得・RAG内部検索を閲覧として数えない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-MET-03",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "文書が回答に使われた回数を確認する",
+      "subject": "システム",
+      "action": "provide",
+      "object": "所有文書のRAG貢献",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-MET-03",
+          "given": "一回答が同じ文書の複数chunkを使う",
+          "when": "文書別のRAG利用を集計する",
+          "then": "当該文書の一意な確定回答数として一件を計上し、文書別件数の合計を部署の質問数と混同しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-MET-04",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "兼務者の利用を一つの部署に帰属させる",
+      "subject": "システム",
+      "action": "provide",
+      "object": "利用時の部署スナップショット",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-MET-04",
+          "given": "利用者が複数の有効所属を持つ",
+          "when": "チャットまたは閲覧を開始する",
+          "then": "検証済みの利用部署を一つ記録し、後日の異動で過去利用を付け替えず、選択部署による権限拡大を許さない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-MET-05",
+      "revision": 1,
+      "status": "active",
+      "type": "functional",
+      "title": "集計を再計算し遅延を示す",
+      "subject": "システム",
+      "action": "provide",
+      "object": "利用イベントと集計の整合性",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-MET-05",
+          "given": "重複または遅着イベントがある",
+          "when": "期間集計を更新する",
+          "then": "一意イベントから再計算して重複加算を防ぎ、集計時刻・時刻帯・反映範囲を表示し、期間ユニーク数を日次値の合計で代用しない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "functional"
+    },
+    {
+      "id": "REQ-MET-06",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "管理統計から会話本文を漏らさない",
+      "subject": "システム",
+      "action": "enforce",
+      "object": "部署境界と集計データの最小化",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u15"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-MET-06",
+          "given": "リーダーが統計APIやIDを改ざんする",
+          "when": "他部署の集計や個人の質問本文を要求する",
+          "then": "管理対象外の情報を拒否し、通常の部署統計には他人の会話本文や他部署利用者名を含めない"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/design/DATA-MODEL.md",
+          "docs/design/TABLES.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "product",
+      "category": "nonfunctional"
+    },
+    {
+      "id": "REQ-PRJ-03",
+      "revision": 1,
+      "status": "active",
+      "type": "constraint",
+      "title": "プロジェクト名をKotoRelayに統一する",
+      "subject": "開発担当",
+      "action": "enforce",
+      "object": "名称と識別子",
+      "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u10"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC-PRJ-03",
+          "given": "このプロジェクトの文書と設計を作成する",
+          "when": "名称を記載する",
+          "then": "名称KotoRelay・読みコトリレー・識別子kotorelayを用い、既存資料の版履歴は維持する"
+        }
+      ],
+      "verification": {
+        "method": "設計レビュー・結合/E2E試験（製品試験は未実施）",
+        "evidence": "受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。"
+      },
+      "traces": {
+        "design": [
+          "docs/planning/REQUESTS.md"
+        ],
+        "implementation": [],
+        "tests": [],
+        "standards": []
+      },
+      "last_changed_by": "requirements-v0.2-2026-09-12",
+      "retirement_reason": "",
+      "superseded_by": "",
+      "scope": "project",
+      "category": "nonfunctional"
+    }
+  ]
+}
