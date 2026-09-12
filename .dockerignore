@@ -1,0 +1,10 @@
+.git
+.workspace
+.devflow
+.venv
+node_modules
+**/node_modules
+**/dist
+artifacts
+**/__pycache__
+.cdk.out

@@ -3,7 +3,7 @@ name = "kotorelay"
 version = "0.1.0"
 description = "承認済みの知識を人とAIへ引き継ぐ文書管理"
 requires-python = ">=3.12,<3.14"
-dependencies = ["fastapi>=0.115,<1", "uvicorn[standard]>=0.34,<1", "pydantic-settings>=2.7,<3", "psycopg[binary]>=3.2,<4", "aurora-dsql-psycopg>=0.2", "boto3>=1.40,<2", "PyJWT[crypto]>=2.10,<3", "pillow>=11,<13", "python-multipart>=0.0.20", "mangum>=0.19,<1"]
+dependencies = ["fastapi>=0.115,<1", "uvicorn[standard]>=0.34,<1", "pydantic-settings>=2.7,<3", "psycopg[binary]>=3.2,<4", "aurora-dsql-python-connector>=0.2", "boto3>=1.40,<2", "PyJWT[crypto]>=2.10,<3", "pillow>=11,<13", "python-multipart>=0.0.20", "mangum>=0.19,<1"]
 [dependency-groups]
 dev = ["pytest>=8,<10", "pytest-cov>=6,<8", "httpx>=0.28,<1", "ruff>=0.11", "mypy>=1.15,<2", "boto3-stubs[s3,bedrock-runtime,s3vectors]>=1.40", "sqlglot>=26", "sqlfluff>=3.3,<5", "aws-cdk-lib>=2.220,<3", "constructs>=10,<11", "cdk-nag>=2.35,<3", "syrupy>=4.9,<6"]
 [tool.uv]

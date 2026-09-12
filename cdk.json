@@ -1,0 +1,4 @@
+{
+  "app": "PYTHONPATH=infra/src .venv/bin/python infra/app.py",
+  "context": { "@aws-cdk/core:checkSecretUsage": true }
+}

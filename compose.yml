@@ -1,0 +1,53 @@
+name: kotorelay
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: kotorelay
+      POSTGRES_USER: kotorelay
+      POSTGRES_PASSWORD: kotorelay-local
+    ports: ['127.0.0.1:55432:5432']
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kotorelay']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  seed:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    command: ['python', '-m', 'kotorelay.seed']
+    environment: &api-environment
+      KOTORELAY_MODE: local
+      KOTORELAY_DATABASE_URL: postgresql://kotorelay:kotorelay-local@db:5432/kotorelay
+      KOTORELAY_OBJECT_ROOT: /data/objects
+      KOTORELAY_FRONTEND_ORIGIN: http://localhost:4321
+    depends_on:
+      db: { condition: service_healthy }
+  api:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    environment: *api-environment
+    ports: ['127.0.0.1:58000:8000']
+    volumes: ['objects:/data/objects']
+    depends_on:
+      seed: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  web:
+    build: { context: ., dockerfile: frontend/Dockerfile }
+    ports: ['127.0.0.1:4321:8080']
+    depends_on:
+      api: { condition: service_healthy }
+volumes:
+  pgdata:
+  objects:
