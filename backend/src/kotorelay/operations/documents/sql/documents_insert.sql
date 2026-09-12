@@ -1,4 +1,4 @@
--- documentsを組織境界内でinsertする。
+-- 現在の組織の文書を、所有部署・公開範囲・状態を指定して登録する。
 INSERT INTO documents (
     id,
     organization_id,

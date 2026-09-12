@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 4c18ae62a9b9de513581947abfc60f1ec45b9f631019a142a812724b4695a84b -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
 
 # 反映ジョブを再処理 — クエリ
 
@@ -16,7 +16,7 @@ SELECT
 
 ### SQLの概要
 
-answersを組織境界内でlistする。
+現在の組織に属する回答履歴を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -43,7 +43,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* answersを組織境界内でlistする。 */
+/* 現在の組織に属する回答履歴を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -73,7 +73,7 @@ DELETE
 
 ### SQLの概要
 
-assetsを組織境界内でdeleteする。
+現在の組織に属する指定の添付画像の記録を削除する。
 
 ### 利用するテーブル
 
@@ -99,7 +99,7 @@ assetsを組織境界内でdeleteする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* assetsを組織境界内でdeleteする。 */
+/* 現在の組織に属する指定の添付画像の記録を削除する。 */
 DELETE FROM assets
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s
@@ -115,7 +115,7 @@ SELECT
 
 ### SQLの概要
 
-assetsを組織境界内でgetする。
+現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
 
 ### 利用するテーブル
 
@@ -141,7 +141,7 @@ assetsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* assetsを組織境界内でgetする。 */
+/* 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。 */
 SELECT
   id,
   organization_id,
@@ -168,7 +168,7 @@ SELECT
 
 ### SQLの概要
 
-assetsを組織境界内でlistする。
+現在の組織に属する添付画像を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -195,7 +195,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* assetsを組織境界内でlistする。 */
+/* 現在の組織に属する添付画像を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -224,7 +224,7 @@ DELETE
 
 ### SQLの概要
 
-chunksを組織境界内でdeleteする。
+現在の組織に属する指定の検索用の文書断片の記録を削除する。
 
 ### 利用するテーブル
 
@@ -250,7 +250,7 @@ chunksを組織境界内でdeleteする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* chunksを組織境界内でdeleteする。 */
+/* 現在の組織に属する指定の検索用の文書断片の記録を削除する。 */
 DELETE FROM chunks
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s
@@ -266,7 +266,7 @@ INSERT
 
 ### SQLの概要
 
-chunksを組織境界内でinsertする。
+現在の組織の検索用の文書断片を、出典の版・本文の保存先・画像配置とともに登録する。
 
 ### 利用するテーブル
 
@@ -291,7 +291,7 @@ chunksを組織境界内でinsertする。
 SQL内にWHERE/JOIN/ORDER/LIMIT条件はありません。
 
 ```sql
-/* chunksを組織境界内でinsertする。 */
+/* 現在の組織の検索用の文書断片を、出典の版・本文の保存先・画像配置とともに登録する。 */
 INSERT INTO chunks (
   id,
   organization_id,
@@ -329,7 +329,7 @@ SELECT
 
 ### SQLの概要
 
-chunksを組織境界内でlistする。
+現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -356,7 +356,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* chunksを組織境界内でlistする。 */
+/* 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -385,7 +385,7 @@ UPDATE
 
 ### SQLの概要
 
-chunksを組織境界内でupdateする。
+現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を更新する。
 
 ### 利用するテーブル
 
@@ -410,7 +410,7 @@ chunksを組織境界内でupdateする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* chunksを組織境界内でupdateする。 */
+/* 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を更新する。 */
 UPDATE chunks SET document_id = %(document_id)s, version_id = %(version_id)s, body_key = %(body_key)s, sha256 = %(sha256)s, heading = %(heading)s, placements = %(placements)s, manifest_hash = %(manifest_hash)s, ready = %(ready)s
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s
@@ -426,7 +426,7 @@ SELECT
 
 ### SQLの概要
 
-departmentsを組織境界内でlistする。
+現在の組織に属する部署を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -453,7 +453,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* departmentsを組織境界内でlistする。 */
+/* 現在の組織に属する部署を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -476,7 +476,7 @@ SELECT
 
 ### SQLの概要
 
-documentsを組織境界内でgetする。
+現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
 
 ### 利用するテーブル
 
@@ -502,7 +502,7 @@ documentsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* documentsを組織境界内でgetする。 */
+/* 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。 */
 SELECT
   id,
   organization_id,
@@ -531,7 +531,7 @@ SELECT
 
 ### SQLの概要
 
-documentsを組織境界内でlistする。
+現在の組織に属する文書を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -558,7 +558,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* documentsを組織境界内でlistする。 */
+/* 現在の組織に属する文書を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -589,7 +589,7 @@ DELETE
 
 ### SQLの概要
 
-draftsを組織境界内でdeleteする。
+現在の組織に属する指定の下書きの記録を削除する。
 
 ### 利用するテーブル
 
@@ -615,7 +615,7 @@ draftsを組織境界内でdeleteする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* draftsを組織境界内でdeleteする。 */
+/* 現在の組織に属する指定の下書きの記録を削除する。 */
 DELETE FROM drafts
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s
@@ -631,7 +631,7 @@ SELECT
 
 ### SQLの概要
 
-draftsを組織境界内でlistする。
+現在の組織に属する下書きを識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -658,7 +658,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* draftsを組織境界内でlistする。 */
+/* 現在の組織に属する下書きを識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -685,7 +685,7 @@ SELECT
 
 ### SQLの概要
 
-membershipsを組織境界内でlistする。
+現在の組織に属する部署所属を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -712,7 +712,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* membershipsを組織境界内でlistする。 */
+/* 現在の組織に属する部署所属を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -739,7 +739,7 @@ DELETE
 
 ### SQLの概要
 
-ocr_runsを組織境界内でdeleteする。
+現在の組織に属する指定の文字認識の実行記録の記録を削除する。
 
 ### 利用するテーブル
 
@@ -765,7 +765,7 @@ ocr_runsを組織境界内でdeleteする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* ocr_runsを組織境界内でdeleteする。 */
+/* 現在の組織に属する指定の文字認識の実行記録の記録を削除する。 */
 DELETE FROM ocr_runs
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s
@@ -781,7 +781,7 @@ SELECT
 
 ### SQLの概要
 
-ocr_runsを組織境界内でgetする。
+現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
 
 ### 利用するテーブル
 
@@ -807,7 +807,7 @@ ocr_runsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* ocr_runsを組織境界内でgetする。 */
+/* 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。 */
 SELECT
   id,
   organization_id,
@@ -834,7 +834,7 @@ SELECT
 
 ### SQLの概要
 
-ocr_runsを組織境界内でlistする。
+現在の組織に属する文字認識の実行記録を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -861,7 +861,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* ocr_runsを組織境界内でlistする。 */
+/* 現在の組織に属する文字認識の実行記録を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -890,7 +890,7 @@ UPDATE
 
 ### SQLの概要
 
-認可判定と並行する失効操作を、同じ組織行へのOCCで直列化する。
+組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
 
 ### 利用するテーブル
 
@@ -915,7 +915,7 @@ UPDATE
 WHERE organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
 
 ```sql
-/* 認可判定と並行する失効操作を、同じ組織行へのOCCで直列化する。 */
+/* 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。 */
 UPDATE organizations SET revision = revision + 1
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
@@ -931,7 +931,7 @@ SELECT
 
 ### SQLの概要
 
-organizationsを組織境界内でgetする。
+現在の組織の組織名・改訂番号・利用停止状態を取得する。
 
 ### 利用するテーブル
 
@@ -957,7 +957,7 @@ organizationsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* organizationsを組織境界内でgetする。 */
+/* 現在の組織の組織名・改訂番号・利用停止状態を取得する。 */
 SELECT
   id,
   organization_id,
@@ -979,7 +979,7 @@ SELECT
 
 ### SQLの概要
 
-outboxを組織境界内でgetする。
+現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を取得する。
 
 ### 利用するテーブル
 
@@ -1005,7 +1005,7 @@ outboxを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* outboxを組織境界内でgetする。 */
+/* 現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を取得する。 */
 SELECT
   id,
   organization_id,
@@ -1031,7 +1031,7 @@ UPDATE
 
 ### SQLの概要
 
-outboxを組織境界内でupdateする。
+現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を更新する。
 
 ### 利用するテーブル
 
@@ -1056,7 +1056,7 @@ outboxを組織境界内でupdateする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* outboxを組織境界内でupdateする。 */
+/* 現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を更新する。 */
 UPDATE outbox SET document_id = %(document_id)s, version_id = %(version_id)s, kind = %(kind)s, status = %(status)s, attempts = %(attempts)s, error_code = %(error_code)s, created_at = %(created_at)s
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s
@@ -1072,7 +1072,7 @@ SELECT
 
 ### SQLの概要
 
-usersを組織境界内でlistする。
+現在の組織に属する利用者を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -1099,7 +1099,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* usersを組織境界内でlistする。 */
+/* 現在の組織に属する利用者を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -1124,7 +1124,7 @@ SELECT
 
 ### SQLの概要
 
-versionsを組織境界内でgetする。
+現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
 
 ### 利用するテーブル
 
@@ -1150,7 +1150,7 @@ versionsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* versionsを組織境界内でgetする。 */
+/* 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。 */
 SELECT
   id,
   organization_id,
@@ -1178,7 +1178,7 @@ SELECT
 
 ### SQLの概要
 
-versionsを組織境界内でlistする。
+現在の組織に属する文書版を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -1205,7 +1205,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* versionsを組織境界内でlistする。 */
+/* 現在の組織に属する文書版を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,

@@ -1,4 +1,4 @@
--- documentsを組織境界内でupdateする。
+-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。
 UPDATE documents SET
     department_id = %(department_id)s,
     title = %(title)s,

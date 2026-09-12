@@ -1,4 +1,4 @@
--- submissionsを組織境界内でinsertする。
+-- 現在の組織の承認申請を、対象の文書版・申請者・審査状態・検証用ハッシュとともに登録する。
 INSERT INTO submissions (
     id,
     organization_id,

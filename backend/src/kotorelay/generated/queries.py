@@ -1,5 +1,5 @@
 """DDL・SQLから生成した型付き境界。直接編集しない。
-SHA256: 777b86c16c6d2948719aa1b092c5a7d7018c30a6757511e4c73bcb4bc04a6191
+SHA256: 2b3b7e49d1fdb24125431d989878de6a2e939657d28e6d7ec81192377735a645
 """
 
 from datetime import datetime
@@ -239,14 +239,14 @@ class AuditRow(BaseModel):
 
 
 def answers_delete(db: Database, organization_id: str, id: str) -> int:
-    """answersの指定行だけを削除する。"""
+    "現在の組織に属する指定の回答履歴の記録を削除する。"
     return db.execute(
         "operations/chat/sql/answers_delete.sql", {"organization_id": organization_id, "id": id}
     )
 
 
 def answers_get(db: Database, organization_id: str, id: str) -> list[AnswersRow]:
-    """answersを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。"
     return db.query(
         "operations/chat/sql/answers_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -255,24 +255,24 @@ def answers_get(db: Database, organization_id: str, id: str) -> list[AnswersRow]
 
 
 def answers_insert(db: Database, row: AnswersRow) -> int:
-    """answersの型検査済み行を保存する。"""
+    "現在の組織の回答履歴として、質問者・利用部署・質問と回答の保存先・根拠を登録する。"
     return db.execute("operations/chat/sql/answers_insert.sql", row.model_dump())
 
 
 def answers_list(db: Database, organization_id: str) -> list[AnswersRow]:
-    """answersを認証組織の範囲で取得する。"""
+    "現在の組織に属する回答履歴を識別子順に一覧取得する。"
     return db.query(
         "operations/chat/sql/answers_list.sql", {"organization_id": organization_id}, AnswersRow
     )
 
 
 def answers_update(db: Database, row: AnswersRow) -> int:
-    """answersの型検査済み行を保存する。"""
+    "現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を更新する。"
     return db.execute("operations/chat/sql/answers_update.sql", row.model_dump())
 
 
 def conversations_delete(db: Database, organization_id: str, id: str) -> int:
-    """conversationsの指定行だけを削除する。"""
+    "現在の組織に属する指定の会話の記録を削除する。"
     return db.execute(
         "operations/chat/sql/conversations_delete.sql",
         {"organization_id": organization_id, "id": id},
@@ -280,7 +280,7 @@ def conversations_delete(db: Database, organization_id: str, id: str) -> int:
 
 
 def conversations_get(db: Database, organization_id: str, id: str) -> list[ConversationsRow]:
-    """conversationsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。"
     return db.query(
         "operations/chat/sql/conversations_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -289,12 +289,12 @@ def conversations_get(db: Database, organization_id: str, id: str) -> list[Conve
 
 
 def conversations_insert(db: Database, row: ConversationsRow) -> int:
-    """conversationsの型検査済み行を保存する。"""
+    "現在の組織の会話を、所有者と開始日時を指定して登録する。"
     return db.execute("operations/chat/sql/conversations_insert.sql", row.model_dump())
 
 
 def conversations_list(db: Database, organization_id: str) -> list[ConversationsRow]:
-    """conversationsを認証組織の範囲で取得する。"""
+    "現在の組織に属する会話を識別子順に一覧取得する。"
     return db.query(
         "operations/chat/sql/conversations_list.sql",
         {"organization_id": organization_id},
@@ -303,14 +303,14 @@ def conversations_list(db: Database, organization_id: str) -> list[Conversations
 
 
 def conversations_update(db: Database, row: ConversationsRow) -> int:
-    """conversationsの型検査済み行を保存する。"""
+    "現在の組織に属する指定の会話について、会話の所有者と開始日時を更新する。"
     return db.execute("operations/chat/sql/conversations_update.sql", row.model_dump())
 
 
 def documents_by_department(
     db: Database, organization_id: str, department_id: str
 ) -> list[DocumentsRow]:
-    """documentsを認証組織の範囲で取得する。"""
+    "現在の組織に属する文書を指定した所有部署で絞り込み、一覧の対象を取得する。"
     return db.query(
         "operations/documents/sql/documents_by_department.sql",
         {"organization_id": organization_id, "department_id": department_id},
@@ -319,7 +319,7 @@ def documents_by_department(
 
 
 def documents_delete(db: Database, organization_id: str, id: str) -> int:
-    """documentsの指定行だけを削除する。"""
+    "現在の組織に属する指定の文書の記録を削除する。"
     return db.execute(
         "operations/documents/sql/documents_delete.sql",
         {"organization_id": organization_id, "id": id},
@@ -327,7 +327,7 @@ def documents_delete(db: Database, organization_id: str, id: str) -> int:
 
 
 def documents_get(db: Database, organization_id: str, id: str) -> list[DocumentsRow]:
-    """documentsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。"
     return db.query(
         "operations/documents/sql/documents_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -336,12 +336,12 @@ def documents_get(db: Database, organization_id: str, id: str) -> list[Documents
 
 
 def documents_insert(db: Database, row: DocumentsRow) -> int:
-    """documentsの型検査済み行を保存する。"""
+    "現在の組織の文書を、所有部署・公開範囲・状態を指定して登録する。"
     return db.execute("operations/documents/sql/documents_insert.sql", row.model_dump())
 
 
 def documents_list(db: Database, organization_id: str) -> list[DocumentsRow]:
-    """documentsを認証組織の範囲で取得する。"""
+    "現在の組織に属する文書を識別子順に一覧取得する。"
     return db.query(
         "operations/documents/sql/documents_list.sql",
         {"organization_id": organization_id},
@@ -350,19 +350,19 @@ def documents_list(db: Database, organization_id: str) -> list[DocumentsRow]:
 
 
 def documents_update(db: Database, row: DocumentsRow) -> int:
-    """documentsの型検査済み行を保存する。"""
+    "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。"
     return db.execute("operations/documents/sql/documents_update.sql", row.model_dump())
 
 
 def drafts_delete(db: Database, organization_id: str, id: str) -> int:
-    """draftsの指定行だけを削除する。"""
+    "現在の組織に属する指定の下書きの記録を削除する。"
     return db.execute(
         "operations/documents/sql/drafts_delete.sql", {"organization_id": organization_id, "id": id}
     )
 
 
 def drafts_get(db: Database, organization_id: str, id: str) -> list[DraftsRow]:
-    """draftsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の下書きについて、本文の保存先・画像配置・改訂番号を取得する。"
     return db.query(
         "operations/documents/sql/drafts_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -371,24 +371,24 @@ def drafts_get(db: Database, organization_id: str, id: str) -> list[DraftsRow]:
 
 
 def drafts_insert(db: Database, row: DraftsRow) -> int:
-    """draftsの型検査済み行を保存する。"""
+    "現在の組織の文書の下書きを、本文の保存先・画像配置・改訂番号を指定して登録する。"
     return db.execute("operations/documents/sql/drafts_insert.sql", row.model_dump())
 
 
 def drafts_list(db: Database, organization_id: str) -> list[DraftsRow]:
-    """draftsを認証組織の範囲で取得する。"""
+    "現在の組織に属する下書きを識別子順に一覧取得する。"
     return db.query(
         "operations/documents/sql/drafts_list.sql", {"organization_id": organization_id}, DraftsRow
     )
 
 
 def drafts_update(db: Database, row: DraftsRow) -> int:
-    """draftsの型検査済み行を保存する。"""
+    "現在の組織に属する指定の下書きについて、本文の保存先・画像配置・改訂番号を更新する。"
     return db.execute("operations/documents/sql/drafts_update.sql", row.model_dump())
 
 
 def versions_delete(db: Database, organization_id: str, id: str) -> int:
-    """versionsの指定行だけを削除する。"""
+    "現在の組織に属する指定の文書版の記録を削除する。"
     return db.execute(
         "operations/documents/sql/versions_delete.sql",
         {"organization_id": organization_id, "id": id},
@@ -396,7 +396,7 @@ def versions_delete(db: Database, organization_id: str, id: str) -> int:
 
 
 def versions_get(db: Database, organization_id: str, id: str) -> list[VersionsRow]:
-    """versionsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。"
     return db.query(
         "operations/documents/sql/versions_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -405,12 +405,12 @@ def versions_get(db: Database, organization_id: str, id: str) -> list[VersionsRo
 
 
 def versions_insert(db: Database, row: VersionsRow) -> int:
-    """versionsの型検査済み行を保存する。"""
+    "現在の組織の文書版を、版番号・本文の保存先・画像構成・検証用ハッシュを指定して登録する。"
     return db.execute("operations/documents/sql/versions_insert.sql", row.model_dump())
 
 
 def versions_list(db: Database, organization_id: str) -> list[VersionsRow]:
-    """versionsを認証組織の範囲で取得する。"""
+    "現在の組織に属する文書版を識別子順に一覧取得する。"
     return db.query(
         "operations/documents/sql/versions_list.sql",
         {"organization_id": organization_id},
@@ -419,7 +419,7 @@ def versions_list(db: Database, organization_id: str) -> list[VersionsRow]:
 
 
 def departments_get(db: Database, organization_id: str, id: str) -> list[DepartmentsRow]:
-    """departmentsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の部署について、部署名と有効状態を取得する。"
     return db.query(
         "operations/groups/sql/departments_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -428,12 +428,12 @@ def departments_get(db: Database, organization_id: str, id: str) -> list[Departm
 
 
 def departments_insert(db: Database, row: DepartmentsRow) -> int:
-    """departmentsの型検査済み行を保存する。"""
+    "現在の組織の部署を、部署名と有効状態を指定して登録する。"
     return db.execute("operations/groups/sql/departments_insert.sql", row.model_dump())
 
 
 def departments_list(db: Database, organization_id: str) -> list[DepartmentsRow]:
-    """departmentsを認証組織の範囲で取得する。"""
+    "現在の組織に属する部署を識別子順に一覧取得する。"
     return db.query(
         "operations/groups/sql/departments_list.sql",
         {"organization_id": organization_id},
@@ -442,12 +442,12 @@ def departments_list(db: Database, organization_id: str) -> list[DepartmentsRow]
 
 
 def departments_update(db: Database, row: DepartmentsRow) -> int:
-    """departmentsの型検査済み行を保存する。"""
+    "現在の組織に属する指定の部署について、部署名と有効状態を更新する。"
     return db.execute("operations/groups/sql/departments_update.sql", row.model_dump())
 
 
 def memberships_delete(db: Database, organization_id: str, id: str) -> int:
-    """membershipsの指定行だけを削除する。"""
+    "現在の組織に属する指定の部署所属の記録を削除する。"
     return db.execute(
         "operations/groups/sql/memberships_delete.sql",
         {"organization_id": organization_id, "id": id},
@@ -455,7 +455,7 @@ def memberships_delete(db: Database, organization_id: str, id: str) -> int:
 
 
 def memberships_get(db: Database, organization_id: str, id: str) -> list[MembershipsRow]:
-    """membershipsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を取得する。"
     return db.query(
         "operations/groups/sql/memberships_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -464,12 +464,12 @@ def memberships_get(db: Database, organization_id: str, id: str) -> list[Members
 
 
 def memberships_insert(db: Database, row: MembershipsRow) -> int:
-    """membershipsの型検査済み行を保存する。"""
+    "現在の組織の利用者の部署所属を、所属部署・権限・有効状態を指定して登録する。"
     return db.execute("operations/groups/sql/memberships_insert.sql", row.model_dump())
 
 
 def memberships_list(db: Database, organization_id: str) -> list[MembershipsRow]:
-    """membershipsを認証組織の範囲で取得する。"""
+    "現在の組織に属する部署所属を識別子順に一覧取得する。"
     return db.query(
         "operations/groups/sql/memberships_list.sql",
         {"organization_id": organization_id},
@@ -478,17 +478,17 @@ def memberships_list(db: Database, organization_id: str) -> list[MembershipsRow]
 
 
 def memberships_update(db: Database, row: MembershipsRow) -> int:
-    """membershipsの型検査済み行を保存する。"""
+    "現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を更新する。"
     return db.execute("operations/groups/sql/memberships_update.sql", row.model_dump())
 
 
 def organizations_fence(db: Database, row: OrganizationsRow) -> int:
-    """organizationsの型検査済み行を保存する。"""
+    "組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。"
     return db.execute("operations/identity/sql/organizations_fence.sql", row.model_dump())
 
 
 def organizations_get(db: Database, organization_id: str, id: str) -> list[OrganizationsRow]:
-    """organizationsを認証組織の範囲で取得する。"""
+    "現在の組織の組織名・改訂番号・利用停止状態を取得する。"
     return db.query(
         "operations/identity/sql/organizations_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -497,12 +497,12 @@ def organizations_get(db: Database, organization_id: str, id: str) -> list[Organ
 
 
 def organizations_insert(db: Database, row: OrganizationsRow) -> int:
-    """organizationsの型検査済み行を保存する。"""
+    "組織を、組織名・改訂番号・利用停止状態を指定して登録する。"
     return db.execute("operations/identity/sql/organizations_insert.sql", row.model_dump())
 
 
 def organizations_list(db: Database, organization_id: str) -> list[OrganizationsRow]:
-    """organizationsを認証組織の範囲で取得する。"""
+    "現在の組織に一致する組織レコードを識別子順に一覧取得する。"
     return db.query(
         "operations/identity/sql/organizations_list.sql",
         {"organization_id": organization_id},
@@ -511,12 +511,12 @@ def organizations_list(db: Database, organization_id: str) -> list[Organizations
 
 
 def organizations_update(db: Database, row: OrganizationsRow) -> int:
-    """organizationsの型検査済み行を保存する。"""
+    "現在の組織の組織名・改訂番号・利用停止状態を更新する。"
     return db.execute("operations/identity/sql/organizations_update.sql", row.model_dump())
 
 
 def users_get(db: Database, organization_id: str, id: str) -> list[UsersRow]:
-    """usersを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の利用者について、認証主体・表示名・有効状態・運用権限を取得する。"
     return db.query(
         "operations/identity/sql/users_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -525,31 +525,31 @@ def users_get(db: Database, organization_id: str, id: str) -> list[UsersRow]:
 
 
 def users_insert(db: Database, row: UsersRow) -> int:
-    """usersの型検査済み行を保存する。"""
+    "現在の組織の利用者を、認証主体・表示名・有効状態・運用権限を指定して登録する。"
     return db.execute("operations/identity/sql/users_insert.sql", row.model_dump())
 
 
 def users_list(db: Database, organization_id: str) -> list[UsersRow]:
-    """usersを認証組織の範囲で取得する。"""
+    "現在の組織に属する利用者を識別子順に一覧取得する。"
     return db.query(
         "operations/identity/sql/users_list.sql", {"organization_id": organization_id}, UsersRow
     )
 
 
 def users_update(db: Database, row: UsersRow) -> int:
-    """usersの型検査済み行を保存する。"""
+    "現在の組織に属する指定の利用者について、認証主体・表示名・有効状態・運用権限を更新する。"
     return db.execute("operations/identity/sql/users_update.sql", row.model_dump())
 
 
 def assets_delete(db: Database, organization_id: str, id: str) -> int:
-    """assetsの指定行だけを削除する。"""
+    "現在の組織に属する指定の添付画像の記録を削除する。"
     return db.execute(
         "operations/images/sql/assets_delete.sql", {"organization_id": organization_id, "id": id}
     )
 
 
 def assets_get(db: Database, organization_id: str, id: str) -> list[AssetsRow]:
-    """assetsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。"
     return db.query(
         "operations/images/sql/assets_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -558,26 +558,26 @@ def assets_get(db: Database, organization_id: str, id: str) -> list[AssetsRow]:
 
 
 def assets_insert(db: Database, row: AssetsRow) -> int:
-    """assetsの型検査済み行を保存する。"""
+    "現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。"
     return db.execute("operations/images/sql/assets_insert.sql", row.model_dump())
 
 
 def assets_list(db: Database, organization_id: str) -> list[AssetsRow]:
-    """assetsを認証組織の範囲で取得する。"""
+    "現在の組織に属する添付画像を識別子順に一覧取得する。"
     return db.query(
         "operations/images/sql/assets_list.sql", {"organization_id": organization_id}, AssetsRow
     )
 
 
 def ocr_runs_delete(db: Database, organization_id: str, id: str) -> int:
-    """ocr_runsの指定行だけを削除する。"""
+    "現在の組織に属する指定の文字認識の実行記録の記録を削除する。"
     return db.execute(
         "operations/images/sql/ocr_runs_delete.sql", {"organization_id": organization_id, "id": id}
     )
 
 
 def ocr_runs_get(db: Database, organization_id: str, id: str) -> list[OcrRunsRow]:
-    """ocr_runsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。"
     return db.query(
         "operations/images/sql/ocr_runs_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -586,26 +586,26 @@ def ocr_runs_get(db: Database, organization_id: str, id: str) -> list[OcrRunsRow
 
 
 def ocr_runs_insert(db: Database, row: OcrRunsRow) -> int:
-    """ocr_runsの型検査済み行を保存する。"""
+    "現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。"
     return db.execute("operations/images/sql/ocr_runs_insert.sql", row.model_dump())
 
 
 def ocr_runs_list(db: Database, organization_id: str) -> list[OcrRunsRow]:
-    """ocr_runsを認証組織の範囲で取得する。"""
+    "現在の組織に属する文字認識の実行記録を識別子順に一覧取得する。"
     return db.query(
         "operations/images/sql/ocr_runs_list.sql", {"organization_id": organization_id}, OcrRunsRow
     )
 
 
 def chunks_delete(db: Database, organization_id: str, id: str) -> int:
-    """chunksの指定行だけを削除する。"""
+    "現在の組織に属する指定の検索用の文書断片の記録を削除する。"
     return db.execute(
         "operations/indexing/sql/chunks_delete.sql", {"organization_id": organization_id, "id": id}
     )
 
 
 def chunks_get(db: Database, organization_id: str, id: str) -> list[ChunksRow]:
-    """chunksを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。"
     return db.query(
         "operations/indexing/sql/chunks_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -614,31 +614,31 @@ def chunks_get(db: Database, organization_id: str, id: str) -> list[ChunksRow]:
 
 
 def chunks_insert(db: Database, row: ChunksRow) -> int:
-    """chunksの型検査済み行を保存する。"""
+    "現在の組織の検索用の文書断片を、出典の版・本文の保存先・画像配置とともに登録する。"
     return db.execute("operations/indexing/sql/chunks_insert.sql", row.model_dump())
 
 
 def chunks_list(db: Database, organization_id: str) -> list[ChunksRow]:
-    """chunksを認証組織の範囲で取得する。"""
+    "現在の組織に属する検索用の文書断片を識別子順に一覧取得する。"
     return db.query(
         "operations/indexing/sql/chunks_list.sql", {"organization_id": organization_id}, ChunksRow
     )
 
 
 def chunks_update(db: Database, row: ChunksRow) -> int:
-    """chunksの型検査済み行を保存する。"""
+    "現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を更新する。"
     return db.execute("operations/indexing/sql/chunks_update.sql", row.model_dump())
 
 
 def outbox_delete(db: Database, organization_id: str, id: str) -> int:
-    """outboxの指定行だけを削除する。"""
+    "現在の組織に属する指定の反映・削除ジョブの記録を削除する。"
     return db.execute(
         "operations/indexing/sql/outbox_delete.sql", {"organization_id": organization_id, "id": id}
     )
 
 
 def outbox_get(db: Database, organization_id: str, id: str) -> list[OutboxRow]:
-    """outboxを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を取得する。"
     return db.query(
         "operations/indexing/sql/outbox_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -647,24 +647,24 @@ def outbox_get(db: Database, organization_id: str, id: str) -> list[OutboxRow]:
 
 
 def outbox_insert(db: Database, row: OutboxRow) -> int:
-    """outboxの型検査済み行を保存する。"""
+    "現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。"
     return db.execute("operations/indexing/sql/outbox_insert.sql", row.model_dump())
 
 
 def outbox_list(db: Database, organization_id: str) -> list[OutboxRow]:
-    """outboxを認証組織の範囲で取得する。"""
+    "現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。"
     return db.query(
         "operations/indexing/sql/outbox_list.sql", {"organization_id": organization_id}, OutboxRow
     )
 
 
 def outbox_update(db: Database, row: OutboxRow) -> int:
-    """outboxの型検査済み行を保存する。"""
+    "現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を更新する。"
     return db.execute("operations/indexing/sql/outbox_update.sql", row.model_dump())
 
 
 def events_get(db: Database, organization_id: str, id: str) -> list[EventsRow]:
-    """eventsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の利用イベントについて、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を取得する。"
     return db.query(
         "operations/metrics/sql/events_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -673,19 +673,19 @@ def events_get(db: Database, organization_id: str, id: str) -> list[EventsRow]:
 
 
 def events_insert(db: Database, row: EventsRow) -> int:
-    """eventsの型検査済み行を保存する。"""
+    "現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。"
     return db.execute("operations/metrics/sql/events_insert.sql", row.model_dump())
 
 
 def events_list(db: Database, organization_id: str) -> list[EventsRow]:
-    """eventsを認証組織の範囲で取得する。"""
+    "現在の組織に属する利用イベントを識別子順に一覧取得する。"
     return db.query(
         "operations/metrics/sql/events_list.sql", {"organization_id": organization_id}, EventsRow
     )
 
 
 def submissions_delete(db: Database, organization_id: str, id: str) -> int:
-    """submissionsの指定行だけを削除する。"""
+    "現在の組織に属する指定の承認申請の記録を削除する。"
     return db.execute(
         "operations/reviews/sql/submissions_delete.sql",
         {"organization_id": organization_id, "id": id},
@@ -693,7 +693,7 @@ def submissions_delete(db: Database, organization_id: str, id: str) -> int:
 
 
 def submissions_get(db: Database, organization_id: str, id: str) -> list[SubmissionsRow]:
-    """submissionsを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を取得する。"
     return db.query(
         "operations/reviews/sql/submissions_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -702,12 +702,12 @@ def submissions_get(db: Database, organization_id: str, id: str) -> list[Submiss
 
 
 def submissions_insert(db: Database, row: SubmissionsRow) -> int:
-    """submissionsの型検査済み行を保存する。"""
+    "現在の組織の承認申請を、対象の文書版・申請者・審査状態・検証用ハッシュとともに登録する。"
     return db.execute("operations/reviews/sql/submissions_insert.sql", row.model_dump())
 
 
 def submissions_list(db: Database, organization_id: str) -> list[SubmissionsRow]:
-    """submissionsを認証組織の範囲で取得する。"""
+    "現在の組織に属する承認申請を識別子順に一覧取得する。"
     return db.query(
         "operations/reviews/sql/submissions_list.sql",
         {"organization_id": organization_id},
@@ -716,12 +716,12 @@ def submissions_list(db: Database, organization_id: str) -> list[SubmissionsRow]
 
 
 def submissions_update(db: Database, row: SubmissionsRow) -> int:
-    """submissionsの型検査済み行を保存する。"""
+    "現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を更新する。"
     return db.execute("operations/reviews/sql/submissions_update.sql", row.model_dump())
 
 
 def audit_get(db: Database, organization_id: str, id: str) -> list[AuditRow]:
-    """auditを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の監査記録について、操作した利用者・対象・変更前後の状態・理由を取得する。"
     return db.query(
         "operations/system/sql/audit_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -730,19 +730,19 @@ def audit_get(db: Database, organization_id: str, id: str) -> list[AuditRow]:
 
 
 def audit_insert(db: Database, row: AuditRow) -> int:
-    """auditの型検査済み行を保存する。"""
+    "現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。"
     return db.execute("operations/system/sql/audit_insert.sql", row.model_dump())
 
 
 def audit_list(db: Database, organization_id: str) -> list[AuditRow]:
-    """auditを認証組織の範囲で取得する。"""
+    "現在の組織に属する監査記録を識別子順に一覧取得する。"
     return db.query(
         "operations/system/sql/audit_list.sql", {"organization_id": organization_id}, AuditRow
     )
 
 
 def idempotency_get(db: Database, organization_id: str, id: str) -> list[IdempotencyRow]:
-    """idempotencyを認証組織の範囲で取得する。"""
+    "現在の組織に属する指定の再送判定の記録について、実行済み操作の入力ハッシュと応答を取得する。"
     return db.query(
         "operations/system/sql/idempotency_get.sql",
         {"organization_id": organization_id, "id": id},
@@ -751,12 +751,12 @@ def idempotency_get(db: Database, organization_id: str, id: str) -> list[Idempot
 
 
 def idempotency_insert(db: Database, row: IdempotencyRow) -> int:
-    """idempotencyの型検査済み行を保存する。"""
+    "現在の組織の操作の再送を判定するため、実行済み操作の入力ハッシュと応答を登録する。"
     return db.execute("operations/system/sql/idempotency_insert.sql", row.model_dump())
 
 
 def idempotency_list(db: Database, organization_id: str) -> list[IdempotencyRow]:
-    """idempotencyを認証組織の範囲で取得する。"""
+    "現在の組織に属する再送判定の記録を識別子順に一覧取得する。"
     return db.query(
         "operations/system/sql/idempotency_list.sql",
         {"organization_id": organization_id},

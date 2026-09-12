@@ -1,4 +1,4 @@
--- membershipsを組織境界内でupdateする。
+-- 現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を更新する。
 UPDATE memberships SET
     department_id = %(department_id)s,
     user_id = %(user_id)s,

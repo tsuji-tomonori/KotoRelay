@@ -6,6 +6,7 @@ import csv
 import io
 import json
 import re
+from pathlib import Path
 
 from sqlglot import exp
 
@@ -37,6 +38,21 @@ LABELS = {
     "sequence": "シーケンス",
     "unit-test": "単体テスト詳細",
 }
+
+
+def sql_description(path: Path) -> str:
+    """SQL正本の先頭にある、日本語一文の役割説明を取得する。"""
+    lines = path.read_text().splitlines()
+    description = lines[0].removeprefix("-- ").strip() if lines else ""
+    if (
+        not lines
+        or not lines[0].startswith("-- ")
+        or not re.search(r"[ぁ-んァ-ヶ一-龯]", description)
+        or not description.endswith("。")
+        or description.count("。") != 1
+    ):
+        raise ValueError(f"SQLの先頭に役割を説明する日本語一文のコメントが必要です: {path}")
+    return description
 
 
 def table(headers, rows):

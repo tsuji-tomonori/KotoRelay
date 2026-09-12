@@ -1,4 +1,4 @@
--- departmentsを組織境界内でlistする。
+-- 現在の組織に属する部署を識別子順に一覧取得する。
 SELECT
     id,
     organization_id,

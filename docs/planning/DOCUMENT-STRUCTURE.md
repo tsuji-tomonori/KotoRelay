@@ -20,3 +20,5 @@ API帳票の配置は`docs/design/generated/api/<group>/<operation>/<kind>.md`�
 前回はproject adapterで独自の見出しを採用し、dev-standardの6帳票の存在・OpenAPIとの集合一致・生成差分を主な検査とした。参照帳票の章順や配置階層、CRUD集合を検証する契約がなく、標準の参考リンクを具体的な受入条件へ落とさなかった。今回、構成の契約と回帰検査を追加し、同じ問題をdev-standardのissueへ報告する。
 
 原因と標準側の改善方針は[dev-standard issue #67](https://github.com/tsuji-tomonori/dev-standard/issues/67)へ報告済み。
+
+SQL正本の先頭には、そのSQLが扱う対象と処理の役割を日本語一文で記載する。シーケンス図のSQL呼出しラベル、クエリ帳票の「SQLの概要」、型付きquery関数のdocstringは、この同じコメントから生成する。たとえば`answers_get`は「現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。」と表示する。SQL識別子はクエリ帳票の章名と実装への参照として保持する。先頭コメントの欠落、日本語のない説明、句点の欠落・複数文は生成時に拒否し、役割の正確さはSQL本文と照合して確認する。

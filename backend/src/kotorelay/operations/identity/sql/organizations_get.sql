@@ -1,4 +1,4 @@
--- organizationsを組織境界内でgetする。
+-- 現在の組織の組織名・改訂番号・利用停止状態を取得する。
 SELECT
     id,
     organization_id,

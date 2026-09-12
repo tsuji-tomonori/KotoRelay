@@ -69,6 +69,36 @@ test('生成設計の章と目次とMermaidを表示する', async ({ page }) =>
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
 
+test('シーケンス図のSQL呼出しに日本語の役割説明を表示する', async ({ page }) => {
+  await page
+    .getByRole('navigation', { name: '品質ナビゲーション' })
+    .getByRole('button', { name: /設計書/ })
+    .click();
+  await page.getByRole('searchbox').fill('ask_question');
+  await page
+    .locator('.inventory button')
+    .filter({ hasText: /^最新承認版の根拠で回答 — シーケンス$/ })
+    .click();
+  const diagram = page.locator('figure svg');
+  await expect(diagram).toBeVisible({ timeout: 45000 });
+  await capture(page, test.info(), 'When', '回答APIのシーケンスを日本語のSQL役割説明で描画する');
+  await expect(diagram).toContainText(
+    '現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。',
+  );
+  await expect(diagram).not.toContainText('answers_get');
+  const fontSize = await diagram
+    .locator('.messageText')
+    .first()
+    .evaluate((element) => {
+      const scale = (element as SVGGraphicsElement).getScreenCTM()?.a ?? 0;
+      return Number.parseFloat(getComputedStyle(element).fontSize) * scale;
+    });
+  expect(fontSize).toBeGreaterThanOrEqual(12);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
 test('品質ポータルがモバイル幅で横にはみ出さない', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

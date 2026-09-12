@@ -1,4 +1,4 @@
--- auditを組織境界内でinsertする。
+-- 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。
 INSERT INTO audit (
     id,
     organization_id,

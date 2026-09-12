@@ -1,4 +1,4 @@
--- documentsを組織境界内でgetする。
+-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
 SELECT
     id,
     organization_id,

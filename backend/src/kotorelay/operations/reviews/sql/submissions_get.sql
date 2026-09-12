@@ -1,4 +1,4 @@
--- submissionsを組織境界内でgetする。
+-- 現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を取得する。
 SELECT
     id,
     organization_id,

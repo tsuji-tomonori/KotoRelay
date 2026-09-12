@@ -1,4 +1,4 @@
--- membershipsを組織境界内でgetする。
+-- 現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を取得する。
 SELECT
     id,
     organization_id,

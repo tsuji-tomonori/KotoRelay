@@ -199,6 +199,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     inventory = Inventory()
     cases = tests()
     queries = {}
+    descriptions = {}
     ddl = {}
     for path in sorted((ROOT / "backend/migrations").glob("*.sql")):
         node = sqlglot.parse_one(path.read_text(), read="postgres")
@@ -210,6 +211,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         if not isinstance(node, (exp.Select, exp.Insert, exp.Update, exp.Delete)):
             raise ValueError(f"未対応SQL: {path}")
         queries[path.stem] = (path, node)
+        descriptions[path.stem] = layout.sql_description(path)
     schema = app.openapi()
     output["OPENAPI.gen.json"] = dump(schema)
     operations = {}
@@ -400,7 +402,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             ]
             contents = [
                 sql_node.key.upper(),
-                path.read_text().splitlines()[0].removeprefix("-- ").strip(),
+                descriptions[name],
                 table(
                     ["DB", "テーブル", "CRUD"],
                     [
@@ -492,7 +494,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             "    else 許可",
         ]
         for name in sql_names:
-            sequence.append("        A->>D: " + name)
+            sequence.append("        A->>D: " + descriptions[name])
         if segment in {"documents", "images", "chat", "operations", "reviews"}:
             sequence += [
                 "        A->>S: 内容ハッシュ実体を照合",

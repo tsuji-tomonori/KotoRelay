@@ -1,4 +1,4 @@
--- departmentsを組織境界内でgetする。
+-- 現在の組織に属する指定の部署について、部署名と有効状態を取得する。
 SELECT
     id,
     organization_id,

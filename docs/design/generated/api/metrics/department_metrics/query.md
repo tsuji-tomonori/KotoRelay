@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 4c18ae62a9b9de513581947abfc60f1ec45b9f631019a142a812724b4695a84b -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
 
 # 部署の利用数と文書貢献を集計 — クエリ
 
@@ -16,7 +16,7 @@ SELECT
 
 ### SQLの概要
 
-departmentsを組織境界内でlistする。
+現在の組織に属する部署を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -43,7 +43,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* departmentsを組織境界内でlistする。 */
+/* 現在の組織に属する部署を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -66,7 +66,7 @@ SELECT
 
 ### SQLの概要
 
-documentsを組織境界内でlistする。
+現在の組織に属する文書を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -93,7 +93,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* documentsを組織境界内でlistする。 */
+/* 現在の組織に属する文書を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -124,7 +124,7 @@ SELECT
 
 ### SQLの概要
 
-eventsを組織境界内でlistする。
+現在の組織に属する利用イベントを識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -151,7 +151,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* eventsを組織境界内でlistする。 */
+/* 現在の組織に属する利用イベントを識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -179,7 +179,7 @@ SELECT
 
 ### SQLの概要
 
-membershipsを組織境界内でlistする。
+現在の組織に属する部署所属を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -206,7 +206,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* membershipsを組織境界内でlistする。 */
+/* 現在の組織に属する部署所属を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -233,7 +233,7 @@ SELECT
 
 ### SQLの概要
 
-organizationsを組織境界内でgetする。
+現在の組織の組織名・改訂番号・利用停止状態を取得する。
 
 ### 利用するテーブル
 
@@ -259,7 +259,7 @@ organizationsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* organizationsを組織境界内でgetする。 */
+/* 現在の組織の組織名・改訂番号・利用停止状態を取得する。 */
 SELECT
   id,
   organization_id,
@@ -281,7 +281,7 @@ SELECT
 
 ### SQLの概要
 
-usersを組織境界内でlistする。
+現在の組織に属する利用者を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -308,7 +308,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* usersを組織境界内でlistする。 */
+/* 現在の組織に属する利用者を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,

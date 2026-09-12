@@ -1,4 +1,4 @@
--- draftsを組織境界内でupdateする。
+-- 現在の組織に属する指定の下書きについて、本文の保存先・画像配置・改訂番号を更新する。
 UPDATE drafts SET
     document_id = %(document_id)s,
     body_key = %(body_key)s,

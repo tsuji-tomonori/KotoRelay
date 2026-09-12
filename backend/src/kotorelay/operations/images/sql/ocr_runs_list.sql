@@ -1,4 +1,4 @@
--- ocr_runsを組織境界内でlistする。
+-- 現在の組織に属する文字認識の実行記録を識別子順に一覧取得する。
 SELECT
     id,
     organization_id,

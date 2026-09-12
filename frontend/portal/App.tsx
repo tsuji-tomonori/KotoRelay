@@ -49,7 +49,12 @@ const statusNames: Record<string, string> = {
   flaky: '再試行で成功',
   missing: '証拠不足',
 };
-mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+mermaid.initialize({
+  startOnLoad: false,
+  securityLevel: 'strict',
+  theme: 'neutral',
+  sequence: { useMaxWidth: false },
+});
 function Diagram({ code }: { code: string }) {
   const target = useRef<HTMLDivElement>(null);
   const [error, setError] = useState('');
@@ -70,7 +75,7 @@ function Diagram({ code }: { code: string }) {
   }, [code]);
   return (
     <figure>
-      <div ref={target} aria-label="設計図" />
+      <div ref={target} className="diagram-scroll" role="region" aria-label="設計図" tabIndex={0} />
       {error && <p role="alert">{error}</p>}
       <details>
         <summary>図の定義</summary>

@@ -1,4 +1,4 @@
--- ocr_runsを組織境界内でinsertする。
+-- 現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。
 INSERT INTO ocr_runs (
     id,
     organization_id,

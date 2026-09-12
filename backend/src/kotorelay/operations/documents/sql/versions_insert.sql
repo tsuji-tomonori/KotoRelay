@@ -1,4 +1,4 @@
--- versionsを組織境界内でinsertする。
+-- 現在の組織の文書版を、版番号・本文の保存先・画像構成・検証用ハッシュを指定して登録する。
 INSERT INTO versions (
     id,
     organization_id,

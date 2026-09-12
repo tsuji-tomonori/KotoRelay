@@ -1,4 +1,4 @@
--- chunksを組織境界内でinsertする。
+-- 現在の組織の検索用の文書断片を、出典の版・本文の保存先・画像配置とともに登録する。
 INSERT INTO chunks (
     id,
     organization_id,

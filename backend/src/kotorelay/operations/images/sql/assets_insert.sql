@@ -1,4 +1,4 @@
--- assetsを組織境界内でinsertする。
+-- 現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。
 INSERT INTO assets (
     id,
     organization_id,

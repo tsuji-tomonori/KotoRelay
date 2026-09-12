@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 4,
+  "catalog_revision": 5,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -5431,6 +5431,54 @@
       "verification": {
         "evidence": "同一コミットの品質Pages",
         "method": "生成差分、構成の回帰検査、品質SPAのE2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "API別のSQL正本が存在する",
+          "id": "AC-DESIGN-05",
+          "then": "SQLごとに役割を日本語一文の先頭コメントで保持し、シーケンスのSQLラベルとクエリ概要と関数の説明へ同じ内容を反映し、コメント欠落を拒否する",
+          "when": "型付きqueryとAPI設計を生成する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-05",
+      "last_changed_by": "sql-role-2026-09-13",
+      "object": "SQLの役割を日本語一文で説明し図へ反映する",
+      "rationale": "利用者がシーケンスのSQL識別子を自然言語の説明へ変更するよう指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/DOCUMENT-STRUCTURE.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "SQLの役割を日本語一文で説明し図へ反映する",
+      "traces": {
+        "design": [
+          "docs/planning/DOCUMENT-STRUCTURE.md"
+        ],
+        "implementation": [
+          "tools/project/api_documents.py",
+          "tools/project/design.py",
+          "tools/project/queries.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_document_structure.py",
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "生成差分、SQLコメントの検査、品質SPAのE2E"
       }
     }
   ],

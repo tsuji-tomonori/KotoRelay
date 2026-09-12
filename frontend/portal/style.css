@@ -404,6 +404,12 @@ img {
   max-width: 100%;
   height: auto;
 }
+.diagram-scroll {
+  overflow-x: auto;
+}
+.markdown .diagram-scroll svg {
+  max-width: none;
+}
 footer {
   font-size: 10px;
   color: #8b9a90;

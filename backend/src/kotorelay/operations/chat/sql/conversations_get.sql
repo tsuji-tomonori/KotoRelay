@@ -1,4 +1,4 @@
--- conversationsを組織境界内でgetする。
+-- 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
 SELECT
     id,
     organization_id,

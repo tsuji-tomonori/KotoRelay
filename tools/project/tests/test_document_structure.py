@@ -4,6 +4,7 @@ import csv
 import importlib.util
 import io
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -21,6 +22,42 @@ def module(name):
 @pytest.fixture(scope="module")
 def generated():
     return module("design").build()[0]
+
+
+@pytest.mark.parametrize(
+    "comment",
+    ["", "SELECT 1;", "-- ", "-- answers_get", "-- 回答を取得する", "-- 取得する。返す。"],
+)
+def test_SQLの役割コメントが欠落または日本語一文でない場合は拒否する(tmp_path, comment):
+    path = tmp_path / "answers_get.sql"
+    path.write_text(comment + "\nSELECT 1;\n")
+    with pytest.raises(ValueError, match="日本語一文"):
+        module("api_documents").sql_description(path)
+
+
+def test_SQL正本の役割コメントが図とクエリ概要と型付き関数へ反映される(generated):
+    import ast
+
+    wrappers = ast.parse(module("queries").render())
+    descriptions = {
+        path.stem: path.read_text().splitlines()[0].removeprefix("-- ")
+        for path in Path("backend/src/kotorelay/operations").rglob("*.sql")
+    }
+    for node in wrappers.body:
+        if isinstance(node, ast.FunctionDef):
+            assert ast.get_docstring(node) == descriptions[node.name]
+    checked = set()
+    for path, body in generated.items():
+        if not path.endswith("/query.md"):
+            continue
+        diagram = generated[path.replace("/query.md", "/sequence.md")].split("```mermaid")[1]
+        diagram = diagram.split("```")[0]
+        for name in re.findall(r"^## (\w+)\.sql$", body, re.MULTILINE):
+            checked.add(name)
+            assert "A->>D: " + descriptions[name] in diagram
+            assert "A->>D: " + name not in diagram
+            assert "### SQLの概要\n\n" + descriptions[name] in body
+    assert "answers_get" in checked
 
 
 def test_全APIがグループとAPIの下で6帳票を持ち索引から辿れる(generated):

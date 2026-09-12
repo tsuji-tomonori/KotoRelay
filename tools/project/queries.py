@@ -12,6 +12,7 @@ import sqlglot
 from sqlglot import exp
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 APP = ROOT / "backend/src/kotorelay"
 TYPES = {
     "VARCHAR": "str",
@@ -23,6 +24,8 @@ TYPES = {
 
 
 def render() -> str:
+    from tools.project.api_documents import sql_description
+
     models: dict[str, tuple[str, list[tuple[str, str]]]] = {}
     sources = sorted((ROOT / "backend/migrations").glob("*.sql")) + sorted(
         (APP / "operations").rglob("*.sql")
@@ -54,6 +57,7 @@ def render() -> str:
         lines += [f"    {name}: {kind}" for name, kind in columns] + [""]
     for path in sorted((APP / "operations").rglob("*.sql")):
         sql = path.read_text()
+        description = sql_description(path)
         parsed = sqlglot.parse_one(re.sub(r"%\((\w+)\)s", r":\1", sql), read="postgres")
         tables = {t.name for t in parsed.find_all(exp.Table)}
         if len(tables) != 1:
@@ -69,21 +73,21 @@ def render() -> str:
             values = ", ".join(f'"{p}": {p}' for p in params)
             lines += [
                 f"def {path.stem}(db: Database, {declarations}) -> list[{cls}]:",
-                f'    """{table}を認証組織の範囲で取得する。"""',
+                f"    {description!r}",
                 f'    return db.query("{relative}", {{{values}}}, {cls})',
                 "",
             ]
         elif isinstance(parsed, (exp.Insert, exp.Update)):
             lines += [
                 f"def {path.stem}(db: Database, row: {cls}) -> int:",
-                f'    """{table}の型検査済み行を保存する。"""',
+                f"    {description!r}",
                 f'    return db.execute("{relative}", row.model_dump())',
                 "",
             ]
         elif isinstance(parsed, exp.Delete):
             lines += [
                 f"def {path.stem}(db: Database, organization_id: str, id: str) -> int:",
-                f'    """{table}の指定行だけを削除する。"""',
+                f"    {description!r}",
                 f'    return db.execute("{relative}", '
                 '{"organization_id": organization_id, "id": id})',
                 "",

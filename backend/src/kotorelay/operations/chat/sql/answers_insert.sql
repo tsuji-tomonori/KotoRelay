@@ -1,4 +1,4 @@
--- answersを組織境界内でinsertする。
+-- 現在の組織の回答履歴として、質問者・利用部署・質問と回答の保存先・根拠を登録する。
 INSERT INTO answers (
     id,
     organization_id,

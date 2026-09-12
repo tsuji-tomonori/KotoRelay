@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 4c18ae62a9b9de513581947abfc60f1ec45b9f631019a142a812724b4695a84b -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
 
 # 部署の所属権限を変更 — クエリ
 
@@ -16,7 +16,7 @@ INSERT
 
 ### SQLの概要
 
-auditを組織境界内でinsertする。
+現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。
 
 ### 利用するテーブル
 
@@ -41,7 +41,7 @@ auditを組織境界内でinsertする。
 SQL内にWHERE/JOIN/ORDER/LIMIT条件はありません。
 
 ```sql
-/* auditを組織境界内でinsertする。 */
+/* 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。 */
 INSERT INTO audit (
   id,
   organization_id,
@@ -79,7 +79,7 @@ SELECT
 
 ### SQLの概要
 
-departmentsを組織境界内でgetする。
+現在の組織に属する指定の部署について、部署名と有効状態を取得する。
 
 ### 利用するテーブル
 
@@ -105,7 +105,7 @@ departmentsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* departmentsを組織境界内でgetする。 */
+/* 現在の組織に属する指定の部署について、部署名と有効状態を取得する。 */
 SELECT
   id,
   organization_id,
@@ -126,7 +126,7 @@ SELECT
 
 ### SQLの概要
 
-departmentsを組織境界内でlistする。
+現在の組織に属する部署を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -153,7 +153,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* departmentsを組織境界内でlistする。 */
+/* 現在の組織に属する部署を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -176,7 +176,7 @@ INSERT
 
 ### SQLの概要
 
-membershipsを組織境界内でinsertする。
+現在の組織の利用者の部署所属を、所属部署・権限・有効状態を指定して登録する。
 
 ### 利用するテーブル
 
@@ -201,7 +201,7 @@ membershipsを組織境界内でinsertする。
 SQL内にWHERE/JOIN/ORDER/LIMIT条件はありません。
 
 ```sql
-/* membershipsを組織境界内でinsertする。 */
+/* 現在の組織の利用者の部署所属を、所属部署・権限・有効状態を指定して登録する。 */
 INSERT INTO memberships (
   id,
   organization_id,
@@ -235,7 +235,7 @@ SELECT
 
 ### SQLの概要
 
-membershipsを組織境界内でlistする。
+現在の組織に属する部署所属を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -262,7 +262,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* membershipsを組織境界内でlistする。 */
+/* 現在の組織に属する部署所属を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,
@@ -289,7 +289,7 @@ UPDATE
 
 ### SQLの概要
 
-membershipsを組織境界内でupdateする。
+現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を更新する。
 
 ### 利用するテーブル
 
@@ -314,7 +314,7 @@ membershipsを組織境界内でupdateする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* membershipsを組織境界内でupdateする。 */
+/* 現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を更新する。 */
 UPDATE memberships SET department_id = %(department_id)s, user_id = %(user_id)s, leader = %(leader)s, can_author = %(can_author)s, can_review = %(can_review)s, active = %(active)s
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s
@@ -330,7 +330,7 @@ UPDATE
 
 ### SQLの概要
 
-認可判定と並行する失効操作を、同じ組織行へのOCCで直列化する。
+組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
 
 ### 利用するテーブル
 
@@ -355,7 +355,7 @@ UPDATE
 WHERE organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
 
 ```sql
-/* 認可判定と並行する失効操作を、同じ組織行へのOCCで直列化する。 */
+/* 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。 */
 UPDATE organizations SET revision = revision + 1
 WHERE
   organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
@@ -371,7 +371,7 @@ SELECT
 
 ### SQLの概要
 
-organizationsを組織境界内でgetする。
+現在の組織の組織名・改訂番号・利用停止状態を取得する。
 
 ### 利用するテーブル
 
@@ -397,7 +397,7 @@ organizationsを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* organizationsを組織境界内でgetする。 */
+/* 現在の組織の組織名・改訂番号・利用停止状態を取得する。 */
 SELECT
   id,
   organization_id,
@@ -419,7 +419,7 @@ SELECT
 
 ### SQLの概要
 
-usersを組織境界内でgetする。
+現在の組織に属する指定の利用者について、認証主体・表示名・有効状態・運用権限を取得する。
 
 ### 利用するテーブル
 
@@ -445,7 +445,7 @@ usersを組織境界内でgetする。
 WHERE organization_id = %(organization_id)s AND id = %(id)s
 
 ```sql
-/* usersを組織境界内でgetする。 */
+/* 現在の組織に属する指定の利用者について、認証主体・表示名・有効状態・運用権限を取得する。 */
 SELECT
   id,
   organization_id,
@@ -468,7 +468,7 @@ SELECT
 
 ### SQLの概要
 
-usersを組織境界内でlistする。
+現在の組織に属する利用者を識別子順に一覧取得する。
 
 ### 利用するテーブル
 
@@ -495,7 +495,7 @@ WHERE organization_id = %(organization_id)s
 ORDER BY id
 
 ```sql
-/* usersを組織境界内でlistする。 */
+/* 現在の組織に属する利用者を識別子順に一覧取得する。 */
 SELECT
   id,
   organization_id,

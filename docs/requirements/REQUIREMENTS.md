@@ -2,7 +2,7 @@
 # KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG 要件一覧
 
 - スキーマ版: 1
-- カタログ版: 4
+- カタログ版: 5
 - Product(JSON): <code>"KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG"</code>
 - 更新日(JSON): <code>"2026-09-12"</code>
 - 正本: `spec/requirements/requirements.qnt`
@@ -123,6 +123,7 @@
 | <code>"REQ-DESIGN-02"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、API帳票をAPIグループとAPIごとの階層へ配置するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
 | <code>"REQ-DESIGN-03"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、APIと保存先のCRUD対応を実装から生成するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
 | <code>"REQ-DESIGN-04"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、品質Pagesで設計の階層を維持するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
+| <code>"REQ-DESIGN-05"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、SQLの役割を日本語一文で説明し図へ反映するを**提供する**（<code>"provide"</code>） | 生成差分、SQLコメントの検査、品質SPAのE2E |
 
 ## REQ-DOC-01: ブラウザでMarkdownを編集する
 
@@ -3736,6 +3737,38 @@
 - 設計: <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
 - 実装: <code>["frontend/portal/App.tsx","tools/project/evidence.py"]</code>
 - テスト: <code>["e2e/portal.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-05: SQLの役割を日本語一文で説明し図へ反映する
+
+要件ID(JSON): <code>"REQ-DESIGN-05"</code>
+タイトル(JSON): <code>"SQLの役割を日本語一文で説明し図へ反映する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"SQLの役割を日本語一文で説明し図へ反映する"</code>
+開発プロジェクトは、SQLの役割を日本語一文で説明し図へ反映するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がシーケンスのSQL識別子を自然言語の説明へ変更するよう指定したため。
+根拠(JSON): <code>"利用者がシーケンスのSQL識別子を自然言語の説明へ変更するよう指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"sql-role-2026-09-13"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-05"</code> 前提: API別のSQL正本が存在する。条件: 型付きqueryとAPI設計を生成する。期待結果: SQLごとに役割を日本語一文の先頭コメントで保持し、シーケンスのSQLラベルとクエリ概要と関数の説明へ同じ内容を反映し、コメント欠落を拒否する。
+  - criterion(JSON Object): <code>{"given":"API別のSQL正本が存在する","id":"AC-DESIGN-05","then":"SQLごとに役割を日本語一文の先頭コメントで保持し、シーケンスのSQLラベルとクエリ概要と関数の説明へ同じ内容を反映し、コメント欠落を拒否する","when":"型付きqueryとAPI設計を生成する"}</code>
+
+要求源(JSON List): <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+検証方法: 生成差分、SQLコメントの検査、品質SPAのE2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"生成差分、SQLコメントの検査、品質SPAのE2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+- 実装: <code>["tools/project/api_documents.py","tools/project/design.py","tools/project/queries.py"]</code>
+- テスト: <code>["tools/project/tests/test_document_structure.py","e2e/portal.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>
