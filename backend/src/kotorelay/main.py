@@ -24,7 +24,9 @@ from kotorelay.operations.reviews.router import router as reviews
 from kotorelay.operations.system.router import router as system
 from kotorelay.runtime import Runtime
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("kotorelay")
+logger.setLevel(logging.INFO)
 LOG_MESSAGES = {"KR_REQUEST": "request_id=%s method=%s status=%s"}
 
 

@@ -772,3 +772,11 @@ def test_削除配送を100行単位で再開し共有本文を残す(client, db
     run_once(rt)
     assert not [c for c in db.tables["chunks"].values() if c["document_id"] == doc["id"]]
     assert client.get(f"/api/documents/{other['id']}", headers=headers("reader")).status_code == 200
+
+
+def test_HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない(client, caplog):
+    create(client, body="ログへ出さない架空の機密本文")
+    messages = [record.getMessage() for record in caplog.records if record.name == "kotorelay"]
+    assert messages and all("request_id=" in message for message in messages)
+    assert "ログへ出さない" not in "".join(messages)
+    assert "demo-author" not in "".join(messages)

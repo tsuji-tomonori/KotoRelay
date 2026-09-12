@@ -236,7 +236,7 @@
     "backend/src/kotorelay/generated/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "backend/src/kotorelay/generated/queries.py": "88f5d1c38046636c6fafa2f68bce1fe9a16836d291d18468773612031d6e7078",
     "backend/src/kotorelay/handler.py": "0e710c00c41a4247d62a9263a437a07b557abcf84a0d8301cbe0034e11fa616c",
-    "backend/src/kotorelay/main.py": "a48ccdaa0f0416ad4fbfb160ed50dce8112aec73ffd39e745c9b0bc26e415487",
+    "backend/src/kotorelay/main.py": "531e25549cc34512f68251b335250b7b054b5ca12eff13c4d6957e4720cf3e1d",
     "backend/src/kotorelay/migrate.py": "773dee73b6c80aa5c3af83a526f3291487a239cb9493f6831a64a231744d9862",
     "backend/src/kotorelay/objects.py": "b48f2e4614263a2304ef53ce6c73d70a888cc420dcca0b904dfeeef91b01e9db",
     "backend/src/kotorelay/operations/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -346,11 +346,11 @@
     "backend/tests/conftest.py": "f4cb66d692a97ca5b59ee751d367b166dff875b85e729f6d1a0a92ec3de45546",
     "backend/tests/test_adapters.py": "00f75b434dce9011cda09d4b597ca7dc7ebae89fca17f228e4e8b2773aa66d98",
     "backend/tests/test_postgres.py": "84eb0cd7e9c9b2ecb6e2a43519375384aa2c35c037a5068df0f7cc1c3b255cd8",
-    "backend/tests/test_workflow.py": "ba42b8e61245d660f57371198978b0ed239bf189ce5c54358b3bfeb43b43c1b2",
+    "backend/tests/test_workflow.py": "b7aaffba489b919604e604c5cd30d7fc4c2b993bf090966ccbfed11a45c004d0",
     "e2e/portal.config.ts": "17dd937e11b8ae0358b4d98a9fc6a032bb5f218853d86c656faaa3e30af3d4fa",
     "e2e/portal.spec.ts": "43ecfdaab839f6b0b24a49b266f6b46513214785bbde7a13078b9849628bb19b",
     "e2e/workflow.spec.ts": "ad390ae124d402459f3f5844e122381f00582beb18514786125829491f0e4a14",
-    "frontend/portal/App.tsx": "536a398faf2c78a60698b1fae6849fd66dc617ef76ce63e7115f0b31c089df7d",
+    "frontend/portal/App.tsx": "b03143d7cf26ca52daa92410f5183102657d2b393bf245b6a14b95c38b0d232c",
     "frontend/portal/vite.config.ts": "069b5a85c1b677969f75334c24a729e4f3a00ca92c7ee69c0bef51eb8fd0482f",
     "frontend/src/components/App.tsx": "d7e4101ffe679b857f56e28a174afa7e5419b772cae02dc9eaf375ab8f6d5f6b",
     "frontend/src/components/Markdown.tsx": "64575fc975bc752675dac84a5472552c77a491544d632bc33276648590e537ef",
@@ -499,6 +499,7 @@
     "backend/tests/test_workflow.py::test_中断した質問は同じIDで再開し二重計上しない",
     "backend/tests/test_workflow.py::test_外部検索は返されたID以外を根拠にしない",
     "backend/tests/test_workflow.py::test_モデル入力直前に失効を検知した場合はモデルを呼ばない",
-    "backend/tests/test_workflow.py::test_削除配送を100行単位で再開し共有本文を残す"
+    "backend/tests/test_workflow.py::test_削除配送を100行単位で再開し共有本文を残す",
+    "backend/tests/test_workflow.py::test_HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない"
   ]
 }

@@ -26,6 +26,8 @@ def execute(name: str, args: list[str], results: list[dict]) -> int:
             args, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT, check=False
         )
     code = outcome.returncode
+    if code:
+        print(log.read_text()[-6000:], flush=True)
     results.append(
         {
             "id": name,
@@ -100,7 +102,16 @@ def main() -> None:
                     "-q",
                 ],
             ),
-            ("TypeScript収集", ["npx", "vitest", "list", "--json=artifacts/vitest-inventory.json"]),
+            (
+                "TypeScript収集",
+                [
+                    "npx",
+                    "vitest",
+                    "list",
+                    "--no-staticParse",
+                    "--json=artifacts/vitest-inventory.json",
+                ],
+            ),
             ("TypeScript単体試験", ["npm", "test"]),
             ("E2E収集", ["npx", "playwright", "test", "--list", "--reporter=json"]),
             ("ComposeE2E", ["npx", "playwright", "test"]),

@@ -233,10 +233,20 @@ function Portal() {
                   <span>{labels[k]}</span>
                   <strong>
                     {data[k].items.filter((i) => i.status === 'passed').length}
-                    <small> / {data[k].items.length}</small>
+                    <small>
+                      {' '}
+                      /{' '}
+                      {
+                        data[k].items.filter((i) => k !== 'coverage' || i.status !== 'skipped')
+                          .length
+                      }
+                    </small>
                   </strong>
                   <span>成功 / 計測項目</span>
-                  {data[k].items.some((i) => i.status !== 'passed') && (
+                  {k === 'coverage' && data[k].items.some((i) => i.status === 'skipped') && (
+                    <span>分岐なしのCDKはC1対象外</span>
+                  )}
+                  {data[k].items.some((i) => !['passed', 'skipped'].includes(i.status)) && (
                     <b className="status failed">未達の項目があります</b>
                   )}
                 </button>
@@ -291,7 +301,9 @@ function Portal() {
                   <div className="detail-heading">
                     <h2>{current.name}</h2>
                     <span className={'status ' + current.status}>
-                      {statusNames[current.status]}
+                      {current.metric && current.status === 'skipped'
+                        ? '対象外'
+                        : statusNames[current.status]}
                     </span>
                   </div>
                   {current.command && <pre className="command">{current.command}</pre>}
