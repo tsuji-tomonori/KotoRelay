@@ -97,8 +97,7 @@ class BedrockEngine:
 
     def index(self, key: str, text: str, document_id: str, version_id: str) -> None:
         self.vectors.put_vectors(
-            vectorBucketName=self.settings.vector_bucket,
-            indexName=self.settings.vector_index,
+            indexArn=self.settings.vector_index_arn,
             vectors=[
                 {
                     "key": key,
@@ -119,8 +118,7 @@ class BedrockEngine:
         ranked: list[tuple[float, str]] = []
         for offset in range(0, len(allowed_documents), 100):
             result = self.vectors.query_vectors(
-                vectorBucketName=self.settings.vector_bucket,
-                indexName=self.settings.vector_index,
+                indexArn=self.settings.vector_index_arn,
                 queryVector={"float32": embedding},
                 topK=10,
                 returnDistance=True,
@@ -137,8 +135,7 @@ class BedrockEngine:
     def delete(self, keys: list[str]) -> None:
         for offset in range(0, len(keys), 100):
             self.vectors.delete_vectors(
-                vectorBucketName=self.settings.vector_bucket,
-                indexName=self.settings.vector_index,
+                indexArn=self.settings.vector_index_arn,
                 keys=keys[offset : offset + 100],
             )
 
@@ -146,8 +143,7 @@ class BedrockEngine:
         found: set[str] = set()
         for offset in range(0, len(keys), 100):
             result = self.vectors.get_vectors(
-                vectorBucketName=self.settings.vector_bucket,
-                indexName=self.settings.vector_index,
+                indexArn=self.settings.vector_index_arn,
                 keys=keys[offset : offset + 100],
             )
             found.update(item["key"] for item in result["vectors"])

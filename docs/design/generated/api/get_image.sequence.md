@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 8ddb6b8d66f674570acb431243c0b3f3887134895acc19f3980f35e395ebe090 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
 
 # 現在の認可で画像を配信 — sequence
 
@@ -51,7 +51,7 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
-| kotorelay.operations.images.functions.authorize_asset | 146 | If | version_id is None |
-| kotorelay.operations.images.functions.authorize_asset | 161 | Return | asset |
-| kotorelay.operations.images.functions.image | 166 | Return | ctx.objects.get(asset.object_key, asset.sha256) |
+| kotorelay.operations.images.functions.authorize_asset | 148 | If | version_id is None |
+| kotorelay.operations.images.functions.authorize_asset | 163 | Return | asset |
+| kotorelay.operations.images.functions.image | 168 | Return | ctx.objects.get(asset.object_key, asset.sha256) |
 | kotorelay.operations.images.router.get_image | 32 | Return | Response(f.image(ctx, str(asset_id), str(version_id) if version_id else None), media_type='image/png') |

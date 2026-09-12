@@ -90,7 +90,7 @@
         ],
         "Code": {
           "ImageUri": {
-            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:8c86b587977bd20b1eef859854655764c65eb113c7a454fc8b1dfb32020591eb"
+            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:8be67ff04a85ee8ff38cf7d29181f4e2d889765bf133ddc8a99d4f124ea7fbba"
           }
         },
         "Environment": {
@@ -133,8 +133,11 @@
             "KOTORELAY_REGION": {
               "Ref": "AWS::Region"
             },
-            "KOTORELAY_VECTOR_BUCKET": {
-              "Ref": "Vectors"
+            "KOTORELAY_VECTOR_INDEX_ARN": {
+              "Fn::GetAtt": [
+                "VectorIndex",
+                "IndexArn"
+              ]
             }
           }
         },
@@ -989,7 +992,7 @@
         ],
         "Code": {
           "ImageUri": {
-            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:8c86b587977bd20b1eef859854655764c65eb113c7a454fc8b1dfb32020591eb"
+            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:8be67ff04a85ee8ff38cf7d29181f4e2d889765bf133ddc8a99d4f124ea7fbba"
           }
         },
         "Environment": {
@@ -1008,8 +1011,11 @@
             "KOTORELAY_REGION": {
               "Ref": "AWS::Region"
             },
-            "KOTORELAY_VECTOR_BUCKET": {
-              "Ref": "Vectors"
+            "KOTORELAY_VECTOR_INDEX_ARN": {
+              "Fn::GetAtt": [
+                "VectorIndex",
+                "IndexArn"
+              ]
             }
           }
         },

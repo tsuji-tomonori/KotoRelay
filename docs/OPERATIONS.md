@@ -29,7 +29,7 @@ DSQLの接続は公式Python connectorでIAMトークンを発行し、TLS証明
 
 - Cost ExplorerでProject=kotorelay / CostCenter=sampleを有効化し、サービス別・日別に確認する。タグ反映には遅延がある。
 - APIと配送workerは別のLambdaなので、Lambdaメトリクスを関数別に確認できる。Bedrockはモデル別の入力・出力トークンと呼出数、S3 Vectorsは保存量とquery数、DSQLはDPUと保存量を確認する。質問本文や画像をログへ出力しない。
-- 質問は利用者ごと1日100件、モデル画像5件、添付10件、1画像5MiB/20MP、1文書最大300チャンク。API同時実行3、worker同時実行1。失敗配送は最大5回。
+- 質問は利用者ごと1日100件、モデル画像5件、添付10件、1画像3MiB/20MP、1文書最大300チャンク。API同時実行3、worker同時実行1。失敗配送は最大5回。
 - S3アクセスログ、CloudFrontアクセスログ、WAF、高度なCognito脅威保護は費用理由を付けた対象限定cdk-nag例外。TLS、非公開バケット、JWT、最小権限の基本的な検査は継続する。
 
 ## バックアップと復旧

@@ -18,12 +18,11 @@ class Settings(BaseSettings):
     issuer: str = ""
     client_id: str = ""
     model_id: str = "amazon.nova-lite-v1:0"
-    vector_bucket: str = ""
-    vector_index: str = "knowledge"
+    vector_index_arn: str = ""
     embedding_model: str = "amazon.titan-embed-text-v2:0"
     max_questions_per_day: int = 100
     max_model_images: int = 5
-    max_image_bytes: int = 5 * 1024 * 1024
+    max_image_bytes: int = 3 * 1024 * 1024
     max_image_pixels: int = 20_000_000
     max_document_images: int = 10
     retention_days: int = 7

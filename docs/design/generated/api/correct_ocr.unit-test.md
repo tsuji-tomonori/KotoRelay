@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 8ddb6b8d66f674570acb431243c0b3f3887134895acc19f3980f35e395ebe090 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
 
 # OCRを訂正し新しいrunを保存 — unit-test
 
@@ -14,8 +14,8 @@
 | backend/src/kotorelay/context.py:89 | allowed | not_found | 404 |
 | backend/src/kotorelay/context.py:53 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/functions.py:113 | bool(assets) | not_found | 404 |
-| backend/src/kotorelay/operations/images/functions.py:117 | region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001 | 'invalid_region' | 422 |
+| backend/src/kotorelay/operations/images/functions.py:115 | bool(assets) | not_found | 404 |
+| backend/src/kotorelay/operations/images/functions.py:119 | region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001 | 'invalid_region' | 422 |
 
 ## Given / When / Then
 

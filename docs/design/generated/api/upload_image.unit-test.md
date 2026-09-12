@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 8ddb6b8d66f674570acb431243c0b3f3887134895acc19f3980f35e395ebe090 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
 
 # 画像を添付して位置付きOCRを実行 — unit-test
 
@@ -15,10 +15,10 @@
 | backend/src/kotorelay/context.py:53 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/images/functions.py:20 | 0 < len(data) <= max_bytes | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/functions.py:23 | source.format in {'PNG', 'JPEG'} and source.width * source.height <= max_pixels | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/functions.py:34 | len(value) <= max_bytes | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/functions.py:56 | text | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/functions.py:74 | len(assets) < ctx.settings.max_document_images | 'limit' | 422 |
+| backend/src/kotorelay/operations/images/functions.py:23 | source.format in {'PNG', 'JPEG'} and source.width * source.height <= max_pixels and (max(source.width, source.height) <= 8000) | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/functions.py:36 | len(value) <= max_bytes | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/functions.py:58 | text | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/images/functions.py:76 | len(assets) < ctx.settings.max_document_images | 'limit' | 422 |
 
 ## Given / When / Then
 

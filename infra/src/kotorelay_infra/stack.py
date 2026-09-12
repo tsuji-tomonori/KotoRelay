@@ -184,7 +184,7 @@ class KotoRelayStack(Stack):
                 "KOTORELAY_REGION": self.region,
                 "KOTORELAY_ISSUER": pool.user_pool_provider_url,
                 "KOTORELAY_CLIENT_ID": client.user_pool_client_id,
-                "KOTORELAY_VECTOR_BUCKET": vector_bucket.ref,
+                "KOTORELAY_VECTOR_INDEX_ARN": vector_index.attr_index_arn,
                 "KOTORELAY_MAX_QUESTIONS_PER_DAY": "100",
             },
         )
@@ -216,7 +216,7 @@ class KotoRelayStack(Stack):
                 "KOTORELAY_DSQL_HOST": cluster.attr_endpoint,
                 "KOTORELAY_DSQL_USER": "kotorelay_app",
                 "KOTORELAY_REGION": self.region,
-                "KOTORELAY_VECTOR_BUCKET": vector_bucket.ref,
+                "KOTORELAY_VECTOR_INDEX_ARN": vector_index.attr_index_arn,
             },
         )
         events.Rule(

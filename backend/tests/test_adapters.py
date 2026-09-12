@@ -95,6 +95,9 @@ def test_ベクトル検索の前に組織と文書フィルタを設定する(s
     vectors.query_vectors.return_value = {"vectors": [{"key": "chunk", "distance": 0.1}]}
     assert engine.search("質問", [str(i) for i in range(101)]) == ["chunk", "chunk"]
     assert vectors.query_vectors.call_count == 2
+    assert "indexArn" in vectors.query_vectors.call_args.kwargs
+    assert "vectorBucketName" not in vectors.query_vectors.call_args.kwargs
+    assert "indexArn" in vectors.put_vectors.call_args.kwargs
     assert (
         vectors.query_vectors.call_args.kwargs["filter"]["$and"][0]["organization_id"]["$eq"]
         == settings.organization_id
@@ -254,3 +257,10 @@ def test_workerのLambda入口とローカルループを実行する(settings):
         with patch.object(worker.time, "sleep", side_effect=KeyboardInterrupt):
             with pytest.raises(KeyboardInterrupt):
                 worker.main()
+
+
+def test_モデルへ送信できない画像寸法を受付時に拒否する():
+    value = io.BytesIO()
+    Image.new("RGB", (8001, 1), "white").save(value, format="PNG")
+    with pytest.raises(Problem):
+        normalize_image(value.getvalue(), 3 * 1024 * 1024, 20_000_000)

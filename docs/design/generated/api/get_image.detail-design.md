@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 8ddb6b8d66f674570acb431243c0b3f3887134895acc19f3980f35e395ebe090 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
 
 # 現在の認可で画像を配信 — detail-design
 
@@ -37,11 +37,11 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/context.py:98 | digest(version.manifest.encode()) == version.manifest_hash | 'integrity' | 503 |
 | backend/src/kotorelay/context.py:97 | self.can_read(doc) and doc.latest_version_id == version.id | not_found | 404 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/functions.py:146 | version_id is None | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/functions.py:144 | bool(assets) | not_found | 404 |
-| backend/src/kotorelay/operations/images/functions.py:150 | bool(docs) and docs[0].status != 'deleted' | not_found | 404 |
-| backend/src/kotorelay/operations/images/functions.py:152 | ctx.can_read(doc) or ctx.permission(doc.department_id, 'draft') | not_found | 404 |
-| backend/src/kotorelay/operations/images/functions.py:155 | any((i.placement.asset_id == asset.id and i.image_hash == asset.sha256 for i in manifest.images)) | not_found | 404 |
+| backend/src/kotorelay/operations/images/functions.py:148 | version_id is None | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/images/functions.py:146 | bool(assets) | not_found | 404 |
+| backend/src/kotorelay/operations/images/functions.py:152 | bool(docs) and docs[0].status != 'deleted' | not_found | 404 |
+| backend/src/kotorelay/operations/images/functions.py:154 | ctx.can_read(doc) or ctx.permission(doc.department_id, 'draft') | not_found | 404 |
+| backend/src/kotorelay/operations/images/functions.py:157 | any((i.placement.asset_id == asset.id and i.image_hash == asset.sha256 for i in manifest.images)) | not_found | 404 |
 
 ## 応答項目の取得元
 
@@ -63,8 +63,8 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/generated/queries.py:523 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
 | backend/src/kotorelay/generated/queries.py:389 | db.query('operations/documents/sql/versions_get.sql', {'organization_id': organization_id, 'id': id}, VersionsRow) |
 | backend/src/kotorelay/objects.py:17 | hashlib.sha256(data).hexdigest() |
-| backend/src/kotorelay/operations/images/functions.py:161 | asset |
-| backend/src/kotorelay/operations/images/functions.py:166 | ctx.objects.get(asset.object_key, asset.sha256) |
+| backend/src/kotorelay/operations/images/functions.py:163 | asset |
+| backend/src/kotorelay/operations/images/functions.py:168 | ctx.objects.get(asset.object_key, asset.sha256) |
 | backend/src/kotorelay/operations/images/router.py:32 | Response(f.image(ctx, str(asset_id), str(version_id) if version_id else None), media_type='image/png') |
 
 異常時: DB transactionがrollbackします。S3の内容ハッシュ実体は孤立し得るため、公開認可に使わず、保持期間後の削除処理で回収します。外部配送失敗はoutboxのerror_codeとattemptsへ記録します。

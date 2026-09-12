@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 8ddb6b8d66f674570acb431243c0b3f3887134895acc19f3980f35e395ebe090 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
 
 # 画像を添付して位置付きOCRを実行 — sequence
 
@@ -42,14 +42,14 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.operations.images.functions.normalize_image | 21 | Try | Try |
-| kotorelay.operations.images.functions.normalize_image | 35 | Return | (value, image.width, image.height) |
-| kotorelay.operations.images.functions.normalize_image | 36 | ExceptHandler | (UnidentifiedImageError, OSError, Image.DecompressionBombError) |
-| kotorelay.operations.images.functions.normalize_image | 37 | Raise | Raise |
-| kotorelay.operations.images.functions.run_ocr | 44 | Try | Try |
-| kotorelay.operations.images.functions.run_ocr | 51 | ExceptHandler | (OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError) |
-| kotorelay.operations.images.functions.run_ocr | 52 | Return | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
-| kotorelay.operations.images.functions.run_ocr | 54 | For | For |
-| kotorelay.operations.images.functions.run_ocr | 56 | If | text |
-| kotorelay.operations.images.functions.run_ocr | 68 | Return | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
-| kotorelay.operations.images.functions.upload | 108 | Return | {'asset': asset, 'ocr_run': run, 'ocr': result} |
+| kotorelay.operations.images.functions.normalize_image | 37 | Return | (value, image.width, image.height) |
+| kotorelay.operations.images.functions.normalize_image | 38 | ExceptHandler | (UnidentifiedImageError, OSError, Image.DecompressionBombError) |
+| kotorelay.operations.images.functions.normalize_image | 39 | Raise | Raise |
+| kotorelay.operations.images.functions.run_ocr | 46 | Try | Try |
+| kotorelay.operations.images.functions.run_ocr | 53 | ExceptHandler | (OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError) |
+| kotorelay.operations.images.functions.run_ocr | 54 | Return | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
+| kotorelay.operations.images.functions.run_ocr | 56 | For | For |
+| kotorelay.operations.images.functions.run_ocr | 58 | If | text |
+| kotorelay.operations.images.functions.run_ocr | 70 | Return | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
+| kotorelay.operations.images.functions.upload | 110 | Return | {'asset': asset, 'ocr_run': run, 'ocr': result} |
 | kotorelay.operations.images.router.upload_image | 22 | Return | f.upload(ctx, str(document_id), file.file.read(ctx.settings.max_image_bytes + 1)) |

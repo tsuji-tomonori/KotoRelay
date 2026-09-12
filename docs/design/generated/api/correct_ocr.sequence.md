@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 8ddb6b8d66f674570acb431243c0b3f3887134895acc19f3980f35e395ebe090 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
 
 # OCRを訂正し新しいrunを保存 — sequence
 
@@ -41,6 +41,6 @@ sequenceDiagram
 | kotorelay.context.now | 18 | Return | datetime.now(UTC) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.images.functions.correct | 116 | For | For |
-| kotorelay.operations.images.functions.correct | 139 | Return | {'ocr_run': run, 'ocr': result} |
+| kotorelay.operations.images.functions.correct | 118 | For | For |
+| kotorelay.operations.images.functions.correct | 141 | Return | {'ocr_run': run, 'ocr': result} |
 | kotorelay.operations.images.router.correct_ocr | 39 | Return | f.correct(ctx, str(asset_id), data) |

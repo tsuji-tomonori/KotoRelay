@@ -938,7 +938,7 @@ export function Images({
       {placements.length === 0 ? (
         <p className="muted">
           {edit
-            ? 'PNG / JPEG · 5 MBまで · OCRの文字と位置を確認して申請できます。'
+            ? 'PNG / JPEG · 3 MiBまで · OCRの文字と位置を確認して申請できます。'
             : '添付画像はありません。'}
         </p>
       ) : (

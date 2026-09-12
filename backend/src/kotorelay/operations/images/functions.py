@@ -21,7 +21,9 @@ def normalize_image(data: bytes, max_bytes: int, max_pixels: int) -> tuple[bytes
     try:
         with Image.open(io.BytesIO(data)) as source:
             require(
-                source.format in {"PNG", "JPEG"} and source.width * source.height <= max_pixels,
+                source.format in {"PNG", "JPEG"}
+                and source.width * source.height <= max_pixels
+                and max(source.width, source.height) <= 8000,
                 "invalid_image",
                 422,
             )

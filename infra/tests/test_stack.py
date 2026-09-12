@@ -98,3 +98,13 @@ def test_構成スナップショットが一致する(stack, snapshot):
                 "S3Key": "検査fixtureのアセット",
             }
     assert template == snapshot
+
+
+def test_LambdaとSDKにベクトル索引ARNを渡す(stack):
+    functions = Template.from_stack(stack).find_resources("AWS::Lambda::Function")
+    for function in functions.values():
+        variables = function["Properties"]["Environment"]["Variables"]
+        assert variables["KOTORELAY_VECTOR_INDEX_ARN"] == {
+            "Fn::GetAtt": ["VectorIndex", "IndexArn"]
+        }
+        assert "KOTORELAY_VECTOR_BUCKET" not in variables

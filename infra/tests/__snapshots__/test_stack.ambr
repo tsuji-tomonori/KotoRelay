@@ -134,8 +134,11 @@
               'KOTORELAY_REGION': dict({
                 'Ref': 'AWS::Region',
               }),
-              'KOTORELAY_VECTOR_BUCKET': dict({
-                'Ref': 'Vectors',
+              'KOTORELAY_VECTOR_INDEX_ARN': dict({
+                'Fn::GetAtt': list([
+                  'VectorIndex',
+                  'IndexArn',
+                ]),
               }),
             }),
           }),
@@ -1089,8 +1092,11 @@
               'KOTORELAY_REGION': dict({
                 'Ref': 'AWS::Region',
               }),
-              'KOTORELAY_VECTOR_BUCKET': dict({
-                'Ref': 'Vectors',
+              'KOTORELAY_VECTOR_INDEX_ARN': dict({
+                'Fn::GetAtt': list([
+                  'VectorIndex',
+                  'IndexArn',
+                ]),
               }),
             }),
           }),
