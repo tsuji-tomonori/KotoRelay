@@ -68,7 +68,17 @@ const placement: Placement = {
   offset: 0,
   heading: '画像',
 };
-const region = { text: '画像の文字', x: 0, y: 0, width: 1, height: 1, confidence: 1, order: 0 };
+const region = {
+  region_id: 'r1',
+  source: 'detected',
+  text: '画像の文字',
+  x: 0,
+  y: 0,
+  width: 1,
+  height: 1,
+  confidence: 1,
+  order: 0,
+};
 const answer = {
   id: 'a1',
   conversation_id: 'c1',
@@ -83,8 +93,14 @@ const answer = {
 };
 function mockApi(handler: (path: string, method?: string, data?: unknown) => unknown = () => []) {
   const calls = vi.fn(handler);
-  const api: Api = async <T,>(path: string, method?: string, data?: unknown) =>
-    (await calls(path, method, data)) as T;
+  const api: Api = async <T,>(path: string, method?: string, data?: unknown) => {
+    const value = await calls(path, method, data);
+    return (
+      path.startsWith('/documents?') && path.includes('page=true') && Array.isArray(value)
+        ? { items: value, has_next: value.length === 30 }
+        : value
+    ) as T;
+  };
   return { api, calls };
 }
 function fill(label: string, value: string) {
@@ -114,18 +130,32 @@ describe('ログインと画面切替', () => {
       async (input) =>
         new Response(
           JSON.stringify(
-            String(input).endsWith('/groups/me') ? { ...identity, memberships: [] } : [],
+            String(input).endsWith('/groups/me')
+              ? identity
+              : String(input).includes('/documents?')
+                ? { items: [], has_next: false }
+                : String(input).includes('/metrics')
+                  ? {
+                      questions: 0,
+                      views: 0,
+                      unique_viewers: 0,
+                      outcomes: {},
+                      generated_at: doc.updated_at,
+                      timezone: 'Asia/Tokyo',
+                      documents: [],
+                    }
+                  : [],
           ),
         ),
     );
     render(<App />);
-    await screen.findByRole('navigation');
+    await screen.findByRole('navigation', { name: 'メインナビゲーション' });
     for (const label of [
-      '執筆ワークスペース',
-      '承認・レビュー',
-      'ナレッジチャット',
+      '執筆',
+      '審査',
+      'RAGチャット',
       '部署管理',
-      '反映ジョブ',
+      '反映・削除ジョブ',
       'ドキュメント',
     ]) {
       fireEvent.click(screen.getByRole('button', { name: label }));
@@ -150,14 +180,14 @@ describe('ログインと画面切替', () => {
           JSON.stringify(
             String(input).endsWith('/groups/me')
               ? { ...identity, user: { ...identity.user, operator: false }, mode: 'aws' }
-              : [],
+              : { items: [], has_next: false },
           ),
         ),
     );
     render(<App />);
-    await screen.findByRole('navigation');
-    expect(screen.queryByRole('button', { name: '反映ジョブ' })).toBeNull();
-    expect(screen.getByText('AWS WORKSPACE')).toBeVisible();
+    await screen.findByRole('navigation', { name: 'メインナビゲーション' });
+    expect(screen.queryByRole('button', { name: '反映・削除ジョブ' })).toBeNull();
+    expect(screen.getByText('AWS環境')).toBeVisible();
   });
 });
 
@@ -176,12 +206,13 @@ describe('文書一覧', () => {
     const open = vi.fn();
     render(<Library api={api} identity={identity} edit={false} onOpen={open} onError={error()} />);
     await screen.findAllByText('開発ガイド');
-    fireEvent.click(screen.getAllByRole('button').find((b) => b.className === 'document-card')!);
+    fireEvent.click(screen.getAllByRole('link', { name: '開発ガイド' })[0]!);
     expect(open).toHaveBeenCalledWith('doc0');
     fireEvent.click(screen.getByRole('button', { name: '次へ' }));
-    await screen.findByText('知識の最初の一枚を。');
+    await screen.findByText('閲覧できる文書はまだありません');
     fireEvent.click(screen.getByRole('button', { name: '前へ' }));
     fill('文書を検索', 'ゼロ');
+    fireEvent.click(screen.getByRole('button', { name: '検索する' }));
     await waitFor(() =>
       expect(calls).toHaveBeenCalledWith(
         expect.stringContaining('search=%E3%82%BC%E3%83%AD'),
@@ -194,10 +225,10 @@ describe('文書一覧', () => {
     const { api, calls } = mockApi((_, method) => (method === 'POST' ? doc : []));
     const open = vi.fn();
     render(<Library api={api} identity={identity} edit onOpen={open} onError={error()} />);
-    await screen.findByText('知識の最初の一枚を。');
+    await screen.findByText('担当する文書はまだありません');
     fireEvent.click(screen.getByRole('button', { name: '新しい文書' }));
     fill('文書タイトル', '新しい手順');
-    fireEvent.change(screen.getByLabelText('所有部署'), { target: { value: 'd1' } });
+    fireEvent.change(screen.getAllByLabelText('所有部署')[0]!, { target: { value: 'd1' } });
     fireEvent.click(screen.getByRole('button', { name: /作成して執筆/ }));
     await waitFor(() => expect(open).toHaveBeenCalledWith('doc1'));
     expect(calls).toHaveBeenCalledWith('/documents', 'POST', {
@@ -213,7 +244,8 @@ describe('文書一覧', () => {
     });
     render(<Library api={api} identity={identity} edit onOpen={vi.fn()} onError={onError} />);
     fill('文書を検索', 'なし');
-    await screen.findByText('一致する文書がありません');
+    fireEvent.click(screen.getByRole('button', { name: '検索する' }));
+    await screen.findByText('条件に一致する文書はありません');
     fireEvent.click(screen.getByRole('button', { name: '新しい文書' }));
     fill('文書タイトル', '手順');
     fireEvent.click(screen.getByRole('button', { name: /作成して執筆/ }));
@@ -274,7 +306,7 @@ describe('文書編集と履歴', () => {
     fireEvent.click(screen.getByRole('button', { name: '保存' }));
     await screen.findByText('保存しました。');
     fireEvent.click(screen.getByRole('button', { name: '承認申請' }));
-    await screen.findByText('v1 を承認申請しました。');
+    await screen.findByText(/第1版を承認申請しました/);
     fireEvent.click(screen.getByRole('button', { name: '版履歴' }));
     await screen.findByText('v2');
     fireEvent.click(screen.getByRole('button', { name: '前の版と比較' }));
@@ -291,7 +323,6 @@ describe('文書編集と履歴', () => {
     const { api } = editorApi(true);
     const onError = error(),
       back = vi.fn();
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     render(
       <DocumentPanel
         id="doc1"
@@ -311,9 +342,6 @@ describe('文書編集と履歴', () => {
     fireEvent.click(screen.getByRole('button', { name: '保存' }));
     await screen.findByText('未保存の変更があります。入力は保持されています。');
     expect(screen.getByLabelText('Markdown本文')).toHaveValue('失わない内容');
-    fireEvent.click(screen.getByRole('button', { name: '文書一覧へ' }));
-    expect(back).not.toHaveBeenCalled();
-    confirm.mockReturnValue(true);
     fireEvent.click(screen.getByRole('button', { name: '文書一覧へ' }));
     expect(back).toHaveBeenCalled();
   });
@@ -371,12 +399,14 @@ describe('文書編集と履歴', () => {
       />,
     );
     await screen.findByRole('heading', { name: '承認本文' });
-    expect(calls).toHaveBeenCalledWith(
-      '/metrics/views/doc1',
-      'POST',
-      expect.objectContaining({ department_id: 'd1' }),
+    await waitFor(() =>
+      expect(calls).toHaveBeenCalledWith(
+        '/metrics/views/doc1',
+        'POST',
+        expect.objectContaining({ department_id: 'd1' }),
+      ),
     );
-    expect(screen.getByText(ready ? /RAGへ反映済み/ : /RAGへの反映待ち/)).toBeVisible();
+    expect(screen.getByText(ready ? /RAGへ反映済み/ : /RAGへの反映は未完了です/)).toBeVisible();
   });
   it('読込失敗を通知する', async () => {
     const { api } = mockApi(() => {
@@ -438,7 +468,7 @@ describe('画像とOCR', () => {
       />,
     );
     await screen.findByDisplayValue('画像の文字');
-    fill('OCR文字', '訂正した文字\n追加した文字');
+    fill('図1・領域1の文字', '訂正した文字\n追加した文字');
     fireEvent.click(screen.getByRole('button', { name: 'OCRを確認して確定' }));
     await waitFor(() => expect(change).toHaveBeenCalledWith([{ ...placement, ocr_run_id: 'o3' }]));
     expect(calls).toHaveBeenCalledWith(
@@ -476,7 +506,7 @@ describe('画像とOCR', () => {
         onError={onError}
       />,
     );
-    await screen.findByText('OCRに失敗しました。文字を入力して確認してください。');
+    await screen.findByText('図1 · 読取失敗');
     fireEvent.click(screen.getByRole('button', { name: 'OCRを確認して確定' }));
     await waitFor(() => expect(onError).toHaveBeenCalled());
     fireEvent.change(screen.getByLabelText('画像を添付'), {
@@ -536,14 +566,17 @@ describe('承認画面', () => {
           : { document: doc, version, body: '# 申請本文', index_ready: false },
     );
     render(<Reviews api={api} token="t" onError={error()} />);
-    await screen.findByText(doc.title);
+    await screen.findByText(new RegExp(doc.title));
     fireEvent.click(screen.getByRole('button', { name: /内容を確認/ }));
     await screen.findByRole('heading', { name: '申請本文' });
-    fill('審査コメント（却下時は必須）', '要件を確認');
+    fill('審査コメント', '要件を確認');
     fireEvent.click(
       screen.getByRole('button', {
         name: decision === 'approved' ? 'この版を承認' : '理由を残して却下',
       }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: decision === 'approved' ? '承認する' : '却下する' }),
     );
     await screen.findByRole('status');
     expect(calls).toHaveBeenCalledWith(
@@ -566,13 +599,14 @@ describe('承認画面', () => {
     });
     const onError = error();
     render(<Reviews api={api} token="t" onError={onError} />);
-    await screen.findByText(doc.title);
+    await screen.findByText(new RegExp(doc.title));
     fireEvent.click(screen.getByRole('button', { name: /内容を確認/ }));
     await waitFor(() => expect(onError).toHaveBeenCalledWith('Error: open'));
     fail = 'decision';
     fireEvent.click(screen.getByRole('button', { name: /内容を確認/ }));
     await screen.findByText('本文');
     fireEvent.click(screen.getByRole('button', { name: 'この版を承認' }));
+    fireEvent.click(screen.getByRole('button', { name: '承認する' }));
     await waitFor(() => expect(onError).toHaveBeenCalledWith('Error: decision'));
     fireEvent.click(screen.getByRole('button', { name: '一覧へ戻る' }));
     expect(screen.getByRole('button', { name: /内容を確認/ })).toBeVisible();
@@ -601,7 +635,7 @@ describe('根拠付きチャット', () => {
     fireEvent.click(screen.getByRole('button', { name: '質問を送信' }));
     await screen.findByText('承認します');
     fireEvent.click(screen.getByRole('button', { name: /開発ガイド/ }));
-    expect(open).toHaveBeenCalledWith('doc1');
+    expect(open).toHaveBeenCalledWith('doc1', answer.citations[0]);
     fireEvent.click(screen.getByRole('button', { name: '履歴を再確認' }));
     await screen.findByText('表示を停止');
     fill('質問', '追加の質問');
@@ -672,16 +706,20 @@ describe('部署管理', () => {
       ];
     });
   }
-  it('リーダーに統計と公開管理と所属管理を表示する', async () => {
+  it('変更前後を確認するまでは公開設定を保存しない', async () => {
     const { api, calls } = groupApi();
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<Groups api={api} identity={identity} onError={error()} />);
     await screen.findByText('別の担当者');
     expect(screen.getByText('3')).toBeVisible();
-    fireEvent.change(screen.getByLabelText('管理部署'), { target: { value: 'd1' } });
-    fireEvent.change(screen.getByLabelText('開発ガイドの公開範囲'), {
-      target: { value: 'organization' },
-    });
+    fireEvent.click(screen.getByRole('button', { name: /管理.*開発ガイド/ }));
+    fill('公開範囲', 'organization');
+    expect(calls.mock.calls.filter((c) => c[1])).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: '変更内容を確認' }));
+    expect(screen.getByRole('dialog')).toHaveTextContent('開発部');
+    fireEvent.click(screen.getByRole('button', { name: 'キャンセル' }));
+    expect(calls.mock.calls.filter((c) => c[1])).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: '変更内容を確認' }));
+    fireEvent.click(screen.getByRole('button', { name: '保存する' }));
     await waitFor(() =>
       expect(calls).toHaveBeenCalledWith(
         '/documents/doc1/policy',
@@ -689,31 +727,11 @@ describe('部署管理', () => {
         expect.objectContaining({ visibility: 'organization' }),
       ),
     );
-    fireEvent.click(screen.getByRole('button', { name: '公開を再開' }));
     await waitFor(() =>
-      expect(calls).toHaveBeenCalledWith(
-        '/documents/doc2/policy',
-        'PUT',
-        expect.objectContaining({ status: 'active' }),
-      ),
-    );
-    fireEvent.click(screen.getAllByRole('button', { name: '公開停止' })[0]!);
-    await waitFor(() =>
-      expect(calls).toHaveBeenCalledWith(
-        '/documents/doc1/policy',
-        'PUT',
-        expect.objectContaining({ status: 'withdrawn' }),
-      ),
-    );
-    fireEvent.click(screen.getAllByRole('button', { name: '削除' })[0]!);
-    await waitFor(() =>
-      expect(calls).toHaveBeenCalledWith(
-        '/documents/doc1/policy',
-        'PUT',
-        expect.objectContaining({ status: 'deleted' }),
-      ),
+      expect(screen.queryByText('開発ガイド の公開設定')).not.toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole('button', { name: '所属を停止' }));
+    fireEvent.click(screen.getByRole('button', { name: '所属を変更する' }));
     await waitFor(() =>
       expect(calls).toHaveBeenCalledWith(
         '/groups/memberships',
@@ -721,7 +739,9 @@ describe('部署管理', () => {
         expect.objectContaining({ active: false }),
       ),
     );
+    await waitFor(() => expect(screen.getByRole('button', { name: '所属を再開' })).toBeEnabled());
     fireEvent.click(screen.getByRole('button', { name: '所属を再開' }));
+    fireEvent.click(screen.getByRole('button', { name: '所属を変更する' }));
     await waitFor(() =>
       expect(calls).toHaveBeenCalledWith(
         '/groups/memberships',
@@ -730,24 +750,26 @@ describe('部署管理', () => {
       ),
     );
   });
-  it('削除取消と各更新失敗を通知する', async () => {
+  it('削除取消と更新失敗でも入力を保持する', async () => {
     const { api, calls } = groupApi(() => {
       throw new Error('groups');
     });
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
     const onError = error();
     render(<Groups api={api} identity={identity} onError={onError} />);
     await screen.findByText('別の担当者');
-    fireEvent.click(screen.getAllByRole('button', { name: '削除' })[0]!);
+    fireEvent.click(screen.getByRole('button', { name: /管理.*開発ガイド/ }));
+    expect(screen.getByRole('button', { name: '削除内容を確認' })).toBeDisabled();
+    fill('削除理由（必須）', '運用を終了');
+    fireEvent.click(screen.getByRole('button', { name: '削除内容を確認' }));
+    fireEvent.click(screen.getByRole('button', { name: 'キャンセル' }));
     expect(calls.mock.calls.filter((c) => c[1])).toHaveLength(0);
-    fireEvent.click(screen.getAllByRole('button', { name: '公開停止' })[0]!);
+    fireEvent.click(screen.getByRole('button', { name: '削除内容を確認' }));
+    fireEvent.click(screen.getByRole('button', { name: '削除する' }));
     await waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
-    fireEvent.change(screen.getByLabelText('開発ガイドの公開範囲'), {
-      target: { value: 'organization' },
-    });
-    await waitFor(() => expect(onError).toHaveBeenCalledTimes(2));
+    expect(screen.getByLabelText('削除理由（必須）')).toHaveValue('運用を終了');
     fireEvent.click(screen.getByRole('button', { name: '所属を停止' }));
-    await waitFor(() => expect(onError).toHaveBeenCalledTimes(3));
+    fireEvent.click(screen.getByRole('button', { name: '所属を変更する' }));
+    await waitFor(() => expect(onError).toHaveBeenCalledTimes(2));
   });
   it('管理対象なしと統計取得失敗を区別する', async () => {
     const { api } = mockApi(() => {
@@ -757,7 +779,7 @@ describe('部署管理', () => {
     const { rerender } = render(
       <Groups api={api} identity={{ ...identity, memberships: [] }} onError={onError} />,
     );
-    expect(screen.getByText('部署リーダー向けの画面です')).toBeVisible();
+    expect(screen.getByText('部署リーダー向けの画面です。')).toBeVisible();
     rerender(<Groups api={api} identity={identity} onError={onError} />);
     expect(onError).not.toHaveBeenCalled();
   });
@@ -771,8 +793,8 @@ describe('部署管理', () => {
   });
 });
 
-describe('反映ジョブ', () => {
-  it('未反映ジョブを実行し照合の不一致を表示する', async () => {
+describe('反映・削除ジョブ', () => {
+  it('未反映・削除ジョブを実行し照合の不一致を表示する', async () => {
     const { api, calls } = mockApi((path, method) =>
       method === 'POST'
         ? {}
@@ -805,11 +827,12 @@ describe('反映ジョブ', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: '正本と索引を照合' }));
     await screen.findByText('doc1: 旧版残留');
+    fireEvent.click(screen.getAllByText('処理の識別情報')[1]!);
     expect(screen.getByText('integrity')).toBeVisible();
   });
   it('ジョブ実行と照合の失敗を通知する', async () => {
     const { api } = mockApi((path) => {
-      if (path === '/operations/jobs')
+      if (path === '/operations/jobs?details=true')
         return [
           {
             id: 'j1',
@@ -853,7 +876,7 @@ it('本文の指定offsetに画像を並べて残りの本文を保つ', async (
     />,
   );
   const captions = document.querySelectorAll('figcaption');
-  expect(Array.from(captions, (c) => c.textContent)).toEqual(['前図', '後図']);
+  expect(Array.from(captions, (c) => c.textContent)).toEqual(['図1 前図', '図2 後図']);
   expect(screen.getByText('前半')).toBeVisible();
   await screen.findAllByText('画像を表示できません。');
 });

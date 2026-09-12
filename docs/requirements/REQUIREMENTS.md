@@ -2,7 +2,7 @@
 # KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG 要件一覧
 
 - スキーマ版: 1
-- カタログ版: 2
+- カタログ版: 3
 - Product(JSON): <code>"KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG"</code>
 - 更新日(JSON): <code>"2026-09-12"</code>
 - 正本: `spec/requirements/requirements.qnt`
@@ -104,6 +104,21 @@
 | <code>"REQ-PRJ-06"</code> | 1 | 有効 | 制約 | 開発担当は、Compose上でE2Eの証拠を取得するを**強制する**（<code>"enforce"</code>） | CIとローカルの実コマンド |
 | <code>"REQ-PRJ-07"</code> | 1 | 有効 | 制約 | 開発担当は、設計と品質を単一SPAで公開するを**強制する**（<code>"enforce"</code>） | CIとローカルの実コマンド |
 | <code>"REQ-PRJ-08"</code> | 1 | 有効 | 制約 | 開発担当は、CDKの構成を多面的に検証するを**強制する**（<code>"enforce"</code>） | CIとローカルの実コマンド |
+| <code>"REQ-UX-01"</code> | 1 | 有効 | 制約 | システムは、読みやすい文字とコントラストを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-02"</code> | 1 | 有効 | 制約 | システムは、画面幅によらずアカウント操作を提供するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-03"</code> | 1 | 有効 | 制約 | システムは、キーボードのフォーカスを維持するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-04"</code> | 1 | 有効 | 機能 | システムは、全画面遷移で未保存入力を保護するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-05"</code> | 1 | 有効 | 機能 | システムは、同じ版の本文と画像配置を再現するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-06"</code> | 1 | 有効 | 機能 | システムは、OCRの文字と領域を一対一で保持するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-07"</code> | 1 | 有効 | 機能 | システムは、画像の代替情報を版へ含めるを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-08"</code> | 1 | 有効 | 機能 | システムは、絵文字を含む挿入位置を統一するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-09"</code> | 1 | 有効 | 機能 | システムは、引用版と最新公開版を混同しないを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-10"</code> | 1 | 有効 | 機能 | システムは、管理対象部署を一覧と操作へ一致させるを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-11"</code> | 1 | 有効 | 機能 | システムは、公開設定を明示確認して保存するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-12"</code> | 1 | 有効 | 機能 | システムは、削除理由を監査へ保存するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-13"</code> | 1 | 有効 | 機能 | システムは、利用部署を閲覧と会話へ明示するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-14"</code> | 1 | 有効 | 機能 | システムは、公開版と作業状態を分離表示するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-15"</code> | 1 | 有効 | 機能 | システムは、一覧の取得状態とページ件数を区別するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 
 ## REQ-DOC-01: ブラウザでMarkdownを編集する
 
@@ -3109,6 +3124,486 @@
 - 設計: <code>["docs/design/generated/INFRA.md"]</code>
 - 実装: <code>["tools/project/verify.py","frontend/portal/App.tsx","infra/src/kotorelay_infra/stack.py"]</code>
 - テスト: <code>["tools/project/tests/test_project_tools.py","infra/tests/test_stack.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-01: 読みやすい文字とコントラスト
+
+要件ID(JSON): <code>"REQ-UX-01"</code>
+タイトル(JSON): <code>"読みやすい文字とコントラスト"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"読みやすい文字とコントラスト"</code>
+システムは、読みやすい文字とコントラストを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-UX-01"</code> 前提: 対象機能を利用できる権限がある。条件: UIを表示する。期待結果: UI文字16px以上、補助14px以上、文字のコントラスト4.5:1以上、操作境界3:1以上を維持する。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-01","then":"UI文字16px以上、補助14px以上、文字のコントラスト4.5:1以上、操作境界3:1以上を維持する","when":"UIを表示する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/styles/tokens.css"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-02: 画面幅によらずアカウント操作を提供する
+
+要件ID(JSON): <code>"REQ-UX-02"</code>
+タイトル(JSON): <code>"画面幅によらずアカウント操作を提供する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"画面幅によらずアカウント操作を提供する"</code>
+システムは、画面幅によらずアカウント操作を提供するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-UX-02"</code> 前提: 対象機能を利用できる権限がある。条件: 320・390・768・1440pxで操作する。期待結果: 利用部署、名前付きメニュー、ログアウトへアクセスでき、表と精密画像以外はページ全体に横スクロールを作らない。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-02","then":"利用部署、名前付きメニュー、ログアウトへアクセスでき、表と精密画像以外はページ全体に横スクロールを作らない","when":"320・390・768・1440pxで操作する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/components/App.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-03: キーボードのフォーカスを維持する
+
+要件ID(JSON): <code>"REQ-UX-03"</code>
+タイトル(JSON): <code>"キーボードのフォーカスを維持する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"キーボードのフォーカスを維持する"</code>
+システムは、キーボードのフォーカスを維持するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-UX-03"</code> 前提: 対象機能を利用できる権限がある。条件: キーボードで画面遷移と確認を操作する。期待結果: 操作位置が視覚で分かり、確認終了後に起点へ戻り、見出しとラベルが操作対象を説明する。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-03","then":"操作位置が視覚で分かり、確認終了後に起点へ戻り、見出しとラベルが操作対象を説明する","when":"キーボードで画面遷移と確認を操作する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/components/ui/ConfirmDialog.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-04: 全画面遷移で未保存入力を保護する
+
+要件ID(JSON): <code>"REQ-UX-04"</code>
+タイトル(JSON): <code>"全画面遷移で未保存入力を保護する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"全画面遷移で未保存入力を保護する"</code>
+システムは、全画面遷移で未保存入力を保護するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-04"</code> 前提: 対象機能を利用できる権限がある。条件: ナビ・ロゴ・戻る・ログアウト・ブラウザ離脱を行う。期待結果: 未保存入力がある場合に確認し、キャンセルと競合時に本文・OCR訂正・設定値を保持する。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-04","then":"未保存入力がある場合に確認し、キャンセルと競合時に本文・OCR訂正・設定値を保持する","when":"ナビ・ロゴ・戻る・ログアウト・ブラウザ離脱を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/components/layout/Workspace.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-05: 同じ版の本文と画像配置を再現する
+
+要件ID(JSON): <code>"REQ-UX-05"</code>
+タイトル(JSON): <code>"同じ版の本文と画像配置を再現する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"同じ版の本文と画像配置を再現する"</code>
+システムは、同じ版の本文と画像配置を再現するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-05"</code> 前提: 対象機能を利用できる権限がある。条件: プレビュー・審査・閲覧を開く。期待結果: 同じマニフェストの本文と画像を同じ順序・位置・説明で表示する。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-05","then":"同じマニフェストの本文と画像を同じ順序・位置・説明で表示する","when":"プレビュー・審査・閲覧を開く"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/features/documents/PlacedDocument.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-06: OCRの文字と領域を一対一で保持する
+
+要件ID(JSON): <code>"REQ-UX-06"</code>
+タイトル(JSON): <code>"OCRの文字と領域を一対一で保持する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"OCRの文字と領域を一対一で保持する"</code>
+システムは、OCRの文字と領域を一対一で保持するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-06"</code> 前提: 対象機能を利用できる権限がある。条件: 領域の複数行訂正・追加・削除・位置変更を行う。期待結果: 安定した領域IDと座標を維持し、手入力の確信度を捏造せず、既存の承認版を書き換えない。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-06","then":"安定した領域IDと座標を維持し、手入力の確信度を捏造せず、既存の承認版を書き換えない","when":"領域の複数行訂正・追加・削除・位置変更を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/images/functions.py"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-07: 画像の代替情報を版へ含める
+
+要件ID(JSON): <code>"REQ-UX-07"</code>
+タイトル(JSON): <code>"画像の代替情報を版へ含める"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"画像の代替情報を版へ含める"</code>
+システムは、画像の代替情報を版へ含めるを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-07"</code> 前提: 対象機能を利用できる権限がある。条件: 画像の説明と代替テキストを保存して申請する。期待結果: 図の意味と説明文が配置情報として確定版に保存され、本文とともに表示される。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-07","then":"図の意味と説明文が配置情報として確定版に保存され、本文とともに表示される","when":"画像の説明と代替テキストを保存して申請する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["backend/src/kotorelay/schemas.py"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-08: 絵文字を含む挿入位置を統一する
+
+要件ID(JSON): <code>"REQ-UX-08"</code>
+タイトル(JSON): <code>"絵文字を含む挿入位置を統一する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"絵文字を含む挿入位置を統一する"</code>
+システムは、絵文字を含む挿入位置を統一するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-08"</code> 前提: 対象機能を利用できる権限がある。条件: 日本語・絵文字を含む本文を編集する。期待結果: Unicodeコードポイント単位の位置をフロントとAPIで共有し、文字途中で分断せず再配置を確認できる。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-08","then":"Unicodeコードポイント単位の位置をフロントとAPIで共有し、文字途中で分断せず再配置を確認できる","when":"日本語・絵文字を含む本文を編集する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/features/documents/PlacedDocument.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-09: 引用版と最新公開版を混同しない
+
+要件ID(JSON): <code>"REQ-UX-09"</code>
+タイトル(JSON): <code>"引用版と最新公開版を混同しない"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"引用版と最新公開版を混同しない"</code>
+システムは、引用版と最新公開版を混同しないを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-09"</code> 前提: 対象機能を利用できる権限がある。条件: 回答後に公開版が更新された文書の引用を開く。期待結果: 当時の引用として新版を表示せず更新を説明し、明示操作で最新版を開き、非許可の旧版は表示しない。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-09","then":"当時の引用として新版を表示せず更新を説明し、明示操作で最新版を開き、非許可の旧版は表示しない","when":"回答後に公開版が更新された文書の引用を開く"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/features/documents/DocumentPanel.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-10: 管理対象部署を一覧と操作へ一致させる
+
+要件ID(JSON): <code>"REQ-UX-10"</code>
+タイトル(JSON): <code>"管理対象部署を一覧と操作へ一致させる"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"管理対象部署を一覧と操作へ一致させる"</code>
+システムは、管理対象部署を一覧と操作へ一致させるを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-10"</code> 前提: 対象機能を利用できる権限がある。条件: 複数部署リーダーが管理部署を選ぶ。期待結果: 文書一覧・統計・所属・確認対象を選択部署へ揃え、APIで認可しページング前に絞り込む。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-10","then":"文書一覧・統計・所属・確認対象を選択部署へ揃え、APIで認可しページング前に絞り込む","when":"複数部署リーダーが管理部署を選ぶ"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/documents/functions.py"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-11: 公開設定を明示確認して保存する
+
+要件ID(JSON): <code>"REQ-UX-11"</code>
+タイトル(JSON): <code>"公開設定を明示確認して保存する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"公開設定を明示確認して保存する"</code>
+システムは、公開設定を明示確認して保存するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-11"</code> 前提: 対象機能を利用できる権限がある。条件: 公開先と公開状態を編集する。期待結果: 編集だけでは反映せず、変更前後と対象部署・文書を確認してから保存する。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-11","then":"編集だけでは反映せず、変更前後と対象部署・文書を確認してから保存する","when":"公開先と公開状態を編集する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/features/groups/Groups.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-12: 削除理由を監査へ保存する
+
+要件ID(JSON): <code>"REQ-UX-12"</code>
+タイトル(JSON): <code>"削除理由を監査へ保存する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"削除理由を監査へ保存する"</code>
+システムは、削除理由を監査へ保存するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-12"</code> 前提: 対象機能を利用できる権限がある。条件: 文書を削除する。期待結果: 理由未入力を拒否し、状態変更と理由の監査を同じ業務transactionで確定する。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-12","then":"理由未入力を拒否し、状態変更と理由の監査を同じ業務transactionで確定する","when":"文書を削除する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/documents/functions.py"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-13: 利用部署を閲覧と会話へ明示する
+
+要件ID(JSON): <code>"REQ-UX-13"</code>
+タイトル(JSON): <code>"利用部署を閲覧と会話へ明示する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"利用部署を閲覧と会話へ明示する"</code>
+システムは、利用部署を閲覧と会話へ明示するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-13"</code> 前提: 対象機能を利用できる権限がある。条件: 利用部署を変更する。期待結果: 閲覧と質問を選択部署に帰属させ、会話内の部署変更を拒否して新規会話を開始する。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-13","then":"閲覧と質問を選択部署に帰属させ、会話内の部署変更を拒否して新規会話を開始する","when":"利用部署を変更する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/chat/functions.py"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-14: 公開版と作業状態を分離表示する
+
+要件ID(JSON): <code>"REQ-UX-14"</code>
+タイトル(JSON): <code>"公開版と作業状態を分離表示する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"公開版と作業状態を分離表示する"</code>
+システムは、公開版と作業状態を分離表示するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-14"</code> 前提: 対象機能を利用できる権限がある。条件: 文書一覧とジョブを表示する。期待結果: 公開版・審査版・RAG反映・削除処理を別の軸として表示し、未計測の処理状態を推測しない。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-14","then":"公開版・審査版・RAG反映・削除処理を別の軸として表示し、未計測の処理状態を推測しない","when":"文書一覧とジョブを表示する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/lib/api.ts"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-UX-15: 一覧の取得状態とページ件数を区別する
+
+要件ID(JSON): <code>"REQ-UX-15"</code>
+タイトル(JSON): <code>"一覧の取得状態とページ件数を区別する"</code>
+主体(JSON): <code>"システム"</code>
+対象(JSON): <code>"一覧の取得状態とページ件数を区別する"</code>
+システムは、一覧の取得状態とページ件数を区別するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 提供されたUIデザイン設計の受入条件。
+根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"ui-design-2026-09-12"</code>
+分類: scope=<code>"product"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-UX-15"</code> 前提: 対象機能を利用できる権限がある。条件: 検索とページ送りを実行する。期待結果: 読込中・0件・検索0件・失敗を区別し再操作を提供し、現在ページの件数を総数と呼ばない。
+  - criterion(JSON Object): <code>{"given":"対象機能を利用できる権限がある","id":"AC-UX-15","then":"読込中・0件・検索0件・失敗を区別し再操作を提供し、現在ページの件数を総数と呼ばない","when":"検索とページ送りを実行する"}</code>
+
+要求源(JSON List): <code>["docs/planning/UI-REVISION.md"]</code>
+検証方法: 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。
+検証証跡: 品質ポータルの同一runの検証結果
+検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
+- 実装: <code>["frontend/src/features/documents/Library.tsx"]</code>
+- テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>

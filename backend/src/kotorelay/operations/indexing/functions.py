@@ -200,6 +200,20 @@ def jobs(ctx: Context) -> list[q.OutboxRow]:
     return q.outbox_list(ctx.db, ctx.org)
 
 
+def job_details(ctx: Context) -> list[dict[str, object]]:
+    rows = jobs(ctx)
+    docs = {d.id: d for d in q.documents_list(ctx.db, ctx.org)}
+    versions = {v.id: v for v in q.versions_list(ctx.db, ctx.org)}
+    return [
+        dict(
+            row.model_dump(),
+            title=docs[row.document_id].title,
+            version_number=versions[row.version_id].number if row.version_id else None,
+        )
+        for row in rows
+    ]
+
+
 def reconcile(ctx: Context) -> list[dict[str, str]]:
     require(ctx.user.operator, "forbidden", 403)
     chunks = q.chunks_list(ctx.db, ctx.org)

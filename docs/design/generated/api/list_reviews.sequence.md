@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 審査状況を一覧 — sequence
 
@@ -20,6 +20,7 @@ sequenceDiagram
         A->>D: organizations_get
         A->>D: submissions_list
         A->>D: users_list
+        A->>D: versions_list
         A->>S: 内容ハッシュ実体を照合
         opt 実体欠落・ハッシュ不一致
             A-->>U: 利用不可・回答保留
@@ -39,5 +40,5 @@ sequenceDiagram
 | kotorelay.context.Context.permission | 67 | Return | False |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.reviews.functions.list_reviews | 18 | Return | [{'submission': s, 'title': documents[s.document_id].title, 'can_review': ctx.permission(documents[s.document_id].department_id, 'review')} for s in q.submissions_list(ctx.db, ctx.org) if s.document_id in documents] |
+| kotorelay.operations.reviews.functions.list_reviews | 21 | Return | [{'submission': s, 'title': versions[s.version_id].title, 'version_number': versions[s.version_id].number, 'requested_by': users[s.requested_by], 'department_name': departments[documents[s.document_id].department_id], 'self_requested': s.requested_by == ctx.user.id, 'can_review': ctx.permission(documents[s.document_id].department_id, 'review')} for s in q.submissions_list(ctx.db, ctx.org) if s.document_id in documents] |
 | kotorelay.operations.reviews.router.list_reviews | 18 | Return | f.list_reviews(ctx) |

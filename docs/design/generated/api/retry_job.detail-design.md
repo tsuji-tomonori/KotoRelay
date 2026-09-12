@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 反映ジョブを再処理 — detail-design
 
@@ -76,29 +76,29 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/context.py:18 | datetime.now(UTC) |
 | backend/src/kotorelay/context.py:26 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | backend/src/kotorelay/generated/queries.py:264 | db.query('operations/chat/sql/answers_list.sql', {'organization_id': organization_id}, AnswersRow) |
-| backend/src/kotorelay/generated/queries.py:535 | db.execute('operations/images/sql/assets_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/generated/queries.py:542 | db.query('operations/images/sql/assets_get.sql', {'organization_id': organization_id, 'id': id}, AssetsRow) |
-| backend/src/kotorelay/generated/queries.py:556 | db.query('operations/images/sql/assets_list.sql', {'organization_id': organization_id}, AssetsRow) |
-| backend/src/kotorelay/generated/queries.py:591 | db.execute('operations/indexing/sql/chunks_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/generated/queries.py:607 | db.execute('operations/indexing/sql/chunks_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:612 | db.query('operations/indexing/sql/chunks_list.sql', {'organization_id': organization_id}, ChunksRow) |
-| backend/src/kotorelay/generated/queries.py:619 | db.execute('operations/indexing/sql/chunks_update.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:426 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/generated/queries.py:320 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/generated/queries.py:334 | db.query('operations/documents/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
-| backend/src/kotorelay/generated/queries.py:348 | db.execute('operations/documents/sql/drafts_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/generated/queries.py:369 | db.query('operations/documents/sql/drafts_list.sql', {'organization_id': organization_id}, DraftsRow) |
-| backend/src/kotorelay/generated/queries.py:462 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/generated/queries.py:563 | db.execute('operations/images/sql/ocr_runs_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/generated/queries.py:570 | db.query('operations/images/sql/ocr_runs_get.sql', {'organization_id': organization_id, 'id': id}, OcrRunsRow) |
-| backend/src/kotorelay/generated/queries.py:584 | db.query('operations/images/sql/ocr_runs_list.sql', {'organization_id': organization_id}, OcrRunsRow) |
-| backend/src/kotorelay/generated/queries.py:476 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:481 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/generated/queries.py:631 | db.query('operations/indexing/sql/outbox_get.sql', {'organization_id': organization_id, 'id': id}, OutboxRow) |
-| backend/src/kotorelay/generated/queries.py:652 | db.execute('operations/indexing/sql/outbox_update.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:523 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
-| backend/src/kotorelay/generated/queries.py:389 | db.query('operations/documents/sql/versions_get.sql', {'organization_id': organization_id, 'id': id}, VersionsRow) |
-| backend/src/kotorelay/generated/queries.py:403 | db.query('operations/documents/sql/versions_list.sql', {'organization_id': organization_id}, VersionsRow) |
+| backend/src/kotorelay/generated/queries.py:546 | db.execute('operations/images/sql/assets_delete.sql', {'organization_id': organization_id, 'id': id}) |
+| backend/src/kotorelay/generated/queries.py:553 | db.query('operations/images/sql/assets_get.sql', {'organization_id': organization_id, 'id': id}, AssetsRow) |
+| backend/src/kotorelay/generated/queries.py:567 | db.query('operations/images/sql/assets_list.sql', {'organization_id': organization_id}, AssetsRow) |
+| backend/src/kotorelay/generated/queries.py:602 | db.execute('operations/indexing/sql/chunks_delete.sql', {'organization_id': organization_id, 'id': id}) |
+| backend/src/kotorelay/generated/queries.py:618 | db.execute('operations/indexing/sql/chunks_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:623 | db.query('operations/indexing/sql/chunks_list.sql', {'organization_id': organization_id}, ChunksRow) |
+| backend/src/kotorelay/generated/queries.py:630 | db.execute('operations/indexing/sql/chunks_update.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:437 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/generated/queries.py:331 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
+| backend/src/kotorelay/generated/queries.py:345 | db.query('operations/documents/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
+| backend/src/kotorelay/generated/queries.py:359 | db.execute('operations/documents/sql/drafts_delete.sql', {'organization_id': organization_id, 'id': id}) |
+| backend/src/kotorelay/generated/queries.py:380 | db.query('operations/documents/sql/drafts_list.sql', {'organization_id': organization_id}, DraftsRow) |
+| backend/src/kotorelay/generated/queries.py:473 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
+| backend/src/kotorelay/generated/queries.py:574 | db.execute('operations/images/sql/ocr_runs_delete.sql', {'organization_id': organization_id, 'id': id}) |
+| backend/src/kotorelay/generated/queries.py:581 | db.query('operations/images/sql/ocr_runs_get.sql', {'organization_id': organization_id, 'id': id}, OcrRunsRow) |
+| backend/src/kotorelay/generated/queries.py:595 | db.query('operations/images/sql/ocr_runs_list.sql', {'organization_id': organization_id}, OcrRunsRow) |
+| backend/src/kotorelay/generated/queries.py:487 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:492 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
+| backend/src/kotorelay/generated/queries.py:642 | db.query('operations/indexing/sql/outbox_get.sql', {'organization_id': organization_id, 'id': id}, OutboxRow) |
+| backend/src/kotorelay/generated/queries.py:663 | db.execute('operations/indexing/sql/outbox_update.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:534 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/generated/queries.py:400 | db.query('operations/documents/sql/versions_get.sql', {'organization_id': organization_id, 'id': id}, VersionsRow) |
+| backend/src/kotorelay/generated/queries.py:414 | db.query('operations/documents/sql/versions_list.sql', {'organization_id': organization_id}, VersionsRow) |
 | backend/src/kotorelay/operations/indexing/functions.py:96 | 'done' |
 | backend/src/kotorelay/operations/indexing/functions.py:41 | 'obsolete' |
 | backend/src/kotorelay/operations/indexing/functions.py:51 | 'pending' |

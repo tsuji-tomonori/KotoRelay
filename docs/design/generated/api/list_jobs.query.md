@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 反映ジョブと失敗理由を確認 — query
 
@@ -28,6 +28,39 @@ ORDER BY
 | organization_id: str | str |
 
 戻り値: `list[DepartmentsRow]`
+
+## documents_list
+
+正本: `backend/src/kotorelay/operations/documents/sql/documents_list.sql`
+
+```sql
+/* documentsを組織境界内でlistする。 */
+SELECT
+  id,
+  organization_id,
+  department_id,
+  title,
+  created_by,
+  visibility,
+  shared_departments,
+  status,
+  revision,
+  next_version,
+  latest_version_id,
+  updated_at
+FROM documents
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+| 入力／出力型 | 定義 |
+| --- | --- |
+| db: Database | Database |
+| organization_id: str | str |
+
+戻り値: `list[DocumentsRow]`
 
 ## memberships_list
 
@@ -139,3 +172,35 @@ ORDER BY
 | organization_id: str | str |
 
 戻り値: `list[UsersRow]`
+
+## versions_list
+
+正本: `backend/src/kotorelay/operations/documents/sql/versions_list.sql`
+
+```sql
+/* versionsを組織境界内でlistする。 */
+SELECT
+  id,
+  organization_id,
+  document_id,
+  number,
+  title,
+  body_key,
+  body_hash,
+  manifest,
+  manifest_hash,
+  created_by,
+  created_at
+FROM versions
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+| 入力／出力型 | 定義 |
+| --- | --- |
+| db: Database | Database |
+| organization_id: str | str |
+
+戻り値: `list[VersionsRow]`

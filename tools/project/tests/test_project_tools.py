@@ -37,3 +37,24 @@ def test_SQLの未対応構文を型生成で拒否する(monkeypatch, tmp_path)
     monkeypatch.setattr(module, "ROOT", tmp_path)
     with pytest.raises(ValueError, match="未対応DDL"):
         module.render()
+
+
+def test_分割されたTSXの画面とイベントを構文木から列挙する():
+    import json
+    import shutil
+    import subprocess
+
+    value = json.loads(
+        subprocess.check_output(
+            [shutil.which("node") or "/usr/bin/node", "tools/project/frontend-inventory.mjs"],
+            text=True,
+        )
+    )
+    components = {c["name"]: c["source"] for c in value["components"]}
+    assert components["Images"] == "frontend/src/features/images/Images.tsx"
+    assert components["Library"] == "frontend/src/features/documents/Library.tsx"
+    assert any(
+        c["event"] == "onChange" and c["source"] == components["Images"]
+        for c in value["interactions"]
+    )
+    assert any("/documents?" in c["expression"] for c in value["calls"])

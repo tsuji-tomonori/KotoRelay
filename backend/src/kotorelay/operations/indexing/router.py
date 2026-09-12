@@ -12,8 +12,8 @@ router = APIRouter(prefix="/api/operations", tags=["運用"])
 
 
 @router.get("/jobs", summary="反映ジョブと失敗理由を確認", operation_id="list_jobs")
-def list_jobs(ctx: Ctx) -> list[q.OutboxRow]:
-    return f.jobs(ctx)
+def list_jobs(ctx: Ctx, details: bool = False) -> list[dict[str, object]]:
+    return f.job_details(ctx) if details else [row.model_dump() for row in f.jobs(ctx)]
 
 
 @router.post("/jobs/{job_id}", summary="反映ジョブを再処理", operation_id="retry_job")

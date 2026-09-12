@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 実閲覧を一意IDで記録 — detail-design
 
@@ -44,14 +44,14 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/context.py:56 | any((m.department_id == department_id for m in self.memberships)) |
 | backend/src/kotorelay/context.py:18 | datetime.now(UTC) |
 | backend/src/kotorelay/context.py:26 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
-| backend/src/kotorelay/generated/queries.py:426 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/generated/queries.py:320 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/generated/queries.py:657 | db.query('operations/metrics/sql/events_get.sql', {'organization_id': organization_id, 'id': id}, EventsRow) |
-| backend/src/kotorelay/generated/queries.py:666 | db.execute('operations/metrics/sql/events_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:462 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/generated/queries.py:476 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:481 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/generated/queries.py:523 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/generated/queries.py:437 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/generated/queries.py:331 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
+| backend/src/kotorelay/generated/queries.py:668 | db.query('operations/metrics/sql/events_get.sql', {'organization_id': organization_id, 'id': id}, EventsRow) |
+| backend/src/kotorelay/generated/queries.py:677 | db.execute('operations/metrics/sql/events_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:473 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
+| backend/src/kotorelay/generated/queries.py:487 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:492 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
+| backend/src/kotorelay/generated/queries.py:534 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
 | backend/src/kotorelay/operations/metrics/functions.py:42 | {'recorded': True} |
 | backend/src/kotorelay/operations/metrics/functions.py:26 | {'recorded': False} |
 | backend/src/kotorelay/operations/metrics/router.py:17 | f.view(ctx, str(document_id), data) |

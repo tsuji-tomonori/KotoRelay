@@ -10,7 +10,7 @@ from pathlib import Path
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-from kotorelay.context import Context, new_id, now
+from kotorelay.context import Context, new_id, now, stable_id
 from kotorelay.errors import Problem, require
 from kotorelay.generated import queries as q
 from kotorelay.schemas import Manifest, OcrCorrection, OcrResult, Region
@@ -58,6 +58,7 @@ def run_ocr(data: bytes, width: int, height: int, command: str) -> OcrResult:
             if text:
                 regions.append(
                     Region(
+                        region_id=new_id(),
                         text=text,
                         x=int(line["left"]) / width,
                         y=int(line["top"]) / height,
@@ -115,13 +116,25 @@ def correct(ctx: Context, asset_id: str, data: OcrCorrection) -> dict[str, objec
     require(bool(assets))
     asset = assets[0]
     ctx.document(asset.document_id, "author")
+    ids = [r.region_id for r in data.regions if r.region_id is not None]
+    require(len(ids) == len(set(ids)), "invalid_region", 422)
     for region in data.regions:
         require(
             region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001,
             "invalid_region",
             422,
         )
-    result = OcrResult(regions=data.regions, engine="human-correction-v1", status="ready")
+    result = OcrResult(
+        regions=[
+            r.model_copy(
+                update={"region_id": r.region_id or new_id(), "source": "human", "confidence": None}
+            )
+            for r in data.regions
+        ],
+        engine="human-correction-v1",
+        status="ready",
+        confirmed=data.confirmed,
+    )
     key = ctx.objects.put(result.model_dump_json().encode(), "application/json")
     run = q.OcrRunsRow(
         id=new_id(),
@@ -182,4 +195,14 @@ def ocr(ctx: Context, run_id: str, version_id: str | None) -> OcrResult:
                 for i in Manifest.model_validate_json(version.manifest).images
             )
         )
-    return OcrResult.model_validate_json(ctx.objects.get(run.result_key, run.result_hash))
+    result = OcrResult.model_validate_json(ctx.objects.get(run.result_key, run.result_hash))
+    # 旧runは読取時だけ安定IDを補い、承認済みのJSONとハッシュを変更しない。
+    return result.model_copy(
+        update={
+            "confirmed": run.confirmed,
+            "regions": [
+                r.model_copy(update={"region_id": r.region_id or stable_id(run.id + ":" + str(i))})
+                for i, r in enumerate(result.regions)
+            ],
+        }
+    )

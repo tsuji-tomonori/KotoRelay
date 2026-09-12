@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 認可されたOCR領域を取得 — interface
 
@@ -75,4 +75,4 @@
 | 参照型 | 制約 |
 | --- | --- |
 | HTTPValidationError | {"properties": {"detail": {"items": {"$ref": "#/components/schemas/ValidationError"}, "type": "array", "title": "Detail"}}, "type": "object", "title": "HTTPValidationError"} |
-| OcrResult | {"properties": {"regions": {"items": {"$ref": "#/components/schemas/Region"}, "type": "array", "maxItems": 1000, "title": "Regions"}, "engine": {"type": "string", "maxLength": 100, "title": "Engine"}, "status": {"type": "string", "enum": ["ready", "failed"], "title": "Status"}}, "additionalProperties": false, "type": "object", "required": ["regions", "engine", "status"], "title": "OcrResult"} |
+| OcrResult | {"properties": {"confirmed": {"type": "boolean", "title": "Confirmed", "default": false}, "regions": {"items": {"$ref": "#/components/schemas/Region"}, "type": "array", "maxItems": 1000, "title": "Regions"}, "engine": {"type": "string", "maxLength": 100, "title": "Engine"}, "status": {"type": "string", "enum": ["ready", "failed"], "title": "Status"}}, "additionalProperties": false, "type": "object", "required": ["regions", "engine", "status"], "title": "OcrResult"} |

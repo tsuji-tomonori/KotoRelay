@@ -102,6 +102,7 @@ def context(
         yield ctx
 
 
-Ctx = Annotated[Context, Depends(context)]
+# 成功応答を送る前にcommitし、commit時の競合も409として返す。
+Ctx = Annotated[Context, Depends(context, scope="function")]
 Rt = Annotated[Runtime, Depends(runtime)]
 Subject = Annotated[str, Depends(subject)]

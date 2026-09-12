@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 閲覧可能な文書を検索 — interface
 
@@ -58,6 +58,49 @@
         "title": "Search",
         "type": "string"
       }
+    },
+    {
+      "in": "query",
+      "name": "department_id",
+      "required": false,
+      "schema": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Department Id"
+      }
+    },
+    {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+        "default": "",
+        "enum": [
+          "",
+          "active",
+          "withdrawn",
+          "deleted"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    {
+      "in": "query",
+      "name": "page",
+      "required": false,
+      "schema": {
+        "default": false,
+        "title": "Page",
+        "type": "boolean"
+      }
     }
   ],
   "responses": {
@@ -65,11 +108,19 @@
       "content": {
         "application/json": {
           "schema": {
-            "items": {
-              "$ref": "#/components/schemas/DocumentsRow"
-            },
-            "title": "Response List Documents",
-            "type": "array"
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/DocumentsRow"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              }
+            ],
+            "title": "Response List Documents"
           }
         }
       },

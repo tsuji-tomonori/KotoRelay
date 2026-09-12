@@ -152,6 +152,10 @@ def browser_tests(
                         "version_count",
                         "submission_count",
                         "ready_chunks",
+                        # 架空E2E文書の削除監査に限って添付する項目。
+                        "action",
+                        "reason",
+                        "after_state",
                     }
                     if not isinstance(value, dict) or set(value) - allowed:
                         raise ValueError("DB証跡は架空文書の許可された状態だけを公開します")

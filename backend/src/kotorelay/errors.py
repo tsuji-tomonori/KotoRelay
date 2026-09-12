@@ -15,6 +15,9 @@ def require(condition: bool, code: str = "not_found", status: int = 404) -> None
 
 
 MESSAGES = {
+    "reason_required": "理由を入力してください。",
+    "conversation_department": "利用部署を変更する場合は新しい会話を開始してください。",
+    "invalid_region": "文字領域の識別と画像内の位置を確認してください。",
     "not_found": "対象を利用できません。",
     "unauthenticated": "ログインが必要です。",
     "forbidden": "この操作は許可されていません。",

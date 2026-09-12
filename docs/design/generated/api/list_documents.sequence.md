@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 閲覧可能な文書を検索 — sequence
 
@@ -14,10 +14,13 @@ sequenceDiagram
     alt 認可条件が不成立
         A-->>U: 401または403または404
     else 許可
+        A->>D: chunks_list
         A->>D: departments_list
+        A->>D: documents_by_department
         A->>D: documents_list
         A->>D: memberships_list
         A->>D: organizations_get
+        A->>D: submissions_list
         A->>D: users_list
         A->>D: versions_list
         A->>S: 内容ハッシュ実体を照合
@@ -46,7 +49,12 @@ sequenceDiagram
 | kotorelay.context.Context.permission | 67 | Return | False |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.functions.list_documents | 63 | If | scope == 'manage' |
-| kotorelay.operations.documents.functions.list_documents | 65 | If | scope == 'work' |
-| kotorelay.operations.documents.functions.list_documents | 78 | Return | sorted(docs, key=lambda d: d.updated_at, reverse=True)[offset:offset + limit] |
-| kotorelay.operations.documents.router.list_documents | 25 | Return | f.list_documents(ctx, scope, offset, limit, search) |
+| kotorelay.operations.documents.functions.document_page | 115 | For | For |
+| kotorelay.operations.documents.functions.document_page | 138 | Return | {'items': items, 'has_next': len(docs) > limit} |
+| kotorelay.operations.documents.functions.list_documents | 68 | If | department_id and scope in {'manage', 'work'} |
+| kotorelay.operations.documents.functions.list_documents | 79 | If | scope == 'manage' |
+| kotorelay.operations.documents.functions.list_documents | 81 | If | scope == 'work' |
+| kotorelay.operations.documents.functions.list_documents | 98 | Return | sorted(docs, key=lambda d: d.updated_at, reverse=True)[offset:offset + limit] |
+| kotorelay.operations.documents.router.list_documents | 29 | If | page |
+| kotorelay.operations.documents.router.list_documents | 30 | Return | f.document_page(ctx, scope, offset, limit, search, department, status) |
+| kotorelay.operations.documents.router.list_documents | 31 | Return | f.list_documents(ctx, scope, offset, limit, search, department, status) |

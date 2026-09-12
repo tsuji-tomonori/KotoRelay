@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 承認版または担当版を表示 — sequence
 
@@ -50,5 +50,5 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
-| kotorelay.operations.documents.functions.read_version | 212 | Return | {'document': doc.model_copy(update={'title': version.title}), 'version': version, 'body': ctx.objects.get(version.body_key, version.body_hash).decode(), 'index_ready': any((c.version_id == version.id and c.ready for c in q.chunks_list(ctx.db, ctx.org)))} |
-| kotorelay.operations.documents.router.read_document | 55 | Return | f.read_version(ctx, str(document_id), str(version_id) if version_id else None) |
+| kotorelay.operations.documents.functions.read_version | 272 | Return | {'document': doc.model_copy(update={'title': version.title}), 'version': version, 'body': ctx.objects.get(version.body_key, version.body_hash).decode(), 'index_ready': any((c.version_id == version.id and c.ready for c in q.chunks_list(ctx.db, ctx.org)))} |
+| kotorelay.operations.documents.router.read_document | 61 | Return | f.read_version(ctx, str(document_id), str(version_id) if version_id else None) |

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # リーダーが公開範囲・公開停止・削除を管理 — sequence
 
@@ -41,5 +41,5 @@ sequenceDiagram
 | kotorelay.context.now | 18 | Return | datetime.now(UTC) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.functions.policy | 276 | Return | updated |
-| kotorelay.operations.documents.router.change_policy | 76 | Return | f.policy(ctx, str(document_id), data) |
+| kotorelay.operations.documents.functions.policy | 337 | Return | updated |
+| kotorelay.operations.documents.router.change_policy | 82 | Return | f.policy(ctx, str(document_id), data) |

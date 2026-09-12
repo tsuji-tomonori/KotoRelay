@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 反映ジョブと失敗理由を確認 — sequence
 
@@ -15,10 +15,12 @@ sequenceDiagram
         A-->>U: 401または403または404
     else 許可
         A->>D: departments_list
+        A->>D: documents_list
         A->>D: memberships_list
         A->>D: organizations_get
         A->>D: outbox_list
         A->>D: users_list
+        A->>D: versions_list
         A->>S: 内容ハッシュ実体を照合
         opt 実体欠落・ハッシュ不一致
             A-->>U: 利用不可・回答保留
@@ -43,5 +45,6 @@ sequenceDiagram
 | --- | --- | --- | --- |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
+| kotorelay.operations.indexing.functions.job_details | 207 | Return | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
 | kotorelay.operations.indexing.functions.jobs | 200 | Return | q.outbox_list(ctx.db, ctx.org) |
-| kotorelay.operations.indexing.router.list_jobs | 16 | Return | f.jobs(ctx) |
+| kotorelay.operations.indexing.router.list_jobs | 16 | Return | f.job_details(ctx) if details else [row.model_dump() for row in f.jobs(ctx)] |

@@ -591,7 +591,7 @@ lambda = [
 requires-dist = [
     { name = "aurora-dsql-python-connector", specifier = ">=0.2" },
     { name = "boto3", specifier = ">=1.40,<2" },
-    { name = "fastapi", specifier = ">=0.115,<1" },
+    { name = "fastapi", specifier = ">=0.121,<1" },
     { name = "mangum", specifier = ">=0.19,<1" },
     { name = "pillow", specifier = ">=11,<13" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.2,<4" },

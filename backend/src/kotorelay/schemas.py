@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 Id = Annotated[
     str, Field(pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
@@ -22,19 +22,24 @@ class Placement(Input):
     ocr_run_id: Id
     offset: int = Field(ge=0, le=100_000)
     heading: str = Field(default="", max_length=200)
+    alt_text: str = Field(default="", max_length=1000)
+    caption: str = Field(default="", max_length=2000)
 
 
 class Region(Input):
+    region_id: Id | None = None
+    source: Literal["detected", "human"] = "detected"
     text: str = Field(max_length=5000)
     x: float = Field(ge=0, le=1)
     y: float = Field(ge=0, le=1)
     width: float = Field(ge=0, le=1)
     height: float = Field(ge=0, le=1)
-    confidence: float = Field(ge=0, le=1)
+    confidence: float | None = Field(default=None, ge=0, le=1)
     order: int = Field(ge=0)
 
 
 class OcrResult(Input):
+    confirmed: bool = False
     regions: list[Region] = Field(max_length=1000)
     engine: str = Field(max_length=100)
     status: Literal["ready", "failed"]
@@ -46,7 +51,9 @@ class CreateDocument(Input):
 
 
 class SaveDraft(Input):
-    title: str = Field(min_length=1, max_length=200)
+    # 本文先頭の空白と末尾改行はMarkdownと配置offsetの一部として保存する。
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=False)
+    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
     body: str = Field(max_length=100_000)
     revision: int = Field(ge=1)
     placements: list[Placement] = Field(default_factory=list, max_length=10)
@@ -63,6 +70,7 @@ class Decide(Input):
 
 
 class ChangePolicy(Input):
+    reason: str = Field(default="", max_length=2000)
     revision: int = Field(ge=1)
     visibility: Literal["department", "selected", "organization"]
     shared_departments: list[Id] = Field(default_factory=list, max_length=30)
@@ -107,6 +115,8 @@ class Manifest(BaseModel):
 
 
 class Citation(BaseModel):
+    version_number: int | None = None
+    has_images: bool = False
     document_id: str
     version_id: str
     chunk_id: str

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 版を確定して承認申請 — sequence
 
@@ -52,8 +52,8 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
-| kotorelay.operations.documents.functions.submit | 140 | If | cached |
-| kotorelay.operations.documents.functions.submit | 141 | Return | q.VersionsRow.model_validate_json(cached) |
-| kotorelay.operations.documents.functions.submit | 145 | For | For |
-| kotorelay.operations.documents.functions.submit | 200 | Return | version |
-| kotorelay.operations.documents.router.submit_version | 50 | Return | f.submit(ctx, str(document_id), data, str(key)) |
+| kotorelay.operations.documents.functions.submit | 200 | If | cached |
+| kotorelay.operations.documents.functions.submit | 201 | Return | q.VersionsRow.model_validate_json(cached) |
+| kotorelay.operations.documents.functions.submit | 205 | For | For |
+| kotorelay.operations.documents.functions.submit | 260 | Return | version |
+| kotorelay.operations.documents.router.submit_version | 56 | Return | f.submit(ctx, str(document_id), data, str(key)) |

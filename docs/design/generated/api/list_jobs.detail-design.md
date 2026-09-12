@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 反映ジョブと失敗理由を確認 — detail-design
 
@@ -13,10 +13,12 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | query | DB対象 | 処理 |
 | --- | --- | --- |
 | departments_list | departments | SELECT |
+| documents_list | documents | SELECT |
 | memberships_list | memberships | SELECT |
 | organizations_get | organizations | SELECT |
 | outbox_list | outbox | SELECT |
 | users_list | users | SELECT |
+| versions_list | versions | SELECT |
 
 ## 前提・正常／異常分岐
 
@@ -31,12 +33,15 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/generated/queries.py:426 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/generated/queries.py:462 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/generated/queries.py:481 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/generated/queries.py:645 | db.query('operations/indexing/sql/outbox_list.sql', {'organization_id': organization_id}, OutboxRow) |
-| backend/src/kotorelay/generated/queries.py:523 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/generated/queries.py:437 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/generated/queries.py:345 | db.query('operations/documents/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
+| backend/src/kotorelay/generated/queries.py:473 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
+| backend/src/kotorelay/generated/queries.py:492 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
+| backend/src/kotorelay/generated/queries.py:656 | db.query('operations/indexing/sql/outbox_list.sql', {'organization_id': organization_id}, OutboxRow) |
+| backend/src/kotorelay/generated/queries.py:534 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/generated/queries.py:414 | db.query('operations/documents/sql/versions_list.sql', {'organization_id': organization_id}, VersionsRow) |
+| backend/src/kotorelay/operations/indexing/functions.py:207 | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
 | backend/src/kotorelay/operations/indexing/functions.py:200 | q.outbox_list(ctx.db, ctx.org) |
-| backend/src/kotorelay/operations/indexing/router.py:16 | f.jobs(ctx) |
+| backend/src/kotorelay/operations/indexing/router.py:16 | f.job_details(ctx) if details else [row.model_dump() for row in f.jobs(ctx)] |
 
 異常時: DB transactionがrollbackします。S3の内容ハッシュ実体は孤立し得るため、公開認可に使わず、保持期間後の削除処理で回収します。外部配送失敗はoutboxのerror_codeとattemptsへ記録します。

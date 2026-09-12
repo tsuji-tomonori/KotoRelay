@@ -1,0 +1,15 @@
+:root {
+  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, system-ui, sans-serif;
+  font-synthesis: none;
+  color: #1a1a1a;
+  background: #f7f9f8;
+  font-size: 100%;
+  line-height: 1.6;
+  --green: #176851;
+  --muted: #595959;
+  --border: #d8dfdb;
+  --control-border: #767676;
+  --link: #0017c1;
+  --danger: #b42318;
+  --focus: #ffd43d;
+}

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # manifestを確認して承認・却下 — detail-design
 
@@ -43,14 +43,14 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/context.py:98 | digest(version.manifest.encode()) == version.manifest_hash | 'integrity' | 503 |
 | backend/src/kotorelay/context.py:97 | self.can_read(doc) and doc.latest_version_id == version.id | not_found | 404 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/reviews/functions.py:36 | cached | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/reviews/functions.py:54 | data.decision == 'approved' | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/reviews/functions.py:31 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/operations/reviews/functions.py:38 | submission.status == 'pending' | 'conflict' | 409 |
-| backend/src/kotorelay/operations/reviews/functions.py:40 | version.created_by != ctx.user.id | 'self_approval' | 403 |
-| backend/src/kotorelay/operations/reviews/functions.py:41 | submission.manifest_hash == data.manifest_hash == version.manifest_hash | 'conflict' | 409 |
-| backend/src/kotorelay/operations/reviews/functions.py:44 | data.decision != 'rejected' or bool(data.reason.strip()) | 'reason_required' | 422 |
-| backend/src/kotorelay/operations/reviews/functions.py:58 | not previous or previous[0].number < version.number | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/reviews/functions.py:43 | cached | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/reviews/functions.py:61 | data.decision == 'approved' | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/reviews/functions.py:38 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/operations/reviews/functions.py:45 | submission.status == 'pending' | 'conflict' | 409 |
+| backend/src/kotorelay/operations/reviews/functions.py:47 | version.created_by != ctx.user.id | 'self_approval' | 403 |
+| backend/src/kotorelay/operations/reviews/functions.py:48 | submission.manifest_hash == data.manifest_hash == version.manifest_hash | 'conflict' | 409 |
+| backend/src/kotorelay/operations/reviews/functions.py:51 | data.decision != 'rejected' or bool(data.reason.strip()) | 'reason_required' | 422 |
+| backend/src/kotorelay/operations/reviews/functions.py:65 | not previous or previous[0].number < version.number | then / else の実装分岐 | 制御フロー参照 |
 
 ## 応答項目の取得元
 
@@ -63,23 +63,23 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/context.py:22 | str(uuid4()) |
 | backend/src/kotorelay/context.py:18 | datetime.now(UTC) |
 | backend/src/kotorelay/context.py:26 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
-| backend/src/kotorelay/generated/queries.py:723 | db.execute('operations/system/sql/audit_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:426 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/generated/queries.py:320 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/generated/queries.py:343 | db.execute('operations/documents/sql/documents_update.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:735 | db.query('operations/system/sql/idempotency_get.sql', {'organization_id': organization_id, 'id': id}, IdempotencyRow) |
-| backend/src/kotorelay/generated/queries.py:744 | db.execute('operations/system/sql/idempotency_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:462 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/generated/queries.py:476 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:481 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/generated/queries.py:640 | db.execute('operations/indexing/sql/outbox_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:686 | db.query('operations/reviews/sql/submissions_get.sql', {'organization_id': organization_id, 'id': id}, SubmissionsRow) |
-| backend/src/kotorelay/generated/queries.py:709 | db.execute('operations/reviews/sql/submissions_update.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:523 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
-| backend/src/kotorelay/generated/queries.py:389 | db.query('operations/documents/sql/versions_get.sql', {'organization_id': organization_id, 'id': id}, VersionsRow) |
+| backend/src/kotorelay/generated/queries.py:734 | db.execute('operations/system/sql/audit_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:437 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/generated/queries.py:331 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
+| backend/src/kotorelay/generated/queries.py:354 | db.execute('operations/documents/sql/documents_update.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:746 | db.query('operations/system/sql/idempotency_get.sql', {'organization_id': organization_id, 'id': id}, IdempotencyRow) |
+| backend/src/kotorelay/generated/queries.py:755 | db.execute('operations/system/sql/idempotency_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:473 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
+| backend/src/kotorelay/generated/queries.py:487 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:492 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
+| backend/src/kotorelay/generated/queries.py:651 | db.execute('operations/indexing/sql/outbox_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:697 | db.query('operations/reviews/sql/submissions_get.sql', {'organization_id': organization_id, 'id': id}, SubmissionsRow) |
+| backend/src/kotorelay/generated/queries.py:720 | db.execute('operations/reviews/sql/submissions_update.sql', row.model_dump()) |
+| backend/src/kotorelay/generated/queries.py:534 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/generated/queries.py:400 | db.query('operations/documents/sql/versions_get.sql', {'organization_id': organization_id, 'id': id}, VersionsRow) |
 | backend/src/kotorelay/objects.py:17 | hashlib.sha256(data).hexdigest() |
-| backend/src/kotorelay/operations/reviews/functions.py:86 | updated |
-| backend/src/kotorelay/operations/reviews/functions.py:37 | q.SubmissionsRow.model_validate_json(cached) |
+| backend/src/kotorelay/operations/reviews/functions.py:93 | updated |
+| backend/src/kotorelay/operations/reviews/functions.py:44 | q.SubmissionsRow.model_validate_json(cached) |
 | backend/src/kotorelay/operations/reviews/router.py:27 | f.decide(ctx, str(submission_id), data, str(key)) |
 
 異常時: DB transactionがrollbackします。S3の内容ハッシュ実体は孤立し得るため、公開認可に使わず、保持期間後の削除処理で回収します。外部配送失敗はoutboxのerror_codeとattemptsへ記録します。

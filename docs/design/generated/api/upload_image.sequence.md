@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 画像を添付して位置付きOCRを実行 — sequence
 
@@ -50,6 +50,6 @@ sequenceDiagram
 | kotorelay.operations.images.functions.run_ocr | 54 | Return | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
 | kotorelay.operations.images.functions.run_ocr | 56 | For | For |
 | kotorelay.operations.images.functions.run_ocr | 58 | If | text |
-| kotorelay.operations.images.functions.run_ocr | 70 | Return | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
-| kotorelay.operations.images.functions.upload | 110 | Return | {'asset': asset, 'ocr_run': run, 'ocr': result} |
+| kotorelay.operations.images.functions.run_ocr | 71 | Return | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
+| kotorelay.operations.images.functions.upload | 111 | Return | {'asset': asset, 'ocr_run': run, 'ocr': result} |
 | kotorelay.operations.images.router.upload_image | 22 | Return | f.upload(ctx, str(document_id), file.file.read(ctx.settings.max_image_bytes + 1)) |

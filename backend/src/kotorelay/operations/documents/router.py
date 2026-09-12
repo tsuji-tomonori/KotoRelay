@@ -21,8 +21,14 @@ def list_documents(
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=100)] = 30,
     search: Annotated[str, Query(max_length=200)] = "",
-) -> list[q.DocumentsRow]:
-    return f.list_documents(ctx, scope, offset, limit, search)
+    department_id: UUID | None = None,
+    status: Literal["", "active", "withdrawn", "deleted"] = "",
+    page: bool = False,
+) -> list[q.DocumentsRow] | dict[str, object]:
+    department = str(department_id) if department_id else None
+    if page:
+        return f.document_page(ctx, scope, offset, limit, search, department, status)
+    return f.list_documents(ctx, scope, offset, limit, search, department, status)
 
 
 @router.post("", status_code=201, summary="文書を作成", operation_id="create_document")

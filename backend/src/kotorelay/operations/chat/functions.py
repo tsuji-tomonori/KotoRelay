@@ -106,6 +106,15 @@ def prepare(ctx: Context, data: Ask, key: str, engine: Engine) -> Prepared:
         conversations = q.conversations_get(ctx.db, ctx.org, data.conversation_id)
         require(bool(conversations) and conversations[0].user_id == ctx.user.id)
         conversation_id = conversations[0].id
+        require(
+            all(
+                a.department_id == data.department_id
+                for a in q.answers_list(ctx.db, ctx.org)
+                if a.conversation_id == conversation_id
+            ),
+            "conversation_department",
+            409,
+        )
     else:
         conversation_id = new_id()
         q.conversations_insert(
@@ -152,6 +161,8 @@ def prepare(ctx: Context, data: Ask, key: str, engine: Engine) -> Prepared:
         citation = Citation(
             document_id=doc.id,
             version_id=version.id,
+            version_number=version.number,
+            has_images=bool(json.loads(chunk.placements)),
             chunk_id=chunk.id,
             title=version.title,
             heading=chunk.heading,

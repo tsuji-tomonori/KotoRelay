@@ -92,3 +92,69 @@ def test_DBの競合時はtransaction全体がrollbackされる(postgres):
             q.organizations_fence(first, row)
     with Database(postgres).transaction() as check:
         assert q.organizations_get(check, org, org)[0].revision == row.revision + 1
+
+
+def test_実SQLで複数部署の管理一覧と権限を絞り込む(postgres):
+    from test_ui_contract import department_page_case
+
+    with TestClient(create_app(postgres)) as client:
+        department_page_case(client)
+
+
+def test_成功応答の送信時には別接続から保存済み文書が見える(postgres):
+    app = create_app(postgres)
+    observed = []
+    title = "コミット済みの応答"
+
+    async def checked(scope, receive, send):
+        async def check_send(message):
+            if message["type"] == "http.response.start" and message["status"] == 201:
+                with Database(postgres).transaction() as db:
+                    rows = q.documents_list(db, postgres.organization_id)
+                    observed.append(any(row.title == title for row in rows))
+            await send(message)
+
+        await app(scope, receive, check_send)
+
+    with TestClient(checked) as client:
+        department = client.get("/api/groups/me", headers=headers()).json()["departments"][0]["id"]
+        result = client.post(
+            "/api/documents",
+            headers=headers(),
+            json={
+                "title": title,
+                "department_id": department,
+            },
+        )
+        assert result.status_code == 201
+    assert observed == [True]
+
+
+def test_commit時の競合は成功応答を送らず409にしてrollbackする(postgres, monkeypatch):
+    from contextlib import contextmanager
+
+    app = create_app(postgres)
+    with TestClient(app) as client:
+        department = client.get("/api/groups/me", headers=headers()).json()["departments"][0]["id"]
+        original = Database.transaction
+
+        @contextmanager
+        def conflict(self):
+            with original(self) as db:
+                yield db
+                raise psycopg.errors.SerializationFailure("commit conflict")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(Database, "transaction", conflict)
+            result = client.post(
+                "/api/documents",
+                headers=headers(),
+                json={
+                    "title": "競合して確定しない文書",
+                    "department_id": department,
+                },
+            )
+        assert result.status_code == 409
+        assert result.json()["code"] == "conflict"
+    with Database(postgres).transaction() as db:
+        assert not q.documents_list(db, postgres.organization_id)

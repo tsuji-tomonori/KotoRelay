@@ -145,6 +145,12 @@
       "ChangePolicy": {
         "additionalProperties": false,
         "properties": {
+          "reason": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Reason",
+            "type": "string"
+          },
           "revision": {
             "minimum": 1.0,
             "title": "Revision",
@@ -204,6 +210,11 @@
             "title": "Document Revision",
             "type": "integer"
           },
+          "has_images": {
+            "default": false,
+            "title": "Has Images",
+            "type": "boolean"
+          },
           "heading": {
             "title": "Heading",
             "type": "string"
@@ -219,6 +230,17 @@
           "version_id": {
             "title": "Version Id",
             "type": "string"
+          },
+          "version_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version Number"
           }
         },
         "required": [
@@ -451,6 +473,11 @@
       "OcrResult": {
         "additionalProperties": false,
         "properties": {
+          "confirmed": {
+            "default": false,
+            "title": "Confirmed",
+            "type": "boolean"
+          },
           "engine": {
             "maxLength": 100,
             "title": "Engine",
@@ -546,9 +573,21 @@
       "Placement": {
         "additionalProperties": false,
         "properties": {
+          "alt_text": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Alt Text",
+            "type": "string"
+          },
           "asset_id": {
             "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
             "title": "Asset Id",
+            "type": "string"
+          },
+          "caption": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Caption",
             "type": "string"
           },
           "heading": {
@@ -587,10 +626,17 @@
         "additionalProperties": false,
         "properties": {
           "confidence": {
-            "maximum": 1.0,
-            "minimum": 0.0,
-            "title": "Confidence",
-            "type": "number"
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
           },
           "height": {
             "maximum": 1.0,
@@ -602,6 +648,27 @@
             "minimum": 0.0,
             "title": "Order",
             "type": "integer"
+          },
+          "region_id": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region Id"
+          },
+          "source": {
+            "default": "detected",
+            "enum": [
+              "detected",
+              "human"
+            ],
+            "title": "Source",
+            "type": "string"
           },
           "text": {
             "maxLength": 5000,
@@ -633,7 +700,6 @@
           "y",
           "width",
           "height",
-          "confidence",
           "order"
         ],
         "title": "Region",
@@ -1072,6 +1138,49 @@
               "title": "Search",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "department_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Department Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "default": "",
+              "enum": [
+                "",
+                "active",
+                "withdrawn",
+                "deleted"
+              ],
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Page",
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1079,11 +1188,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/DocumentsRow"
-                  },
-                  "title": "Response List Documents",
-                  "type": "array"
+                  "anyOf": [
+                    {
+                      "items": {
+                        "$ref": "#/components/schemas/DocumentsRow"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  ],
+                  "title": "Response List Documents"
                 }
               }
             },
@@ -2111,13 +2228,26 @@
     "/api/operations/jobs": {
       "get": {
         "operationId": "list_jobs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "details",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Details",
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/OutboxRow"
+                    "additionalProperties": true,
+                    "type": "object"
                   },
                   "title": "Response List Jobs",
                   "type": "array"
@@ -2125,6 +2255,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "security": [

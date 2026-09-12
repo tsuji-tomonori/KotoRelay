@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 文書を作成 — sequence
 
@@ -44,4 +44,4 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.operations.documents.functions.create | 56 | Return | doc |
-| kotorelay.operations.documents.router.create_document | 30 | Return | f.create(ctx, data) |
+| kotorelay.operations.documents.router.create_document | 36 | Return | f.create(ctx, data) |

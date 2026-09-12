@@ -96,6 +96,7 @@ def policy(client: TestClient, doc: dict, **kwargs: object):
             "visibility": "department",
             "shared_departments": [],
             "status": "active",
+            "reason": "検証文書の利用終了",
             **kwargs,
         },
     )

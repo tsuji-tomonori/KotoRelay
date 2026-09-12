@@ -1,5 +1,5 @@
 """DDL・SQLから生成した型付き境界。直接編集しない。
-SHA256: 0989b190d415f48766b3bd4e1bf07f94b329ddb18514ebdf39553ca18b1e960e
+SHA256: 777b86c16c6d2948719aa1b092c5a7d7018c30a6757511e4c73bcb4bc04a6191
 """
 
 from datetime import datetime
@@ -305,6 +305,17 @@ def conversations_list(db: Database, organization_id: str) -> list[Conversations
 def conversations_update(db: Database, row: ConversationsRow) -> int:
     """conversationsの型検査済み行を保存する。"""
     return db.execute("operations/chat/sql/conversations_update.sql", row.model_dump())
+
+
+def documents_by_department(
+    db: Database, organization_id: str, department_id: str
+) -> list[DocumentsRow]:
+    """documentsを認証組織の範囲で取得する。"""
+    return db.query(
+        "operations/documents/sql/documents_by_department.sql",
+        {"organization_id": organization_id, "department_id": department_id},
+        DocumentsRow,
+    )
 
 
 def documents_delete(db: Database, organization_id: str, id: str) -> int:

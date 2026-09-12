@@ -2,7 +2,7 @@
 
 承認した知識を、人とAIへつなぐ文書管理サンプルです。Markdownの執筆、画像・OCRを含む版の承認、部署ごとの共有、現行権限で保護した根拠付きチャットを提供します。
 
-[設計と品質ポータル](https://tsuji-tomonori.github.io/KotoRelay/) · [運用手順](docs/OPERATIONS.md) · [要件](docs/requirements/REQUIREMENTS.md) · [API設計](docs/design/generated/API.md) · [設計判断](docs/decisions/IMPLEMENTATION.md)
+[設計と品質ポータル](https://tsuji-tomonori.github.io/KotoRelay/) · [運用手順](docs/OPERATIONS.md) · [要件](docs/requirements/REQUIREMENTS.md) · [API設計](docs/design/generated/API.md) · [設計判断](docs/decisions/IMPLEMENTATION.md) · [UI改訂方針](docs/planning/UI-REVISION.md)
 
 ```bash
 # Node.js 24 / Python 3.12 / uv / Docker Compose v2
@@ -28,6 +28,8 @@ npx playwright test --config e2e/portal.config.ts
 # 品質SPAをローカルで閲覧
 python3 -m http.server 4173 --directory artifacts/site
 ```
+
+UIは提供デザインに沿った文字・配色・メニューと、OCR領域編集、未保存確認、引用版の更新案内、公開設定の明示保存を備えます。原資料・ZIP・一時ログを置く `.workspace/` はGit管理対象外です。
 
 閾値はC0相当95%、C1相当90%。実行文・行・分岐を区別して分母分子を公開します。E2EのGiven/When/ThenごとにPNGを記録し、必要なDB状態を添付します。未実行・失敗・再試行を成功へ読み替えません。
 

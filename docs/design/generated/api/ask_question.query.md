@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 最新承認版の根拠で回答 — query
 
@@ -76,6 +76,38 @@ VALUES
 | row: AnswersRow | AnswersRow |
 
 戻り値: `int`
+
+## answers_list
+
+正本: `backend/src/kotorelay/operations/chat/sql/answers_list.sql`
+
+```sql
+/* answersを組織境界内でlistする。 */
+SELECT
+  id,
+  organization_id,
+  conversation_id,
+  user_id,
+  department_id,
+  question_key,
+  answer_key,
+  evidence,
+  status,
+  model,
+  created_at
+FROM answers
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+| 入力／出力型 | 定義 |
+| --- | --- |
+| db: Database | Database |
+| organization_id: str | str |
+
+戻り値: `list[AnswersRow]`
 
 ## assets_get
 

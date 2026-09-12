@@ -7,6 +7,8 @@ import ast
 import hashlib
 import json
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -48,8 +50,10 @@ def sources() -> list[Path]:
         ("frontend/src", ".tsx"),
         ("frontend/src", ".ts"),
         ("frontend/src", ".astro"),
+        ("frontend/src", ".css"),
         ("frontend/portal", ".tsx"),
         ("frontend/portal", ".ts"),
+        ("frontend/portal", ".css"),
         ("frontend/tests", ".tsx"),
         ("frontend/tests", ".ts"),
         ("e2e", ".ts"),
@@ -495,35 +499,40 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         "tBridgeが15分間隔でoutboxを配送します。S3/DSQLは削除保護・Retainです。cdk-na"
         "g例外理由はstack.pyの各resourceに限定して保持します。"
     )
-    frontend = (ROOT / "frontend/src/components/App.tsx").read_text()
-    names = re.findall(r"export (?:default )?function (\w+)", frontend)
+    frontend = json.loads(
+        subprocess.check_output(
+            [shutil.which("node") or "/usr/bin/node", "tools/project/frontend-inventory.mjs"],
+            cwd=ROOT,
+            text=True,
+        )
+    )
     output["FRONTEND.md"] = (
-        header
-        + "# フロントエンド\n\nAstroの単一ルート `/` がReactワークスペースを起動します。状態はReact"
-        " hook、認証トークンはsessionStorage、APIは同一originの `/api` です。\n\n"
-        + table(["コンポーネント", "実装"], [[n, "frontend/src/components/App.tsx"] for n in names])
-        + "\n## API呼出しと画面遷移\n\n"
+        header + "# フロントエンド\n\nAstroの単一ルート `/` がReactワークスペースを起動します。"
+        "TypeScript構文木から全TS/TSXのコンポーネント・呼出し・操作イベントを列挙します。\n\n"
         + table(
-            ["行", "処理"],
+            ["コンポーネント", "実装", "行"],
+            [[c["name"], c["source"], c["line"]] for c in frontend["components"]],
+        )
+        + "\n## API呼出しと状態遷移\n\n"
+        + table(
+            ["実装", "行", "処理"],
+            [[c["source"], c["line"], c["expression"]] for c in frontend["calls"]],
+        )
+        + "\n## 操作イベント\n\n"
+        + table(
+            ["実装", "行", "イベント", "処理"],
             [
-                [i, line.strip()]
-                for i, line in enumerate(frontend.splitlines(), 1)
-                if any(
-                    token in line
-                    for token in [
-                        "api<",
-                        "void api(",
-                        "setView(",
-                        "setSelected(",
-                        "setDirty(",
-                        "setBusy(",
-                    ]
-                )
+                [c["source"], c["line"], c["event"], c["expression"]]
+                for c in frontend["interactions"]
             ],
         )
-        + "\n## 安全な表示\n\nHTMLを無効化し、リンクschemeを検証します。画像は認証付"
-        "きAPIからBlobとして表示し、破棄時にURLをrevokeします。文書読込完了まで入力を無効化し、競合時の"
-        "入力を保持します。"
+        + "\n## スタイル定義\n\n```css\n"
+        + (ROOT / "frontend/src/styles/tokens.css").read_text()
+        + "\n```\n"
+        + "\n## 表示と版の整合\n\n同じPlacedDocumentをプレビュー・審査・閲覧に使います。"
+        "挿入位置はUnicodeコードポイント数です。OCR領域の識別と位置を独立して保持し、"
+        "版と画像は認可付きAPIから読み込みます。未保存確認はWorkspaceで共有し、"
+        "引用版の変更と非許可状態を区別して表示します。詳細は上記の実装イベントに対応します。"
     )
     output["manifest.json"] = dump(
         {

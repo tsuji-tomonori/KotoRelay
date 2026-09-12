@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 2,
+  "catalog_revision": 3,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -4543,6 +4543,711 @@
       "verification": {
         "evidence": "GitHub Pagesの同一runの品質記録",
         "method": "CIとローカルの実コマンド"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-01",
+          "then": "UI文字16px以上、補助14px以上、文字のコントラスト4.5:1以上、操作境界3:1以上を維持する",
+          "when": "UIを表示する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-UX-01",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "読みやすい文字とコントラスト",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "読みやすい文字とコントラスト",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/styles/tokens.css"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-02",
+          "then": "利用部署、名前付きメニュー、ログアウトへアクセスでき、表と精密画像以外はページ全体に横スクロールを作らない",
+          "when": "320・390・768・1440pxで操作する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-UX-02",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "画面幅によらずアカウント操作を提供する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "画面幅によらずアカウント操作を提供する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/components/App.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-03",
+          "then": "操作位置が視覚で分かり、確認終了後に起点へ戻り、見出しとラベルが操作対象を説明する",
+          "when": "キーボードで画面遷移と確認を操作する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-UX-03",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "キーボードのフォーカスを維持する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "キーボードのフォーカスを維持する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/components/ui/ConfirmDialog.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-04",
+          "then": "未保存入力がある場合に確認し、キャンセルと競合時に本文・OCR訂正・設定値を保持する",
+          "when": "ナビ・ロゴ・戻る・ログアウト・ブラウザ離脱を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-04",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "全画面遷移で未保存入力を保護する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "全画面遷移で未保存入力を保護する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/components/layout/Workspace.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-05",
+          "then": "同じマニフェストの本文と画像を同じ順序・位置・説明で表示する",
+          "when": "プレビュー・審査・閲覧を開く"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-05",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "同じ版の本文と画像配置を再現する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "同じ版の本文と画像配置を再現する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/features/documents/PlacedDocument.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-06",
+          "then": "安定した領域IDと座標を維持し、手入力の確信度を捏造せず、既存の承認版を書き換えない",
+          "when": "領域の複数行訂正・追加・削除・位置変更を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-06",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "OCRの文字と領域を一対一で保持する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "OCRの文字と領域を一対一で保持する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "backend/src/kotorelay/operations/images/functions.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-07",
+          "then": "図の意味と説明文が配置情報として確定版に保存され、本文とともに表示される",
+          "when": "画像の説明と代替テキストを保存して申請する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-07",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "画像の代替情報を版へ含める",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "画像の代替情報を版へ含める",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "backend/src/kotorelay/schemas.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-08",
+          "then": "Unicodeコードポイント単位の位置をフロントとAPIで共有し、文字途中で分断せず再配置を確認できる",
+          "when": "日本語・絵文字を含む本文を編集する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-08",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "絵文字を含む挿入位置を統一する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "絵文字を含む挿入位置を統一する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/features/documents/PlacedDocument.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-09",
+          "then": "当時の引用として新版を表示せず更新を説明し、明示操作で最新版を開き、非許可の旧版は表示しない",
+          "when": "回答後に公開版が更新された文書の引用を開く"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-09",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "引用版と最新公開版を混同しない",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "引用版と最新公開版を混同しない",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/features/documents/DocumentPanel.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-10",
+          "then": "文書一覧・統計・所属・確認対象を選択部署へ揃え、APIで認可しページング前に絞り込む",
+          "when": "複数部署リーダーが管理部署を選ぶ"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-10",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "管理対象部署を一覧と操作へ一致させる",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "管理対象部署を一覧と操作へ一致させる",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "backend/src/kotorelay/operations/documents/functions.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-11",
+          "then": "編集だけでは反映せず、変更前後と対象部署・文書を確認してから保存する",
+          "when": "公開先と公開状態を編集する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-11",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "公開設定を明示確認して保存する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "公開設定を明示確認して保存する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/features/groups/Groups.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-12",
+          "then": "理由未入力を拒否し、状態変更と理由の監査を同じ業務transactionで確定する",
+          "when": "文書を削除する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-12",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "削除理由を監査へ保存する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "削除理由を監査へ保存する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "backend/src/kotorelay/operations/documents/functions.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-13",
+          "then": "閲覧と質問を選択部署に帰属させ、会話内の部署変更を拒否して新規会話を開始する",
+          "when": "利用部署を変更する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-13",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "利用部署を閲覧と会話へ明示する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "利用部署を閲覧と会話へ明示する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "backend/src/kotorelay/operations/chat/functions.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-14",
+          "then": "公開版・審査版・RAG反映・削除処理を別の軸として表示し、未計測の処理状態を推測しない",
+          "when": "文書一覧とジョブを表示する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-14",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "公開版と作業状態を分離表示する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "公開版と作業状態を分離表示する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/lib/api.ts"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "対象機能を利用できる権限がある",
+          "id": "AC-UX-15",
+          "then": "読込中・0件・検索0件・失敗を区別し再操作を提供し、現在ページの件数を総数と呼ばない",
+          "when": "検索とページ送りを実行する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-UX-15",
+      "last_changed_by": "ui-design-2026-09-12",
+      "object": "一覧の取得状態とページ件数を区別する",
+      "rationale": "提供されたUIデザイン設計の受入条件。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "product",
+      "source_refs": [
+        "docs/planning/UI-REVISION.md"
+      ],
+      "status": "active",
+      "subject": "システム",
+      "superseded_by": "",
+      "title": "一覧の取得状態とページ件数を区別する",
+      "traces": {
+        "design": [
+          "docs/design/generated/FRONTEND.md"
+        ],
+        "implementation": [
+          "frontend/src/features/documents/Library.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "frontend/tests/ui-design.test.tsx",
+          "backend/tests/test_ui_contract.py",
+          "e2e/workflow.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "品質ポータルの同一runの検証結果",
+        "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
       }
     }
   ],

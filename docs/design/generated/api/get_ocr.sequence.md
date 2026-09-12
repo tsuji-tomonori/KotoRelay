@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 認可されたOCR領域を取得 — sequence
 
@@ -49,11 +49,12 @@ sequenceDiagram
 | kotorelay.context.Context.permission | 67 | Return | False |
 | kotorelay.context.Context.version | 96 | If | not self.permission(doc.department_id, 'draft') |
 | kotorelay.context.Context.version | 100 | Return | version |
+| kotorelay.context.stable_id | 26 | Return | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
-| kotorelay.operations.images.functions.authorize_asset | 148 | If | version_id is None |
-| kotorelay.operations.images.functions.authorize_asset | 163 | Return | asset |
-| kotorelay.operations.images.functions.ocr | 176 | If | version_id |
-| kotorelay.operations.images.functions.ocr | 185 | Return | OcrResult.model_validate_json(ctx.objects.get(run.result_key, run.result_hash)) |
+| kotorelay.operations.images.functions.authorize_asset | 161 | If | version_id is None |
+| kotorelay.operations.images.functions.authorize_asset | 176 | Return | asset |
+| kotorelay.operations.images.functions.ocr | 189 | If | version_id |
+| kotorelay.operations.images.functions.ocr | 200 | Return | result.model_copy(update={'confirmed': run.confirmed, 'regions': [r.model_copy(update={'region_id': r.region_id or stable_id(run.id + ':' + str(i))}) for i, r in enumerate(result.regions)]}) |
 | kotorelay.operations.images.router.get_ocr | 44 | Return | f.ocr(ctx, str(run_id), str(version_id) if version_id else None) |

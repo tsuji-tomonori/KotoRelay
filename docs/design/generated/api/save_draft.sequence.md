@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 競合を検出して下書きを保存 — sequence
 
@@ -42,7 +42,7 @@ sequenceDiagram
 | kotorelay.context.now | 18 | Return | datetime.now(UTC) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.functions.draft | 84 | Return | {'document': doc, 'body': ctx.objects.get(row.body_key, row.body_hash).decode(), 'revision': row.revision, 'placements': json.loads(row.placements)} |
-| kotorelay.operations.documents.functions.save | 133 | Return | draft(ctx, doc.id) |
-| kotorelay.operations.documents.functions.validate_placements | 94 | For | For |
-| kotorelay.operations.documents.router.save_draft | 40 | Return | f.save(ctx, str(document_id), data) |
+| kotorelay.operations.documents.functions.draft | 144 | Return | {'document': doc, 'body': ctx.objects.get(row.body_key, row.body_hash).decode(), 'revision': row.revision, 'placements': json.loads(row.placements)} |
+| kotorelay.operations.documents.functions.save | 193 | Return | draft(ctx, doc.id) |
+| kotorelay.operations.documents.functions.validate_placements | 154 | For | For |
+| kotorelay.operations.documents.router.save_draft | 46 | Return | f.save(ctx, str(document_id), data) |

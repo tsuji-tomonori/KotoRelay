@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 最新承認版の根拠で回答 — sequence
 
@@ -16,6 +16,7 @@ sequenceDiagram
     else 許可
         A->>D: answers_get
         A->>D: answers_insert
+        A->>D: answers_list
         A->>D: assets_get
         A->>D: audit_insert
         A->>D: chunks_get
@@ -75,26 +76,26 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
-| kotorelay.operations.chat.functions.finalize | 243 | For | For |
-| kotorelay.operations.chat.functions.finalize | 260 | Return | present(ctx, row) |
+| kotorelay.operations.chat.functions.finalize | 254 | For | For |
+| kotorelay.operations.chat.functions.finalize | 271 | Return | present(ctx, row) |
 | kotorelay.operations.chat.functions.prepare | 78 | If | prior |
 | kotorelay.operations.chat.functions.prepare | 87 | Raise | Raise |
 | kotorelay.operations.chat.functions.prepare | 103 | If | resumed is not None |
 | kotorelay.operations.chat.functions.prepare | 105 | If | data.conversation_id |
-| kotorelay.operations.chat.functions.prepare | 124 | For | For |
-| kotorelay.operations.chat.functions.prepare | 125 | If | chunk.document_id not in docs or chunk.version_id != docs[chunk.document_id].latest_version_id or (not chunk.ready) |
-| kotorelay.operations.chat.functions.prepare | 131 | If | vector_keys is not None and chunk.id not in vector_keys |
-| kotorelay.operations.chat.functions.prepare | 133 | Try | Try |
-| kotorelay.operations.chat.functions.prepare | 135 | ExceptHandler | Problem |
-| kotorelay.operations.chat.functions.prepare | 142 | If | score > 0 and (vector_keys is not None or score >= max(1, len(terms(data.question)) * 0.3)) |
-| kotorelay.operations.chat.functions.prepare | 149 | For | For |
-| kotorelay.operations.chat.functions.prepare | 162 | If | not validate_citation(ctx, citation) |
-| kotorelay.operations.chat.functions.prepare | 166 | If | len(images) + len(related) > ctx.settings.max_model_images |
-| kotorelay.operations.chat.functions.prepare | 168 | For | For |
-| kotorelay.operations.chat.functions.prepare | 173 | If | len(citations) >= 5 |
-| kotorelay.operations.chat.functions.prepare | 175 | If | resumed is None |
-| kotorelay.operations.chat.functions.prepare | 192 | Return | Prepared(answer_id=answer_id, conversation_id=conversation_id, question=data.question, department_id=data.department_id, citations=citations, texts=texts, images=images) |
-| kotorelay.operations.chat.functions.present | 267 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| kotorelay.operations.chat.functions.prepare | 133 | For | For |
+| kotorelay.operations.chat.functions.prepare | 134 | If | chunk.document_id not in docs or chunk.version_id != docs[chunk.document_id].latest_version_id or (not chunk.ready) |
+| kotorelay.operations.chat.functions.prepare | 140 | If | vector_keys is not None and chunk.id not in vector_keys |
+| kotorelay.operations.chat.functions.prepare | 142 | Try | Try |
+| kotorelay.operations.chat.functions.prepare | 144 | ExceptHandler | Problem |
+| kotorelay.operations.chat.functions.prepare | 151 | If | score > 0 and (vector_keys is not None or score >= max(1, len(terms(data.question)) * 0.3)) |
+| kotorelay.operations.chat.functions.prepare | 158 | For | For |
+| kotorelay.operations.chat.functions.prepare | 173 | If | not validate_citation(ctx, citation) |
+| kotorelay.operations.chat.functions.prepare | 177 | If | len(images) + len(related) > ctx.settings.max_model_images |
+| kotorelay.operations.chat.functions.prepare | 179 | For | For |
+| kotorelay.operations.chat.functions.prepare | 184 | If | len(citations) >= 5 |
+| kotorelay.operations.chat.functions.prepare | 186 | If | resumed is None |
+| kotorelay.operations.chat.functions.prepare | 203 | Return | Prepared(answer_id=answer_id, conversation_id=conversation_id, question=data.question, department_id=data.department_id, citations=citations, texts=texts, images=images) |
+| kotorelay.operations.chat.functions.present | 278 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
 | kotorelay.operations.chat.functions.validate_citation | 30 | If | not docs |
 | kotorelay.operations.chat.functions.validate_citation | 31 | Return | False |
 | kotorelay.operations.chat.functions.validate_citation | 33 | If | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision |

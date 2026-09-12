@@ -1,4 +1,10 @@
 export interface Document {
+  published_number?: number | null;
+  approved_at?: string | null;
+  index_ready?: boolean;
+  summary?: string;
+  review_status?: string | null;
+  review_number?: number | null;
   id: string;
   title: string;
   department_id: string;
@@ -9,6 +15,10 @@ export interface Document {
   visibility: string;
   shared_departments: string;
   updated_at: string;
+}
+export interface DocumentPage {
+  items: Document[];
+  has_next: boolean;
 }
 export interface Membership {
   id: string;
@@ -27,6 +37,8 @@ export interface Identity {
   mode: string;
 }
 export interface Placement {
+  alt_text?: string;
+  caption?: string;
   id: string;
   asset_id: string;
   ocr_run_id: string;
@@ -40,15 +52,18 @@ export interface Draft {
   placements: Placement[];
 }
 export interface Region {
+  region_id?: string;
+  source?: 'detected' | 'human';
   text: string;
   x: number;
   y: number;
   width: number;
   height: number;
-  confidence: number;
+  confidence: number | null;
   order: number;
 }
 export interface Ocr {
+  confirmed?: boolean;
   regions: Region[];
   status: string;
   engine: string;
@@ -74,6 +89,10 @@ export interface Submission {
   decided_at: string | null;
 }
 export interface Review {
+  version_number?: number;
+  requested_by?: string;
+  department_name?: string;
+  self_requested?: boolean;
   submission: Submission;
   title: string;
   can_review: boolean;
@@ -85,6 +104,8 @@ export interface ReadDocument {
   index_ready: boolean;
 }
 export interface Citation {
+  version_number?: number;
+  has_images?: boolean;
   document_id: string;
   version_id: string;
   chunk_id: string;
@@ -102,6 +123,9 @@ export interface Answer {
   created_at: string;
 }
 export interface Job {
+  title?: string;
+  version_number?: number;
+  created_at?: string;
   id: string;
   document_id: string;
   kind: string;
@@ -190,4 +214,37 @@ export function statusLabel(status: string): string {
       } as Record<string, string>
     )[status] ?? status
   );
+}
+
+export const visibilityLabel: Record<string, string> = {
+  department: '所有部署に公開',
+  organization: '組織内に公開',
+  selected: '指定部署に公開',
+};
+export function publicationLabel(doc: Document): string {
+  return doc.status === 'active'
+    ? doc.latest_version_id
+      ? '公開中'
+      : '公開版なし'
+    : statusLabel(doc.status);
+}
+export function jobLabel(kind: string, status: string): string {
+  const labels: Record<string, string> =
+    kind === 'purge'
+      ? {
+          pending: '削除待ち',
+          running: '削除処理中',
+          retained: '保持期間中',
+          done: '削除完了',
+          failed: '削除失敗',
+          obsolete: '対象外',
+        }
+      : {
+          pending: '反映待ち',
+          running: '反映中',
+          done: '反映済み',
+          failed: '反映失敗',
+          obsolete: '対象外',
+        };
+  return labels[status] ?? status;
 }

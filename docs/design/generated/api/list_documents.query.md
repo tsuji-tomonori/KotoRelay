@@ -1,8 +1,39 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: f4209c4ed7b292c6ed57aa300cf25000f8931a1f59b1fb43cfeb436b1d949dbe -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 209f2912c47883d8fdc722aafdde6cf403dff105c2efced6770337a06a320dd2 -->
 
 # 閲覧可能な文書を検索 — query
 
 DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更新し、競合は全体rollback→409。モデル呼出しはtransaction外、回答確定は別transactionで再認可。
+
+## chunks_list
+
+正本: `backend/src/kotorelay/operations/indexing/sql/chunks_list.sql`
+
+```sql
+/* chunksを組織境界内でlistする。 */
+SELECT
+  id,
+  organization_id,
+  document_id,
+  version_id,
+  body_key,
+  sha256,
+  heading,
+  placements,
+  manifest_hash,
+  ready
+FROM chunks
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+| 入力／出力型 | 定義 |
+| --- | --- |
+| db: Database | Database |
+| organization_id: str | str |
+
+戻り値: `list[ChunksRow]`
 
 ## departments_list
 
@@ -28,6 +59,38 @@ ORDER BY
 | organization_id: str | str |
 
 戻り値: `list[DepartmentsRow]`
+
+## documents_by_department
+
+正本: `backend/src/kotorelay/operations/documents/sql/documents_by_department.sql`
+
+```sql
+/* 選択した所有部署の文書をページング前に組織内で絞り込む。 */
+SELECT
+  id,
+  organization_id,
+  department_id,
+  title,
+  created_by,
+  visibility,
+  shared_departments,
+  status,
+  revision,
+  next_version,
+  latest_version_id,
+  updated_at
+FROM documents
+WHERE
+  organization_id = %(organization_id)s AND department_id = %(department_id)s
+```
+
+| 入力／出力型 | 定義 |
+| --- | --- |
+| db: Database | Database |
+| organization_id: str | str |
+| department_id: str | str |
+
+戻り値: `list[DocumentsRow]`
 
 ## documents_list
 
@@ -115,6 +178,38 @@ WHERE
 | id: str | str |
 
 戻り値: `list[OrganizationsRow]`
+
+## submissions_list
+
+正本: `backend/src/kotorelay/operations/reviews/sql/submissions_list.sql`
+
+```sql
+/* submissionsを組織境界内でlistする。 */
+SELECT
+  id,
+  organization_id,
+  document_id,
+  version_id,
+  requested_by,
+  status,
+  manifest_hash,
+  decided_by,
+  reason,
+  created_at,
+  decided_at
+FROM submissions
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+| 入力／出力型 | 定義 |
+| --- | --- |
+| db: Database | Database |
+| organization_id: str | str |
+
+戻り値: `list[SubmissionsRow]`
 
 ## users_list
 
