@@ -26,5 +26,7 @@ class Settings(BaseSettings):
     max_image_bytes: int = 5 * 1024 * 1024
     max_image_pixels: int = 20_000_000
     max_document_images: int = 10
+    retention_days: int = 7
+    worker_subject: str = "service-worker"
     ocr_command: str = "tesseract"
     frontend_origin: str = "http://localhost:4321"

@@ -11,6 +11,7 @@ def identity(ctx: Context) -> dict[str, object]:
         "user": ctx.user,
         "memberships": ctx.memberships,
         "departments": [d for d in q.departments_list(ctx.db, ctx.org) if ctx.member(d.id)],
+        "directory": [d for d in q.departments_list(ctx.db, ctx.org) if d.active],
         "mode": ctx.settings.mode,
     }
 

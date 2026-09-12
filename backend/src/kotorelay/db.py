@@ -8,9 +8,10 @@ from pathlib import Path
 from typing import TypeVar, cast
 
 import psycopg
-from kotorelay.config import Settings
 from psycopg.rows import dict_row
 from pydantic import BaseModel
+
+from kotorelay.config import Settings
 
 T = TypeVar("T", bound=BaseModel)
 APP = Path(__file__).parent

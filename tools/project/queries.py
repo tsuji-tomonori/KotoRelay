@@ -84,7 +84,8 @@ def render() -> str:
             lines += [
                 f"def {path.stem}(db: Database, organization_id: str, id: str) -> int:",
                 f'    """{table}の指定行だけを削除する。"""',
-                f'    return db.execute("{relative}", {{"organization_id": organization_id, "id": id}})',
+                f'    return db.execute("{relative}", '
+                '{"organization_id": organization_id, "id": id})',
                 "",
             ]
         else:
@@ -98,6 +99,22 @@ def main() -> None:
     args = parser.parse_args()
     import subprocess
 
+    cleaned = subprocess.run(
+        [
+            str(Path(sys.executable).parent / "ruff"),
+            "check",
+            "--fix",
+            "--select",
+            "I",
+            "--stdin-filename",
+            "backend/src/kotorelay/generated/queries.py",
+            "-",
+        ],
+        input=render(),
+        text=True,
+        capture_output=True,
+        check=True,
+    )
     result = subprocess.run(
         [
             str(Path(sys.executable).parent / "ruff"),
@@ -106,7 +123,7 @@ def main() -> None:
             "queries.py",
             "-",
         ],
-        input=render(),
+        input=cleaned.stdout,
         text=True,
         capture_output=True,
         check=True,

@@ -1,6 +1,7 @@
 """待機計算固定費を持たないKotoRelayのAWS構成を定義する。"""
 
 from pathlib import Path
+from typing import cast
 
 from aws_cdk import (
     CfnOutput,
@@ -30,6 +31,8 @@ from aws_cdk import (
 from aws_cdk import (
     aws_dsql as dsql,
 )
+from aws_cdk import aws_events as events
+from aws_cdk import aws_events_targets as targets
 from aws_cdk import (
     aws_iam as iam,
 )
@@ -144,20 +147,30 @@ class KotoRelayStack(Stack):
             iam.PolicyStatement(
                 actions=[
                     "s3vectors:PutVectors",
+                    "s3vectors:GetVectors",
                     "s3vectors:QueryVectors",
                     "s3vectors:DeleteVectors",
                 ],
                 resources=[vector_index.attr_index_arn],
             )
         )
-        code_path = asset_path or str(ROOT / "artifacts/lambda")
-        api_function = lambda_.Function(
+        code_path = asset_path or str(ROOT)
+        api_function = lambda_.DockerImageFunction(
             self,
             "Api",
-            runtime=lambda_.Runtime.PYTHON_3_12,
             architecture=lambda_.Architecture.X86_64,
-            handler="kotorelay.handler.handler",
-            code=lambda_.Code.from_asset(code_path),
+            code=lambda_.DockerImageCode.from_image_asset(
+                code_path,
+                file="backend/Dockerfile.lambda",
+                exclude=["backend/tests", "**/__pycache__"]
+                + sorted(
+                    [
+                        p.name
+                        for p in ROOT.iterdir()
+                        if p.name not in {"backend", "pyproject.toml", "uv.lock"}
+                    ]
+                ),
+            ),
             role=role,
             log_group=log_group,
             memory_size=1024,
@@ -175,16 +188,62 @@ class KotoRelayStack(Stack):
                 "KOTORELAY_MAX_QUESTIONS_PER_DAY": "100",
             },
         )
+        worker = lambda_.DockerImageFunction(
+            self,
+            "Worker",
+            architecture=lambda_.Architecture.X86_64,
+            code=lambda_.DockerImageCode.from_image_asset(
+                code_path,
+                file="backend/Dockerfile.lambda",
+                exclude=["backend/tests", "**/__pycache__"]
+                + sorted(
+                    [
+                        p.name
+                        for p in ROOT.iterdir()
+                        if p.name not in {"backend", "pyproject.toml", "uv.lock"}
+                    ]
+                ),
+                cmd=["kotorelay.worker.handler"],
+            ),
+            role=role,
+            log_group=log_group,
+            memory_size=1024,
+            timeout=Duration.minutes(5),
+            reserved_concurrent_executions=1,
+            environment={
+                "KOTORELAY_MODE": "aws",
+                "KOTORELAY_BUCKET": data.bucket_name,
+                "KOTORELAY_DSQL_HOST": cluster.attr_endpoint,
+                "KOTORELAY_DSQL_USER": "kotorelay_app",
+                "KOTORELAY_REGION": self.region,
+                "KOTORELAY_VECTOR_BUCKET": vector_bucket.ref,
+            },
+        )
+        events.Rule(
+            self,
+            "DeliverOutbox",
+            schedule=events.Schedule.rate(Duration.minutes(15)),
+            targets=[targets.LambdaFunction(worker, retry_attempts=2)],
+        )
         authorizer = authorizers.HttpJwtAuthorizer(
             "UserJwt", pool.user_pool_provider_url, jwt_audience=[client.user_pool_client_id]
         )
         api = apigw.HttpApi(self, "HttpApi", default_authorizer=authorizer)
+        api_access_logs = logs.LogGroup(
+            self, "ApiAccessLogs", retention=logs.RetentionDays.ONE_WEEK
+        )
+        stage = cast(apigw.CfnStage, cast(apigw.IHttpStage, api.default_stage).node.default_child)
+        stage.access_log_settings = apigw.CfnStage.AccessLogSettingsProperty(
+            destination_arn=api_access_logs.log_group_arn,
+            format='{"requestId":"$context.requestId","status":"$context.status","routeKey":"$context.routeKey"}',
+        )
         integration = integrations.HttpLambdaIntegration("FastAPI", api_function)
         api.add_routes(path="/{proxy+}", methods=[apigw.HttpMethod.ANY], integration=integration)
         distribution = cloudfront.Distribution(
             self,
             "Distribution",
             default_behavior=cloudfront.BehaviorOptions(
+                response_headers_policy=cloudfront.ResponseHeadersPolicy.SECURITY_HEADERS,
                 origin=origins.S3BucketOrigin.with_origin_access_control(web),
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             ),
@@ -212,7 +271,7 @@ class KotoRelayStack(Stack):
             [
                 {
                     "id": "AwsSolutions-S1",
-                    "reason": "サンプルではS3アクセスログの保存費を抑え、API監査の一意IDを使用する。",
+                    "reason": "サンプルではS3アクセスログの保存費を抑え、API監査IDを使う。",
                 }
             ],
         )
@@ -222,15 +281,15 @@ class KotoRelayStack(Stack):
                 {"id": "AwsSolutions-CFR1", "reason": "サンプルの配信先を国で制限する要件がない。"},
                 {
                     "id": "AwsSolutions-CFR2",
-                    "reason": "WAFの月額基本料を避け、JWT認証とAPI入力検査、利用上限で制限する。",
+                    "reason": "WAFの月額基本料を避け、JWT認証と入力検査で制限する。",
                 },
                 {
                     "id": "AwsSolutions-CFR3",
-                    "reason": "アクセスログの追加保存費を避け、APIの本文を含まない処理ログを利用する。",
+                    "reason": "アクセスログの追加保存費を避け、本文なしのAPIログを使う。",
                 },
                 {
                     "id": "AwsSolutions-CFR4",
-                    "reason": "独自ドメインの維持費を避け、CloudFront既定ドメインをHTTPSで利用する。",
+                    "reason": "ドメイン維持費を避け、CloudFront既定HTTPSを使う。",
                 },
             ],
         )
@@ -238,8 +297,8 @@ class KotoRelayStack(Stack):
             pool,
             [
                 {
-                    "id": "AwsSolutions-COG3",
-                    "reason": "高度な脅威保護の追加料金を避ける。自己登録禁止と短いトークン、有効所属の再確認で境界を保つ。",
+                    "id": "AwsSolutions-COG8",
+                    "reason": "追加料金を避け、自己登録禁止・短命JWT・所属の再確認を使う。",
                 }
             ],
         )
@@ -248,7 +307,7 @@ class KotoRelayStack(Stack):
             [
                 {
                     "id": "AwsSolutions-IAM5",
-                    "reason": "S3の内容ハッシュキーとCloudWatchの動的ログストリームに限ったワイルドカード。バケットとロググループは限定する。",
+                    "reason": "対象バケット内の内容ハッシュキーと対象ログ内の動的ストリームのみ。",
                 }
             ],
             apply_to_children=True,

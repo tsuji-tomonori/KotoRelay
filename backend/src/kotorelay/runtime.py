@@ -9,6 +9,7 @@ from typing import Annotated
 import jwt
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from kotorelay.config import Settings
 from kotorelay.context import Context
 from kotorelay.db import Database

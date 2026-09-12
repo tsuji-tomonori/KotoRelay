@@ -10,12 +10,11 @@ from typing import TypeVar
 
 import pytest
 from fastapi.testclient import TestClient
-from pydantic import BaseModel
-
 from kotorelay.config import Settings
 from kotorelay.db import Database
 from kotorelay.main import create_app
 from kotorelay.seed import seed
+from pydantic import BaseModel
 
 T = TypeVar("T", bound=BaseModel)
 

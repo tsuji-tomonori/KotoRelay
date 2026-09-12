@@ -1,2 +1,28 @@
 -- documentsを組織境界内でinsertする。
-INSERT INTO documents (id, organization_id, department_id, title, created_by, visibility, shared_departments, status, revision, next_version, latest_version_id, updated_at) VALUES (%(id)s, %(organization_id)s, %(department_id)s, %(title)s, %(created_by)s, %(visibility)s, %(shared_departments)s, %(status)s, %(revision)s, %(next_version)s, %(latest_version_id)s, %(updated_at)s);
+INSERT INTO documents (
+    id,
+    organization_id,
+    department_id,
+    title,
+    created_by,
+    visibility,
+    shared_departments,
+    status,
+    revision,
+    next_version,
+    latest_version_id,
+    updated_at
+) VALUES (
+    %(id)s,
+    %(organization_id)s,
+    %(department_id)s,
+    %(title)s,
+    %(created_by)s,
+    %(visibility)s,
+    %(shared_departments)s,
+    %(status)s,
+    %(revision)s,
+    %(next_version)s,
+    %(latest_version_id)s,
+    %(updated_at)s
+);

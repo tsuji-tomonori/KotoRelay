@@ -15,7 +15,8 @@ CREATE TABLE submissions (
     UNIQUE (organization_id, id),
     UNIQUE (organization_id, version_id),
     FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),
-    FOREIGN KEY (organization_id, version_id) REFERENCES versions (organization_id, id),
+    FOREIGN KEY (organization_id, document_id, version_id)
+    REFERENCES versions (organization_id, document_id, id),
     FOREIGN KEY (organization_id, requested_by) REFERENCES users (organization_id, id),
     FOREIGN KEY (organization_id, decided_by) REFERENCES users (organization_id, id),
     CHECK (status IN ('pending', 'approved', 'rejected')),

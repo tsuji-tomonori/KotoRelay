@@ -44,6 +44,7 @@ def view(ctx: Context, document_id: str, data: ViewEvent) -> dict[str, bool]:
 
 def summary(ctx: Context, department_id: str, start: datetime, end: datetime) -> dict[str, object]:
     require(ctx.permission(department_id, "manage"), "forbidden", 403)
+    require(start.tzinfo is not None and end.tzinfo is not None, "invalid_period", 422)
     require(start < end, "invalid_period", 422)
     events = [e for e in q.events_list(ctx.db, ctx.org) if start <= e.created_at < end]
     consumed = [e for e in events if e.department_id == department_id]

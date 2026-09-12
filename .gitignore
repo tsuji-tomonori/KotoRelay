@@ -15,3 +15,6 @@ artifacts/
 !.env.example
 playwright-report/
 test-results/
+
+.dev-standard/quint/runtime/
+.dev-standard/python/runtime/

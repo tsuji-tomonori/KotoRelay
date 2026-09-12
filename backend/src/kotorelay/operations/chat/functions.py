@@ -11,6 +11,7 @@ from kotorelay.context import Context, new_id, now, stable_id
 from kotorelay.engines import Engine, terms
 from kotorelay.errors import Problem, require
 from kotorelay.generated import queries as q
+from kotorelay.objects import digest
 from kotorelay.schemas import AnswerView, Ask, Citation, Evidence, Manifest
 
 
@@ -41,7 +42,9 @@ def validate_citation(ctx: Context, citation: Citation) -> bool:
         return False
     version, chunk = versions[0], chunks[0]
     if not (
-        chunk.ready
+        digest(version.manifest.encode()) == version.manifest_hash
+        and version.document_id == doc.id
+        and chunk.ready
         and chunk.version_id == version.id
         and chunk.document_id == doc.id
         and chunk.manifest_hash == version.manifest_hash == citation.manifest_hash
@@ -52,6 +55,9 @@ def validate_citation(ctx: Context, citation: Citation) -> bool:
         ctx.objects.get(chunk.body_key, chunk.sha256)
         ctx.objects.get(version.body_key, version.body_hash)
         manifest = Manifest.model_validate_json(version.manifest)
+        placements = set(json.loads(chunk.placements))
+        if placements - {image.placement.id for image in manifest.images}:
+            return False
         for image in manifest.images:
             if image.placement.id in json.loads(chunk.placements):
                 assets = q.assets_get(ctx.db, ctx.org, image.placement.asset_id)
@@ -79,10 +85,13 @@ def prepare(ctx: Context, data: Ask, key: str, engine: Engine) -> Prepared:
             409,
         )
         raise Problem(409, "already_answered", answer_id)
+    request = data.model_dump_json()
+    resumed = ctx.idempotent_result(key, "ask", request)
     events = q.events_list(ctx.db, ctx.org)
     today = datetime.now(UTC).date()
     require(
-        sum(
+        resumed is not None
+        or sum(
             1
             for e in events
             if e.user_id == ctx.user.id and e.kind == "question" and e.created_at.date() == today
@@ -91,7 +100,9 @@ def prepare(ctx: Context, data: Ask, key: str, engine: Engine) -> Prepared:
         "limit",
         429,
     )
-    if data.conversation_id:
+    if resumed is not None:
+        conversation_id = resumed
+    elif data.conversation_id:
         conversations = q.conversations_get(ctx.db, ctx.org, data.conversation_id)
         require(bool(conversations) and conversations[0].user_id == ctx.user.id)
         conversation_id = conversations[0].id
@@ -161,20 +172,22 @@ def prepare(ctx: Context, data: Ask, key: str, engine: Engine) -> Prepared:
         texts.append(text)
         if len(citations) >= 5:
             break
-    q.events_insert(
-        ctx.db,
-        q.EventsRow(
-            id=answer_id,
-            organization_id=ctx.org,
-            user_id=ctx.user.id,
-            department_id=data.department_id,
-            document_id=None,
-            answer_id=None,
-            kind="question",
-            outcome="accepted",
-            created_at=now(),
-        ),
-    )
+    if resumed is None:
+        q.events_insert(
+            ctx.db,
+            q.EventsRow(
+                id=answer_id,
+                organization_id=ctx.org,
+                user_id=ctx.user.id,
+                department_id=data.department_id,
+                document_id=None,
+                answer_id=None,
+                kind="question",
+                outcome="accepted",
+                created_at=now(),
+            ),
+        )
+        ctx.remember(key, "ask", request, conversation_id)
     ctx.fence()
     return Prepared(
         answer_id=answer_id,

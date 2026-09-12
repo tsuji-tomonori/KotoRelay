@@ -13,6 +13,7 @@ CREATE TABLE versions (
     created_at timestamptz NOT NULL,
     PRIMARY KEY (id),
     UNIQUE (organization_id, id),
+    UNIQUE (organization_id, document_id, id),
     UNIQUE (organization_id, document_id, number),
     FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),
     FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id),

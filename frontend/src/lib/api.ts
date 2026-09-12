@@ -20,6 +20,7 @@ export interface Membership {
   active: boolean;
 }
 export interface Identity {
+  directory?: { id: string; name: string }[];
   user: { id: string; display_name: string; operator: boolean };
   departments: { id: string; name: string }[];
   memberships: Membership[];

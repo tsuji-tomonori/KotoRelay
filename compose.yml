@@ -16,6 +16,7 @@ services:
       timeout: 3s
       retries: 30
   seed:
+    image: kotorelay-api
     build: { context: ., dockerfile: backend/Dockerfile }
     command: ['python', '-m', 'kotorelay.seed']
     environment: &api-environment
@@ -26,6 +27,7 @@ services:
     depends_on:
       db: { condition: service_healthy }
   api:
+    image: kotorelay-api
     build: { context: ., dockerfile: backend/Dockerfile }
     environment: *api-environment
     ports: ['127.0.0.1:58000:8000']
@@ -43,6 +45,14 @@ services:
       interval: 3s
       timeout: 3s
       retries: 30
+  worker:
+    image: kotorelay-api
+    command: ['python', '-m', 'kotorelay.worker']
+    environment: *api-environment
+    volumes: ['objects:/data/objects']
+    depends_on:
+      api: { condition: service_healthy }
+    profiles: ['worker']
   web:
     build: { context: ., dockerfile: frontend/Dockerfile }
     ports: ['127.0.0.1:4321:8080']

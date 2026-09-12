@@ -13,6 +13,7 @@ CREATE TABLE chunks (
     PRIMARY KEY (id),
     UNIQUE (organization_id, id),
     FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),
-    FOREIGN KEY (organization_id, version_id) REFERENCES versions (organization_id, id),
+    FOREIGN KEY (organization_id, document_id, version_id)
+    REFERENCES versions (organization_id, document_id, id),
     FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );

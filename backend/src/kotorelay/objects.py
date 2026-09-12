@@ -8,6 +8,7 @@ from typing import Protocol
 
 import boto3
 from botocore.config import Config
+
 from kotorelay.config import Settings
 from kotorelay.errors import require
 

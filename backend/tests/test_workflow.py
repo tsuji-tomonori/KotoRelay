@@ -7,9 +7,8 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from PIL import Image
-
 from kotorelay.context import stable_id
+from PIL import Image
 
 DEPT = stable_id("開発部")
 OTHER = stable_id("営業部")
@@ -483,6 +482,16 @@ def test_画像のOCR確認をmanifestへ固定する(client):
     )
     assert ask(client).json()["status"] == "answered"
 
+    assert client.get(f"/api/images/ocr/{p['ocr_run_id']}", headers=headers()).status_code == 200
+    rt = client.app.state.runtime
+    rt.settings.max_model_images = 0
+    assert ask(client).status_code == 200
+    rt.settings.max_model_images = 5
+    assert ask(client).status_code == 200
+    policy(client, doc, status="deleted")
+    rt.settings.retention_days = 0
+    index(client)
+
 
 @pytest.mark.parametrize("payload", [b"", b"<svg onload=alert(1)>", b"not-a-png"])
 def test_不正画像を拒否する(client, payload):
@@ -515,3 +524,251 @@ def test_認可情報の上書き入力を拒否する(client):
 def test_非運用者は反映ジョブを操作できない(client):
     assert client.get("/api/operations/jobs", headers=headers("reader")).status_code == 403
     assert client.get("/api/operations/reconcile", headers=headers("leader")).status_code == 403
+
+
+def test_現行の所属と管理メンバーを取得する(client):
+    me = client.get("/api/groups/me", headers=headers("author")).json()
+    assert me["user"]["display_name"] == "青木 はるか"
+    members = client.get(f"/api/groups/{DEPT}/members", headers=headers("leader")).json()
+    assert len(members) == 5
+    assert client.get(f"/api/groups/{DEPT}/members", headers=headers("reader")).status_code == 403
+    assert (
+        client.put(
+            "/api/groups/memberships",
+            headers=headers("operator"),
+            json={"user_id": stable_id("other"), "department_id": DEPT, "can_author": True},
+        ).status_code
+        == 200
+    )
+    assert (
+        client.get("/api/groups/me", headers=headers("other")).json()["memberships"][1][
+            "can_author"
+        ]
+        is True
+    )
+
+
+def test_反映失敗を照合し再試行で回復する(client, monkeypatch):
+    doc = create(client)
+    version = submit(client, doc)
+    approve(client, version)
+    differences = client.get("/api/operations/reconcile", headers=headers("operator")).json()
+    assert differences[0]["reason"] == "最新承認版が未反映"
+    rt = client.app.state.runtime
+    monkeypatch.setattr(rt.engine, "verify", lambda keys: False)
+    job = client.get("/api/operations/jobs", headers=headers("operator")).json()[0]
+    result = client.post(f"/api/operations/jobs/{job['id']}", headers=headers("operator")).json()
+    assert result["status"] == "failed"
+    assert ask(client).json()["status"] == "held"
+    monkeypatch.setattr(rt.engine, "verify", lambda keys: True)
+    result = client.post(f"/api/operations/jobs/{job['id']}", headers=headers("operator")).json()
+    assert result["status"] == "done"
+    assert ask(client).json()["status"] == "answered"
+    assert (
+        client.post(f"/api/operations/jobs/{job['id']}", headers=headers("operator")).json()[
+            "attempts"
+        ]
+        == 2
+    )
+    policy(client, doc, status="withdrawn")
+    assert (
+        "停止済み"
+        in client.get("/api/operations/reconcile", headers=headers("operator")).json()[0]["reason"]
+    )
+    index(client)
+
+
+def test_画像を含む削除を保持期間後に完了する(client, db):
+    doc, _ = published(client)
+    answer = ask(client).json()
+    assert policy(client, doc, status="deleted").status_code == 200
+    jobs = client.get("/api/operations/jobs", headers=headers("operator")).json()
+    purge = next(j for j in jobs if j["kind"] == "purge")
+    url = f"/api/operations/jobs/{purge['id']}"
+    assert client.post(url, headers=headers("operator")).json()["status"] == "retained"
+    client.app.state.runtime.settings.retention_days = 0
+    assert client.post(url, headers=headers("operator")).json()["status"] == "done"
+    assert not any(c["document_id"] == doc["id"] for c in db.tables["chunks"].values())
+    assert not any(d["document_id"] == doc["id"] for d in db.tables["drafts"].values())
+    assert (
+        client.get(f"/api/chat/{answer['conversation_id']}", headers=headers("reader")).json()[0][
+            "status"
+        ]
+        == "hidden"
+    )
+
+
+def test_モデル実行中の権限変更で回答を保留する(client, monkeypatch):
+    from kotorelay.generated import queries as q
+    from kotorelay.operations.documents.functions import policy as update
+    from kotorelay.schemas import ChangePolicy
+
+    doc, _ = published(client)
+    rt = client.app.state.runtime
+
+    def generate(question, texts, images):
+        with rt.context("demo-leader") as ctx:
+            current = q.documents_get(ctx.db, ctx.org, doc["id"])[0]
+            update(
+                ctx,
+                doc["id"],
+                ChangePolicy(
+                    revision=current.revision, visibility="department", status="withdrawn"
+                ),
+            )
+        return "絶対に送信しない本文"
+
+    monkeypatch.setattr(rt.engine, "generate", generate)
+    result = ask(client).json()
+    assert result["status"] == "held" and "絶対に送信" not in result["answer"]
+
+
+def test_モデル呼び出し失敗を失敗件数として区別する(client, monkeypatch):
+    published(client)
+
+    def generate(*args):
+        raise TimeoutError("timeout")
+
+    monkeypatch.setattr(client.app.state.runtime.engine, "generate", generate)
+    result = ask(client).json()
+    assert result["status"] == "failed" and result["citations"] == []
+
+
+def test_不正な索引来歴をモデルへ渡さない(client, db):
+    doc, _ = published(client)
+    chunk = next(iter(db.tables["chunks"].values()))
+    chunk["manifest_hash"] = "0" * 64
+    assert ask(client).json()["status"] == "held"
+    chunk["manifest_hash"] = ""
+    chunk["body_key"] = "0" * 64
+    assert ask(client).json()["status"] == "held"
+
+
+def test_利用上限を超えた質問を受け付けない(client):
+    client.app.state.runtime.settings.max_questions_per_day = 1
+    assert ask(client).status_code == 200
+    assert ask(client).status_code == 429
+
+
+def test_失効したジョブは公開版を戻さない(client):
+    doc = create(client)
+    v1 = submit(client, doc)
+    approve(client, v1)
+    v2 = submit(client, doc)
+    approve(client, v2)
+    jobs = client.get("/api/operations/jobs", headers=headers("operator")).json()
+    old = next(j for j in jobs if j["version_id"] == v1["id"])
+    assert (
+        client.post(f"/api/operations/jobs/{old['id']}", headers=headers("operator")).json()[
+            "status"
+        ]
+        == "obsolete"
+    )
+    index(client)
+    assert ask(client).json()["citations"][0]["version_id"] == v2["id"]
+
+
+def test_外部索引失敗を記録して部分完了をreadyにしない(client, monkeypatch):
+    doc = create(client)
+    version = submit(client, doc)
+    approve(client, version)
+
+    def index_failure(*args):
+        raise OSError("external")
+
+    monkeypatch.setattr(client.app.state.runtime.engine, "index", index_failure)
+    job = client.get("/api/operations/jobs", headers=headers("operator")).json()[0]
+    result = client.post(f"/api/operations/jobs/{job['id']}", headers=headers("operator")).json()
+    assert result["status"] == "failed" and result["error_code"] == "external_failure"
+    assert ask(client).json()["status"] == "held"
+
+
+def test_workerが未配送ジョブを処理する(client):
+    from kotorelay.worker import run_once
+
+    doc = create(client)
+    version = submit(client, doc)
+    approve(client, version)
+    assert run_once(client.app.state.runtime) == 1
+    assert run_once(client.app.state.runtime) == 0
+    assert ask(client).json()["status"] == "answered"
+
+
+@pytest.mark.parametrize(
+    "target", ["document", "version", "chunk", "manifest", "placement", "body"]
+)
+def test_回答根拠の欠落と改変は閲覧時に非表示とする(client, db, target):
+    doc, version = published(client)
+    answer = ask(client).json()
+    chunk = db.tables["chunks"][answer["citations"][0]["chunk_id"]]
+    if target == "document":
+        del db.tables["documents"][doc["id"]]
+    elif target == "version":
+        del db.tables["versions"][version["id"]]
+    elif target == "chunk":
+        del db.tables["chunks"][chunk["id"]]
+    elif target == "manifest":
+        db.tables["versions"][version["id"]]["manifest"] = "{}"
+    elif target == "placement":
+        chunk["placements"] = '["unknown"]'
+    else:
+        client.app.state.runtime.objects.delete(chunk["body_key"])
+    result = client.get(f"/api/chat/{answer['conversation_id']}", headers=headers("reader")).json()
+    assert result[0]["status"] == "hidden" and result[0]["citations"] == []
+
+
+def test_中断した質問は同じIDで再開し二重計上しない(client, db):
+    from kotorelay.operations.chat.functions import prepare
+    from kotorelay.schemas import Ask
+
+    published(client)
+    rt = client.app.state.runtime
+    key = str(uuid4())
+    data = Ask(question="開発フロー", department_id=DEPT)
+    with rt.context("demo-reader") as ctx:
+        first = prepare(ctx, data, key, rt.engine)
+    result = client.post("/api/chat", headers=headers("reader", key), json=data.model_dump())
+    assert result.status_code == 200, result.text
+    assert result.json()["conversation_id"] == first.conversation_id
+    assert len([e for e in db.tables["events"].values() if e["kind"] == "question"]) == 1
+
+
+def test_外部検索は返されたID以外を根拠にしない(client, monkeypatch):
+    published(client)
+    rt = client.app.state.runtime
+    monkeypatch.setattr(rt.engine, "search", lambda *args: [])
+    assert ask(client).json()["status"] == "held"
+
+
+def test_モデル入力直前に失効を検知した場合はモデルを呼ばない(client, monkeypatch):
+    from kotorelay.operations.chat import service
+
+    published(client)
+    original = service.f.validate_citation
+    calls = 0
+
+    def validate(ctx, citation):
+        nonlocal calls
+        calls += 1
+        return original(ctx, citation) if calls == 1 else False
+
+    monkeypatch.setattr(service.f, "validate_citation", validate)
+    assert ask(client).json()["status"] == "held"
+
+
+def test_削除配送を100行単位で再開し共有本文を残す(client, db):
+    from kotorelay.worker import run_once
+
+    doc, _ = published(client)
+    other, _ = published(client)
+    chunk = next(c for c in db.tables["chunks"].values() if c["document_id"] == doc["id"])
+    for _ in range(101):
+        new = dict(chunk, id=str(uuid4()))
+        db.tables["chunks"][new["id"]] = new
+    policy(client, doc, status="deleted")
+    rt = client.app.state.runtime
+    rt.settings.retention_days = 0
+    run_once(rt)
+    run_once(rt)
+    assert not [c for c in db.tables["chunks"].values() if c["document_id"] == doc["id"]]
+    assert client.get(f"/api/documents/{other['id']}", headers=headers("reader")).status_code == 200

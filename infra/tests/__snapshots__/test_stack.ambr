@@ -1,0 +1,1159 @@
+# serializer version: 1
+# name: test_構成スナップショットが一致する
+  dict({
+    'Outputs': dict({
+      'AppRoleArn': dict({
+        'Value': dict({
+          'Fn::GetAtt': list([
+            'ApiRole1873F438',
+            'Arn',
+          ]),
+        }),
+      }),
+      'ContentBucket': dict({
+        'Value': dict({
+          'Ref': 'Content88381566',
+        }),
+      }),
+      'DatabaseEndpoint': dict({
+        'Value': dict({
+          'Fn::GetAtt': list([
+            'Database',
+            'Endpoint',
+          ]),
+        }),
+      }),
+      'FrontendBucket': dict({
+        'Value': dict({
+          'Ref': 'Frontend23D93C55',
+        }),
+      }),
+      'UserPoolClientId': dict({
+        'Value': dict({
+          'Ref': 'UsersWebClient8EE36D42',
+        }),
+      }),
+      'UserPoolId': dict({
+        'Value': dict({
+          'Ref': 'Users0A0EEA89',
+        }),
+      }),
+      'Website': dict({
+        'Value': dict({
+          'Fn::Join': list([
+            '',
+            list([
+              'https://',
+              dict({
+                'Fn::GetAtt': list([
+                  'Distribution830FAC52',
+                  'DomainName',
+                ]),
+              }),
+            ]),
+          ]),
+        }),
+      }),
+    }),
+    'Parameters': dict({
+      'BootstrapVersion': dict({
+        'Default': '/cdk-bootstrap/hnb659fds/version',
+        'Description': 'Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]',
+        'Type': 'AWS::SSM::Parameter::Value<String>',
+      }),
+    }),
+    'Resources': dict({
+      'ApiAccessLogsE9DF007D': dict({
+        'DeletionPolicy': 'Retain',
+        'Properties': dict({
+          'RetentionInDays': 7,
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::Logs::LogGroup',
+        'UpdateReplacePolicy': 'Retain',
+      }),
+      'ApiF70053CD': dict({
+        'DependsOn': list([
+          'ApiRoleDefaultPolicyCFEBAD31',
+          'ApiRole1873F438',
+        ]),
+        'Properties': dict({
+          'Architectures': list([
+            'x86_64',
+          ]),
+          'Code': dict({
+            'S3Bucket': 'CDKアセットバケット',
+            'S3Key': '検査fixtureのアセット',
+          }),
+          'Environment': dict({
+            'Variables': dict({
+              'KOTORELAY_BUCKET': dict({
+                'Ref': 'Content88381566',
+              }),
+              'KOTORELAY_CLIENT_ID': dict({
+                'Ref': 'UsersWebClient8EE36D42',
+              }),
+              'KOTORELAY_DSQL_HOST': dict({
+                'Fn::GetAtt': list([
+                  'Database',
+                  'Endpoint',
+                ]),
+              }),
+              'KOTORELAY_DSQL_USER': 'kotorelay_app',
+              'KOTORELAY_FRONTEND_ORIGIN': dict({
+                'Fn::Join': list([
+                  '',
+                  list([
+                    'https://',
+                    dict({
+                      'Fn::GetAtt': list([
+                        'Distribution830FAC52',
+                        'DomainName',
+                      ]),
+                    }),
+                  ]),
+                ]),
+              }),
+              'KOTORELAY_ISSUER': dict({
+                'Fn::GetAtt': list([
+                  'Users0A0EEA89',
+                  'ProviderURL',
+                ]),
+              }),
+              'KOTORELAY_MAX_QUESTIONS_PER_DAY': '100',
+              'KOTORELAY_MODE': 'aws',
+              'KOTORELAY_REGION': dict({
+                'Ref': 'AWS::Region',
+              }),
+              'KOTORELAY_VECTOR_BUCKET': dict({
+                'Ref': 'Vectors',
+              }),
+            }),
+          }),
+          'LoggingConfig': dict({
+            'LogGroup': dict({
+              'Ref': 'ApiLogs3D05D88B',
+            }),
+          }),
+          'MemorySize': 1024,
+          'PackageType': 'Image',
+          'ReservedConcurrentExecutions': 3,
+          'Role': dict({
+            'Fn::GetAtt': list([
+              'ApiRole1873F438',
+              'Arn',
+            ]),
+          }),
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+          'Timeout': 29,
+        }),
+        'Type': 'AWS::Lambda::Function',
+      }),
+      'ApiLogs3D05D88B': dict({
+        'DeletionPolicy': 'Delete',
+        'Properties': dict({
+          'RetentionInDays': 7,
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::Logs::LogGroup',
+        'UpdateReplacePolicy': 'Delete',
+      }),
+      'ApiRole1873F438': dict({
+        'Metadata': dict({
+          'cdk_nag': dict({
+            'rules_to_suppress': list([
+              dict({
+                'id': 'AwsSolutions-IAM5',
+                'is_reason_encoded': True,
+                'reason': '5a++6LGh44OQ44Kx44OD44OI5YaF44Gu5YaF5a6544OP44OD44K344Ol44Kt44O844Go5a++6LGh44Ot44Kw5YaF44Gu5YuV55qE44K544OI44Oq44O844Og44Gu44G/44CC',
+              }),
+            ]),
+          }),
+        }),
+        'Properties': dict({
+          'AssumeRolePolicyDocument': dict({
+            'Statement': list([
+              dict({
+                'Action': 'sts:AssumeRole',
+                'Effect': 'Allow',
+                'Principal': dict({
+                  'Service': 'lambda.amazonaws.com',
+                }),
+              }),
+            ]),
+            'Version': '2012-10-17',
+          }),
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::IAM::Role',
+      }),
+      'ApiRoleDefaultPolicyCFEBAD31': dict({
+        'Metadata': dict({
+          'cdk_nag': dict({
+            'rules_to_suppress': list([
+              dict({
+                'id': 'AwsSolutions-IAM5',
+                'is_reason_encoded': True,
+                'reason': '5a++6LGh44OQ44Kx44OD44OI5YaF44Gu5YaF5a6544OP44OD44K344Ol44Kt44O844Go5a++6LGh44Ot44Kw5YaF44Gu5YuV55qE44K544OI44Oq44O844Og44Gu44G/44CC',
+              }),
+            ]),
+          }),
+        }),
+        'Properties': dict({
+          'PolicyDocument': dict({
+            'Statement': list([
+              dict({
+                'Action': list([
+                  'logs:CreateLogStream',
+                  'logs:PutLogEvents',
+                ]),
+                'Effect': 'Allow',
+                'Resource': dict({
+                  'Fn::GetAtt': list([
+                    'ApiLogs3D05D88B',
+                    'Arn',
+                  ]),
+                }),
+              }),
+              dict({
+                'Action': list([
+                  's3:GetObject*',
+                  's3:GetBucket*',
+                  's3:List*',
+                  's3:DeleteObject*',
+                  's3:PutObject',
+                  's3:PutObjectLegalHold',
+                  's3:PutObjectRetention',
+                  's3:PutObjectTagging',
+                  's3:PutObjectVersionTagging',
+                  's3:Abort*',
+                ]),
+                'Effect': 'Allow',
+                'Resource': list([
+                  dict({
+                    'Fn::GetAtt': list([
+                      'Content88381566',
+                      'Arn',
+                    ]),
+                  }),
+                  dict({
+                    'Fn::Join': list([
+                      '',
+                      list([
+                        dict({
+                          'Fn::GetAtt': list([
+                            'Content88381566',
+                            'Arn',
+                          ]),
+                        }),
+                        '/*',
+                      ]),
+                    ]),
+                  }),
+                ]),
+              }),
+              dict({
+                'Action': 'dsql:DbConnect',
+                'Effect': 'Allow',
+                'Resource': dict({
+                  'Fn::GetAtt': list([
+                    'Database',
+                    'ResourceArn',
+                  ]),
+                }),
+              }),
+              dict({
+                'Action': 'bedrock:InvokeModel',
+                'Effect': 'Allow',
+                'Resource': list([
+                  dict({
+                    'Fn::Join': list([
+                      '',
+                      list([
+                        'arn:',
+                        dict({
+                          'Ref': 'AWS::Partition',
+                        }),
+                        ':bedrock:',
+                        dict({
+                          'Ref': 'AWS::Region',
+                        }),
+                        '::foundation-model/amazon.nova-lite-v1:0',
+                      ]),
+                    ]),
+                  }),
+                  dict({
+                    'Fn::Join': list([
+                      '',
+                      list([
+                        'arn:',
+                        dict({
+                          'Ref': 'AWS::Partition',
+                        }),
+                        ':bedrock:',
+                        dict({
+                          'Ref': 'AWS::Region',
+                        }),
+                        '::foundation-model/amazon.titan-embed-text-v2:0',
+                      ]),
+                    ]),
+                  }),
+                ]),
+              }),
+              dict({
+                'Action': list([
+                  's3vectors:PutVectors',
+                  's3vectors:GetVectors',
+                  's3vectors:QueryVectors',
+                  's3vectors:DeleteVectors',
+                ]),
+                'Effect': 'Allow',
+                'Resource': dict({
+                  'Fn::GetAtt': list([
+                    'VectorIndex',
+                    'IndexArn',
+                  ]),
+                }),
+              }),
+            ]),
+            'Version': '2012-10-17',
+          }),
+          'PolicyName': 'ApiRoleDefaultPolicyCFEBAD31',
+          'Roles': list([
+            dict({
+              'Ref': 'ApiRole1873F438',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::IAM::Policy',
+      }),
+      'Content88381566': dict({
+        'DeletionPolicy': 'Retain',
+        'Metadata': dict({
+          'cdk_nag': dict({
+            'rules_to_suppress': list([
+              dict({
+                'id': 'AwsSolutions-S1',
+                'is_reason_encoded': True,
+                'reason': '44K144Oz44OX44Or44Gn44GvUzPjgqLjgq/jgrvjgrnjg63jgrDjga7kv53lrZjosrvjgpLmipHjgYjjgIFBUEnnm6Pmn7tJROOCkuS9v+OBhuOAgg==',
+              }),
+            ]),
+          }),
+        }),
+        'Properties': dict({
+          'BucketEncryption': dict({
+            'ServerSideEncryptionConfiguration': list([
+              dict({
+                'ServerSideEncryptionByDefault': dict({
+                  'SSEAlgorithm': 'AES256',
+                }),
+              }),
+            ]),
+          }),
+          'PublicAccessBlockConfiguration': dict({
+            'BlockPublicAcls': True,
+            'BlockPublicPolicy': True,
+            'IgnorePublicAcls': True,
+            'RestrictPublicBuckets': True,
+          }),
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::S3::Bucket',
+        'UpdateReplacePolicy': 'Retain',
+      }),
+      'ContentPolicy707C1736': dict({
+        'Properties': dict({
+          'Bucket': dict({
+            'Ref': 'Content88381566',
+          }),
+          'PolicyDocument': dict({
+            'Statement': list([
+              dict({
+                'Action': 's3:*',
+                'Condition': dict({
+                  'Bool': dict({
+                    'aws:SecureTransport': 'false',
+                  }),
+                }),
+                'Effect': 'Deny',
+                'Principal': dict({
+                  'AWS': '*',
+                }),
+                'Resource': list([
+                  dict({
+                    'Fn::GetAtt': list([
+                      'Content88381566',
+                      'Arn',
+                    ]),
+                  }),
+                  dict({
+                    'Fn::Join': list([
+                      '',
+                      list([
+                        dict({
+                          'Fn::GetAtt': list([
+                            'Content88381566',
+                            'Arn',
+                          ]),
+                        }),
+                        '/*',
+                      ]),
+                    ]),
+                  }),
+                ]),
+              }),
+            ]),
+            'Version': '2012-10-17',
+          }),
+        }),
+        'Type': 'AWS::S3::BucketPolicy',
+      }),
+      'Database': dict({
+        'DeletionPolicy': 'Retain',
+        'Properties': dict({
+          'DeletionProtectionEnabled': True,
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::DSQL::Cluster',
+        'UpdateReplacePolicy': 'Retain',
+      }),
+      'DeliverOutbox2A3823DC': dict({
+        'Properties': dict({
+          'ScheduleExpression': 'rate(15 minutes)',
+          'State': 'ENABLED',
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+          'Targets': list([
+            dict({
+              'Arn': dict({
+                'Fn::GetAtt': list([
+                  'Worker11F36D0F',
+                  'Arn',
+                ]),
+              }),
+              'Id': 'Target0',
+              'RetryPolicy': dict({
+                'MaximumRetryAttempts': 2,
+              }),
+            }),
+          ]),
+        }),
+        'Type': 'AWS::Events::Rule',
+      }),
+      'DeliverOutboxAllowEventRuleKotoRelayWorker015B76AC9F5DB16C': dict({
+        'Properties': dict({
+          'Action': 'lambda:InvokeFunction',
+          'FunctionName': dict({
+            'Fn::GetAtt': list([
+              'Worker11F36D0F',
+              'Arn',
+            ]),
+          }),
+          'Principal': 'events.amazonaws.com',
+          'SourceArn': dict({
+            'Fn::GetAtt': list([
+              'DeliverOutbox2A3823DC',
+              'Arn',
+            ]),
+          }),
+        }),
+        'Type': 'AWS::Lambda::Permission',
+      }),
+      'Distribution830FAC52': dict({
+        'Metadata': dict({
+          'cdk_nag': dict({
+            'rules_to_suppress': list([
+              dict({
+                'id': 'AwsSolutions-CFR1',
+                'is_reason_encoded': True,
+                'reason': '44K144Oz44OX44Or44Gu6YWN5L+h5YWI44KS5Zu944Gn5Yi26ZmQ44GZ44KL6KaB5Lu244GM44Gq44GE44CC',
+              }),
+              dict({
+                'id': 'AwsSolutions-CFR2',
+                'is_reason_encoded': True,
+                'reason': 'V0FG44Gu5pyI6aGN5Z+65pys5paZ44KS6YG/44GR44CBSldU6KqN6Ki844Go5YWl5Yqb5qSc5p+744Gn5Yi26ZmQ44GZ44KL44CC',
+              }),
+              dict({
+                'id': 'AwsSolutions-CFR3',
+                'is_reason_encoded': True,
+                'reason': '44Ki44Kv44K744K544Ot44Kw44Gu6L+95Yqg5L+d5a2Y6LK744KS6YG/44GR44CB5pys5paH44Gq44GX44GuQVBJ44Ot44Kw44KS5L2/44GG44CC',
+              }),
+              dict({
+                'id': 'AwsSolutions-CFR4',
+                'is_reason_encoded': True,
+                'reason': '44OJ44Oh44Kk44Oz57at5oyB6LK744KS6YG/44GR44CBQ2xvdWRGcm9udOaXouWumkhUVFBT44KS5L2/44GG44CC',
+              }),
+            ]),
+          }),
+        }),
+        'Properties': dict({
+          'DistributionConfig': dict({
+            'CacheBehaviors': list([
+              dict({
+                'AllowedMethods': list([
+                  'GET',
+                  'HEAD',
+                  'OPTIONS',
+                  'PUT',
+                  'PATCH',
+                  'POST',
+                  'DELETE',
+                ]),
+                'CachePolicyId': '4135ea2d-6df8-44a3-9df3-4b5a84be39ad',
+                'Compress': True,
+                'OriginRequestPolicyId': 'b689b0a8-53d0-40ab-baf2-68738e2966ac',
+                'PathPattern': 'api/*',
+                'TargetOriginId': 'KotoRelayDistributionOrigin249E436BA',
+                'ViewerProtocolPolicy': 'https-only',
+              }),
+            ]),
+            'DefaultCacheBehavior': dict({
+              'CachePolicyId': '658327ea-f89d-4fab-a63d-7e88639e58f6',
+              'Compress': True,
+              'ResponseHeadersPolicyId': '67f7725c-6f97-4210-82d7-5512b31e9d03',
+              'TargetOriginId': 'KotoRelayDistributionOrigin123AD3532',
+              'ViewerProtocolPolicy': 'redirect-to-https',
+            }),
+            'DefaultRootObject': 'index.html',
+            'Enabled': True,
+            'HttpVersion': 'http2',
+            'IPV6Enabled': True,
+            'Origins': list([
+              dict({
+                'DomainName': dict({
+                  'Fn::GetAtt': list([
+                    'Frontend23D93C55',
+                    'RegionalDomainName',
+                  ]),
+                }),
+                'Id': 'KotoRelayDistributionOrigin123AD3532',
+                'OriginAccessControlId': dict({
+                  'Fn::GetAtt': list([
+                    'DistributionOrigin1S3OriginAccessControlEB606076',
+                    'Id',
+                  ]),
+                }),
+                'S3OriginConfig': dict({
+                  'OriginAccessIdentity': '',
+                }),
+              }),
+              dict({
+                'CustomOriginConfig': dict({
+                  'OriginProtocolPolicy': 'https-only',
+                  'OriginSSLProtocols': list([
+                    'TLSv1.2',
+                  ]),
+                }),
+                'DomainName': dict({
+                  'Fn::Join': list([
+                    '',
+                    list([
+                      dict({
+                        'Ref': 'HttpApiF5A9A8A7',
+                      }),
+                      '.execute-api.',
+                      dict({
+                        'Ref': 'AWS::Region',
+                      }),
+                      '.amazonaws.com',
+                    ]),
+                  ]),
+                }),
+                'Id': 'KotoRelayDistributionOrigin249E436BA',
+              }),
+            ]),
+            'PriceClass': 'PriceClass_100',
+          }),
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::CloudFront::Distribution',
+      }),
+      'DistributionOrigin1S3OriginAccessControlEB606076': dict({
+        'Properties': dict({
+          'OriginAccessControlConfig': dict({
+            'Name': 'KotoRelayDistributionOrigin1S3OriginAccessControl66B9515A',
+            'OriginAccessControlOriginType': 's3',
+            'SigningBehavior': 'always',
+            'SigningProtocol': 'sigv4',
+          }),
+        }),
+        'Type': 'AWS::CloudFront::OriginAccessControl',
+      }),
+      'Frontend23D93C55': dict({
+        'DeletionPolicy': 'Retain',
+        'Metadata': dict({
+          'cdk_nag': dict({
+            'rules_to_suppress': list([
+              dict({
+                'id': 'AwsSolutions-S1',
+                'is_reason_encoded': True,
+                'reason': '44K144Oz44OX44Or44Gn44GvUzPjgqLjgq/jgrvjgrnjg63jgrDjga7kv53lrZjosrvjgpLmipHjgYjjgIFBUEnnm6Pmn7tJROOCkuS9v+OBhuOAgg==',
+              }),
+            ]),
+          }),
+        }),
+        'Properties': dict({
+          'BucketEncryption': dict({
+            'ServerSideEncryptionConfiguration': list([
+              dict({
+                'ServerSideEncryptionByDefault': dict({
+                  'SSEAlgorithm': 'AES256',
+                }),
+              }),
+            ]),
+          }),
+          'PublicAccessBlockConfiguration': dict({
+            'BlockPublicAcls': True,
+            'BlockPublicPolicy': True,
+            'IgnorePublicAcls': True,
+            'RestrictPublicBuckets': True,
+          }),
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::S3::Bucket',
+        'UpdateReplacePolicy': 'Retain',
+      }),
+      'FrontendPolicy442AF6CA': dict({
+        'Properties': dict({
+          'Bucket': dict({
+            'Ref': 'Frontend23D93C55',
+          }),
+          'PolicyDocument': dict({
+            'Statement': list([
+              dict({
+                'Action': 's3:*',
+                'Condition': dict({
+                  'Bool': dict({
+                    'aws:SecureTransport': 'false',
+                  }),
+                }),
+                'Effect': 'Deny',
+                'Principal': dict({
+                  'AWS': '*',
+                }),
+                'Resource': list([
+                  dict({
+                    'Fn::GetAtt': list([
+                      'Frontend23D93C55',
+                      'Arn',
+                    ]),
+                  }),
+                  dict({
+                    'Fn::Join': list([
+                      '',
+                      list([
+                        dict({
+                          'Fn::GetAtt': list([
+                            'Frontend23D93C55',
+                            'Arn',
+                          ]),
+                        }),
+                        '/*',
+                      ]),
+                    ]),
+                  }),
+                ]),
+              }),
+              dict({
+                'Action': 's3:GetObject',
+                'Condition': dict({
+                  'StringEquals': dict({
+                    'AWS:SourceArn': dict({
+                      'Fn::Join': list([
+                        '',
+                        list([
+                          'arn:',
+                          dict({
+                            'Ref': 'AWS::Partition',
+                          }),
+                          ':cloudfront::',
+                          dict({
+                            'Ref': 'AWS::AccountId',
+                          }),
+                          ':distribution/',
+                          dict({
+                            'Ref': 'Distribution830FAC52',
+                          }),
+                        ]),
+                      ]),
+                    }),
+                  }),
+                }),
+                'Effect': 'Allow',
+                'Principal': dict({
+                  'Service': 'cloudfront.amazonaws.com',
+                }),
+                'Resource': dict({
+                  'Fn::Join': list([
+                    '',
+                    list([
+                      dict({
+                        'Fn::GetAtt': list([
+                          'Frontend23D93C55',
+                          'Arn',
+                        ]),
+                      }),
+                      '/*',
+                    ]),
+                  ]),
+                }),
+              }),
+            ]),
+            'Version': '2012-10-17',
+          }),
+        }),
+        'Type': 'AWS::S3::BucketPolicy',
+      }),
+      'HttpApiANYproxy435A1FB9': dict({
+        'Properties': dict({
+          'ApiId': dict({
+            'Ref': 'HttpApiF5A9A8A7',
+          }),
+          'AuthorizationType': 'JWT',
+          'AuthorizerId': dict({
+            'Ref': 'HttpApiUserJwtA1BD2A35',
+          }),
+          'RouteKey': 'ANY /{proxy+}',
+          'Target': dict({
+            'Fn::Join': list([
+              '',
+              list([
+                'integrations/',
+                dict({
+                  'Ref': 'HttpApiANYproxyFastAPICB7DF9E1',
+                }),
+              ]),
+            ]),
+          }),
+        }),
+        'Type': 'AWS::ApiGatewayV2::Route',
+      }),
+      'HttpApiANYproxyFastAPICB7DF9E1': dict({
+        'Properties': dict({
+          'ApiId': dict({
+            'Ref': 'HttpApiF5A9A8A7',
+          }),
+          'IntegrationType': 'AWS_PROXY',
+          'IntegrationUri': dict({
+            'Fn::GetAtt': list([
+              'ApiF70053CD',
+              'Arn',
+            ]),
+          }),
+          'PayloadFormatVersion': '2.0',
+        }),
+        'Type': 'AWS::ApiGatewayV2::Integration',
+      }),
+      'HttpApiANYproxyFastAPIPermissionBA30AB33': dict({
+        'Properties': dict({
+          'Action': 'lambda:InvokeFunction',
+          'FunctionName': dict({
+            'Fn::GetAtt': list([
+              'ApiF70053CD',
+              'Arn',
+            ]),
+          }),
+          'Principal': 'apigateway.amazonaws.com',
+          'SourceArn': dict({
+            'Fn::Join': list([
+              '',
+              list([
+                'arn:',
+                dict({
+                  'Ref': 'AWS::Partition',
+                }),
+                ':execute-api:',
+                dict({
+                  'Ref': 'AWS::Region',
+                }),
+                ':',
+                dict({
+                  'Ref': 'AWS::AccountId',
+                }),
+                ':',
+                dict({
+                  'Ref': 'HttpApiF5A9A8A7',
+                }),
+                '/*/*/{proxy+}',
+              ]),
+            ]),
+          }),
+        }),
+        'Type': 'AWS::Lambda::Permission',
+      }),
+      'HttpApiDefaultStage3EEB07D6': dict({
+        'Properties': dict({
+          'AccessLogSettings': dict({
+            'DestinationArn': dict({
+              'Fn::GetAtt': list([
+                'ApiAccessLogsE9DF007D',
+                'Arn',
+              ]),
+            }),
+            'Format': '{"requestId":"$context.requestId","status":"$context.status","routeKey":"$context.routeKey"}',
+          }),
+          'ApiId': dict({
+            'Ref': 'HttpApiF5A9A8A7',
+          }),
+          'AutoDeploy': True,
+          'StageName': '$default',
+          'Tags': dict({
+            'CostCenter': 'sample',
+            'Project': 'kotorelay',
+          }),
+        }),
+        'Type': 'AWS::ApiGatewayV2::Stage',
+      }),
+      'HttpApiF5A9A8A7': dict({
+        'Properties': dict({
+          'Name': 'HttpApi',
+          'ProtocolType': 'HTTP',
+          'Tags': dict({
+            'CostCenter': 'sample',
+            'Project': 'kotorelay',
+          }),
+        }),
+        'Type': 'AWS::ApiGatewayV2::Api',
+      }),
+      'HttpApiUserJwtA1BD2A35': dict({
+        'Properties': dict({
+          'ApiId': dict({
+            'Ref': 'HttpApiF5A9A8A7',
+          }),
+          'AuthorizerType': 'JWT',
+          'IdentitySource': list([
+            '$request.header.Authorization',
+          ]),
+          'JwtConfiguration': dict({
+            'Audience': list([
+              dict({
+                'Ref': 'UsersWebClient8EE36D42',
+              }),
+            ]),
+            'Issuer': dict({
+              'Fn::GetAtt': list([
+                'Users0A0EEA89',
+                'ProviderURL',
+              ]),
+            }),
+          }),
+          'Name': 'UserJwt',
+        }),
+        'Type': 'AWS::ApiGatewayV2::Authorizer',
+      }),
+      'Users0A0EEA89': dict({
+        'DeletionPolicy': 'Retain',
+        'Metadata': dict({
+          'cdk_nag': dict({
+            'rules_to_suppress': list([
+              dict({
+                'id': 'AwsSolutions-COG8',
+                'is_reason_encoded': True,
+                'reason': '6L+95Yqg5paZ6YeR44KS6YG/44GR44CB6Ieq5bex55m76Yyy56aB5q2i44O755+t5ZG9SldU44O75omA5bGe44Gu5YaN56K66KqN44KS5L2/44GG44CC',
+              }),
+            ]),
+          }),
+        }),
+        'Properties': dict({
+          'AccountRecoverySetting': dict({
+            'RecoveryMechanisms': list([
+              dict({
+                'Name': 'verified_phone_number',
+                'Priority': 1,
+              }),
+              dict({
+                'Name': 'verified_email',
+                'Priority': 2,
+              }),
+            ]),
+          }),
+          'AdminCreateUserConfig': dict({
+            'AllowAdminCreateUserOnly': True,
+          }),
+          'EmailVerificationMessage': 'The verification code to your new account is {####}',
+          'EmailVerificationSubject': 'Verify your new account',
+          'EnabledMfas': list([
+            'SOFTWARE_TOKEN_MFA',
+          ]),
+          'MfaConfiguration': 'OPTIONAL',
+          'Policies': dict({
+            'PasswordPolicy': dict({
+              'MinimumLength': 14,
+              'RequireLowercase': True,
+              'RequireNumbers': True,
+              'RequireSymbols': True,
+              'RequireUppercase': True,
+            }),
+          }),
+          'SmsVerificationMessage': 'The verification code to your new account is {####}',
+          'UserPoolTags': dict({
+            'CostCenter': 'sample',
+            'Project': 'kotorelay',
+          }),
+          'VerificationMessageTemplate': dict({
+            'DefaultEmailOption': 'CONFIRM_WITH_CODE',
+            'EmailMessage': 'The verification code to your new account is {####}',
+            'EmailSubject': 'Verify your new account',
+            'SmsMessage': 'The verification code to your new account is {####}',
+          }),
+        }),
+        'Type': 'AWS::Cognito::UserPool',
+        'UpdateReplacePolicy': 'Retain',
+      }),
+      'UsersWebClient8EE36D42': dict({
+        'Properties': dict({
+          'AccessTokenValidity': 15,
+          'AllowedOAuthFlows': list([
+            'implicit',
+            'code',
+          ]),
+          'AllowedOAuthFlowsUserPoolClient': True,
+          'AllowedOAuthScopes': list([
+            'profile',
+            'phone',
+            'email',
+            'openid',
+            'aws.cognito.signin.user.admin',
+          ]),
+          'CallbackURLs': list([
+            'https://example.com',
+          ]),
+          'ExplicitAuthFlows': list([
+            'ALLOW_USER_SRP_AUTH',
+            'ALLOW_REFRESH_TOKEN_AUTH',
+          ]),
+          'GenerateSecret': False,
+          'IdTokenValidity': 15,
+          'PreventUserExistenceErrors': 'ENABLED',
+          'SupportedIdentityProviders': list([
+            'COGNITO',
+          ]),
+          'TokenValidityUnits': dict({
+            'AccessToken': 'minutes',
+            'IdToken': 'minutes',
+          }),
+          'UserPoolId': dict({
+            'Ref': 'Users0A0EEA89',
+          }),
+        }),
+        'Type': 'AWS::Cognito::UserPoolClient',
+      }),
+      'VectorIndex': dict({
+        'Properties': dict({
+          'DataType': 'float32',
+          'Dimension': 256,
+          'DistanceMetric': 'cosine',
+          'IndexName': 'knowledge',
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+          'VectorBucketArn': dict({
+            'Fn::GetAtt': list([
+              'Vectors',
+              'VectorBucketArn',
+            ]),
+          }),
+        }),
+        'Type': 'AWS::S3Vectors::Index',
+      }),
+      'Vectors': dict({
+        'DeletionPolicy': 'Retain',
+        'Properties': dict({
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+        }),
+        'Type': 'AWS::S3Vectors::VectorBucket',
+        'UpdateReplacePolicy': 'Retain',
+      }),
+      'Worker11F36D0F': dict({
+        'DependsOn': list([
+          'ApiRoleDefaultPolicyCFEBAD31',
+          'ApiRole1873F438',
+        ]),
+        'Properties': dict({
+          'Architectures': list([
+            'x86_64',
+          ]),
+          'Code': dict({
+            'S3Bucket': 'CDKアセットバケット',
+            'S3Key': '検査fixtureのアセット',
+          }),
+          'Environment': dict({
+            'Variables': dict({
+              'KOTORELAY_BUCKET': dict({
+                'Ref': 'Content88381566',
+              }),
+              'KOTORELAY_DSQL_HOST': dict({
+                'Fn::GetAtt': list([
+                  'Database',
+                  'Endpoint',
+                ]),
+              }),
+              'KOTORELAY_DSQL_USER': 'kotorelay_app',
+              'KOTORELAY_MODE': 'aws',
+              'KOTORELAY_REGION': dict({
+                'Ref': 'AWS::Region',
+              }),
+              'KOTORELAY_VECTOR_BUCKET': dict({
+                'Ref': 'Vectors',
+              }),
+            }),
+          }),
+          'ImageConfig': dict({
+            'Command': list([
+              'kotorelay.worker.handler',
+            ]),
+          }),
+          'LoggingConfig': dict({
+            'LogGroup': dict({
+              'Ref': 'ApiLogs3D05D88B',
+            }),
+          }),
+          'MemorySize': 1024,
+          'PackageType': 'Image',
+          'ReservedConcurrentExecutions': 1,
+          'Role': dict({
+            'Fn::GetAtt': list([
+              'ApiRole1873F438',
+              'Arn',
+            ]),
+          }),
+          'Tags': list([
+            dict({
+              'Key': 'CostCenter',
+              'Value': 'sample',
+            }),
+            dict({
+              'Key': 'Project',
+              'Value': 'kotorelay',
+            }),
+          ]),
+          'Timeout': 300,
+        }),
+        'Type': 'AWS::Lambda::Function',
+      }),
+    }),
+    'Rules': dict({
+      'CheckBootstrapVersion': dict({
+        'Assertions': list([
+          dict({
+            'Assert': dict({
+              'Fn::Not': list([
+                dict({
+                  'Fn::Contains': list([
+                    list([
+                      '1',
+                      '2',
+                      '3',
+                      '4',
+                      '5',
+                    ]),
+                    dict({
+                      'Ref': 'BootstrapVersion',
+                    }),
+                  ]),
+                }),
+              ]),
+            }),
+            'AssertDescription': "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+          }),
+        ]),
+      }),
+    }),
+  })
+# ---

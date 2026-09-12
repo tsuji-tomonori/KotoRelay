@@ -141,9 +141,7 @@ test('根拠付きチャットと公開停止による履歴失効', async ({ pa
     await page.getByRole('button', { name: 'ナレッジチャット', exact: true }).click();
   });
   await step(page, info, 'When', '開発フローについて質問する', async () => {
-    await page
-      .getByLabel('質問', { exact: true })
-      .fill(doc.id);
+    await page.getByLabel('質問', { exact: true }).fill(doc.id);
     await page.getByRole('button', { name: '質問を送信' }).click();
     await expect(page.getByText('回答済み', { exact: true })).toBeVisible();
     await expect(page.getByText('参照した承認版')).toBeVisible();
@@ -151,8 +149,7 @@ test('根拠付きチャットと公開停止による履歴失効', async ({ pa
   await step(page, info, 'Then', '公開停止後に履歴を再取得すると古い回答を隠す', async () => {
     const docs = await api(request, 'leader', '/documents?scope=manage');
     for (const d of docs.filter(
-      (d: { id: string; status: string; latest_version_id: string | null }) =>
-        d.id === doc.id,
+      (d: { id: string; status: string; latest_version_id: string | null }) => d.id === doc.id,
     ))
       await api(request, 'leader', `/documents/${d.id}/policy`, 'PUT', {
         revision: d.revision,
@@ -236,5 +233,47 @@ test('モバイルでナビゲーションと文書を閲覧できる', async ({
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
+  });
+});
+
+test('添付画像をOCRで読み取り確認した版を申請する', async ({ page, request }, info) => {
+  await page.setContent(
+    '<article style="width:700px;padding:40px;background:white;color:black;font:48px sans-serif"><h1>RELEASE GUIDE</h1><p>承認後に開発を開始</p></article>',
+  );
+  const png = await page.locator('article').screenshot();
+  const title = `E2E画像 ${Date.now()}`;
+  const { doc } = await fixture(request, title);
+  await step(page, info, 'Given', '執筆中の文書と読み取る画像を用意する', async () => {
+    await login(page, 'author');
+    await page.getByRole('button', { name: '執筆ワークスペース', exact: true }).click();
+    await page.getByLabel('文書を検索').fill(title);
+    await page
+      .getByRole('button')
+      .filter({ has: page.getByRole('heading', { name: title, exact: true }) })
+      .click();
+    await expect(page.getByLabel('Markdown本文')).toBeEnabled();
+  });
+  await step(
+    page,
+    info,
+    'When',
+    '実際のTesseract OCRで画像を読み取り文字と位置を確認する',
+    async () => {
+      await page
+        .getByLabel('画像を添付')
+        .setInputFiles({ name: 'release.png', mimeType: 'image/png', buffer: png });
+      await expect(page.getByLabel('OCR文字')).toBeVisible();
+      await expect(page.getByLabel('OCR文字')).toHaveValue(/RELEASE/, { timeout: 30000 });
+      await page.getByRole('button', { name: 'OCRを確認して確定' }).click();
+      await expect(page.getByText('OCRを確認しました。文書を保存してください。')).toBeVisible();
+      await page.getByRole('button', { name: '保存', exact: true }).click();
+      await expect(page.getByText('保存しました。')).toBeVisible();
+    },
+  );
+  await step(page, info, 'Then', '本文・画像・OCRを同じ承認対象として固定する', async () => {
+    await page.getByRole('button', { name: '承認申請', exact: true }).click();
+    await expect(page.getByText('v1 を承認申請しました。')).toBeVisible();
+    const state = await databaseEvidence(info, doc.id);
+    expect(state.submission_count).toBe(1);
   });
 });

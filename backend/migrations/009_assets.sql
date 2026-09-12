@@ -12,6 +12,7 @@ CREATE TABLE assets (
     created_at timestamptz NOT NULL,
     PRIMARY KEY (id),
     UNIQUE (organization_id, id),
+    UNIQUE (organization_id, document_id, id),
     FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),
     FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );

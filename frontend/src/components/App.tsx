@@ -205,7 +205,7 @@ export default function App() {
   );
 }
 
-function Login({
+export function Login({
   onLogin,
   error,
   loading,
@@ -298,7 +298,7 @@ function Login({
   );
 }
 
-function Library({
+export function Library({
   api,
   identity,
   edit,
@@ -481,7 +481,7 @@ function Library({
   );
 }
 
-function DocumentPanel({
+export function DocumentPanel({
   id,
   api,
   token,
@@ -671,6 +671,7 @@ function DocumentPanel({
               <div className="editor-label">MARKDOWN</div>
               <textarea
                 aria-label="Markdown本文"
+                disabled={!draft || busy}
                 value={body}
                 onChange={(e) => {
                   setBody(e.target.value);
@@ -681,13 +682,23 @@ function DocumentPanel({
             </div>
             <div className="preview">
               <div className="editor-label">PREVIEW</div>
-              <Markdown body={body} />
+              <PlacedDocument
+                body={body}
+                placements={placements}
+                token={token}
+                version={read?.version.id}
+              />
             </div>
           </div>
         </section>
       ) : (
         <section className="panel article">
-          <Markdown body={body} />
+          <PlacedDocument
+            body={body}
+            placements={placements}
+            token={token}
+            version={read?.version.id}
+          />
         </section>
       )}
       <Images
@@ -729,7 +740,50 @@ function DocumentPanel({
   );
 }
 
-function ProtectedImage({ token, id, version }: { token: string; id: string; version?: string }) {
+export function PlacedDocument({
+  body,
+  placements,
+  token,
+  version,
+}: {
+  body: string;
+  placements: Placement[];
+  token: string;
+  version?: string;
+}) {
+  const sorted = [...placements].sort((a, b) => a.offset - b.offset);
+  let offset = 0;
+  const parts = sorted.map((p) => {
+    const end = Math.min(body.length, Math.max(offset, p.offset));
+    const text = body.slice(offset, end);
+    offset = end;
+    return (
+      <div key={p.id}>
+        <Markdown body={text} />
+        <figure>
+          <ProtectedImage token={token} id={p.asset_id} version={version} />
+          <figcaption>{p.heading}</figcaption>
+        </figure>
+      </div>
+    );
+  });
+  return (
+    <>
+      {parts}
+      <Markdown body={body.slice(offset)} />
+    </>
+  );
+}
+
+export function ProtectedImage({
+  token,
+  id,
+  version,
+}: {
+  token: string;
+  id: string;
+  version?: string;
+}) {
   const [url, setUrl] = useState('');
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -756,7 +810,7 @@ function ProtectedImage({ token, id, version }: { token: string; id: string; ver
   );
 }
 
-function Images({
+export function Images({
   api,
   token,
   documentId,
@@ -780,6 +834,7 @@ function Images({
   const [ocr, setOcr] = useState<Record<string, Ocr>>({});
   const [text, setText] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState('');
   useEffect(() => {
     let active = true;
     Promise.all(
@@ -852,12 +907,14 @@ function Images({
           value.id === p.id ? { ...value, ocr_run_id: result.ocr_run.id } : value,
         ),
       );
+      setNotice('OCRを確認しました。文書を保存してください。');
     } catch (e) {
       onError(String(e));
     }
   }
   return (
     <section className="panel images-panel">
+      {notice && <p role="status">{notice}</p>}
       <div className="section-heading">
         <h2>
           添付画像・OCR <span className="count">{placements.length}</span>
@@ -945,7 +1002,7 @@ function Images({
   );
 }
 
-function Reviews({
+export function Reviews({
   api,
   token,
   onError,
@@ -1092,7 +1149,7 @@ function Reviews({
   );
 }
 
-function Chat({
+export function Chat({
   api,
   identity,
   onOpen,
@@ -1229,7 +1286,7 @@ function Chat({
   );
 }
 
-function Groups({
+export function Groups({
   api,
   identity,
   onError,
@@ -1281,12 +1338,12 @@ function Groups({
       onError(String(e));
     }
   }
-  async function share(doc: Document, visibility: string) {
+  async function share(doc: Document, visibility: string, departments: string[] = []) {
     try {
       await api(`/documents/${doc.id}/policy`, 'PUT', {
         revision: doc.revision,
         visibility,
-        shared_departments: [],
+        shared_departments: departments,
         status: doc.status,
       });
       setRevision(revision + 1);
@@ -1380,6 +1437,34 @@ function Groups({
                     <option value="selected">指定部署</option>
                   </select>
                 </label>
+                {doc.visibility === 'selected' && (
+                  <fieldset>
+                    <legend>共有先部署</legend>
+                    {(identity.directory ?? identity.departments).map((dept) => (
+                      <label key={dept.id}>
+                        <input
+                          type="checkbox"
+                          aria-label={`${doc.title}を${dept.name}に共有`}
+                          checked={(JSON.parse(doc.shared_departments) as string[]).includes(
+                            dept.id,
+                          )}
+                          disabled={doc.status === 'deleted'}
+                          onChange={(e) => {
+                            const current = JSON.parse(doc.shared_departments) as string[];
+                            void share(
+                              doc,
+                              'selected',
+                              e.target.checked
+                                ? [...current, dept.id]
+                                : current.filter((id) => id !== dept.id),
+                            );
+                          }}
+                        />
+                        {dept.name}
+                      </label>
+                    ))}
+                  </fieldset>
+                )}
                 <span>
                   閲覧 {metrics?.documents.find((d) => d.id === doc.id)?.views ?? 0} / 回答貢献{' '}
                   {metrics?.documents.find((d) => d.id === doc.id)?.contributions ?? 0}
@@ -1427,7 +1512,7 @@ function Groups({
   );
 }
 
-function Operations({ api, onError }: { api: Api; onError: (message: string) => void }) {
+export function Operations({ api, onError }: { api: Api; onError: (message: string) => void }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [revision, setRevision] = useState(0);
   const [differences, setDifferences] = useState<{ document_id: string; reason: string }[]>([]);
@@ -1478,9 +1563,7 @@ function Operations({ api, onError }: { api: Api; onError: (message: string) => 
               {job.error_code && <span>{job.error_code}</span>}
               <button
                 className="secondary"
-                disabled={
-                  ['done', 'obsolete', 'retained'].includes(job.status) || job.attempts >= 5
-                }
+                disabled={['done', 'obsolete'].includes(job.status) || job.attempts >= 5}
                 onClick={() => void process(job)}
               >
                 実行・再処理

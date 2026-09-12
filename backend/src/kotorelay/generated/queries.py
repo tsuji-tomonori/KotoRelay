@@ -1,5 +1,5 @@
 """DDL・SQLから生成した型付き境界。直接編集しない。
-SHA256: 5d3215e56565d4f9f74e48c1c92655042a16cd5e8c2d386eb553327d5b4d3740
+SHA256: 0989b190d415f48766b3bd4e1bf07f94b329ddb18514ebdf39553ca18b1e960e
 """
 
 from datetime import datetime

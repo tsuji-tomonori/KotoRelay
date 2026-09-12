@@ -13,6 +13,7 @@ CREATE TABLE ocr_runs (
     PRIMARY KEY (id),
     UNIQUE (organization_id, id),
     FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),
-    FOREIGN KEY (organization_id, asset_id) REFERENCES assets (organization_id, id),
+    FOREIGN KEY (organization_id, document_id, asset_id)
+    REFERENCES assets (organization_id, document_id, id),
     FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Protocol
 
 import boto3
 from botocore.config import Config
+
 from kotorelay.config import Settings
 
 if TYPE_CHECKING:
@@ -21,6 +22,7 @@ class Engine(Protocol):
     def index(self, key: str, text: str, document_id: str, version_id: str) -> None: ...
     def search(self, question: str, allowed_documents: list[str]) -> list[str] | None: ...
     def delete(self, keys: list[str]) -> None: ...
+    def verify(self, keys: list[str]) -> bool: ...
 
 
 def terms(text: str) -> set[str]:
@@ -44,6 +46,9 @@ class LocalEngine:
 
     def delete(self, keys: list[str]) -> None:
         return None
+
+    def verify(self, keys: list[str]) -> bool:
+        return True
 
 
 class BedrockEngine:
@@ -136,3 +141,14 @@ class BedrockEngine:
                 indexName=self.settings.vector_index,
                 keys=keys[offset : offset + 100],
             )
+
+    def verify(self, keys: list[str]) -> bool:
+        found: set[str] = set()
+        for offset in range(0, len(keys), 100):
+            result = self.vectors.get_vectors(
+                vectorBucketName=self.settings.vector_bucket,
+                indexName=self.settings.vector_index,
+                keys=keys[offset : offset + 100],
+            )
+            found.update(item["key"] for item in result["vectors"])
+        return found == set(keys)
