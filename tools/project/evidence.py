@@ -285,13 +285,22 @@ def main() -> None:
             {
                 "id": path.relative_to(ROOT).as_posix(),
                 "name": title,
-                "group": "API六帳票" if path.parent.name == "api" else "全体設計",
+                "group": "API / " + path.relative_to(ROOT / "docs/design/generated").parts[1]
+                if "api" == path.relative_to(ROOT / "docs/design/generated").parts[0]
+                else "CRUD"
+                if "crud" == path.relative_to(ROOT / "docs/design/generated").parts[0]
+                else "全体設計",
                 "status": "passed",
                 "body": body,
                 "path": "design/index.html",
             }
         )
+    for path in (ROOT / "docs/design/generated/crud").glob("*.csv"):
+        target = PUBLIC / "design-data/crud" / path.name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
     for path in [
+        ROOT / "docs/planning/DOCUMENT-STRUCTURE.md",
         ROOT / "docs/decisions/IMPLEMENTATION.md",
         ROOT / "docs/requirements/REQUIREMENTS.md",
         ROOT / "docs/OPERATIONS.md",

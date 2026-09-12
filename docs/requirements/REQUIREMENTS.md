@@ -2,7 +2,7 @@
 # KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG 要件一覧
 
 - スキーマ版: 1
-- カタログ版: 3
+- カタログ版: 4
 - Product(JSON): <code>"KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG"</code>
 - 更新日(JSON): <code>"2026-09-12"</code>
 - 正本: `spec/requirements/requirements.qnt`
@@ -119,6 +119,10 @@
 | <code>"REQ-UX-13"</code> | 1 | 有効 | 機能 | システムは、利用部署を閲覧と会話へ明示するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-14"</code> | 1 | 有効 | 機能 | システムは、公開版と作業状態を分離表示するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-15"</code> | 1 | 有効 | 機能 | システムは、一覧の取得状態とページ件数を区別するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-DESIGN-01"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、API帳票の章構成を参照設計に揃えるを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
+| <code>"REQ-DESIGN-02"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、API帳票をAPIグループとAPIごとの階層へ配置するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
+| <code>"REQ-DESIGN-03"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、APIと保存先のCRUD対応を実装から生成するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
+| <code>"REQ-DESIGN-04"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、品質Pagesで設計の階層を維持するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
 
 ## REQ-DOC-01: ブラウザでMarkdownを編集する
 
@@ -3604,6 +3608,134 @@
 - 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
 - 実装: <code>["frontend/src/features/documents/Library.tsx"]</code>
 - テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-01: API帳票の章構成を参照設計に揃える
+
+要件ID(JSON): <code>"REQ-DESIGN-01"</code>
+タイトル(JSON): <code>"API帳票の章構成を参照設計に揃える"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"API帳票の章構成を参照設計に揃える"</code>
+開発プロジェクトは、API帳票の章構成を参照設計に揃えるを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。
+根拠(JSON): <code>"利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"document-structure-2026-09-12"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-01"</code> 前提: API実装と要件が存在する。条件: 設計を生成し品質Pagesで閲覧する。期待結果: lazunex 40.apisの6帳票の章名・順序・SQL別の節を保持し、欠落・並べ替え・重複を検査で拒否する。
+  - criterion(JSON Object): <code>{"given":"API実装と要件が存在する","id":"AC-DESIGN-01","then":"lazunex 40.apisの6帳票の章名・順序・SQL別の節を保持し、欠落・並べ替え・重複を検査で拒否する","when":"設計を生成し品質Pagesで閲覧する"}</code>
+
+要求源(JSON List): <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+検証方法: 生成差分、構成の回帰検査、品質SPAのE2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"生成差分、構成の回帰検査、品質SPAのE2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+- 実装: <code>["tools/project/api_documents.py","tools/project/design.py"]</code>
+- テスト: <code>["tools/project/tests/test_document_structure.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-02: API帳票をAPIグループとAPIごとの階層へ配置する
+
+要件ID(JSON): <code>"REQ-DESIGN-02"</code>
+タイトル(JSON): <code>"API帳票をAPIグループとAPIごとの階層へ配置する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"API帳票をAPIグループとAPIごとの階層へ配置する"</code>
+開発プロジェクトは、API帳票をAPIグループとAPIごとの階層へ配置するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。
+根拠(JSON): <code>"利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"document-structure-2026-09-12"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-02"</code> 前提: API実装と要件が存在する。条件: 設計を生成し品質Pagesで閲覧する。期待結果: 生成帳票をAPIグループ、API、帳票の階層へ配置し索引から辿れる。
+  - criterion(JSON Object): <code>{"given":"API実装と要件が存在する","id":"AC-DESIGN-02","then":"生成帳票をAPIグループ、API、帳票の階層へ配置し索引から辿れる","when":"設計を生成し品質Pagesで閲覧する"}</code>
+
+要求源(JSON List): <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+検証方法: 生成差分、構成の回帰検査、品質SPAのE2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"生成差分、構成の回帰検査、品質SPAのE2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+- 実装: <code>["tools/project/design.py"]</code>
+- テスト: <code>["tools/project/tests/test_document_structure.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-03: APIと保存先のCRUD対応を実装から生成する
+
+要件ID(JSON): <code>"REQ-DESIGN-03"</code>
+タイトル(JSON): <code>"APIと保存先のCRUD対応を実装から生成する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"APIと保存先のCRUD対応を実装から生成する"</code>
+開発プロジェクトは、APIと保存先のCRUD対応を実装から生成するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。
+根拠(JSON): <code>"利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"document-structure-2026-09-12"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-03"</code> 前提: API実装と要件が存在する。条件: 設計を生成し品質Pagesで閲覧する。期待結果: SQLと保存先呼出しからAPI別CRUD表・CSV・図と根拠を生成し、実装にない操作を作らない。
+  - criterion(JSON Object): <code>{"given":"API実装と要件が存在する","id":"AC-DESIGN-03","then":"SQLと保存先呼出しからAPI別CRUD表・CSV・図と根拠を生成し、実装にない操作を作らない","when":"設計を生成し品質Pagesで閲覧する"}</code>
+
+要求源(JSON List): <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+検証方法: 生成差分、構成の回帰検査、品質SPAのE2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"生成差分、構成の回帰検査、品質SPAのE2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+- 実装: <code>["tools/project/api_documents.py","tools/project/design.py"]</code>
+- テスト: <code>["tools/project/tests/test_document_structure.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-04: 品質Pagesで設計の階層を維持する
+
+要件ID(JSON): <code>"REQ-DESIGN-04"</code>
+タイトル(JSON): <code>"品質Pagesで設計の階層を維持する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"品質Pagesで設計の階層を維持する"</code>
+開発プロジェクトは、品質Pagesで設計の階層を維持するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。
+根拠(JSON): <code>"利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"document-structure-2026-09-12"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-04"</code> 前提: API実装と要件が存在する。条件: 設計を生成し品質Pagesで閲覧する。期待結果: APIグループからAPIと帳票を辿れて現在位置が分かり、検索結果でも親階層を表示する。
+  - criterion(JSON Object): <code>{"given":"API実装と要件が存在する","id":"AC-DESIGN-04","then":"APIグループからAPIと帳票を辿れて現在位置が分かり、検索結果でも親階層を表示する","when":"設計を生成し品質Pagesで閲覧する"}</code>
+
+要求源(JSON List): <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+検証方法: 生成差分、構成の回帰検査、品質SPAのE2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"生成差分、構成の回帰検査、品質SPAのE2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/DOCUMENT-STRUCTURE.md"]</code>
+- 実装: <code>["frontend/portal/App.tsx","tools/project/evidence.py"]</code>
+- テスト: <code>["e2e/portal.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>

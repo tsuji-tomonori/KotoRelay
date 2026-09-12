@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 3,
+  "catalog_revision": 4,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -5248,6 +5248,189 @@
       "verification": {
         "evidence": "品質ポータルの同一runの検証結果",
         "method": "関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "API実装と要件が存在する",
+          "id": "AC-DESIGN-01",
+          "then": "lazunex 40.apisの6帳票の章名・順序・SQL別の節を保持し、欠落・並べ替え・重複を検査で拒否する",
+          "when": "設計を生成し品質Pagesで閲覧する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-01",
+      "last_changed_by": "document-structure-2026-09-12",
+      "object": "API帳票の章構成を参照設計に揃える",
+      "rationale": "利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/DOCUMENT-STRUCTURE.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "API帳票の章構成を参照設計に揃える",
+      "traces": {
+        "design": [
+          "docs/planning/DOCUMENT-STRUCTURE.md"
+        ],
+        "implementation": [
+          "tools/project/api_documents.py",
+          "tools/project/design.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_document_structure.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "生成差分、構成の回帰検査、品質SPAのE2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "API実装と要件が存在する",
+          "id": "AC-DESIGN-02",
+          "then": "生成帳票をAPIグループ、API、帳票の階層へ配置し索引から辿れる",
+          "when": "設計を生成し品質Pagesで閲覧する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-02",
+      "last_changed_by": "document-structure-2026-09-12",
+      "object": "API帳票をAPIグループとAPIごとの階層へ配置する",
+      "rationale": "利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/DOCUMENT-STRUCTURE.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "API帳票をAPIグループとAPIごとの階層へ配置する",
+      "traces": {
+        "design": [
+          "docs/planning/DOCUMENT-STRUCTURE.md"
+        ],
+        "implementation": [
+          "tools/project/design.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_document_structure.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "生成差分、構成の回帰検査、品質SPAのE2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "API実装と要件が存在する",
+          "id": "AC-DESIGN-03",
+          "then": "SQLと保存先呼出しからAPI別CRUD表・CSV・図と根拠を生成し、実装にない操作を作らない",
+          "when": "設計を生成し品質Pagesで閲覧する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-03",
+      "last_changed_by": "document-structure-2026-09-12",
+      "object": "APIと保存先のCRUD対応を実装から生成する",
+      "rationale": "利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/DOCUMENT-STRUCTURE.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "APIと保存先のCRUD対応を実装から生成する",
+      "traces": {
+        "design": [
+          "docs/planning/DOCUMENT-STRUCTURE.md"
+        ],
+        "implementation": [
+          "tools/project/api_documents.py",
+          "tools/project/design.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_document_structure.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "生成差分、構成の回帰検査、品質SPAのE2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "API実装と要件が存在する",
+          "id": "AC-DESIGN-04",
+          "then": "APIグループからAPIと帳票を辿れて現在位置が分かり、検索結果でも親階層を表示する",
+          "when": "設計を生成し品質Pagesで閲覧する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-04",
+      "last_changed_by": "document-structure-2026-09-12",
+      "object": "品質Pagesで設計の階層を維持する",
+      "rationale": "利用者が章構成、CRUD、配置と閲覧の階層を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/DOCUMENT-STRUCTURE.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "品質Pagesで設計の階層を維持する",
+      "traces": {
+        "design": [
+          "docs/planning/DOCUMENT-STRUCTURE.md"
+        ],
+        "implementation": [
+          "frontend/portal/App.tsx",
+          "tools/project/evidence.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "生成差分、構成の回帰検査、品質SPAのE2E"
       }
     }
   ],

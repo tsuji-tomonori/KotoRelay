@@ -36,3 +36,5 @@ UIは提供デザインに沿った文字・配色・メニューと、OCR領域
 要件は `spec/requirements/requirements.qnt` が正本です。変更後は `python3 tools/quintflow.py generate` を実行します。現在設計は `uv run python tools/project/design.py`、型付きSQLは `uv run python tools/project/queries.py` で生成し、それぞれ `--check` で欠落・変更を検出します。
 
 AWSへの実デプロイと実DSQL/Bedrockの疎通は未実行です。常設サーバー等の待機計算固定費を避けた構成ですが、AWSの利用量・保存量による料金は発生します。構築・認証・バックアップ・復旧・cdk-nag除外理由は運用手順を参照してください。
+
+設計書の章構成・API階層・CRUD図は[生成設計の構成方針](docs/planning/DOCUMENT-STRUCTURE.md)に従います。

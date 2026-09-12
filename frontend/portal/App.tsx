@@ -79,18 +79,91 @@ function Diagram({ code }: { code: string }) {
     </figure>
   );
 }
-function Documentation({ body }: { body: string }) {
-  const headings = Array.from(body.matchAll(/^#{1,3} (.+)$/gm), (m) => m[1]);
-  function anchor(value: string) {
-    return 'heading-' + encodeURIComponent(value);
+function designTrail(item: Item): string[] {
+  const parts = item.id.replace('docs/design/generated/', '').split('/');
+  return parts[0] === 'api' ? ['API', ...parts.slice(1, -1)] : [item.group ?? '全体設計'];
+}
+function DesignTree({
+  items,
+  current,
+  select,
+  query,
+  depth = 0,
+}: {
+  items: Item[];
+  current?: string;
+  select: (id: string) => void;
+  query: string;
+  depth?: number;
+}) {
+  const leaves = items.filter((i) => designTrail(i).length === depth);
+  const branches = Array.from(
+    new Set(items.filter((i) => designTrail(i).length > depth).map((i) => designTrail(i)[depth])),
+  );
+  return (
+    <>
+      {leaves.map((item) => (
+        <button
+          key={item.id}
+          aria-current={current === item.id ? 'true' : undefined}
+          onClick={() => select(item.id)}
+        >
+          {item.name}
+        </button>
+      ))}
+      {branches.map((name) => {
+        const children = items.filter((i) => designTrail(i)[depth] === name);
+        return (
+          <details key={name} open={depth < 2 || !!query || children.some((i) => i.id === current)}>
+            <summary>{name}</summary>
+            <div className="design-children">
+              <DesignTree
+                items={children}
+                current={current}
+                select={select}
+                query={query}
+                depth={depth + 1}
+              />
+            </div>
+          </details>
+        );
+      })}
+    </>
+  );
+}
+function Documentation({
+  body,
+  id,
+  documents,
+  onNavigate,
+}: {
+  body: string;
+  id: string;
+  documents: Item[];
+  onNavigate: (id: string) => void;
+}) {
+  const headings: { text: string; line: number }[] = [];
+  let fence = '';
+  body.split('\n').forEach((line, index) => {
+    const marker = line.match(/^\s*(`{3,}|~{3,})/);
+    if (marker) {
+      if (!fence) fence = marker[1];
+      else if (marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = '';
+    } else if (!fence) {
+      const match = line.match(/^#{1,3} (.+)$/);
+      if (match) headings.push({ text: match[1], line: index + 1 });
+    }
+  });
+  function anchor(line?: number) {
+    return 'heading-' + line;
   }
   return (
     <>
       <details className="toc" open>
         <summary>この設計書の目次</summary>
         {headings.map((h, i) => (
-          <a key={i} href={'#' + anchor(h)}>
-            {h}
+          <a key={i} href={'#' + anchor(h.line)}>
+            {h.text}
           </a>
         ))}
       </details>
@@ -98,20 +171,49 @@ function Documentation({ body }: { body: string }) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-            h1: ({ children }) => <h2 id={anchor(String(children))}>{children}</h2>,
-            h2: ({ children }) => <h3 id={anchor(String(children))}>{children}</h3>,
-            h3: ({ children }) => <h4 id={anchor(String(children))}>{children}</h4>,
+            h1: ({ children, node }) => <h2 id={anchor(node?.position?.start.line)}>{children}</h2>,
+            h2: ({ children, node }) => <h3 id={anchor(node?.position?.start.line)}>{children}</h3>,
+            h3: ({ children, node }) => <h4 id={anchor(node?.position?.start.line)}>{children}</h4>,
             code: ({ className, children }) =>
               className === 'language-mermaid' ? (
                 <Diagram code={String(children).trim()} />
               ) : (
                 <code className={className}>{children}</code>
               ),
-            a: ({ href, children }) => (
-              <a href={href?.startsWith('https://') ? href : undefined} rel="noopener noreferrer">
-                {children}
-              </a>
-            ),
+            a: ({ href, children }) => {
+              const target = new URL(href ?? '', 'https://design.invalid/' + id);
+              const internal =
+                target.origin === 'https://design.invalid' &&
+                documents.find((i) => '/' + i.id === target.pathname);
+              const csv =
+                target.origin === 'https://design.invalid' &&
+                /^\/docs\/design\/generated\/crud\/[a-z]+\.csv$/.test(target.pathname);
+              return (
+                <a
+                  href={
+                    internal
+                      ? '#'
+                      : csv
+                        ? 'design-data/' + target.pathname.split('/generated/')[1]
+                        : href?.startsWith('https://')
+                          ? href
+                          : undefined
+                  }
+                  download={csv || undefined}
+                  rel="noopener noreferrer"
+                  onClick={
+                    internal
+                      ? (e) => {
+                          e.preventDefault();
+                          onNavigate(internal.id);
+                        }
+                      : undefined
+                  }
+                >
+                  {children}
+                </a>
+              );
+            },
           }}
         >
           {body}
@@ -277,27 +379,45 @@ function Portal() {
             </label>
             <div className="workspace">
               <aside className="inventory" aria-label="項目一覧">
-                {groups.map((group) => (
-                  <details open key={group}>
-                    <summary>{group}</summary>
-                    {items
-                      .filter((i) => (i.group ?? labels[category]) === group)
-                      .map((item) => (
-                        <button
-                          key={item.id}
-                          aria-current={current?.id === item.id ? 'true' : undefined}
-                          onClick={() => setSelected(item.id)}
-                        >
-                          <span className={'dot ' + item.status} />
-                          {item.name}
-                        </button>
-                      ))}
-                  </details>
-                ))}
+                {category === 'design' ? (
+                  <DesignTree
+                    items={items}
+                    current={current?.id}
+                    select={setSelected}
+                    query={query}
+                  />
+                ) : (
+                  groups.map((group) => (
+                    <details open key={group}>
+                      <summary>{group}</summary>
+                      {items
+                        .filter((i) => (i.group ?? labels[category]) === group)
+                        .map((item) => (
+                          <button
+                            key={item.id}
+                            aria-current={current?.id === item.id ? 'true' : undefined}
+                            onClick={() => setSelected(item.id)}
+                          >
+                            <span className={'dot ' + item.status} />
+                            {item.name}
+                          </button>
+                        ))}
+                    </details>
+                  ))
+                )}
                 {!items.length && <p>一致する項目はありません。</p>}
               </aside>
               {current && (
                 <article className="panel detail" key={current.id}>
+                  {category === 'design' && (
+                    <nav className="breadcrumbs" aria-label="設計書の現在位置">
+                      <ol>
+                        {[...designTrail(current), current.name].map((part, index) => (
+                          <li key={index}>{part}</li>
+                        ))}
+                      </ol>
+                    </nav>
+                  )}
                   <div className="detail-heading">
                     <h2>{current.name}</h2>
                     <span className={'status ' + current.status}>
@@ -332,7 +452,17 @@ function Portal() {
                       {current.actual}
                     </p>
                   )}
-                  {current.body && <Documentation body={current.body} />}
+                  {current.body && (
+                    <Documentation
+                      body={current.body}
+                      id={current.id}
+                      documents={data.design.items}
+                      onNavigate={(id) => {
+                        setQuery('');
+                        setSelected(id);
+                      }}
+                    />
+                  )}
                   <div className="steps">
                     {current.steps?.map((step, i) => (
                       <section className="step" key={i}>

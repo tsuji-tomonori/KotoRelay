@@ -16,7 +16,7 @@ import sqlglot
 from sqlglot import exp
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT / "backend/src"), str(ROOT / "infra/src")]
+sys.path[:0] = [str(ROOT), str(ROOT / "backend/src"), str(ROOT / "infra/src")]
 OUT = ROOT / "docs/design/generated"
 KINDS = ["detail-design", "interface", "messages", "query", "sequence", "unit-test"]
 
@@ -59,7 +59,16 @@ def sources() -> list[Path]:
         ("e2e", ".ts"),
     ]:
         paths.extend((ROOT / folder).rglob("*" + suffix))
-    return sorted(set(paths + [ROOT / "spec/requirements/requirements.json", Path(__file__)]))
+    return sorted(
+        set(
+            paths
+            + [
+                ROOT / "spec/requirements/requirements.json",
+                Path(__file__),
+                ROOT / "tools/project/api_documents.py",
+            ]
+        )
+    )
 
 
 class Inventory:
@@ -178,6 +187,8 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     from fastapi.routing import APIRoute
     from kotorelay.main import LOG_MESSAGES, app
 
+    from tools.project import api_documents as layout
+
     files = sources()
     hashes = {
         p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in files
@@ -202,6 +213,9 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     schema = app.openapi()
     output["OPENAPI.gen.json"] = dump(schema)
     operations = {}
+    groups = {}
+    matrices = {"db": {}, "objects": {}, "vectors": {}}
+    crud_evidence = []
     rows = []
     routes = list(app.routes)
     for route in routes:
@@ -257,43 +271,87 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         if not relevant:
             relevant = [c for c in cases if "DB" in str(c["name"]) or "認証" in str(c["name"])]
         summary = operation.get("summary", operation_id)
-        base = "api/" + operation_id
-        docs = {kind: f"docs/design/generated/{base}.{kind}.md" for kind in KINDS}
+        base = f"api/{segment}/{operation_id}"
+        docs = {kind: f"docs/design/generated/{base}/{kind}.md" for kind in KINDS}
         operations[operation_id] = docs
-        rows.append(
-            [method.upper(), route.path, summary, f"[{operation_id}]({base}.detail-design.md)"]
+        entry = [method.upper(), route.path, summary, f"[{operation_id}]({base}/README.md)"]
+        rows.append(entry)
+        groups.setdefault(segment, []).append((operation_id, summary))
+        output[f"{base}/README.md"] = (
+            header
+            + f"# {summary} ({operation_id})\n\n`{method.upper()} {route.path}`\n\n"
+            + "\n".join(f"- [{label}]({kind}.md)" for kind, label in layout.LABELS.items())
         )
+        for matrix in matrices.values():
+            matrix[operation_id] = {}
+        for name in sql_names:
+            for resource, actions in layout.sql_access(queries[name][1]).items():
+                if resource not in ddl:
+                    raise ValueError(f"CRUDの未知テーブル: {resource}")
+                matrices["db"][operation_id].setdefault(resource, set()).update(actions)
+                crud_evidence.append(
+                    [
+                        operation_id,
+                        "DB",
+                        resource,
+                        "".join(k for k in "CRUD" if k in actions),
+                        queries[name][0].relative_to(ROOT).as_posix(),
+                    ]
+                )
+        object_calls = {"put": "CU", "get": "R", "delete": "D"}
+        vector_calls = {"index": "CU", "search": "R", "verify": "R", "delete": "D"}
+        for key_name in reached:
+            for call in (n for n in ast.walk(inventory.nodes[key_name]) if isinstance(n, ast.Call)):
+                name = ast.unparse(call.func)
+                for prefix, methods, store, resource in [
+                    ("ctx.objects.", object_calls, "objects", "content_object"),
+                    ("engine.", vector_calls, "vectors", "vector"),
+                    ("rt.engine.", vector_calls, "vectors", "vector"),
+                ]:
+                    if name.startswith(prefix) and name[len(prefix) :] in methods:
+                        action = methods[name[len(prefix) :]]
+                        matrices[store][operation_id].setdefault(resource, set()).update(action)
+                        crud_evidence.append(
+                            [
+                                operation_id,
+                                store,
+                                resource,
+                                action,
+                                f"{inventory.paths[key_name].relative_to(ROOT)}:{call.lineno}",
+                            ]
+                        )
 
-        def emit(kind: str, body: str, base: str = base, summary: str = summary) -> None:
-            output[f"{base}.{kind}.md"] = header + f"# {summary} — {kind}\n\n" + body
+        def emit(
+            kind: str,
+            body: str,
+            base: str = base,
+            summary: str = summary,
+            query_names: tuple[str, ...] = tuple(queries[name][0].name for name in sql_names),
+        ) -> None:
+            layout.validate(kind, body, list(query_names))
+            output[f"{base}/{kind}.md"] = (
+                header
+                + f"# {summary} — {layout.LABELS[kind]}\n\n"
+                + f"章構成: [lazunex API帳票]({layout.REFERENCE}/40.apis)。\n\n"
+                + body
+            )
 
-        emit(
-            "interface",
-            f"`{method.upper()} {route.path}`\n\n"
-            + "アプリケーションが出力するOpenAPI operation。参照型と継承設定は同梱OPENAPI.gen.j"
-            "sonのcomponentsで解決します。\n\n```json\n"
-            + dump(operation)
-            + "```\n\n"
-            + table(
-                ["参照型", "制約"],
-                [
-                    [name, json.dumps(value, ensure_ascii=False)]
-                    for name, value in schema.get("components", {}).get("schemas", {}).items()
-                    if "#/components/schemas/" + name in dump(operation)
-                ],
-            ),
-        )
+        emit("interface", layout.interface(operation, schema))
         tx = (
             "DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更新し、"
             "競合は全体rollback→409。モデル呼出しはtransaction外、回答確定は別transaction"
             "で再認可。"
         )
-        emit(
-            "detail-design",
-            f"目的: {summary}。\n\n"
-            "入力はinterface帳票の型制約に従います。認可はサーバーの有効所属と権限から決まります。\n\n"
-            f"{tx}\n\n## DB操作と入出力\n\n"
-            + table(
+        input_text = "\n\n".join(
+            f"**{name}**\n\n{body}"
+            for name, body in zip(
+                layout.CHAPTERS["interface"][:4],
+                layout.input_sections(operation, schema),
+                strict=True,
+            )
+        )
+        changes = (
+            table(
                 ["query", "DB対象", "処理"],
                 [
                     [
@@ -304,54 +362,119 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                     for name in sql_names
                 ],
             )
-            + "\n## 前提・正常／異常分岐\n\n"
-            + table(["実装箇所", "検査条件", "不成立時／分岐", "HTTP"], factors)
-            + "\n## 応答項目の取得元\n\n"
-            + table(["実装箇所", "返却式（DB行・変換結果・固定値）"], returns)
-            + "\n異常時: DB transactionがrollbackします。S3の内容ハッシュ実体は孤立し得るため、公開"
-            "認可に使わず、保持期間後の削除処理で回収します。外部配送失敗はoutboxのerror_codeとattemp"
-            "tsへ記録します。",
+            if sql_names
+            else "DBへのアクセスはありません。"
         )
+        emit(
+            "detail-design",
+            layout.sections(
+                "detail-design",
+                [
+                    f"目的: {summary}。\n\n" + input_text,
+                    "認証・認可と型制約を満たすこと。以下は実装の検査条件と制御分岐です。条件の成立を一律に正常系とは扱いません。\n\n"
+                    + table(["実装箇所", "検査条件", "不成立時／分岐", "HTTP"], factors),
+                    tx
+                    + "\n\n参照操作も併記します。SELECTは変更ではありません。\n\n"
+                    + changes
+                    + "\n異常時はDB transactionがrollbackします。内容ハッシュ実体は孤立し得るため、"
+                    "公開認可には使いません。配送失敗はoutboxへ記録します。",
+                    layout.response_section(operation, schema)
+                    + "\n\n**応答項目の取得元**\n\n"
+                    + table(["実装箇所", "返却式（DB行・変換結果・固定値）"], returns),
+                ],
+            ),
+        )
+        query_bodies = []
+        for name in sql_names:
+            path, sql_node = queries[name]
+            function = inventory.nodes["kotorelay.generated.queries." + name]
+            argument_rows = [
+                [a.arg, ast.unparse(a.annotation) if a.annotation else "なし"]
+                for a in function.args.args
+                if a.arg != "db"
+            ]
+            conditions = [
+                n.sql(dialect="postgres")
+                for n in sql_node.walk()
+                if isinstance(n, (exp.Where, exp.Join, exp.Order, exp.Limit))
+            ]
+            contents = [
+                sql_node.key.upper(),
+                path.read_text().splitlines()[0].removeprefix("-- ").strip(),
+                table(
+                    ["DB", "テーブル", "CRUD"],
+                    [
+                        ["PostgreSQL / DSQL", target, "".join(k for k in "CRUD" if k in actions)]
+                        for target, actions in layout.sql_access(sql_node).items()
+                    ],
+                ),
+                table(["引数", "型"], argument_rows) if argument_rows else "引数はありません。",
+                f"型: `{ast.unparse(function.returns)}`",
+                "\n\n".join(conditions) or "SQL内にWHERE/JOIN/ORDER/LIMIT条件はありません。",
+            ]
+            query_bodies.append(
+                "## "
+                + path.name
+                + "\n\n正本: `"
+                + path.relative_to(ROOT).as_posix()
+                + "`\n\n"
+                + "\n\n".join(
+                    f"### {heading}\n\n{body}"
+                    for heading, body in zip(layout.QUERY_SECTIONS, contents, strict=True)
+                )
+                + "\n\n```sql\n"
+                + sql_node.sql(dialect="postgres", pretty=True)
+                + "\n```"
+            )
         emit(
             "query",
             tx
             + "\n\n"
-            + ("DB操作はありません。healthは固定の稼働状態を返します。\n" if not sql_names else "")
-            + "\n".join(
-                "## "
-                + name
-                + "\n\n正本: `"
-                + queries[name][0].relative_to(ROOT).as_posix()
-                + "`\n\n```sql\n"
-                + queries[name][1].sql(dialect="postgres", pretty=True)
-                + "\n```\n\n"
-                + table(
-                    ["入力／出力型", "定義"],
-                    [
-                        [ast.unparse(a), ast.unparse(a.annotation) if a.annotation else "なし"]
-                        for a in inventory.nodes["kotorelay.generated.queries." + name].args.args
-                    ],
-                )
-                + "\n戻り値: `"
-                + ast.unparse(inventory.nodes["kotorelay.generated.queries." + name].returns)
-                + "`\n"
-                for name in sql_names
+            + (
+                "\n\n".join(query_bodies)
+                or "DB操作はありません。このAPIは固定の稼働状態を返します。"
             ),
         )
         emit(
             "messages",
-            table(
-                ["ID", "level", "テンプレート", "条件", "出力型・マスク", "場所", "運用"],
+            layout.sections(
+                "messages",
                 [
-                    [
-                        "KR_REQUEST",
-                        "INFO",
-                        LOG_MESSAGES["KR_REQUEST"],
-                        "HTTP応答生成時",
-                        "request_id:UUID、method:str、status:int。機密本文とJWTは記録しない。",
-                        "backend/src/kotorelay/main.py:security_headers",
-                        "5xxはrequest_idから処理失敗を照合。409は再読込後に再試行。",
-                    ]
+                    table(
+                        ["項目", "値"],
+                        [
+                            ["operation", operation_id],
+                            ["endpoint", f"{method.upper()} {route.path}"],
+                            ["router", inventory.paths[key].relative_to(ROOT).as_posix()],
+                        ],
+                    ),
+                    "共通HTTP middlewareのlogger呼出しと実行時LOG_MESSAGESを読み取ります。"
+                    "HTTPエラーメッセージをログとして置換しません。",
+                    table(
+                        ["id", "message_id", "ログ概要"],
+                        [["M001", "KR_REQUEST", "HTTP応答時の相関ID・メソッド・ステータス"]],
+                    ),
+                    "### `M001` `KR_REQUEST`\n\n"
+                    + table(
+                        ["項目", "内容"],
+                        [
+                            ["level", "INFO"],
+                            ["テンプレート", LOG_MESSAGES["KR_REQUEST"]],
+                            ["条件", "HTTP応答生成時"],
+                            ["場所", "backend/src/kotorelay/main.py:security_headers"],
+                            ["運用対応", "5xxはrequest_idから照合。409は再読込後に再試行。"],
+                        ],
+                    )
+                    + "\n#### 出力項目\n\n"
+                    + table(
+                        ["出力項目", "型", "マスク規則"],
+                        [
+                            ["request_id", "UUID文字列", "相関用ID"],
+                            ["method", "str", "HTTPメソッドのみ"],
+                            ["status", "int", "HTTPコードのみ"],
+                        ],
+                    ),
+                    "LOG_MESSAGESとlogger呼出しが実装に存在すること。本文・JWT・OCR本文をログに含めないこと。lazunex固有のloggerラッパーやWARNING以上の運用規則は、本実装の規則として転記しません。",
                 ],
             ),
         )
@@ -394,6 +517,14 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             "        A-->>U: 認可済み結果",
             "    end",
         ]
+        if operation_id == "health":
+            sequence = [
+                "sequenceDiagram",
+                "    participant U as 利用者",
+                "    participant A as API",
+                f"    U->>A: {method.upper()} {route.path}",
+                "    A-->>U: 固定の稼働状態",
+            ]
         # 詳細な条件とtry/except順序はASTから再生成し、概略図に続けて掲載する。
         flow = []
         for k in reached:
@@ -417,26 +548,56 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             "sequence",
             "```mermaid\n"
             + "\n".join(sequence)
-            + "\n```\n\n## 制御順序（関数内の行順）\n\n"
+            + "\n```\n\n**制御順序（関数内の行順）**\n\n"
             + table(["関数", "行", "要素", "条件・早期終了・例外"], flow),
+        )
+        factor_details = (
+            "\n\n".join(
+                f"### F{i:02d} 条件分岐\n\n対象: `{f[0]}`。式: `{f[1]}`\n\n"
+                + table(
+                    ["要素ID", "要素", "期待観点"],
+                    [
+                        [
+                            f"F{i:02d}-true",
+                            "成立",
+                            "成立側の実装を実行。正常／異常は上記式と処理に依存する。",
+                        ],
+                        [f"F{i:02d}-false", "不成立", f"{f[2]} / {f[3]}"],
+                    ],
+                )
+                for i, f in enumerate(factors, 1)
+            )
+            or "明示的な条件分岐はありません。"
+        )
+        case_rows = [[f"TC{i:03d}", c["name"], c["id"]] for i, c in enumerate(relevant, 1)]
+        case_details = "\n\n".join(
+            f"### TC{i:03d}\n\n"
+            + table(
+                ["項目", "内容"],
+                [
+                    ["日本語ケース", c["name"]],
+                    ["test node", c["id"]],
+                    ["Given", c["given"]],
+                    ["When", " ; ".join(c["requests"]) or "SDK境界を実行"],
+                    [
+                        "Then",
+                        " ; ".join(c["assertions"])
+                        or "pytest.raises / mock assertionで例外・依存先を検証",
+                    ],
+                ],
+            )
+            for i, c in enumerate(relevant, 1)
         )
         emit(
             "unit-test",
-            "実在するpytest関数とassertから抽出。パラメータごとの実行成否は品質ポータルで確認します。共有するA"
-            "PI群の境界試験も含みます。\n\n## 入力・認可・分岐要因\n\n"
-            + table(["場所", "要因／要素", "異常結果", "HTTP"], factors)
-            + "\n## Given / When / Then\n\n"
-            + table(
-                ["日本語ケース／test node", "Given", "When", "Then（期待状態）"],
+            layout.sections(
+                "unit-test",
                 [
-                    [
-                        str(c["name"]) + " / " + str(c["id"]),
-                        c["given"],
-                        " ; ".join(c["requests"]) or "SDK境界を実行",
-                        " ; ".join(c["assertions"])
-                        or "pytest.raises / mock assertion で例外・依存先を検証",
-                    ]
-                    for c in relevant
+                    "FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用します。healthは認証不要です。型制約違反は422、認証失敗は401、commit競合は409です。",
+                    factor_details,
+                    "参照先と同じ章名を保持しています。ここでは実在するテストを列挙します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。\n\n"
+                    + table(["Case ID", "日本語ケース", "test node"], case_rows),
+                    case_details or "このAPI群に対応する実在ケースがありません。",
                 ],
             ),
         )
@@ -449,7 +610,82 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     if set(operations) != expected_operations:
         raise ValueError("OpenAPIとASTのoperation集合が一致しません")
     output["API.md"] = (
-        header + "# API一覧\n\n" + table(["method", "path", "目的", "6帳票の入口"], rows)
+        header
+        + "# API一覧\n\n## APIグループ\n\n"
+        + "\n".join(f"- [{group}](api/{group}/README.md)" for group in groups)
+        + "\n\n## API一覧\n\n"
+        + table(["method", "path", "目的", "6帳票の入口"], rows)
+    )
+    for group, entries in groups.items():
+        output[f"api/{group}/README.md"] = (
+            header
+            + f"# APIグループ: {group}\n\n"
+            + "\n".join(f"- [{summary} ({op})]({op}/README.md)" for op, summary in entries)
+        )
+    for kind, matrix in matrices.items():
+        resources = (
+            sorted(ddl)
+            if kind == "db"
+            else sorted({resource for cells in matrix.values() for resource in cells})
+        )
+        csv_body = layout.csv_matrix(matrix, resources)
+        output[f"crud/{kind}.csv"] = csv_body
+        title = {
+            "db": "DB CRUD対応表",
+            "objects": "オブジェクト保存 CRUD対応表",
+            "vectors": "ベクトル索引 CRUD対応表",
+        }[kind]
+        matrix_rows = [
+            [
+                op,
+                *[
+                    "".join(c for c in "CRUD" if c in cells.get(resource, set())) or "—"
+                    for resource in resources
+                ],
+            ]
+            for op, cells in sorted(matrix.items())
+        ]
+        diagrams = []
+        for group, entries in groups.items():
+            lines = ["flowchart LR"]
+            edges = 0
+            for index, (op, _) in enumerate(entries):
+                for j, resource in enumerate(resources):
+                    actions = "".join(c for c in "CRUD" if c in matrix[op].get(resource, set()))
+                    if actions:
+                        lines.append(f'    A{index}["{op}"] -->|{actions}| R{j}["{resource}"]')
+                        edges += 1
+            diagrams.append(
+                f"## APIグループ: {group}\n\n"
+                + (
+                    "```mermaid\n" + "\n".join(lines) + "\n```"
+                    if edges
+                    else "この保存先へのアクセスはありません。"
+                )
+            )
+        evidence_rows = [row for row in crud_evidence if row[1] == ("DB" if kind == "db" else kind)]
+        output[f"crud/{kind}.md"] = (
+            header + f"# {title}\n\n[参照構成]({layout.REFERENCE}/30.crud)。"
+            "C=作成、R=参照、U=更新、D=削除。条件分岐を含む到達可能な呼出しの静的な和集合です。"
+            "全操作が毎回実行される意味ではありません。S3のputとvectorのindexは上書きを含むため"
+            "CUとします。Bedrockの生成呼出しはCRUDに含めません。\n\n"
+            + table(["API", *resources], matrix_rows)
+            + "\n"
+            + "\n\n".join(diagrams)
+            + "\n\n## 抽出根拠\n\n"
+            + table(["API", "保存先", "リソース", "CRUD", "SQL正本／呼出箇所"], evidence_rows)
+        )
+    output["crud/README.md"] = (
+        header
+        + "# CRUD図と対応表\n\n"
+        + "\n".join(
+            f"- [{label}]({kind}.md)（[CSV]({kind}.csv)）"
+            for kind, label in [
+                ("db", "DB"),
+                ("objects", "オブジェクト保存"),
+                ("vectors", "ベクトル索引"),
+            ]
+        )
     )
     data_rows = []
     er = ["erDiagram"]
@@ -537,6 +773,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     output["manifest.json"] = dump(
         {
             "source_sha256": hashes,
+            "layout_reference": layout.REFERENCE,
             "operation_documents": operations,
             "sql": sorted(queries),
             "tests": [c["id"] for c in cases],
@@ -566,7 +803,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             "data": {
                 "status": "required",
                 "sources": ["backend/migrations"],
-                "markdown": ["docs/design/generated/DATA.md"],
+                "markdown": ["docs/design/generated/DATA.md"] + markdown("crud/"),
                 "generate": command,
                 "check": command + ["--check"],
             },

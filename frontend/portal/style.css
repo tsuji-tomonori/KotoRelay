@@ -515,3 +515,26 @@ dialog img {
     font-size: 10px;
   }
 }
+
+.design-children {
+  border-left: 1px solid #d8dfdb;
+  margin-left: 10px;
+  padding-left: 8px;
+}
+.inventory .design-children summary {
+  color: #394a40;
+  font-size: 13px;
+}
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  gap: 8px;
+  padding: 0;
+  font-size: 14px;
+  color: #48584d;
+}
+.breadcrumbs li + li::before {
+  content: '/';
+  padding-right: 8px;
+}

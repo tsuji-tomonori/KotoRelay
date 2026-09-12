@@ -1,212 +1,213 @@
 {
+  "layout_reference": "https://github.com/tsuji-tomonori/lazunex/tree/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/docs/spec",
   "operation_documents": {
     "ask_question": {
-      "detail-design": "docs/design/generated/api/ask_question.detail-design.md",
-      "interface": "docs/design/generated/api/ask_question.interface.md",
-      "messages": "docs/design/generated/api/ask_question.messages.md",
-      "query": "docs/design/generated/api/ask_question.query.md",
-      "sequence": "docs/design/generated/api/ask_question.sequence.md",
-      "unit-test": "docs/design/generated/api/ask_question.unit-test.md"
+      "detail-design": "docs/design/generated/api/chat/ask_question/detail-design.md",
+      "interface": "docs/design/generated/api/chat/ask_question/interface.md",
+      "messages": "docs/design/generated/api/chat/ask_question/messages.md",
+      "query": "docs/design/generated/api/chat/ask_question/query.md",
+      "sequence": "docs/design/generated/api/chat/ask_question/sequence.md",
+      "unit-test": "docs/design/generated/api/chat/ask_question/unit-test.md"
     },
     "change_membership": {
-      "detail-design": "docs/design/generated/api/change_membership.detail-design.md",
-      "interface": "docs/design/generated/api/change_membership.interface.md",
-      "messages": "docs/design/generated/api/change_membership.messages.md",
-      "query": "docs/design/generated/api/change_membership.query.md",
-      "sequence": "docs/design/generated/api/change_membership.sequence.md",
-      "unit-test": "docs/design/generated/api/change_membership.unit-test.md"
+      "detail-design": "docs/design/generated/api/groups/change_membership/detail-design.md",
+      "interface": "docs/design/generated/api/groups/change_membership/interface.md",
+      "messages": "docs/design/generated/api/groups/change_membership/messages.md",
+      "query": "docs/design/generated/api/groups/change_membership/query.md",
+      "sequence": "docs/design/generated/api/groups/change_membership/sequence.md",
+      "unit-test": "docs/design/generated/api/groups/change_membership/unit-test.md"
     },
     "change_policy": {
-      "detail-design": "docs/design/generated/api/change_policy.detail-design.md",
-      "interface": "docs/design/generated/api/change_policy.interface.md",
-      "messages": "docs/design/generated/api/change_policy.messages.md",
-      "query": "docs/design/generated/api/change_policy.query.md",
-      "sequence": "docs/design/generated/api/change_policy.sequence.md",
-      "unit-test": "docs/design/generated/api/change_policy.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/change_policy/detail-design.md",
+      "interface": "docs/design/generated/api/documents/change_policy/interface.md",
+      "messages": "docs/design/generated/api/documents/change_policy/messages.md",
+      "query": "docs/design/generated/api/documents/change_policy/query.md",
+      "sequence": "docs/design/generated/api/documents/change_policy/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/change_policy/unit-test.md"
     },
     "chat_history": {
-      "detail-design": "docs/design/generated/api/chat_history.detail-design.md",
-      "interface": "docs/design/generated/api/chat_history.interface.md",
-      "messages": "docs/design/generated/api/chat_history.messages.md",
-      "query": "docs/design/generated/api/chat_history.query.md",
-      "sequence": "docs/design/generated/api/chat_history.sequence.md",
-      "unit-test": "docs/design/generated/api/chat_history.unit-test.md"
+      "detail-design": "docs/design/generated/api/chat/chat_history/detail-design.md",
+      "interface": "docs/design/generated/api/chat/chat_history/interface.md",
+      "messages": "docs/design/generated/api/chat/chat_history/messages.md",
+      "query": "docs/design/generated/api/chat/chat_history/query.md",
+      "sequence": "docs/design/generated/api/chat/chat_history/sequence.md",
+      "unit-test": "docs/design/generated/api/chat/chat_history/unit-test.md"
     },
     "correct_ocr": {
-      "detail-design": "docs/design/generated/api/correct_ocr.detail-design.md",
-      "interface": "docs/design/generated/api/correct_ocr.interface.md",
-      "messages": "docs/design/generated/api/correct_ocr.messages.md",
-      "query": "docs/design/generated/api/correct_ocr.query.md",
-      "sequence": "docs/design/generated/api/correct_ocr.sequence.md",
-      "unit-test": "docs/design/generated/api/correct_ocr.unit-test.md"
+      "detail-design": "docs/design/generated/api/images/correct_ocr/detail-design.md",
+      "interface": "docs/design/generated/api/images/correct_ocr/interface.md",
+      "messages": "docs/design/generated/api/images/correct_ocr/messages.md",
+      "query": "docs/design/generated/api/images/correct_ocr/query.md",
+      "sequence": "docs/design/generated/api/images/correct_ocr/sequence.md",
+      "unit-test": "docs/design/generated/api/images/correct_ocr/unit-test.md"
     },
     "create_document": {
-      "detail-design": "docs/design/generated/api/create_document.detail-design.md",
-      "interface": "docs/design/generated/api/create_document.interface.md",
-      "messages": "docs/design/generated/api/create_document.messages.md",
-      "query": "docs/design/generated/api/create_document.query.md",
-      "sequence": "docs/design/generated/api/create_document.sequence.md",
-      "unit-test": "docs/design/generated/api/create_document.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/create_document/detail-design.md",
+      "interface": "docs/design/generated/api/documents/create_document/interface.md",
+      "messages": "docs/design/generated/api/documents/create_document/messages.md",
+      "query": "docs/design/generated/api/documents/create_document/query.md",
+      "sequence": "docs/design/generated/api/documents/create_document/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/create_document/unit-test.md"
     },
     "decide_review": {
-      "detail-design": "docs/design/generated/api/decide_review.detail-design.md",
-      "interface": "docs/design/generated/api/decide_review.interface.md",
-      "messages": "docs/design/generated/api/decide_review.messages.md",
-      "query": "docs/design/generated/api/decide_review.query.md",
-      "sequence": "docs/design/generated/api/decide_review.sequence.md",
-      "unit-test": "docs/design/generated/api/decide_review.unit-test.md"
+      "detail-design": "docs/design/generated/api/reviews/decide_review/detail-design.md",
+      "interface": "docs/design/generated/api/reviews/decide_review/interface.md",
+      "messages": "docs/design/generated/api/reviews/decide_review/messages.md",
+      "query": "docs/design/generated/api/reviews/decide_review/query.md",
+      "sequence": "docs/design/generated/api/reviews/decide_review/sequence.md",
+      "unit-test": "docs/design/generated/api/reviews/decide_review/unit-test.md"
     },
     "department_metrics": {
-      "detail-design": "docs/design/generated/api/department_metrics.detail-design.md",
-      "interface": "docs/design/generated/api/department_metrics.interface.md",
-      "messages": "docs/design/generated/api/department_metrics.messages.md",
-      "query": "docs/design/generated/api/department_metrics.query.md",
-      "sequence": "docs/design/generated/api/department_metrics.sequence.md",
-      "unit-test": "docs/design/generated/api/department_metrics.unit-test.md"
+      "detail-design": "docs/design/generated/api/metrics/department_metrics/detail-design.md",
+      "interface": "docs/design/generated/api/metrics/department_metrics/interface.md",
+      "messages": "docs/design/generated/api/metrics/department_metrics/messages.md",
+      "query": "docs/design/generated/api/metrics/department_metrics/query.md",
+      "sequence": "docs/design/generated/api/metrics/department_metrics/sequence.md",
+      "unit-test": "docs/design/generated/api/metrics/department_metrics/unit-test.md"
     },
     "get_draft": {
-      "detail-design": "docs/design/generated/api/get_draft.detail-design.md",
-      "interface": "docs/design/generated/api/get_draft.interface.md",
-      "messages": "docs/design/generated/api/get_draft.messages.md",
-      "query": "docs/design/generated/api/get_draft.query.md",
-      "sequence": "docs/design/generated/api/get_draft.sequence.md",
-      "unit-test": "docs/design/generated/api/get_draft.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/get_draft/detail-design.md",
+      "interface": "docs/design/generated/api/documents/get_draft/interface.md",
+      "messages": "docs/design/generated/api/documents/get_draft/messages.md",
+      "query": "docs/design/generated/api/documents/get_draft/query.md",
+      "sequence": "docs/design/generated/api/documents/get_draft/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/get_draft/unit-test.md"
     },
     "get_identity": {
-      "detail-design": "docs/design/generated/api/get_identity.detail-design.md",
-      "interface": "docs/design/generated/api/get_identity.interface.md",
-      "messages": "docs/design/generated/api/get_identity.messages.md",
-      "query": "docs/design/generated/api/get_identity.query.md",
-      "sequence": "docs/design/generated/api/get_identity.sequence.md",
-      "unit-test": "docs/design/generated/api/get_identity.unit-test.md"
+      "detail-design": "docs/design/generated/api/groups/get_identity/detail-design.md",
+      "interface": "docs/design/generated/api/groups/get_identity/interface.md",
+      "messages": "docs/design/generated/api/groups/get_identity/messages.md",
+      "query": "docs/design/generated/api/groups/get_identity/query.md",
+      "sequence": "docs/design/generated/api/groups/get_identity/sequence.md",
+      "unit-test": "docs/design/generated/api/groups/get_identity/unit-test.md"
     },
     "get_image": {
-      "detail-design": "docs/design/generated/api/get_image.detail-design.md",
-      "interface": "docs/design/generated/api/get_image.interface.md",
-      "messages": "docs/design/generated/api/get_image.messages.md",
-      "query": "docs/design/generated/api/get_image.query.md",
-      "sequence": "docs/design/generated/api/get_image.sequence.md",
-      "unit-test": "docs/design/generated/api/get_image.unit-test.md"
+      "detail-design": "docs/design/generated/api/images/get_image/detail-design.md",
+      "interface": "docs/design/generated/api/images/get_image/interface.md",
+      "messages": "docs/design/generated/api/images/get_image/messages.md",
+      "query": "docs/design/generated/api/images/get_image/query.md",
+      "sequence": "docs/design/generated/api/images/get_image/sequence.md",
+      "unit-test": "docs/design/generated/api/images/get_image/unit-test.md"
     },
     "get_ocr": {
-      "detail-design": "docs/design/generated/api/get_ocr.detail-design.md",
-      "interface": "docs/design/generated/api/get_ocr.interface.md",
-      "messages": "docs/design/generated/api/get_ocr.messages.md",
-      "query": "docs/design/generated/api/get_ocr.query.md",
-      "sequence": "docs/design/generated/api/get_ocr.sequence.md",
-      "unit-test": "docs/design/generated/api/get_ocr.unit-test.md"
+      "detail-design": "docs/design/generated/api/images/get_ocr/detail-design.md",
+      "interface": "docs/design/generated/api/images/get_ocr/interface.md",
+      "messages": "docs/design/generated/api/images/get_ocr/messages.md",
+      "query": "docs/design/generated/api/images/get_ocr/query.md",
+      "sequence": "docs/design/generated/api/images/get_ocr/sequence.md",
+      "unit-test": "docs/design/generated/api/images/get_ocr/unit-test.md"
     },
     "health": {
-      "detail-design": "docs/design/generated/api/health.detail-design.md",
-      "interface": "docs/design/generated/api/health.interface.md",
-      "messages": "docs/design/generated/api/health.messages.md",
-      "query": "docs/design/generated/api/health.query.md",
-      "sequence": "docs/design/generated/api/health.sequence.md",
-      "unit-test": "docs/design/generated/api/health.unit-test.md"
+      "detail-design": "docs/design/generated/api/health/health/detail-design.md",
+      "interface": "docs/design/generated/api/health/health/interface.md",
+      "messages": "docs/design/generated/api/health/health/messages.md",
+      "query": "docs/design/generated/api/health/health/query.md",
+      "sequence": "docs/design/generated/api/health/health/sequence.md",
+      "unit-test": "docs/design/generated/api/health/health/unit-test.md"
     },
     "list_documents": {
-      "detail-design": "docs/design/generated/api/list_documents.detail-design.md",
-      "interface": "docs/design/generated/api/list_documents.interface.md",
-      "messages": "docs/design/generated/api/list_documents.messages.md",
-      "query": "docs/design/generated/api/list_documents.query.md",
-      "sequence": "docs/design/generated/api/list_documents.sequence.md",
-      "unit-test": "docs/design/generated/api/list_documents.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/list_documents/detail-design.md",
+      "interface": "docs/design/generated/api/documents/list_documents/interface.md",
+      "messages": "docs/design/generated/api/documents/list_documents/messages.md",
+      "query": "docs/design/generated/api/documents/list_documents/query.md",
+      "sequence": "docs/design/generated/api/documents/list_documents/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/list_documents/unit-test.md"
     },
     "list_jobs": {
-      "detail-design": "docs/design/generated/api/list_jobs.detail-design.md",
-      "interface": "docs/design/generated/api/list_jobs.interface.md",
-      "messages": "docs/design/generated/api/list_jobs.messages.md",
-      "query": "docs/design/generated/api/list_jobs.query.md",
-      "sequence": "docs/design/generated/api/list_jobs.sequence.md",
-      "unit-test": "docs/design/generated/api/list_jobs.unit-test.md"
+      "detail-design": "docs/design/generated/api/operations/list_jobs/detail-design.md",
+      "interface": "docs/design/generated/api/operations/list_jobs/interface.md",
+      "messages": "docs/design/generated/api/operations/list_jobs/messages.md",
+      "query": "docs/design/generated/api/operations/list_jobs/query.md",
+      "sequence": "docs/design/generated/api/operations/list_jobs/sequence.md",
+      "unit-test": "docs/design/generated/api/operations/list_jobs/unit-test.md"
     },
     "list_members": {
-      "detail-design": "docs/design/generated/api/list_members.detail-design.md",
-      "interface": "docs/design/generated/api/list_members.interface.md",
-      "messages": "docs/design/generated/api/list_members.messages.md",
-      "query": "docs/design/generated/api/list_members.query.md",
-      "sequence": "docs/design/generated/api/list_members.sequence.md",
-      "unit-test": "docs/design/generated/api/list_members.unit-test.md"
+      "detail-design": "docs/design/generated/api/groups/list_members/detail-design.md",
+      "interface": "docs/design/generated/api/groups/list_members/interface.md",
+      "messages": "docs/design/generated/api/groups/list_members/messages.md",
+      "query": "docs/design/generated/api/groups/list_members/query.md",
+      "sequence": "docs/design/generated/api/groups/list_members/sequence.md",
+      "unit-test": "docs/design/generated/api/groups/list_members/unit-test.md"
     },
     "list_reviews": {
-      "detail-design": "docs/design/generated/api/list_reviews.detail-design.md",
-      "interface": "docs/design/generated/api/list_reviews.interface.md",
-      "messages": "docs/design/generated/api/list_reviews.messages.md",
-      "query": "docs/design/generated/api/list_reviews.query.md",
-      "sequence": "docs/design/generated/api/list_reviews.sequence.md",
-      "unit-test": "docs/design/generated/api/list_reviews.unit-test.md"
+      "detail-design": "docs/design/generated/api/reviews/list_reviews/detail-design.md",
+      "interface": "docs/design/generated/api/reviews/list_reviews/interface.md",
+      "messages": "docs/design/generated/api/reviews/list_reviews/messages.md",
+      "query": "docs/design/generated/api/reviews/list_reviews/query.md",
+      "sequence": "docs/design/generated/api/reviews/list_reviews/sequence.md",
+      "unit-test": "docs/design/generated/api/reviews/list_reviews/unit-test.md"
     },
     "read_document": {
-      "detail-design": "docs/design/generated/api/read_document.detail-design.md",
-      "interface": "docs/design/generated/api/read_document.interface.md",
-      "messages": "docs/design/generated/api/read_document.messages.md",
-      "query": "docs/design/generated/api/read_document.query.md",
-      "sequence": "docs/design/generated/api/read_document.sequence.md",
-      "unit-test": "docs/design/generated/api/read_document.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/read_document/detail-design.md",
+      "interface": "docs/design/generated/api/documents/read_document/interface.md",
+      "messages": "docs/design/generated/api/documents/read_document/messages.md",
+      "query": "docs/design/generated/api/documents/read_document/query.md",
+      "sequence": "docs/design/generated/api/documents/read_document/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/read_document/unit-test.md"
     },
     "reconcile_index": {
-      "detail-design": "docs/design/generated/api/reconcile_index.detail-design.md",
-      "interface": "docs/design/generated/api/reconcile_index.interface.md",
-      "messages": "docs/design/generated/api/reconcile_index.messages.md",
-      "query": "docs/design/generated/api/reconcile_index.query.md",
-      "sequence": "docs/design/generated/api/reconcile_index.sequence.md",
-      "unit-test": "docs/design/generated/api/reconcile_index.unit-test.md"
+      "detail-design": "docs/design/generated/api/operations/reconcile_index/detail-design.md",
+      "interface": "docs/design/generated/api/operations/reconcile_index/interface.md",
+      "messages": "docs/design/generated/api/operations/reconcile_index/messages.md",
+      "query": "docs/design/generated/api/operations/reconcile_index/query.md",
+      "sequence": "docs/design/generated/api/operations/reconcile_index/sequence.md",
+      "unit-test": "docs/design/generated/api/operations/reconcile_index/unit-test.md"
     },
     "record_view": {
-      "detail-design": "docs/design/generated/api/record_view.detail-design.md",
-      "interface": "docs/design/generated/api/record_view.interface.md",
-      "messages": "docs/design/generated/api/record_view.messages.md",
-      "query": "docs/design/generated/api/record_view.query.md",
-      "sequence": "docs/design/generated/api/record_view.sequence.md",
-      "unit-test": "docs/design/generated/api/record_view.unit-test.md"
+      "detail-design": "docs/design/generated/api/metrics/record_view/detail-design.md",
+      "interface": "docs/design/generated/api/metrics/record_view/interface.md",
+      "messages": "docs/design/generated/api/metrics/record_view/messages.md",
+      "query": "docs/design/generated/api/metrics/record_view/query.md",
+      "sequence": "docs/design/generated/api/metrics/record_view/sequence.md",
+      "unit-test": "docs/design/generated/api/metrics/record_view/unit-test.md"
     },
     "retry_job": {
-      "detail-design": "docs/design/generated/api/retry_job.detail-design.md",
-      "interface": "docs/design/generated/api/retry_job.interface.md",
-      "messages": "docs/design/generated/api/retry_job.messages.md",
-      "query": "docs/design/generated/api/retry_job.query.md",
-      "sequence": "docs/design/generated/api/retry_job.sequence.md",
-      "unit-test": "docs/design/generated/api/retry_job.unit-test.md"
+      "detail-design": "docs/design/generated/api/operations/retry_job/detail-design.md",
+      "interface": "docs/design/generated/api/operations/retry_job/interface.md",
+      "messages": "docs/design/generated/api/operations/retry_job/messages.md",
+      "query": "docs/design/generated/api/operations/retry_job/query.md",
+      "sequence": "docs/design/generated/api/operations/retry_job/sequence.md",
+      "unit-test": "docs/design/generated/api/operations/retry_job/unit-test.md"
     },
     "save_draft": {
-      "detail-design": "docs/design/generated/api/save_draft.detail-design.md",
-      "interface": "docs/design/generated/api/save_draft.interface.md",
-      "messages": "docs/design/generated/api/save_draft.messages.md",
-      "query": "docs/design/generated/api/save_draft.query.md",
-      "sequence": "docs/design/generated/api/save_draft.sequence.md",
-      "unit-test": "docs/design/generated/api/save_draft.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/save_draft/detail-design.md",
+      "interface": "docs/design/generated/api/documents/save_draft/interface.md",
+      "messages": "docs/design/generated/api/documents/save_draft/messages.md",
+      "query": "docs/design/generated/api/documents/save_draft/query.md",
+      "sequence": "docs/design/generated/api/documents/save_draft/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/save_draft/unit-test.md"
     },
     "submit_version": {
-      "detail-design": "docs/design/generated/api/submit_version.detail-design.md",
-      "interface": "docs/design/generated/api/submit_version.interface.md",
-      "messages": "docs/design/generated/api/submit_version.messages.md",
-      "query": "docs/design/generated/api/submit_version.query.md",
-      "sequence": "docs/design/generated/api/submit_version.sequence.md",
-      "unit-test": "docs/design/generated/api/submit_version.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/submit_version/detail-design.md",
+      "interface": "docs/design/generated/api/documents/submit_version/interface.md",
+      "messages": "docs/design/generated/api/documents/submit_version/messages.md",
+      "query": "docs/design/generated/api/documents/submit_version/query.md",
+      "sequence": "docs/design/generated/api/documents/submit_version/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/submit_version/unit-test.md"
     },
     "upload_image": {
-      "detail-design": "docs/design/generated/api/upload_image.detail-design.md",
-      "interface": "docs/design/generated/api/upload_image.interface.md",
-      "messages": "docs/design/generated/api/upload_image.messages.md",
-      "query": "docs/design/generated/api/upload_image.query.md",
-      "sequence": "docs/design/generated/api/upload_image.sequence.md",
-      "unit-test": "docs/design/generated/api/upload_image.unit-test.md"
+      "detail-design": "docs/design/generated/api/images/upload_image/detail-design.md",
+      "interface": "docs/design/generated/api/images/upload_image/interface.md",
+      "messages": "docs/design/generated/api/images/upload_image/messages.md",
+      "query": "docs/design/generated/api/images/upload_image/query.md",
+      "sequence": "docs/design/generated/api/images/upload_image/sequence.md",
+      "unit-test": "docs/design/generated/api/images/upload_image/unit-test.md"
     },
     "version_diff": {
-      "detail-design": "docs/design/generated/api/version_diff.detail-design.md",
-      "interface": "docs/design/generated/api/version_diff.interface.md",
-      "messages": "docs/design/generated/api/version_diff.messages.md",
-      "query": "docs/design/generated/api/version_diff.query.md",
-      "sequence": "docs/design/generated/api/version_diff.sequence.md",
-      "unit-test": "docs/design/generated/api/version_diff.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/version_diff/detail-design.md",
+      "interface": "docs/design/generated/api/documents/version_diff/interface.md",
+      "messages": "docs/design/generated/api/documents/version_diff/messages.md",
+      "query": "docs/design/generated/api/documents/version_diff/query.md",
+      "sequence": "docs/design/generated/api/documents/version_diff/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/version_diff/unit-test.md"
     },
     "version_history": {
-      "detail-design": "docs/design/generated/api/version_history.detail-design.md",
-      "interface": "docs/design/generated/api/version_history.interface.md",
-      "messages": "docs/design/generated/api/version_history.messages.md",
-      "query": "docs/design/generated/api/version_history.query.md",
-      "sequence": "docs/design/generated/api/version_history.sequence.md",
-      "unit-test": "docs/design/generated/api/version_history.unit-test.md"
+      "detail-design": "docs/design/generated/api/documents/version_history/detail-design.md",
+      "interface": "docs/design/generated/api/documents/version_history/interface.md",
+      "messages": "docs/design/generated/api/documents/version_history/messages.md",
+      "query": "docs/design/generated/api/documents/version_history/query.md",
+      "sequence": "docs/design/generated/api/documents/version_history/sequence.md",
+      "unit-test": "docs/design/generated/api/documents/version_history/unit-test.md"
     }
   },
   "source_sha256": {
@@ -350,10 +351,10 @@
     "backend/tests/test_ui_contract.py": "d71f1fc4450eb172634b0a0b0c10fa735c309bfc9fbce834508f1141bae4269d",
     "backend/tests/test_workflow.py": "d578ace99cec8ef339d7afdd4683f5ce39ca82fa1ae15d6fd06e0ab4c8f5a97c",
     "e2e/portal.config.ts": "17dd937e11b8ae0358b4d98a9fc6a032bb5f218853d86c656faaa3e30af3d4fa",
-    "e2e/portal.spec.ts": "43ecfdaab839f6b0b24a49b266f6b46513214785bbde7a13078b9849628bb19b",
+    "e2e/portal.spec.ts": "eb13e9678e41957b53336aa215ea10b757d7bce6b7c62b5bb282218dbaa483f6",
     "e2e/workflow.spec.ts": "02899a76499caec7f5e83990ac78d4e6535b608b6437ead424f974b7f3db38f5",
-    "frontend/portal/App.tsx": "b03143d7cf26ca52daa92410f5183102657d2b393bf245b6a14b95c38b0d232c",
-    "frontend/portal/style.css": "8a63b0dd394fb395ffdc749c7a48559e0fcec8887dcb765b1b3e0c45dbcfd5d1",
+    "frontend/portal/App.tsx": "082a38b544e5e7e611893218893d8827598661ecba8021fdbb2537ae83b75d26",
+    "frontend/portal/style.css": "01e116d9da4ed108707dba8426e25c97fae1b80e09e9c36a3f53da9d62e9080b",
     "frontend/portal/vite.config.ts": "069b5a85c1b677969f75334c24a729e4f3a00ca92c7ee69c0bef51eb8fd0482f",
     "frontend/src/components/App.tsx": "9003bcc360fbd7d45bd89b1a3dfd36e1f78b8e2f09201cc600eca5cce9d21796",
     "frontend/src/components/Markdown.tsx": "4e553216a7ac6a1fb672b0751f4ba3fac953b06cd566180f7fd8603df646de05",
@@ -382,8 +383,9 @@
     "infra/src/kotorelay_infra/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "infra/src/kotorelay_infra/stack.py": "2ae7d1606bd770647e505dcbec4b0b9d47e14e09030f6803d3a5ed6d221b15e3",
     "infra/tests/test_stack.py": "08b4a814f0a82f677eb274539fbb955b698cd40004960c64d463d2cede95ecc6",
-    "spec/requirements/requirements.json": "dbd263e4a2b1c49acdd8e288a40fc83e8b4d6bd5e9dc3f93819e3813c053b155",
-    "tools/project/design.py": "caecc56bf06ad403d1ef417da1d8badf42b9ff016824229bdadc193ddbcd59f8"
+    "spec/requirements/requirements.json": "a55dc1cac2c81deff442af6b092f280f0553d4711398410e31f66a4e0d6bfdbd",
+    "tools/project/api_documents.py": "e074d6363f798542d1d008ef938b82fe683b56c9f46b6bd2e684e6bf688ec8c6",
+    "tools/project/design.py": "cfda04d69871ab87c4feaaf1773083be7f3bfc74b9acc6765efb021b6d466262"
   },
   "sql": [
     "answers_delete",
