@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 反映ジョブを再処理 — 詳細設計
 
@@ -54,17 +54,17 @@
 | backend/src/kotorelay/operations/indexing/shared/functions.py:28 | line.startswith('#') | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/shared/functions.py:32 | len(buffer) + len(part) > 1200 and buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/shared/functions.py:220 | len(actual) == len(parts) and engine.verify([c.id for c in actual]) | 'integrity' | 503 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:16 | not job.version_id or f.is_obsolete_version(doc, job) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:22 | f.has_more_stale_chunks(stale) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:24 | f.is_inactive_document(doc) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:42 | f.is_existing_chunk(previous, chunk) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:98 | f.is_finished_job(job) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:56 | f.is_restored_document(doc) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:58 | f.is_within_retention(ctx, job) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:76 | f.has_more_target_chunks(target_chunks) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:81 | f.has_more_target_ocr(target_runs) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:84 | f.is_target_asset(asset, doc) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/router.py:87 | f.is_target_draft(draft, doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:17 | not job.version_id or f.is_obsolete_version(doc, job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:23 | f.has_more_stale_chunks(stale) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:25 | f.is_inactive_document(doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:43 | f.is_existing_chunk(previous, chunk) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:99 | f.is_finished_job(job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:57 | f.is_restored_document(doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:59 | f.is_within_retention(ctx, job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:77 | f.has_more_target_chunks(target_chunks) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:82 | f.has_more_target_ocr(target_runs) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:85 | f.is_target_asset(asset, doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:88 | f.is_target_draft(draft, doc) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -142,6 +142,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | --- | --- |
 | backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
 | backend/src/kotorelay/context.py:27 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
+| backend/src/kotorelay/operational_logging.py:150 | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
 | backend/src/kotorelay/operations/indexing/retry_job/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
 | backend/src/kotorelay/operations/indexing/retry_job/router.py:27 | build_response(process(ctx, rt.engine, str(job_id))) |
 | backend/src/kotorelay/operations/indexing/shared/functions.py:284 | q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) |
@@ -226,17 +227,17 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/indexing/shared/generated/queries.py:441 | db.execute('operations/indexing/shared/sql/017_outbox_update.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/indexing/shared/generated/queries.py:471 | db.query('operations/indexing/shared/sql/018_versions_get.sql', params.model_dump(), VersionsGetRow) |
 | backend/src/kotorelay/operations/indexing/shared/generated/queries.py:502 | db.query('operations/indexing/shared/sql/019_versions_list.sql', params.model_dump(), VersionsListRow) |
-| backend/src/kotorelay/operations/indexing/shared/router.py:51 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:17 | 'obsolete' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:23 | 'pending' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:25 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:109 | updated |
-| backend/src/kotorelay/operations/indexing/shared/router.py:99 | job |
-| backend/src/kotorelay/operations/indexing/shared/router.py:89 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:57 | 'obsolete' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:59 | 'retained' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:77 | 'pending' |
-| backend/src/kotorelay/operations/indexing/shared/router.py:82 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:52 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:18 | 'obsolete' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:24 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:26 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:116 | updated |
+| backend/src/kotorelay/operations/indexing/shared/router.py:100 | job |
+| backend/src/kotorelay/operations/indexing/shared/router.py:90 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:58 | 'obsolete' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:60 | 'retained' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:78 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:83 | 'pending' |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:194 | db.execute('operations/system/authorization/sql/007_organizations_fence.sql', params.model_dump()) |

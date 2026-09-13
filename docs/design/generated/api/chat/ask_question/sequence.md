@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 最新承認版の根拠で回答 — シーケンス
 
@@ -9,6 +9,8 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
+    participant E as HTTP例外ハンドラ
+    participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体
     participant M as モデル・検索エンジン
@@ -18,22 +20,19 @@ sequenceDiagram
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(users) == 1
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: 質問先部署への現在の所属を確認する。
     A->>F: member
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：ctx.member(data.department_id)
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     A->>F: stable_id
     A->>F: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
@@ -43,11 +42,10 @@ sequenceDiagram
     opt 前条件が成立
     A->>S: 実体を取得・ハッシュ照合
     end
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id)
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 409 / {code： "idempotency_conflict", message： "同じ操作IDが異なる内容で使用されています。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
-    Note over A: 例外を送出し通常経路を終了
+    Note over A: already_answeredは内部制御例外。catchで既存回答を再取得・再認可し、HTTP 200 / AnswerView（id・answer・status・citations等）を返す。HTTP 409は送らない。
     end
     A->>F: 要求内容の一致を確認して同じ冪等キーの記録済み結果を取得する。
     A->>F: idempotent_result
@@ -56,16 +54,14 @@ sequenceDiagram
     opt 前条件が成立
     A->>F: digest
     end
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：record.operation == operation and record.request_hash == digest(request.encode())
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 409 / {code： "idempotency_conflict", message： "同じ操作IDが異なる内容で使用されています。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     A->>F: 現在の組織に属する利用イベントを識別子順に一覧取得する。
     A->>D: 現在の組織に属する利用イベントを識別子順に一覧取得する。
     A->>F: 再開要求を除いて利用者の当日質問数の上限を確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：resumed is not None or sum((1 for e in events if e.user_id == ctx.user.id and e.kind == 'question' and (e.created_at.date() == today))) < ctx.settings.max_questions_per_day
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 429 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     alt resumed is not None
     else 条件不成立
@@ -73,15 +69,13 @@ sequenceDiagram
     A->>F: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
     A->>D: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
     A->>F: 会話が存在し現在の利用者が所有することを確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(conversations) and conversations[0].user_id == ctx.user.id
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     A->>F: 会話内の回答が同じ部署に帰属することを確認する。
     A->>D: 現在の組織に属する回答履歴を識別子順に一覧取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：all((a.department_id == data.department_id for a in q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) if a.conversation_id == conversation_id))
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 409 / {code： "conversation_department", message： "利用部署を変更する場合は新しい会話を開始してください。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     else 条件不成立
     A->>F: new_id
@@ -116,6 +110,8 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     end
     opt 例外発生：Problem
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
     Note over A: 次の反復へ
     end
     A->>F: 検索順位があれば順位を使い、ローカル検索では質問と本文の共通語数を得点にする。
@@ -155,6 +151,10 @@ sequenceDiagram
     end
     end
     end
+    opt 例外発生：(Problem, ValueError)
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    end
     alt not validate_citation(ctx, citation)
     Note over A: 次の反復へ
     end
@@ -189,9 +189,8 @@ sequenceDiagram
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: fence
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：38 で捕捉 / HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     Note over A: この処理からreturn
     Note over A,D: 正常終了時commit・競合時rollback
@@ -200,28 +199,78 @@ sequenceDiagram
     opt 例外発生：Problem
     A->>F: 既存回答の再表示以外の例外かを判定する。
     alt f.is_unhandled_problem(exc)
-    Note over A: 例外を送出し通常経路を終了
+    opt 再送出されたProblem：forbidden
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    end
+    end
+    opt 再送出されたProblem：not_found
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    end
+    end
+    opt 再送出されたProblem：conflict
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    end
+    end
+    opt 再送出されたProblem：conversation_department
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conversation_department", message： "利用部署を変更する場合は新しい会話を開始してください。", request_id： 相関ID}
+    end
+    end
+    opt 再送出されたProblem：idempotency_conflict
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "idempotency_conflict", message： "同じ操作IDが異なる内容で使用されています。", request_id： 相関ID}
+    end
+    end
+    opt 再送出されたProblem：limit
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 429 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID}
+    end
+    end
     end
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(users) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
     A->>D: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
     A->>F: present
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：answer.user_id == ctx.user.id
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    end
     end
     loop evidence.citations
     A->>F: validate_citation
@@ -243,6 +292,10 @@ sequenceDiagram
     end
     end
     end
+    opt 例外発生：(Problem, ValueError)
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    end
     end
     A->>S: 実体を取得・ハッシュ照合
     alt valid
@@ -258,14 +311,20 @@ sequenceDiagram
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(users) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
@@ -289,6 +348,10 @@ sequenceDiagram
     end
     end
     end
+    opt 例外発生：(Problem, ValueError)
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    end
     end
     alt not all((validate_citation(ctx, c) for c in prepared.citations))
     A->>F: 失効した根拠とその本文・画像をモデル入力から除く。
@@ -301,27 +364,40 @@ sequenceDiagram
     A->>F: 準備済みの本文と画像をモデルへ送り回答を取得する。
     A->>M: generate
     end
+    opt 例外発生：(BotoCoreError, ClientError, TimeoutError)
+    A->>L: KR_MODEL_FAILED / 回答モデルの呼出しが失敗しました。
+    Note over A,U: 後続の再認可と保存が成功すればHTTP 200、AnswerView.status=failed、answer=現在利用できる根拠が不足しているため、回答を保留しました。
+    end
     end
     end
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(users) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: 回答確定時点でも質問先部署への所属が有効であることを確認する。
     A->>F: member
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：ctx.member(prepared.department_id)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    end
     end
     opt 前条件が成立
     loop prepared.citations
@@ -343,6 +419,10 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     end
     end
+    end
+    opt 例外発生：(Problem, ValueError)
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
     end
     end
     end
@@ -372,14 +452,20 @@ sequenceDiagram
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: fence
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    end
     end
     A->>F: present
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：answer.user_id == ctx.user.id
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    end
     end
     loop evidence.citations
     A->>F: validate_citation
@@ -401,6 +487,10 @@ sequenceDiagram
     end
     end
     end
+    opt 例外発生：(Problem, ValueError)
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    end
     end
     A->>S: 実体を取得・ハッシュ照合
     alt valid
@@ -412,8 +502,46 @@ sequenceDiagram
     Note over A: この処理からreturn
     Note over A,D: 正常終了時commit・競合時rollback
     end
-    A-->>U: HTTP応答
+    A-->>U: HTTP 200 / AnswerView
+    Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
+    opt 入力検証の失敗（RequestValidationError）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    end
+    end
+    opt SQL実行またはcommitの競合（psycopg.Error）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    end
+    end
+    opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
+    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    end
+    end
 ```
+
+**例外応答一覧（HTTP境界へ到達した場合）**
+
+| HTTP | code | message | 相関ID |
+| --- | --- | --- | --- |
+| 401 | unauthenticated | ログインが必要です。 | request_id |
+| 403 | forbidden | この操作は許可されていません。 | request_id |
+| 404 | not_found | 対象を利用できません。 | request_id |
+| 409 | conflict | 他の操作で更新されました。最新の状態を確認してください。 | request_id |
+| 409 | conflict | 競合しました。再読込してください。 | request_id |
+| 409 | conversation_department | 利用部署を変更する場合は新しい会話を開始してください。 | request_id |
+| 409 | idempotency_conflict | 同じ操作IDが異なる内容で使用されています。 | request_id |
+| 422 | invalid_input | 入力形式を確認してください。 | request_id |
+| 429 | limit | 利用上限に達しました。 | request_id |
+| 503 | unavailable | 一時的に利用できません。 | request_id |
+
 
 **制御順序（関数内の行順）**
 
@@ -437,6 +565,7 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
+| kotorelay.operational_logging.continuation_context | 150 | Return | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
 | kotorelay.operations.chat.ask_question.functions.answers_get | 30 | Return | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=exc.message)) |
 | kotorelay.operations.chat.ask_question.functions.answers_get_2 | 50 | Return | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=answer_id)) |
 | kotorelay.operations.chat.ask_question.functions.answers_insert | 298 | Return | q.answers_insert(ctx.db, q.AnswersInsertParams.model_validate(row, from_attributes=True)) |
@@ -481,52 +610,52 @@ sequenceDiagram
 | kotorelay.operations.chat.ask_question.functions.validate_repeated_question | 57 | Return | require(prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id), 'idempotency_conflict', 409) |
 | kotorelay.operations.chat.ask_question.functions.versions_get | 189 | Return | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=chunk.version_id)) |
 | kotorelay.operations.chat.ask_question.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 34 | Try | Try |
-| kotorelay.operations.chat.ask_question.router.ask_question | 37 | ExceptHandler | Problem |
-| kotorelay.operations.chat.ask_question.router.ask_question | 38 | If | f.is_unhandled_problem(exc) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 39 | Raise | Raise |
-| kotorelay.operations.chat.ask_question.router.ask_question | 41 | Return | build_response(present(ctx, f.answers_get(ctx, exc)[0])) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 44 | If | prepared.citations |
-| kotorelay.operations.chat.ask_question.router.ask_question | 46 | If | not all((validate_citation(ctx, c) for c in prepared.citations)) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 48 | If | prepared.citations |
-| kotorelay.operations.chat.ask_question.router.ask_question | 49 | Try | Try |
-| kotorelay.operations.chat.ask_question.router.ask_question | 51 | ExceptHandler | (BotoCoreError, ClientError, TimeoutError) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 54 | Return | build_response(finalize(ctx, prepared, answer, rt.engine, failed)) |
-| kotorelay.operations.chat.ask_question.router.finalize | 139 | For | For |
-| kotorelay.operations.chat.ask_question.router.finalize | 143 | Return | present(ctx, row) |
-| kotorelay.operations.chat.ask_question.router.prepare | 61 | If | prior |
-| kotorelay.operations.chat.ask_question.router.prepare | 63 | Raise | Raise |
-| kotorelay.operations.chat.ask_question.router.prepare | 69 | If | resumed is not None |
-| kotorelay.operations.chat.ask_question.router.prepare | 71 | If | data.conversation_id |
-| kotorelay.operations.chat.ask_question.router.prepare | 83 | For | For |
-| kotorelay.operations.chat.ask_question.router.prepare | 84 | If | f.is_unavailable_chunk(docs, chunk) |
-| kotorelay.operations.chat.ask_question.router.prepare | 86 | If | f.is_outside_search_results(vector_keys, chunk) |
-| kotorelay.operations.chat.ask_question.router.prepare | 88 | Try | Try |
-| kotorelay.operations.chat.ask_question.router.prepare | 90 | ExceptHandler | Problem |
-| kotorelay.operations.chat.ask_question.router.prepare | 93 | If | f.has_sufficient_relevance(score, vector_keys, data) |
-| kotorelay.operations.chat.ask_question.router.prepare | 98 | For | For |
-| kotorelay.operations.chat.ask_question.router.prepare | 102 | If | not validate_citation(ctx, citation) |
-| kotorelay.operations.chat.ask_question.router.prepare | 106 | If | f.exceeds_image_limit(images, related, ctx) |
-| kotorelay.operations.chat.ask_question.router.prepare | 108 | For | For |
-| kotorelay.operations.chat.ask_question.router.prepare | 113 | If | f.has_enough_citations(citations) |
-| kotorelay.operations.chat.ask_question.router.prepare | 115 | If | f.is_new_question(resumed) |
-| kotorelay.operations.chat.ask_question.router.prepare | 119 | Return | Prepared(answer_id=answer_id, conversation_id=conversation_id, question=data.question, department_id=data.department_id, citations=citations, texts=texts, images=images) |
-| kotorelay.operations.chat.shared.functions.present | 74 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 19 | If | not docs |
-| kotorelay.operations.chat.shared.functions.validate_citation | 20 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 22 | If | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision |
-| kotorelay.operations.chat.shared.functions.validate_citation | 27 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 32 | If | not versions or not chunks |
-| kotorelay.operations.chat.shared.functions.validate_citation | 33 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 35 | If | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 44 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 45 | Try | Try |
-| kotorelay.operations.chat.shared.functions.validate_citation | 50 | If | placements - {image.placement.id for image in manifest.images} |
-| kotorelay.operations.chat.shared.functions.validate_citation | 51 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 52 | For | For |
-| kotorelay.operations.chat.shared.functions.validate_citation | 53 | If | image.placement.id in json.loads(chunk.placements) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 61 | If | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') |
-| kotorelay.operations.chat.shared.functions.validate_citation | 62 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 65 | Return | True |
-| kotorelay.operations.chat.shared.functions.validate_citation | 66 | ExceptHandler | (Problem, ValueError) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 67 | Return | False |
+| kotorelay.operations.chat.ask_question.router.ask_question | 35 | Try | Try |
+| kotorelay.operations.chat.ask_question.router.ask_question | 38 | ExceptHandler | Problem |
+| kotorelay.operations.chat.ask_question.router.ask_question | 39 | If | f.is_unhandled_problem(exc) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 40 | Raise | Raise |
+| kotorelay.operations.chat.ask_question.router.ask_question | 42 | Return | build_response(present(ctx, f.answers_get(ctx, exc)[0])) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 45 | If | prepared.citations |
+| kotorelay.operations.chat.ask_question.router.ask_question | 47 | If | not all((validate_citation(ctx, c) for c in prepared.citations)) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 49 | If | prepared.citations |
+| kotorelay.operations.chat.ask_question.router.ask_question | 50 | Try | Try |
+| kotorelay.operations.chat.ask_question.router.ask_question | 52 | ExceptHandler | (BotoCoreError, ClientError, TimeoutError) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 59 | Return | build_response(finalize(ctx, prepared, answer, rt.engine, failed)) |
+| kotorelay.operations.chat.ask_question.router.finalize | 148 | For | For |
+| kotorelay.operations.chat.ask_question.router.finalize | 152 | Return | present(ctx, row) |
+| kotorelay.operations.chat.ask_question.router.prepare | 66 | If | prior |
+| kotorelay.operations.chat.ask_question.router.prepare | 68 | Raise | Raise |
+| kotorelay.operations.chat.ask_question.router.prepare | 74 | If | resumed is not None |
+| kotorelay.operations.chat.ask_question.router.prepare | 76 | If | data.conversation_id |
+| kotorelay.operations.chat.ask_question.router.prepare | 88 | For | For |
+| kotorelay.operations.chat.ask_question.router.prepare | 89 | If | f.is_unavailable_chunk(docs, chunk) |
+| kotorelay.operations.chat.ask_question.router.prepare | 91 | If | f.is_outside_search_results(vector_keys, chunk) |
+| kotorelay.operations.chat.ask_question.router.prepare | 93 | Try | Try |
+| kotorelay.operations.chat.ask_question.router.prepare | 95 | ExceptHandler | Problem |
+| kotorelay.operations.chat.ask_question.router.prepare | 102 | If | f.has_sufficient_relevance(score, vector_keys, data) |
+| kotorelay.operations.chat.ask_question.router.prepare | 107 | For | For |
+| kotorelay.operations.chat.ask_question.router.prepare | 111 | If | not validate_citation(ctx, citation) |
+| kotorelay.operations.chat.ask_question.router.prepare | 115 | If | f.exceeds_image_limit(images, related, ctx) |
+| kotorelay.operations.chat.ask_question.router.prepare | 117 | For | For |
+| kotorelay.operations.chat.ask_question.router.prepare | 122 | If | f.has_enough_citations(citations) |
+| kotorelay.operations.chat.ask_question.router.prepare | 124 | If | f.is_new_question(resumed) |
+| kotorelay.operations.chat.ask_question.router.prepare | 128 | Return | Prepared(answer_id=answer_id, conversation_id=conversation_id, question=data.question, department_id=data.department_id, citations=citations, texts=texts, images=images) |
+| kotorelay.operations.chat.shared.functions.present | 79 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 20 | If | not docs |
+| kotorelay.operations.chat.shared.functions.validate_citation | 21 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 23 | If | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision |
+| kotorelay.operations.chat.shared.functions.validate_citation | 28 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 33 | If | not versions or not chunks |
+| kotorelay.operations.chat.shared.functions.validate_citation | 34 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 36 | If | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 45 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 46 | Try | Try |
+| kotorelay.operations.chat.shared.functions.validate_citation | 51 | If | placements - {image.placement.id for image in manifest.images} |
+| kotorelay.operations.chat.shared.functions.validate_citation | 52 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 53 | For | For |
+| kotorelay.operations.chat.shared.functions.validate_citation | 54 | If | image.placement.id in json.loads(chunk.placements) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 62 | If | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') |
+| kotorelay.operations.chat.shared.functions.validate_citation | 63 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 66 | Return | True |
+| kotorelay.operations.chat.shared.functions.validate_citation | 67 | ExceptHandler | (Problem, ValueError) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 72 | Return | False |

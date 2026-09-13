@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 現行認可で会話履歴を再表示 — ログメッセージ
 
@@ -10,41 +10,86 @@
 | --- | --- |
 | operation | chat_history |
 | endpoint | GET /api/chat/{conversation_id} |
-| router | backend/src/kotorelay/operations/chat/chat_history/router.py |
 
 
 ## 生成・検証方針
 
-共通HTTP middlewareのlogger呼出しと実行時LOG_MESSAGESを読み取ります。HTTPエラーメッセージをログとして置換しません。
+lazunexのops_loggerと同じく、独自型のcontext、ログID、例外型、応答、確認・復旧手順を必須にします。実行時catalogと実際のops_logger呼出しから生成します。通常アクセスのINFO KR_REQUESTは相関ID・メソッド・statusだけを記録します。
 
 ## メッセージ一覧
 
-| id | message_id | ログ概要 |
+| message_id | level | ログ概要 |
 | --- | --- | --- |
-| M001 | KR_REQUEST | HTTP応答時の相関ID・メソッド・ステータス |
+| KR_EVIDENCE_REJECTED | WARNING | 整合性を確認できない回答根拠を除外しました。 |
+| KR_HTTP_FAILED | ERROR | 処理を完了できずエラー応答を返しました。 |
+| KR_HTTP_REJECTED | WARNING | 業務条件または入力検証によりリクエストを拒否しました。 |
 
 
 ## ログ詳細
 
-### `M001` `KR_REQUEST`
+### `KR_EVIDENCE_REJECTED`
 
 | 項目 | 内容 |
 | --- | --- |
-| level | INFO |
-| テンプレート | request_id=%s method=%s status=%s |
-| 条件 | HTTP応答生成時 |
-| 場所 | backend/src/kotorelay/main.py:security_headers |
-| 運用対応 | 5xxはrequest_idから照合。409は再読込後に再試行。 |
+| level | WARNING |
+| メッセージ | 整合性を確認できない回答根拠を除外しました。 |
+| 例外・出力条件 | 根拠の読込み・検証でProblemまたはValueErrorを捕捉した場合。 |
+| 返すレスポンス | HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。 |
+| 呼出し位置 | backend/src/kotorelay/operations/chat/shared/functions.py:68 |
+| 確認手順 | request_idと例外型から版・権限・実体の整合性を確認する。 |
+| 復旧手順 | 公開版と索引を照合し、必要なら再索引する。 |
 
-#### 出力項目
 
-| 出力項目 | 型 | マスク規則 |
+### `KR_HTTP_FAILED`
+
+| 項目 | 内容 |
+| --- | --- |
+| level | ERROR |
+| メッセージ | 処理を完了できずエラー応答を返しました。 |
+| 例外・出力条件 | Problemの5xx、競合以外のpsycopg.Error、外部サービス例外をHTTP境界で捕捉した場合。 |
+| 返すレスポンス | HTTP status / code / messageはcontextの応答と一致。request_idは相関ID。 |
+| 呼出し位置 | backend/src/kotorelay/main.py:error_response |
+| 確認手順 | request_idから例外型と応答コードを調べ、DB接続・実体整合性・外部サービス稼働を確認する。 |
+| 復旧手順 | 依存先を復旧し、保存済み状態を確認して同じ操作IDで再試行する。 |
+
+
+### `KR_HTTP_REJECTED`
+
+| 項目 | 内容 |
+| --- | --- |
+| level | WARNING |
+| メッセージ | 業務条件または入力検証によりリクエストを拒否しました。 |
+| 例外・出力条件 | Problemの4xx、RequestValidationError、DBの競合例外をHTTP境界で捕捉した場合。 |
+| 返すレスポンス | HTTP status / code / messageはcontextの応答と一致。request_idは相関ID。 |
+| 呼出し位置 | backend/src/kotorelay/main.py:error_response |
+| 確認手順 | request_idで検索し、例外型・code・HTTP statusを確認する。 |
+| 復旧手順 | 401は再認証、403/404は権限、409は再読込、422は入力、429は時間を置いて再試行する。 |
+
+
+### 例外からHTTPエラー応答への対応
+
+以下は例外が内部で処理されずHTTP境界に到達した場合の応答です。内部で捕捉して継続する経路はシーケンスのcatchと上記ログ別の継続結果を参照してください。
+
+| 例外 | HTTP | code | message | ログID |
+| --- | --- | --- | --- | --- |
+| Problem | 401 | unauthenticated | ログインが必要です。 | KR_HTTP_REJECTED |
+| Problem | 404 | not_found | 対象を利用できません。 | KR_HTTP_REJECTED |
+| psycopg.Error | 409 | conflict | 競合しました。再読込してください。 | KR_HTTP_REJECTED |
+| RequestValidationError | 422 | invalid_input | 入力形式を確認してください。 | KR_HTTP_REJECTED |
+| psycopg.Error / BotoCoreError / ClientError / OSError / TimeoutError | 503 | unavailable | 一時的に利用できません。 | KR_HTTP_FAILED |
+
+
+### 型付き出力項目
+
+| 項目 | 型 | 内容 |
 | --- | --- | --- |
-| request_id | UUID文字列 | 相関用ID |
-| method | str | HTTPメソッドのみ |
-| status | int | HTTPコードのみ |
+| request_id | uuid.UUID &#124; None | HTTP要求との相関ID。workerではnull。 |
+| exception_type | str | 捕捉した例外の型名。 |
+| status | int &#124; None | 確定したHTTPエラーのstatus。継続処理ではnull。 |
+| code | str &#124; None | 安全なHTTP応答またはジョブの失敗コード。その他の継続処理ではnull。 |
+| message | str | HTTP応答の安全なメッセージ、またはcatalogの継続結果。 |
 
 
 ## strict検証で要求する項目
 
-LOG_MESSAGESとlogger呼出しが実装に存在すること。本文・JWT・OCR本文をログに含めないこと。lazunex固有のloggerラッパーやWARNING以上の運用規則は、本実装の規則として転記しません。
+型・catalogの未登録ID、未知context項目、level不一致を拒否します。例外の生メッセージ、本文、JWT、OCR原文は渡しません。HTTPエラーにはrequest_idを付け、同じIDのログと照合します。

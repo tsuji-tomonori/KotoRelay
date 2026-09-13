@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from tools.project.test_narrative import parse
+
 
 def pytest_collection_finish(session):
     items = []
@@ -14,6 +16,11 @@ def pytest_collection_finish(session):
                 "node": item.nodeid,
                 "name": name.removeprefix("test_"),
                 "group": path,
+                **(
+                    parse(item.obj.__doc__, item.nodeid)
+                    if path.startswith("backend/tests/")
+                    else {}
+                ),
             }
         )
     output = Path("artifacts/pytest-inventory.json")

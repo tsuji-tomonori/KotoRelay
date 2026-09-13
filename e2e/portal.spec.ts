@@ -297,3 +297,49 @@ test('routerの文書作成順をSQLの役割ラベルで確認し長い図を�
   );
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
+
+test('例外応答と型付きログを日本語のテスト手順から照合できる', async ({ page }) => {
+  await page
+    .getByRole('navigation', { name: '品質ナビゲーション' })
+    .getByRole('button', { name: /設計書/ })
+    .click();
+  await page.getByRole('searchbox').fill('save_draft');
+  await page
+    .locator('.inventory button')
+    .filter({ hasText: /— シーケンス$/ })
+    .click();
+  const diagram = page.getByRole('region', { name: '設計図' });
+  await expect(diagram.locator('svg')).toBeVisible({ timeout: 45000 });
+  await expect(diagram).toContainText('HTTP 409');
+  await expect(diagram).toContainText('他の操作で更新されました。');
+  await expect(diagram).toContainText('KR_HTTP_REJECTED');
+  await expect(diagram).not.toContainText('例外を送出し通常経路を終了');
+  await page
+    .locator('.inventory button')
+    .filter({ hasText: /— ログメッセージ$/ })
+    .click();
+  await expect(page.locator('.markdown')).toContainText('RequestValidationError');
+  await expect(page.locator('.markdown')).toContainText('復旧手順');
+  await expect(page.locator('.markdown')).toContainText('他の操作で更新されました。');
+  await page
+    .getByRole('heading', { name: '例外からHTTPエラー応答への対応', exact: true })
+    .scrollIntoViewIfNeeded();
+  await capture(page, test.info(), 'When', '例外のHTTP応答とログのメッセージ・復旧手順を照合する');
+  await page
+    .locator('.inventory button')
+    .filter({ hasText: /— 単体テスト詳細$/ })
+    .click();
+  await expect(page.locator('.markdown')).toContainText('保存番号2の下書きがある。');
+  await expect(page.locator('.markdown')).toContainText('古い保存番号1');
+  await expect(page.locator('.markdown')).not.toContainText('result.status_code == 409');
+  await page
+    .getByRole('navigation', { name: '品質ナビゲーション' })
+    .getByRole('button', { name: /単体テスト/ })
+    .click();
+  await page.getByRole('searchbox').fill('競合保存は先行内容を上書きしない');
+  await page.locator('.inventory button').first().click();
+  await expect(page.locator('.test-narrative')).toContainText('Given — 前提');
+  await expect(page.locator('.test-narrative')).toContainText(
+    '409を返し、先に保存した本文を上書きしない。',
+  );
+});

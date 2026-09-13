@@ -25,6 +25,10 @@ def stream(data: bytes):
 
 
 def test_S3のハッシュ照合とストリーム解放(settings):
+    """Given: S3クライアントが正常な実体と改変した実体を返す。
+    When: 実体を保存・取得・削除し、改変済みの実体も取得する。
+    Then: 暗号化して保存し、読取ストリームを閉じ、改変はProblemで拒否する。
+    """
     client = MagicMock()
     with patch("kotorelay.objects.boto3.client", return_value=client):
         objects = S3Objects(settings)
@@ -49,6 +53,10 @@ def test_S3のハッシュ照合とストリーム解放(settings):
 
 
 def test_ローカル実体の改変とパス逸脱を拒否する(tmp_path):
+    """Given: ローカル実体の保存領域がある。
+    When: 保存・削除後の再読取、不正なキー、改変した実体の読取を行う。
+    Then: 正常な内容だけを返し、欠落・パス逸脱・改変を拒否する。
+    """
     objects = LocalObjects(str(tmp_path))
     key = objects.put(b"test")
     assert objects.get(key) == b"test"
@@ -66,6 +74,10 @@ def test_ローカル実体の改変とパス逸脱を拒否する(tmp_path):
 
 
 def test_Bedrockへ構造化画像bytesと出力上限を渡す(settings):
+    """Given: モデルが複数のテキスト断片を返す。
+    When: 質問・根拠・画像bytesで回答生成を呼ぶ。
+    Then: 画像を構造化して送り、出力上限1000を指定し、テキストだけを連結する。
+    """
     client = MagicMock()
     vectors = MagicMock()
     with patch("kotorelay.engines.boto3.client", side_effect=[client, vectors]):
@@ -81,6 +93,10 @@ def test_Bedrockへ構造化画像bytesと出力上限を渡す(settings):
 
 
 def test_ベクトル検索の前に組織と文書フィルタを設定する(settings):
+    """Given: 組織と対象文書が決まっている。
+    When: 101文書を検索対象にして索引の登録・検索・削除を行う。
+    Then: 組織フィルタとindexArnを渡し、上限に合わせて複数回に分割する。
+    """
     client = MagicMock()
     vectors = MagicMock()
     with patch("kotorelay.engines.boto3.client", side_effect=[client, vectors]):
@@ -107,6 +123,10 @@ def test_ベクトル検索の前に組織と文書フィルタを設定する(s
 
 
 def test_ローカル抽出はモデル名で区別する():
+    """Given: ローカル検索エンジンを使う。
+    When: 検索・索引登録・削除・回答生成・語句抽出を行う。
+    Then: 外部検索を行わず、回答をローカル検索として識別し、日本語の語句を抽出する。
+    """
     engine = LocalEngine()
     assert engine.search("質問", []) is None
     assert engine.index("a", "本文", "d", "v") is None
@@ -116,6 +136,10 @@ def test_ローカル抽出はモデル名で区別する():
 
 
 def test_OCRの座標と読み順を正規化する():
+    """Given: OCRコマンドが座標と文字をTSVで返す。
+    When: 画像サイズを指定してOCR結果を読み取る。
+    Then: 座標と信頼度を割合へ変換し、読み順を保ち、空行は領域にしない。
+    """
     result = MagicMock(
         stdout=b"left\ttop\twidth\theight\tconf\ttext\n10\t20\t30\t40\t90\tHello\n0\t0\t0\t0\t-1\t\n"
     )
@@ -133,6 +157,10 @@ def test_OCRの座標と読み順を正規化する():
 
 
 def test_画像の解像度と正規化後サイズを制限する():
+    """Given: JPEG画像と画像受付上限がある。
+    When: 正常画像を正規化し、画素数超過・サイズ超過・読取失敗も試す。
+    Then: 正常画像をPNGへ変換し、上限超過と破損画像はProblemで拒否する。
+    """
     output = io.BytesIO()
     Image.new("RGB", (30, 30), "white").save(output, format="JPEG")
     data = output.getvalue()
@@ -150,6 +178,10 @@ def test_画像の解像度と正規化後サイズを制限する():
 
 
 def test_見出しと長文を上限内のチャンクへ分割する():
+    """Given: 見出し付き長文、長い行列、空の本文がある。
+    When: 本文を索引用チャンクへ分割する。
+    Then: 各チャンクを1200文字以内にし、見出しを保持し、空本文は空の結果にする。
+    """
     assert split_chunks("") == []
     chunks = split_chunks("# 見出し\n" + "あ" * 3000 + "\n# 次\n本文")
     assert all((len(text) <= 1200 for _, text in chunks))
@@ -158,6 +190,10 @@ def test_見出しと長文を上限内のチャンクへ分割する():
 
 
 def test_DBポートのparameter_bindingとtransaction終了を検証する(settings):
+    """Given: DB接続が組織の行と更新件数を返す。
+    When: transaction内で型付きqueryを実行し、終了後にもDB操作を試す。
+    Then: パラメータを束縛して型付き行を返し、分離レベルを設定し、終了後の操作を拒否する。
+    """
     connection = MagicMock()
     connection.__enter__.return_value = connection
     connection.execute.return_value.fetchall.return_value = [
@@ -194,6 +230,10 @@ def test_DBポートのparameter_bindingとtransaction終了を検証する(sett
 
 
 def test_DSQLは公式コネクタとTLS検証を使う(settings):
+    """Given: AWSモードのDSQL接続先を設定している。
+    When: DB接続を開始する。
+    Then: 公式コネクタへverify-fullとアプリ用DBユーザーを渡す。
+    """
     db = Database(
         settings.model_copy(
             update={"mode": "aws", "dsql_host": "example.dsql.ap-northeast-1.on.aws"}
@@ -206,6 +246,10 @@ def test_DSQLは公式コネクタとTLS検証を使う(settings):
 
 
 def test_本番認証ではローカルトークンを受け付けない(settings):
+    """Given: AWSモードでissuerとclientを設定している。
+    When: 正常なaccess token、期限切れ・ローカルtoken、id tokenを検証する。
+    Then: 正しいaccess tokenだけを受け付け、ほかはProblemで拒否する。
+    """
     runtime = Runtime(settings)
     runtime.settings = settings.model_copy(
         update={"mode": "aws", "issuer": "https://issuer", "client_id": "client"}
@@ -228,12 +272,20 @@ def test_本番認証ではローカルトークンを受け付けない(setting
 
 
 def test_Lambdaエントリポイントを構成する():
+    """Given: FastAPIのLambdaアダプターが配置されている。
+    When: Lambdaエントリポイントを読み込む。
+    Then: 呼び出せるハンドラーが構成されている。
+    """
     from kotorelay.handler import handler
 
     assert callable(handler)
 
 
 def test_移行は各DDLを独立実行する(settings, tmp_path, monkeypatch):
+    """Given: 番号付きDDLファイルが2件ある。
+    When: 移行コマンドを実行する。
+    Then: 自動commitで各DDLを独立して実行する。
+    """
     from kotorelay.migrate import main
 
     (tmp_path / "001.sql").write_text("CREATE TABLE first (id integer);")
@@ -248,6 +300,10 @@ def test_移行は各DDLを独立実行する(settings, tmp_path, monkeypatch):
 
 
 def test_ベクトルの全件読戻しで部分保存を検知する(settings):
+    """Given: 外部索引に101件の登録予定IDがある。
+    When: 全件読戻し・欠落あり・対象なしの完了検証を実行する。
+    Then: 全件存在する場合だけ成功し、欠落は失敗、対象なしは成功する。
+    """
     client = MagicMock()
     vectors = MagicMock()
     with patch("kotorelay.engines.boto3.client", side_effect=[client, vectors]):
@@ -262,6 +318,10 @@ def test_ベクトルの全件読戻しで部分保存を検知する(settings):
 
 
 def test_workerのLambda入口とローカルループを実行する(settings):
+    """Given: workerの実処理が2件完了する。
+    When: Lambda入口とローカルループを実行する。
+    Then: Lambdaは処理件数2を返し、ローカルループは割込みで終了できる。
+    """
     from kotorelay import worker
 
     with patch.object(worker, "Runtime"), patch.object(worker, "run_once", return_value=2):
@@ -272,6 +332,10 @@ def test_workerのLambda入口とローカルループを実行する(settings):
 
 
 def test_モデルへ送信できない画像寸法を受付時に拒否する():
+    """Given: 長辺8001ピクセルのPNGがある。
+    When: 画像の正規化を要求する。
+    Then: 総画素数上限内でもモデルに送れない長辺をProblemで拒否する。
+    """
     value = io.BytesIO()
     Image.new("RGB", (8001, 1), "white").save(value, format="PNG")
     with pytest.raises(Problem):

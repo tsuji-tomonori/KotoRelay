@@ -12,6 +12,9 @@ type Item = {
   group?: string;
   command?: string;
   detail?: string;
+  given?: string;
+  when?: string;
+  then?: string;
   expected?: string;
   actual?: string;
   covered?: number;
@@ -433,6 +436,16 @@ function Portal() {
                   </div>
                   {current.command && <pre className="command">{current.command}</pre>}
                   {current.detail && <p>{current.detail}</p>}
+                  {current.given && (
+                    <dl className="test-narrative">
+                      <dt>Given — 前提</dt>
+                      <dd>{current.given}</dd>
+                      <dt>When — 操作</dt>
+                      <dd>{current.when}</dd>
+                      <dt>Then — 期待結果</dt>
+                      <dd>{current.then}</dd>
+                    </dl>
+                  )}
                   {current.covered !== undefined && current.total !== undefined && (
                     <div className="coverage">
                       <strong>

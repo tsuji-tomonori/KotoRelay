@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 死活確認 — シーケンス
 
@@ -9,6 +9,8 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
+    participant E as HTTP例外ハンドラ
+    participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体
     participant M as モデル・検索エンジン
@@ -16,8 +18,14 @@ sequenceDiagram
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     Note over A: この処理からreturn
-    A-->>U: HTTP応答
+    A-->>U: HTTP 200 / dict[str, str]
 ```
+
+**例外応答一覧（HTTP境界へ到達した場合）**
+
+| HTTP | code | message | 相関ID |
+| --- | --- | --- | --- |
+
 
 **制御順序（関数内の行順）**
 

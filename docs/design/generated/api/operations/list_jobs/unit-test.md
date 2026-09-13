@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 反映ジョブと失敗理由を確認 — 単体テスト詳細
 
@@ -10,59 +10,184 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ## 1. 要因ごとの要素
 
-### F01 条件分岐
+### F01 審査とジョブの表示名を対象版から得る
 
-対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F01-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F01-false | 不成立 | 'unauthenticated' / 401 |
+| 承認済み版と未承認のタイトルがある。 | 審査とジョブの詳細一覧を取得する。 | 対象版の表示名と版番号を返し、未承認名を混ぜず、運用権限のない詳細取得は403となる。 |
 
 
-### F02 条件分岐
+### F02 承認された版だけを引用付きで回答する
 
-対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F02-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F02-false | 不成立 | 'unauthenticated' / 401 |
+| 承認と索引反映が完了した文書がある。 | 関連する質問を送信し会話履歴を取得する。 | 200で承認版を引用して回答し、履歴にも同じ回答を残す。 |
 
 
-### F03 条件分岐
+### F03 新しい下書きは公開タイトルと本文を変更しない
 
-対象: `backend/src/kotorelay/errors.py:13`。式: `not condition`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F03-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F03-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| 公開済みの文書がある。 | 新しい下書きに未公開のタイトルと本文を保存する。 | 閲覧一覧と文書詳細は既存の公開版を維持し、質問にも回答できる。 |
 
 
-### F04 条件分岐
+### F04 新版承認後の未反映期間は旧版を使わない
 
-対象: `backend/src/kotorelay/operations/indexing/list_jobs/functions.py:18`。式: `ctx.user.operator`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F04-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F04-false | 不成立 | 'forbidden' / 403 |
+| 旧版が公開・索引反映されている。 | 新版を承認し、索引反映の前後に質問する。 | 未反映中は保留し、反映後は新版だけを引用し、旧版の直接閲覧は404となる。 |
 
 
-### F05 条件分岐
+### F05 公開停止と削除で回答履歴も失効する
 
-対象: `backend/src/kotorelay/operations/indexing/list_jobs/router.py:26`。式: `details`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F05-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F05-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| 公開版を引用した会話履歴がある。 | 文書を公開停止または削除して再質問・履歴取得する。 | 新規回答を保留し、過去の回答本文と引用を非表示にする。 |
+
+
+### F06 他部署は直接IDと一覧とRAGから取得できない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 部署内限定の文書が公開されている。 | 他部署の利用者が直接閲覧・一覧取得・質問を実行する。 | 文書は取得できず、根拠なしの質問は保留、未所属部署を指定した質問は403となる。 |
+
+
+### F07 共有は閲覧だけを許可する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 部署内限定の文書が公開されている。 | 他部署へ閲覧共有し、その部署から詳細・下書き・公開設定を操作する。 | 公開版は閲覧できるが、下書き取得と公開設定変更は404で拒否する。 |
+
+
+### F08 所属停止は古いトークンでも即時反映する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 所属中の利用者に公開版と会話履歴がある。 | 所属を停止し、停止前のトークンで文書と履歴を取得する。 | 文書は404、履歴の回答は非表示となる。 |
+
+
+### F09 審査の再送は結果とジョブを重複作成しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認待ちの版がある。 | 同一操作IDで承認を再送し、さらに内容を変えて再送する。 | 同一内容は同じ結果と1件のジョブを返し、内容変更と再審査は409で拒否する。 |
+
+
+### F10 閲覧と質問の再送を重複計上しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開済み文書がある。 | 同じ閲覧IDと質問の操作IDをそれぞれ再送し、部署統計を取得する。 | 閲覧・質問・利用者・貢献を各1件だけ計上し、統計に質問本文を含めない。 |
+
+
+### F11 他人の会話と管理統計を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 閲覧者が質問して会話を作成している。 | 他の利用者が会話を参照・継続し、閲覧者が管理統計を取得する。 | 他人の会話は404、管理権限のない統計取得は403となる。 |
+
+
+### F12 画像のOCR確認をmanifestへ固定する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 画像を添付できる下書きがある。 | 画像を登録し、未確認で申請した後にOCRを訂正・確認して承認する。 | 未確認申請は409、承認版の画像とOCRだけが閲覧・引用でき、OCR参照を版へ固定する。 |
+
+
+### F13 非運用者は反映ジョブを操作できない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 閲覧者と部署リーダーがいる。 | 運用ジョブ一覧と照合を要求する。 | 運用権限がないため403となる。 |
+
+
+### F14 反映失敗を照合し再試行で回復する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認済みだが索引が未反映の文書がある。 | 照合後、索引の完了検証を失敗させてから復旧し同じジョブを再試行する。 | 失敗中は回答を保留し、復旧後は完了して回答でき、完了済み再送は試行数を増やさない。 |
+
+
+### F15 画像を含む削除を保持期間後に完了する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開文書とその会話履歴がある。 | 削除後に保持期間内と期間経過後で削除ジョブを実行する。 | 期間内は保持し、期間後はチャンクと下書きを消し、履歴の回答を非表示にする。 |
+
+
+### F16 モデル実行中の権限変更で回答を保留する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 回答に利用できる公開版がある。 | モデルの処理中に文書を公開停止する。 | 回答は保留となり、生成済みの機密本文を返さない。 |
+
+
+### F17 モデル呼び出し失敗を失敗件数として区別する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 回答に利用できる公開版がある。 | モデル呼出しをタイムアウトさせる。 | 回答状態をfailedとして根拠を空にし、通常の根拠不足と区別する。 |
+
+
+### F18 不正な索引来歴をモデルへ渡さない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 索引済みの公開文書がある。 | 索引のmanifestハッシュや本文参照を改変して質問する。 | 不正な根拠を使わず回答を保留する。 |
+
+
+### F19 失効したジョブは公開版を戻さない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 旧版と新版が承認され、それぞれの反映ジョブがある。 | 旧版ジョブを先に実行してから未反映分を処理する。 | 旧版ジョブはobsoleteとなり、回答は新版を引用する。 |
+
+
+### F20 外部索引失敗を記録して部分完了をreadyにしない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認済み版の索引ジョブがある。 | 外部索引の書込みで例外を発生させる。 | ジョブをfailed・external_failureとし、不完全な索引では回答を保留する。 |
+
+
+### F21 回答根拠の欠落と改変は閲覧時に非表示とする
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開版を引用した回答履歴がある。 | 文書・版・チャンク・manifest・配置・本文のいずれかを欠落または改変して履歴を取得する。 | 該当する回答と引用を非表示にする。 |
+
+
+### F22 中断した質問は同じIDで再開し二重計上しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 質問受付だけを保存し、回答確定前に中断している。 | 同じ操作IDで質問を再送する。 | 同じ会話で200を返し、質問イベントは1件のままになる。 |
+
+
+### F23 外部検索は返されたID以外を根拠にしない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| ローカルには索引済みの文書がある。 | 外部検索が該当IDなしを返す状態で質問する。 | 外部検索にない根拠を補わず回答を保留する。 |
+
+
+### F24 モデル入力直前に失効を検知した場合はモデルを呼ばない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 根拠の初回検証が成功している。 | モデル入力直前の再検証で根拠を失効させる。 | 回答を保留し、失効した根拠を利用しない。 |
+
+
+### F25 削除配送を100行単位で再開し共有本文を残す
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 削除対象に100件超のチャンクと、同じ本文を使う別文書がある。 | 保持期間を経過させてworkerを複数回実行する。 | 対象チャンクを全件削除し、共有本文を使う別文書は閲覧できる。 |
 
 
 ## 2. 直積したテストケース一覧
 
-参照先と同じ章名を保持しています。ここでは実在するテストを列挙します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
+実在するテストのdocstringに記載したGiven/When/Thenを表示します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
 
 | Case ID | 日本語ケース | test node |
 | --- | --- | --- |
@@ -101,9 +226,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 審査とジョブの表示名を対象版から得る |
 | test node | backend/tests/test_ui_contract.py::test_審査とジョブの表示名を対象版から得る |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '未承認名', 'body': '本文', 'revision': 2}) ; client.get('/api/operations/jobs?details=true', headers=headers('operator')) ; client.get('/api/operations/jobs?details=true', headers=headers('reader')) ; client.get('/api/operations/jobs?details=true', headers=headers('operator')) ; client.get('/api/reviews', headers=headers('reviewer')) |
-| Then | review['title'] == version['title'] and review['version_number'] == 1 ; review['requested_by'] and review['department_name'] ; jobs[0]['version_number'] == 1 ; client.get('/api/operations/jobs?details=true', headers=headers('reader')).status_code == 403 ; any((j['version_number'] is None for j in jobs)) |
+| Given | 承認済み版と未承認のタイトルがある。 |
+| When | 審査とジョブの詳細一覧を取得する。 |
+| Then | 対象版の表示名と版番号を返し、未承認名を混ぜず、運用権限のない詳細取得は403となる。 |
 
 
 ### TC002
@@ -112,9 +237,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 承認された版だけを引用付きで回答する |
 | test node | backend/tests/test_workflow.py::test_承認された版だけを引用付きで回答する |
-| Given | client |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result.status_code == 200 ; answer['status'] == 'answered' ; '承認後にリリース' in answer['answer'] ; answer['citations'][0]['version_id'] == version['id'] ; answer['citations'][0]['document_id'] == doc['id'] ; history[0]['answer'] == answer['answer'] |
+| Given | 承認と索引反映が完了した文書がある。 |
+| When | 関連する質問を送信し会話履歴を取得する。 |
+| Then | 200で承認版を引用して回答し、履歴にも同じ回答を残す。 |
 
 
 ### TC003
@@ -123,9 +248,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 新しい下書きは公開タイトルと本文を変更しない |
 | test node | backend/tests/test_workflow.py::test_新しい下書きは公開タイトルと本文を変更しない |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '極秘タイトル', 'body': '公開不可', 'revision': 2}) ; client.get('/api/documents', headers=headers('reader')) ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.get('/api/documents', headers=headers('reader')).json()[0]['title'] == '開発ガイド' ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')).json()['version']['id'] == v1['id'] ; ask(client).json()['status'] == 'answered' |
+| Given | 公開済みの文書がある。 |
+| When | 新しい下書きに未公開のタイトルと本文を保存する。 |
+| Then | 閲覧一覧と文書詳細は既存の公開版を維持し、質問にも回答できる。 |
 
 
 ### TC004
@@ -134,9 +259,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 新版承認後の未反映期間は旧版を使わない |
 | test node | backend/tests/test_workflow.py::test_新版承認後の未反映期間は旧版を使わない |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '新版', 'body': '開発フローを変更しました。', 'revision': 2}) ; client.get(f"/api/documents/{doc['id']}?version_id={v1['id']}", headers=headers('reader')) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | ask(client).json()['status'] == 'held' ; ask(client).json()['citations'][0]['version_id'] == v2['id'] ; client.get(f"/api/documents/{doc['id']}?version_id={v1['id']}", headers=headers('reader')).status_code == 404 |
+| Given | 旧版が公開・索引反映されている。 |
+| When | 新版を承認し、索引反映の前後に質問する。 |
+| Then | 未反映中は保留し、反映後は新版だけを引用し、旧版の直接閲覧は404となる。 |
 
 
 ### TC005
@@ -145,9 +270,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 公開停止と削除で回答履歴も失効する |
 | test node | backend/tests/test_workflow.py::test_公開停止と削除で回答履歴も失効する |
-| Given | client, status |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | policy(client, doc, status=status).status_code == 200 ; ask(client).json()['status'] == 'held' ; history[0]['status'] == 'hidden' and history[0]['citations'] == [] ; '承認後にリリース' not in history[0]['answer'] |
+| Given | 公開版を引用した会話履歴がある。 |
+| When | 文書を公開停止または削除して再質問・履歴取得する。 |
+| Then | 新規回答を保留し、過去の回答本文と引用を非表示にする。 |
 
 
 ### TC006
@@ -156,9 +281,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 他部署は直接IDと一覧とRAGから取得できない |
 | test node | backend/tests/test_workflow.py::test_他部署は直接IDと一覧とRAGから取得できない |
-| Given | client |
-| When | client.get(f"/api/documents/{doc['id']}", headers=headers('other')) ; client.get('/api/documents', headers=headers('other')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.get(f"/api/documents/{doc['id']}", headers=headers('other')).status_code == 404 ; client.get('/api/documents', headers=headers('other')).json() == [] ; ask(client, 'other', department_id=OTHER).json()['status'] == 'held' ; ask(client, 'other').status_code == 403 |
+| Given | 部署内限定の文書が公開されている。 |
+| When | 他部署の利用者が直接閲覧・一覧取得・質問を実行する。 |
+| Then | 文書は取得できず、根拠なしの質問は保留、未所属部署を指定した質問は403となる。 |
 
 
 ### TC007
@@ -167,9 +292,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 共有は閲覧だけを許可する |
 | test node | backend/tests/test_workflow.py::test_共有は閲覧だけを許可する |
-| Given | client |
-| When | client.get(f"/api/documents/{doc['id']}", headers=headers('other')) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers('other')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('other'), json={'revision': 1, 'visibility': 'organization', 'status': 'deleted'}) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | policy(client, doc, visibility='selected', shared_departments=[OTHER]).status_code == 200 ; client.get(f"/api/documents/{doc['id']}", headers=headers('other')).status_code == 200 ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers('other')).status_code == 404 ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('other'), json={'revision': 1, 'visibility': 'organization', 'status': 'deleted'}).status_code == 404 |
+| Given | 部署内限定の文書が公開されている。 |
+| When | 他部署へ閲覧共有し、その部署から詳細・下書き・公開設定を操作する。 |
+| Then | 公開版は閲覧できるが、下書き取得と公開設定変更は404で拒否する。 |
 
 
 ### TC008
@@ -178,9 +303,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 所属停止は古いトークンでも即時反映する |
 | test node | backend/tests/test_workflow.py::test_所属停止は古いトークンでも即時反映する |
-| Given | client |
-| When | client.put('/api/groups/memberships', headers=headers('leader'), json={'user_id': stable_id('reader'), 'department_id': DEPT, 'active': False}) ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | response.status_code == 200 ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')).status_code == 404 ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')).json()[0]['status'] == 'hidden' |
+| Given | 所属中の利用者に公開版と会話履歴がある。 |
+| When | 所属を停止し、停止前のトークンで文書と履歴を取得する。 |
+| Then | 文書は404、履歴の回答は非表示となる。 |
 
 
 ### TC009
@@ -189,9 +314,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 審査の再送は結果とジョブを重複作成しない |
 | test node | backend/tests/test_workflow.py::test_審査の再送は結果とジョブを重複作成しない |
-| Given | client |
-| When | client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json=data) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) |
-| Then | first.json() == second.json() ; len(client.get('/api/operations/jobs', headers=headers('operator')).json()) == 1 ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data).status_code == 409 ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json=data).status_code == 409 |
+| Given | 承認待ちの版がある。 |
+| When | 同一操作IDで承認を再送し、さらに内容を変えて再送する。 |
+| Then | 同一内容は同じ結果と1件のジョブを返し、内容変更と再審査は409で拒否する。 |
 
 
 ### TC010
@@ -200,9 +325,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 閲覧と質問の再送を重複計上しない |
 | test node | backend/tests/test_workflow.py::test_閲覧と質問の再送を重複計上しない |
-| Given | client |
-| When | client.post('/api/chat', headers=headers('reader', key), json=question) ; client.post('/api/chat', headers=headers('reader', key), json=question) ; client.get(f'/api/metrics/{DEPT}?start=2020-01-01T00:00:00Z&end=2100-01-01T00:00:00Z', headers=headers('leader')) ; client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view) ; client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view).json()['recorded'] ; not client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view).json()['recorded'] ; a.json() == b.json() ; metrics['questions'] == 1 and metrics['views'] == 1 and (metrics['unique_viewers'] == 1) ; metrics['documents'][0]['contributions'] == 1 ; 'question' not in str(metrics['documents']) |
+| Given | 公開済み文書がある。 |
+| When | 同じ閲覧IDと質問の操作IDをそれぞれ再送し、部署統計を取得する。 |
+| Then | 閲覧・質問・利用者・貢献を各1件だけ計上し、統計に質問本文を含めない。 |
 
 
 ### TC011
@@ -211,9 +336,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 他人の会話と管理統計を拒否する |
 | test node | backend/tests/test_workflow.py::test_他人の会話と管理統計を拒否する |
-| Given | client |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('leader')) ; client.get(f'/api/metrics/{DEPT}?start=2020-01-01T00:00:00Z&end=2100-01-01T00:00:00Z', headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('leader')).status_code == 404 ; ask(client, 'author', conversation_id=answer['conversation_id']).status_code == 404 ; client.get(f'/api/metrics/{DEPT}?start=2020-01-01T00:00:00Z&end=2100-01-01T00:00:00Z', headers=headers('reader')).status_code == 403 |
+| Given | 閲覧者が質問して会話を作成している。 |
+| When | 他の利用者が会話を参照・継続し、閲覧者が管理統計を取得する。 |
+| Then | 他人の会話は404、管理権限のない統計取得は403となる。 |
 
 
 ### TC012
@@ -222,9 +347,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 画像のOCR確認をmanifestへ固定する |
 | test node | backend/tests/test_workflow.py::test_画像のOCR確認をmanifestへ固定する |
-| Given | client |
-| When | client.post(f"/api/images/documents/{doc['id']}", headers=headers(), files={'file': ('image.png', buf.getvalue(), 'image/png')}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '画像手順', 'body': '画像の開発フロー', 'revision': 2, 'placements': [p]}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '画像手順', 'body': '画像の開発フロー', 'revision': 3, 'placements': [p]}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': 3}) ; client.post(f"/api/images/{asset['id']}/ocr", headers=headers(), json={'regions': [{'text': '承認後に開発を開始', 'x': 0, 'y': 0, 'width': 1, 'height': 1, 'confidence': 1, 'order': 0}], 'confirmed': True}) ; client.get(f"/api/images/{asset['id']}?version_id={version['id']}", headers=headers('reader')) ; client.get(f"/api/images/{asset['id']}", headers=headers('reader')) ; client.get(f"/api/images/ocr/{run['id']}?version_id={version['id']}", headers=headers('reader')) ; client.get(f"/api/images/ocr/{p['ocr_run_id']}", headers=headers()) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | upload.status_code == 201 ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': 3}).status_code == 409 ; client.get(f"/api/images/{asset['id']}?version_id={version['id']}", headers=headers('reader')).status_code == 200 ; client.get(f"/api/images/{asset['id']}", headers=headers('reader')).status_code == 404 ; client.get(f"/api/images/ocr/{run['id']}?version_id={version['id']}", headers=headers('reader')).status_code == 404 ; ask(client).json()['status'] == 'answered' ; client.get(f"/api/images/ocr/{p['ocr_run_id']}", headers=headers()).status_code == 200 ; ask(client).status_code == 200 ; ask(client).status_code == 200 |
+| Given | 画像を添付できる下書きがある。 |
+| When | 画像を登録し、未確認で申請した後にOCRを訂正・確認して承認する。 |
+| Then | 未確認申請は409、承認版の画像とOCRだけが閲覧・引用でき、OCR参照を版へ固定する。 |
 
 
 ### TC013
@@ -233,9 +358,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 非運用者は反映ジョブを操作できない |
 | test node | backend/tests/test_workflow.py::test_非運用者は反映ジョブを操作できない |
-| Given | client |
-| When | client.get('/api/operations/jobs', headers=headers('reader')) ; client.get('/api/operations/reconcile', headers=headers('leader')) |
-| Then | client.get('/api/operations/jobs', headers=headers('reader')).status_code == 403 ; client.get('/api/operations/reconcile', headers=headers('leader')).status_code == 403 |
+| Given | 閲覧者と部署リーダーがいる。 |
+| When | 運用ジョブ一覧と照合を要求する。 |
+| Then | 運用権限がないため403となる。 |
 
 
 ### TC014
@@ -244,9 +369,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 反映失敗を照合し再試行で回復する |
 | test node | backend/tests/test_workflow.py::test_反映失敗を照合し再試行で回復する |
-| Given | client, monkeypatch |
-| When | client.get('/api/operations/reconcile', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.get('/api/operations/reconcile', headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | differences[0]['reason'] == '最新承認版が未反映' ; result['status'] == 'failed' ; ask(client).json()['status'] == 'held' ; result['status'] == 'done' ; ask(client).json()['status'] == 'answered' ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')).json()['attempts'] == 2 ; '停止済み' in client.get('/api/operations/reconcile', headers=headers('operator')).json()[0]['reason'] |
+| Given | 承認済みだが索引が未反映の文書がある。 |
+| When | 照合後、索引の完了検証を失敗させてから復旧し同じジョブを再試行する。 |
+| Then | 失敗中は回答を保留し、復旧後は完了して回答でき、完了済み再送は試行数を増やさない。 |
 
 
 ### TC015
@@ -255,9 +380,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 画像を含む削除を保持期間後に完了する |
 | test node | backend/tests/test_workflow.py::test_画像を含む削除を保持期間後に完了する |
-| Given | client, db |
-| When | client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(url, headers=headers('operator')) ; client.post(url, headers=headers('operator')) ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | policy(client, doc, status='deleted').status_code == 200 ; client.post(url, headers=headers('operator')).json()['status'] == 'retained' ; client.post(url, headers=headers('operator')).json()['status'] == 'done' ; not any((c['document_id'] == doc['id'] for c in db.tables['chunks'].values())) ; not any((d['document_id'] == doc['id'] for d in db.tables['drafts'].values())) ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')).json()[0]['status'] == 'hidden' |
+| Given | 公開文書とその会話履歴がある。 |
+| When | 削除後に保持期間内と期間経過後で削除ジョブを実行する。 |
+| Then | 期間内は保持し、期間後はチャンクと下書きを消し、履歴の回答を非表示にする。 |
 
 
 ### TC016
@@ -266,9 +391,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | モデル実行中の権限変更で回答を保留する |
 | test node | backend/tests/test_workflow.py::test_モデル実行中の権限変更で回答を保留する |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result['status'] == 'held' and '絶対に送信' not in result['answer'] |
+| Given | 回答に利用できる公開版がある。 |
+| When | モデルの処理中に文書を公開停止する。 |
+| Then | 回答は保留となり、生成済みの機密本文を返さない。 |
 
 
 ### TC017
@@ -277,9 +402,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | モデル呼び出し失敗を失敗件数として区別する |
 | test node | backend/tests/test_workflow.py::test_モデル呼び出し失敗を失敗件数として区別する |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result['status'] == 'failed' and result['citations'] == [] |
+| Given | 回答に利用できる公開版がある。 |
+| When | モデル呼出しをタイムアウトさせる。 |
+| Then | 回答状態をfailedとして根拠を空にし、通常の根拠不足と区別する。 |
 
 
 ### TC018
@@ -288,9 +413,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 不正な索引来歴をモデルへ渡さない |
 | test node | backend/tests/test_workflow.py::test_不正な索引来歴をモデルへ渡さない |
-| Given | client, db |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | ask(client).json()['status'] == 'held' ; ask(client).json()['status'] == 'held' |
+| Given | 索引済みの公開文書がある。 |
+| When | 索引のmanifestハッシュや本文参照を改変して質問する。 |
+| Then | 不正な根拠を使わず回答を保留する。 |
 
 
 ### TC019
@@ -299,9 +424,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 失効したジョブは公開版を戻さない |
 | test node | backend/tests/test_workflow.py::test_失効したジョブは公開版を戻さない |
-| Given | client |
-| When | client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{old['id']}", headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | client.post(f"/api/operations/jobs/{old['id']}", headers=headers('operator')).json()['status'] == 'obsolete' ; ask(client).json()['citations'][0]['version_id'] == v2['id'] |
+| Given | 旧版と新版が承認され、それぞれの反映ジョブがある。 |
+| When | 旧版ジョブを先に実行してから未反映分を処理する。 |
+| Then | 旧版ジョブはobsoleteとなり、回答は新版を引用する。 |
 
 
 ### TC020
@@ -310,9 +435,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 外部索引失敗を記録して部分完了をreadyにしない |
 | test node | backend/tests/test_workflow.py::test_外部索引失敗を記録して部分完了をreadyにしない |
-| Given | client, monkeypatch |
-| When | client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | result['status'] == 'failed' and result['error_code'] == 'external_failure' ; ask(client).json()['status'] == 'held' |
+| Given | 承認済み版の索引ジョブがある。 |
+| When | 外部索引の書込みで例外を発生させる。 |
+| Then | ジョブをfailed・external_failureとし、不完全な索引では回答を保留する。 |
 
 
 ### TC021
@@ -321,9 +446,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 回答根拠の欠落と改変は閲覧時に非表示とする |
 | test node | backend/tests/test_workflow.py::test_回答根拠の欠落と改変は閲覧時に非表示とする |
-| Given | client, db, target |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result[0]['status'] == 'hidden' and result[0]['citations'] == [] |
+| Given | 公開版を引用した回答履歴がある。 |
+| When | 文書・版・チャンク・manifest・配置・本文のいずれかを欠落または改変して履歴を取得する。 |
+| Then | 該当する回答と引用を非表示にする。 |
 
 
 ### TC022
@@ -332,9 +457,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 中断した質問は同じIDで再開し二重計上しない |
 | test node | backend/tests/test_workflow.py::test_中断した質問は同じIDで再開し二重計上しない |
-| Given | client, db |
-| When | client.post('/api/chat', headers=headers('reader', key), json=data.model_dump()) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result.status_code == 200 ; result.json()['conversation_id'] == first.conversation_id ; len([e for e in db.tables['events'].values() if e['kind'] == 'question']) == 1 |
+| Given | 質問受付だけを保存し、回答確定前に中断している。 |
+| When | 同じ操作IDで質問を再送する。 |
+| Then | 同じ会話で200を返し、質問イベントは1件のままになる。 |
 
 
 ### TC023
@@ -343,9 +468,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 外部検索は返されたID以外を根拠にしない |
 | test node | backend/tests/test_workflow.py::test_外部検索は返されたID以外を根拠にしない |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | ask(client).json()['status'] == 'held' |
+| Given | ローカルには索引済みの文書がある。 |
+| When | 外部検索が該当IDなしを返す状態で質問する。 |
+| Then | 外部検索にない根拠を補わず回答を保留する。 |
 
 
 ### TC024
@@ -354,9 +479,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | モデル入力直前に失効を検知した場合はモデルを呼ばない |
 | test node | backend/tests/test_workflow.py::test_モデル入力直前に失効を検知した場合はモデルを呼ばない |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | ask(client).json()['status'] == 'held' |
+| Given | 根拠の初回検証が成功している。 |
+| When | モデル入力直前の再検証で根拠を失効させる。 |
+| Then | 回答を保留し、失効した根拠を利用しない。 |
 
 
 ### TC025
@@ -365,6 +490,6 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 削除配送を100行単位で再開し共有本文を残す |
 | test node | backend/tests/test_workflow.py::test_削除配送を100行単位で再開し共有本文を残す |
-| Given | client, db |
-| When | client.get(f"/api/documents/{other['id']}", headers=headers('reader')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | not [c for c in db.tables['chunks'].values() if c['document_id'] == doc['id']] ; client.get(f"/api/documents/{other['id']}", headers=headers('reader')).status_code == 200 |
+| Given | 削除対象に100件超のチャンクと、同じ本文を使う別文書がある。 |
+| When | 保持期間を経過させてworkerを複数回実行する。 |
+| Then | 対象チャンクを全件削除し、共有本文を使う別文書は閲覧できる。 |

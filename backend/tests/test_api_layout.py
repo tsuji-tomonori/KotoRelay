@@ -14,6 +14,10 @@ PACKAGES = sorted(
 
 @pytest.mark.parametrize("package", PACKAGES, ids=[p.split(".")[-1] for p in PACKAGES])
 def test_APIごとのサンプルを実HTTPで再現する(client, package):
+    """Given: 全APIに入力と期待応答のサンプルが定義されている。
+    When: 各APIのサンプルを実際のHTTP要求として実行する。
+    Then: ヘルスチェックと未認証時のstatus・本文が各サンプルの契約に一致する。
+    """
     contract = importlib.import_module(package + ".contract").CONTRACT
     for sample in importlib.import_module(package + ".samples").SAMPLES:
         response = client.request(sample.method, sample.path)

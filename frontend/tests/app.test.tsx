@@ -827,7 +827,7 @@ describe('反映・削除ジョブ', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: '正本と索引を照合' }));
     await screen.findByText('doc1: 旧版残留');
-    fireEvent.click(screen.getAllByText('処理の識別情報')[1]!);
+    fireEvent.click((await screen.findAllByText('処理の識別情報'))[1]!);
     expect(screen.getByText('integrity')).toBeVisible();
   });
   it('ジョブ実行と照合の失敗を通知する', async () => {

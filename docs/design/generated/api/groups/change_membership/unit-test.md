@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 部署の所属権限を変更 — 単体テスト詳細
 
@@ -10,99 +10,58 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ## 1. 要因ごとの要素
 
-### F01 条件分岐
+### F01 成功応答の送信時には別接続から保存済み文書が見える
 
-対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F01-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F01-false | 不成立 | 'unauthenticated' / 401 |
+| 実PostgreSQLを使うAPIの応答送信を観測できる。 | 文書作成の201応答が始まる時点で別接続から文書を読む。 | 成功応答前にcommit済みで、作成した文書が別接続から見える。 |
 
 
-### F02 条件分岐
+### F02 commit時の競合は成功応答を送らず409にしてrollbackする
 
-対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F02-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F02-false | 不成立 | 'unauthenticated' / 401 |
+| 文書作成後のcommitで競合する接続を用意している。 | 文書作成を実行して保存状態を別接続から確認する。 | 201を送らず409・conflictを返し、文書はrollbackされて残らない。 |
 
 
-### F03 条件分岐
+### F03 複数部署の一覧を権限検査してページング前に絞る
 
-対象: `backend/src/kotorelay/context.py:64`。式: `q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F03-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F03-false | 不成立 | 'conflict' / 409 |
+| 複数部署の管理権限と各部署の文書がある。 | 部署を指定し1件ずつの管理一覧を取得する。 | ページング前に部署で絞り、権限のない部署や用途は403で拒否する。 |
 
 
-### F04 条件分岐
+### F04 会話内の利用部署変更を拒否し新規会話なら許可する
 
-対象: `backend/src/kotorelay/context.py:79`。式: `m.department_id == department_id`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F04-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F04-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| 利用者が複数部署に所属し、既存の会話がある。 | 同じ会話で部署を変え、その後新しい会話で別部署を指定する。 | 既存会話の部署変更は409、新規会話は別IDで200となる。 |
 
 
-### F05 条件分岐
+### F05 所属停止は古いトークンでも即時反映する
 
-対象: `backend/src/kotorelay/errors.py:13`。式: `not condition`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F05-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F05-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| 所属中の利用者に公開版と会話履歴がある。 | 所属を停止し、停止前のトークンで文書と履歴を取得する。 | 文書は404、履歴の回答は非表示となる。 |
 
 
-### F06 条件分岐
+### F06 自己承認とリーダーの暗黙承認を拒否する
 
-対象: `backend/src/kotorelay/operations/groups/change_membership/functions.py:17`。式: `ctx.permission(data.department_id, 'manage') or ctx.user.operator`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F06-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F06-false | 不成立 | 'forbidden' / 403 |
+| 執筆者の申請に対し、執筆者へ審査権限も付与している。 | 執筆者自身と審査権限のないリーダーが承認する。 | 自己承認は403、リーダーの暗黙の承認は404で拒否する。 |
 
 
-### F07 条件分岐
+### F07 現行の所属と管理メンバーを取得する
 
-対象: `backend/src/kotorelay/operations/groups/change_membership/functions.py:35`。式: `bool(q.departments_get(ctx.db, q.DepartmentsGetParams(organization_id=ctx.org, id=data.department_id)))`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F07-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F07-false | 不成立 | 'not_found' / 404 |
-
-
-### F08 条件分岐
-
-対象: `backend/src/kotorelay/operations/groups/change_membership/functions.py:24`。式: `bool(q.users_get(ctx.db, q.UsersGetParams(organization_id=ctx.org, id=data.user_id)))`
-
-| 要素ID | 要素 | 期待観点 |
-| --- | --- | --- |
-| F08-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F08-false | 不成立 | 'not_found' / 404 |
-
-
-### F09 条件分岐
-
-対象: `backend/src/kotorelay/operations/groups/change_membership/router.py:30`。式: `rows`
-
-| 要素ID | 要素 | 期待観点 |
-| --- | --- | --- |
-| F09-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F09-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| 複数の役割と部署が登録されている。 | 本人情報・管理メンバーを取得し、運用者が他部署の所属権限を追加する。 | 管理権限に従って一覧を制限し、本人情報に追加した所属権限を反映する。 |
 
 
 ## 2. 直積したテストケース一覧
 
-参照先と同じ章名を保持しています。ここでは実在するテストを列挙します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
+実在するテストのdocstringに記載したGiven/When/Thenを表示します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
 
 | Case ID | 日本語ケース | test node |
 | --- | --- | --- |
@@ -123,9 +82,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 成功応答の送信時には別接続から保存済み文書が見える |
 | test node | backend/tests/test_postgres.py::test_成功応答の送信時には別接続から保存済み文書が見える |
-| Given | postgres |
-| When | client.post('/api/documents', headers=headers(), json={'title': title, 'department_id': department}) ; client.get('/api/groups/me', headers=headers()) |
-| Then | observed == [True] ; result.status_code == 201 |
+| Given | 実PostgreSQLを使うAPIの応答送信を観測できる。 |
+| When | 文書作成の201応答が始まる時点で別接続から文書を読む。 |
+| Then | 成功応答前にcommit済みで、作成した文書が別接続から見える。 |
 
 
 ### TC002
@@ -134,9 +93,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | commit時の競合は成功応答を送らず409にしてrollbackする |
 | test node | backend/tests/test_postgres.py::test_commit時の競合は成功応答を送らず409にしてrollbackする |
-| Given | postgres, monkeypatch |
-| When | client.post('/api/documents', headers=headers(), json={'title': '競合して確定しない文書', 'department_id': department}) ; client.get('/api/groups/me', headers=headers()) |
-| Then | result.status_code == 409 ; result.json()['code'] == 'conflict' ; not q.documents_list(db, q.DocumentsListParams(organization_id=postgres.organization_id)) |
+| Given | 文書作成後のcommitで競合する接続を用意している。 |
+| When | 文書作成を実行して保存状態を別接続から確認する。 |
+| Then | 201を送らず409・conflictを返し、文書はrollbackされて残らない。 |
 
 
 ### TC003
@@ -145,9 +104,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 複数部署の一覧を権限検査してページング前に絞る |
 | test node | backend/tests/test_ui_contract.py::test_複数部署の一覧を権限検査してページング前に絞る |
-| Given | client |
-| When | client.get(f'/api/documents?scope=manage&page=true&department_id={department}&limit=1', headers=headers('leader')) ; client.post('/api/documents', headers=headers('other'), json={'title': '営業部の文書', 'department_id': OTHER}) ; client.get(f'/api/documents?scope=work&department_id={OTHER}', headers=headers('author')) ; client.get(f'/api/documents?scope=manage&department_id={DEPT}', headers=headers('reader')) ; client.put('/api/groups/memberships', headers=headers('operator'), json={'user_id': user, 'department_id': department, **permissions}) ; client.get('/api/groups/me', headers=headers(persona)) |
-| Then | pytest.raises / mock assertionで例外・依存先を検証 |
+| Given | 複数部署の管理権限と各部署の文書がある。 |
+| When | 部署を指定し1件ずつの管理一覧を取得する。 |
+| Then | ページング前に部署で絞り、権限のない部署や用途は403で拒否する。 |
 
 
 ### TC004
@@ -156,9 +115,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 会話内の利用部署変更を拒否し新規会話なら許可する |
 | test node | backend/tests/test_ui_contract.py::test_会話内の利用部署変更を拒否し新規会話なら許可する |
-| Given | client |
-| When | client.put('/api/groups/memberships', headers=headers('operator'), json={'user_id': user, 'department_id': department, **permissions}) ; client.get('/api/groups/me', headers=headers(persona)) |
-| Then | ask(client, conversation_id=first['conversation_id']).status_code == 200 ; changed.status_code == 409 ; fresh.status_code == 200 and fresh.json()['conversation_id'] != first['conversation_id'] |
+| Given | 利用者が複数部署に所属し、既存の会話がある。 |
+| When | 同じ会話で部署を変え、その後新しい会話で別部署を指定する。 |
+| Then | 既存会話の部署変更は409、新規会話は別IDで200となる。 |
 
 
 ### TC005
@@ -167,9 +126,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 所属停止は古いトークンでも即時反映する |
 | test node | backend/tests/test_workflow.py::test_所属停止は古いトークンでも即時反映する |
-| Given | client |
-| When | client.put('/api/groups/memberships', headers=headers('leader'), json={'user_id': stable_id('reader'), 'department_id': DEPT, 'active': False}) ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | response.status_code == 200 ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')).status_code == 404 ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')).json()[0]['status'] == 'hidden' |
+| Given | 所属中の利用者に公開版と会話履歴がある。 |
+| When | 所属を停止し、停止前のトークンで文書と履歴を取得する。 |
+| Then | 文書は404、履歴の回答は非表示となる。 |
 
 
 ### TC006
@@ -178,9 +137,9 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 自己承認とリーダーの暗黙承認を拒否する |
 | test node | backend/tests/test_workflow.py::test_自己承認とリーダーの暗黙承認を拒否する |
-| Given | client |
-| When | client.put('/api/groups/memberships', headers=headers('leader'), json={'user_id': stable_id('author'), 'department_id': DEPT, 'can_author': True, 'can_review': True}) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers(persona), json={'manifest_hash': version['manifest_hash'], 'decision': 'approved'}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) |
-| Then | client.post(f"/api/reviews/{review['id']}/decision", headers=headers(persona), json={'manifest_hash': version['manifest_hash'], 'decision': 'approved'}).status_code == code |
+| Given | 執筆者の申請に対し、執筆者へ審査権限も付与している。 |
+| When | 執筆者自身と審査権限のないリーダーが承認する。 |
+| Then | 自己承認は403、リーダーの暗黙の承認は404で拒否する。 |
 
 
 ### TC007
@@ -189,6 +148,6 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 現行の所属と管理メンバーを取得する |
 | test node | backend/tests/test_workflow.py::test_現行の所属と管理メンバーを取得する |
-| Given | client |
-| When | client.get('/api/groups/me', headers=headers('author')) ; client.get(f'/api/groups/{DEPT}/members', headers=headers('leader')) ; client.get(f'/api/groups/{DEPT}/members', headers=headers('reader')) ; client.put('/api/groups/memberships', headers=headers('operator'), json={'user_id': stable_id('other'), 'department_id': DEPT, 'can_author': True}) ; client.get('/api/groups/me', headers=headers('other')) |
-| Then | me['user']['display_name'] == '青木 はるか' ; len(members) == 5 ; client.get(f'/api/groups/{DEPT}/members', headers=headers('reader')).status_code == 403 ; client.put('/api/groups/memberships', headers=headers('operator'), json={'user_id': stable_id('other'), 'department_id': DEPT, 'can_author': True}).status_code == 200 ; client.get('/api/groups/me', headers=headers('other')).json()['memberships'][1]['can_author'] is True |
+| Given | 複数の役割と部署が登録されている。 |
+| When | 本人情報・管理メンバーを取得し、運用者が他部署の所属権限を追加する。 |
+| Then | 管理権限に従って一覧を制限し、本人情報に追加した所属権限を反映する。 |

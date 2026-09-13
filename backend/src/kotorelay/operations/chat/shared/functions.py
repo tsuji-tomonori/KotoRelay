@@ -8,6 +8,7 @@ from kotorelay.context import Context
 from kotorelay.errors import Problem, require
 from kotorelay.generated import models
 from kotorelay.objects import digest
+from kotorelay.operational_logging import MessageId, continuation_context, ops_logger
 from kotorelay.operations.chat.shared.generated import queries as q
 from kotorelay.schemas import AnswerView, Citation, Evidence, Manifest
 
@@ -63,7 +64,11 @@ def validate_citation(ctx: Context, citation: Citation) -> bool:
                 ctx.objects.get(assets[0].object_key, image.image_hash)
                 ctx.objects.get(runs[0].result_key, image.ocr_hash)
         return True
-    except (Problem, ValueError):
+    except (Problem, ValueError) as exc:
+        ops_logger.warning(
+            MessageId.EVIDENCE_REJECTED,
+            context_model=continuation_context(MessageId.EVIDENCE_REJECTED, exc),
+        )
         return False
 
 

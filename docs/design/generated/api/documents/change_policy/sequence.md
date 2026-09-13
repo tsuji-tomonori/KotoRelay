@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # リーダーが公開範囲・公開停止・削除を管理 — シーケンス
 
@@ -9,50 +9,73 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
+    participant E as HTTP例外ハンドラ
+    participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体
     participant M as モデル・検索エンジン
     U->>A: PUT /api/documents/{document_id}/policy
     Note over A,D: 依存注入でtransaction開始・組織と所属を確認
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(users) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: 文書を取得して要求された操作の権限を確認する。
     A->>F: document
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(rows)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
     end
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    end
+    opt 検証不成立：allowed
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    end
     end
     A->>F: 文書が読み込み時点から変更されていないことを確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：doc.revision == data.revision
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    end
     end
     A->>F: 文書を削除するときに理由が入力されていることを確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：data.status != 'deleted' or bool(data.reason.strip())
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 422 / {code： "reason_required", message： "理由を入力してください。", request_id： 相関ID}
+    end
     end
     A->>F: 処理対象の識別子を重複なく取り出す。
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>F: 共有先の全部署が現在の組織に存在することを確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：set(data.shared_departments) <= departments
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 422 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    end
     end
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: now
@@ -70,15 +93,54 @@ sequenceDiagram
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: fence
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    end
     end
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     Note over A: この処理からreturn
     Note over A,D: 成功応答前に依存transactionをcommit・失敗時rollback
-    A-->>U: HTTP応答
+    A-->>U: HTTP 200 / models.DocumentsRow
+    Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
+    opt 入力検証の失敗（RequestValidationError）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    end
+    end
+    opt SQL実行またはcommitの競合（psycopg.Error）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    end
+    end
+    opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
+    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    end
+    end
 ```
+
+**例外応答一覧（HTTP境界へ到達した場合）**
+
+| HTTP | code | message | 相関ID |
+| --- | --- | --- | --- |
+| 401 | unauthenticated | ログインが必要です。 | request_id |
+| 404 | not_found | 対象を利用できません。 | request_id |
+| 409 | conflict | 他の操作で更新されました。最新の状態を確認してください。 | request_id |
+| 409 | conflict | 競合しました。再読込してください。 | request_id |
+| 422 | forbidden | この操作は許可されていません。 | request_id |
+| 422 | invalid_input | 入力形式を確認してください。 | request_id |
+| 422 | reason_required | 理由を入力してください。 | request_id |
+| 503 | unavailable | 一時的に利用できません。 | request_id |
+
 
 **制御順序（関数内の行順）**
 

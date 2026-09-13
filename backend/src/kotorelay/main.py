@@ -4,16 +4,25 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Awaitable, Callable
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import psycopg
+from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from kotorelay.config import Settings
+from kotorelay.error_responses import (
+    INVALID_INPUT,
+    UNAVAILABLE,
+    ErrorOutcome,
+    database_outcome,
+    problem_outcome,
+)
 from kotorelay.errors import Problem
+from kotorelay.operational_logging import REQUEST_ID, MessageId, OperationalLogContext, ops_logger
 from kotorelay.operations.chat.router import router as chat
 from kotorelay.operations.documents.router import router as documents
 from kotorelay.operations.groups.router import router as groups
@@ -48,7 +57,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         request.state.request_id = str(uuid4())
-        response = await call_next(request)
+        token = REQUEST_ID.set(UUID(request.state.request_id))
+        try:
+            response = await call_next(request)
+        finally:
+            REQUEST_ID.reset(token)
         response.headers.update(
             {
                 "Cache-Control": "no-store",
@@ -65,41 +78,44 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         return response
 
-    @app.exception_handler(Problem)
-    async def problem(request: Request, exc: Problem) -> JSONResponse:
+    def error_response(request: Request, exc: Exception, outcome: ErrorOutcome) -> JSONResponse:
+        context = OperationalLogContext(
+            request_id=UUID(request.state.request_id),
+            exception_type=type(exc).__name__,
+            status=outcome.status,
+            code=outcome.code,
+            message=outcome.message,
+        )
+        if outcome.status >= 500:
+            ops_logger.error(MessageId.HTTP_FAILED, context_model=context)
+        else:
+            ops_logger.warning(MessageId.HTTP_REJECTED, context_model=context)
         return JSONResponse(
-            status_code=exc.status,
+            status_code=outcome.status,
             content={
-                "code": exc.code,
-                "message": exc.message,
+                "code": outcome.code,
+                "message": outcome.message,
                 "request_id": request.state.request_id,
             },
         )
+
+    @app.exception_handler(Problem)
+    async def problem(request: Request, exc: Problem) -> JSONResponse:
+        return error_response(request, exc, problem_outcome(exc))
 
     @app.exception_handler(RequestValidationError)
     async def validation(request: Request, exc: RequestValidationError) -> JSONResponse:
-        return JSONResponse(
-            status_code=422,
-            content={
-                "code": "invalid_input",
-                "message": "入力形式を確認してください。",
-                "request_id": request.state.request_id,
-            },
-        )
+        return error_response(request, exc, INVALID_INPUT)
 
     @app.exception_handler(psycopg.Error)
     async def database_error(request: Request, exc: psycopg.Error) -> JSONResponse:
-        conflict = exc.sqlstate in {"40001", "23505", "OC000", "OC001"}
-        return JSONResponse(
-            status_code=409 if conflict else 503,
-            content={
-                "code": "conflict" if conflict else "unavailable",
-                "message": "競合しました。再読込してください。"
-                if conflict
-                else "一時的に利用できません。",
-                "request_id": request.state.request_id,
-            },
-        )
+        return error_response(request, exc, database_outcome(exc))
+
+    async def external_error(request: Request, exc: Exception) -> JSONResponse:
+        return error_response(request, exc, UNAVAILABLE)
+
+    for exception_type in (BotoCoreError, ClientError, OSError, TimeoutError):
+        app.add_exception_handler(exception_type, external_error)
 
     return app
 

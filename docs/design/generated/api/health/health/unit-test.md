@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 死活確認 — 単体テスト詳細
 
@@ -10,11 +10,16 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ## 1. 要因ごとの要素
 
-明示的な条件分岐はありません。
+### F01 認可情報の上書き入力を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 認証済みの執筆者がいる。 | 文書作成時に権限を書き換える余剰項目を送り、ヘルスチェックも取得する。 | 余剰入力は内容を反射せず422で拒否し、ヘルスチェックは製品名を返す。 |
+
 
 ## 2. 直積したテストケース一覧
 
-参照先と同じ章名を保持しています。ここでは実在するテストを列挙します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
+実在するテストのdocstringに記載したGiven/When/Thenを表示します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
 
 | Case ID | 日本語ケース | test node |
 | --- | --- | --- |
@@ -29,6 +34,6 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | --- | --- |
 | 日本語ケース | 認可情報の上書き入力を拒否する |
 | test node | backend/tests/test_workflow.py::test_認可情報の上書き入力を拒否する |
-| Given | client |
-| When | client.post('/api/documents', headers=headers(), json={'title': '無効', 'department_id': DEPT, 'can_author': True}) ; client.get('/api/health') |
-| Then | result.status_code == 422 and 'can_author' not in result.text ; client.get('/api/health').json()['product'] == 'KotoRelay' |
+| Given | 認証済みの執筆者がいる。 |
+| When | 文書作成時に権限を書き換える余剰項目を送り、ヘルスチェックも取得する。 |
+| Then | 余剰入力は内容を反射せず422で拒否し、ヘルスチェックは製品名を返す。 |

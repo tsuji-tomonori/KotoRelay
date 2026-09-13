@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 画像を添付して位置付きOCRを実行 — 詳細設計
 
@@ -49,11 +49,11 @@
 | backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
 | backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:94 | len(assets) < ctx.settings.max_document_images | 'limit' | 422 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:24 | 0 < len(data) <= max_bytes | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:27 | source.format in {'PNG', 'JPEG'} and source.width * source.height <= max_pixels and (max(source.width, source.height) <= 8000) | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:40 | len(value) <= max_bytes | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:62 | text | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:98 | len(assets) < ctx.settings.max_document_images | 'limit' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:25 | 0 < len(data) <= max_bytes | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:28 | source.format in {'PNG', 'JPEG'} and source.width * source.height <= max_pixels and (max(source.width, source.height) <= 8000) | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:41 | len(value) <= max_bytes | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:66 | text | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -107,20 +107,21 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/context.py:111 | doc |
 | backend/src/kotorelay/context.py:23 | str(uuid4()) |
 | backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:127 | q.assets_insert(ctx.db, q.AssetsInsertParams.model_validate(asset, from_attributes=True)) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:111 | models.AssetsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, object_key=key, sha256=key, media_type='image/png', width=width, height=height, size=len(value), created_at=now()) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:143 | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, asset_id=asset.id, result_key=result_key, result_hash=result_key, engine=result.engine, status=result.status, confirmed=False, created_at=now()) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:173 | {'asset': asset, 'ocr_run': run, 'ocr': result} |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:166 | ctx.fence() |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:80 | ctx.document(str(document_id), 'author') |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:94 | require(len(assets) < ctx.settings.max_document_images, 'limit', 422) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:41 | (value, image.width, image.height) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:159 | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:99 | ctx.objects.put(value, 'image/png') |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:132 | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:75 | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:58 | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:85 | [a for a in q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) if a.document_id == doc.id] |
+| backend/src/kotorelay/operational_logging.py:150 | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:131 | q.assets_insert(ctx.db, q.AssetsInsertParams.model_validate(asset, from_attributes=True)) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:115 | models.AssetsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, object_key=key, sha256=key, media_type='image/png', width=width, height=height, size=len(value), created_at=now()) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:147 | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, asset_id=asset.id, result_key=result_key, result_hash=result_key, engine=result.engine, status=result.status, confirmed=False, created_at=now()) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:177 | {'asset': asset, 'ocr_run': run, 'ocr': result} |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:170 | ctx.fence() |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:84 | ctx.document(str(document_id), 'author') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:98 | require(len(assets) < ctx.settings.max_document_images, 'limit', 422) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:42 | (value, image.width, image.height) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:163 | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:103 | ctx.objects.put(value, 'image/png') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:136 | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:79 | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:62 | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:89 | [a for a in q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) if a.document_id == doc.id] |
 | backend/src/kotorelay/operations/images/upload_image/generated/queries.py:33 | db.execute('operations/images/upload_image/sql/001_assets_insert.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/images/upload_image/generated/queries.py:63 | db.query('operations/images/upload_image/sql/002_assets_list.sql', params.model_dump(), AssetsListRow) |
 | backend/src/kotorelay/operations/images/upload_image/generated/queries.py:86 | db.execute('operations/images/upload_image/sql/003_ocr_runs_insert.sql', params.model_dump()) |

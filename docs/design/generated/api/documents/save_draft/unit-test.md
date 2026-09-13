@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 競合を検出して下書きを保存 — 単体テスト詳細
 
@@ -10,157 +10,380 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ## 1. 要因ごとの要素
 
-### F01 条件分岐
+### F01 入力と認証の拒否を安全な応答とログで照合する
 
-対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F01-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F01-false | 不成立 | 'unauthenticated' / 401 |
+| 未認証の要求と、余剰の機密項目を含む入力がある。 | 一覧取得と不正な文書作成を要求する。 | 401と422を返し、ログには入力値を反射せず応答コードと例外型を残す。 |
 
 
-### F02 条件分岐
+### F02 PostgreSQLで承認とoutboxと回答を一貫して確定する
 
-対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F02-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F02-false | 不成立 | 'unauthenticated' / 401 |
+| 実PostgreSQLで文書と利用者を準備している。 | 申請・承認・索引反映・質問をHTTPで実行する。 | 承認版を引用して回答し、他部署の直接閲覧は404となる。 |
 
 
-### F03 条件分岐
+### F03 成功応答の送信時には別接続から保存済み文書が見える
 
-対象: `backend/src/kotorelay/context.py:103`。式: `bool(rows)`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F03-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F03-false | 不成立 | not_found / 404 |
+| 実PostgreSQLを使うAPIの応答送信を観測できる。 | 文書作成の201応答が始まる時点で別接続から文書を読む。 | 成功応答前にcommit済みで、作成した文書が別接続から見える。 |
 
 
-### F04 条件分岐
+### F04 commit時の競合は成功応答を送らず409にしてrollbackする
 
-対象: `backend/src/kotorelay/context.py:110`。式: `allowed`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F04-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F04-false | 不成立 | not_found / 404 |
+| 文書作成後のcommitで競合する接続を用意している。 | 文書作成を実行して保存状態を別接続から確認する。 | 201を送らず409・conflictを返し、文書はrollbackされて残らない。 |
 
 
-### F05 条件分岐
+### F05 複数部署の一覧を権限検査してページング前に絞る
 
-対象: `backend/src/kotorelay/context.py:64`。式: `q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F05-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F05-false | 不成立 | 'conflict' / 409 |
+| 複数部署の管理権限と各部署の文書がある。 | 部署を指定し1件ずつの管理一覧を取得する。 | ページング前に部署で絞り、権限のない部署や用途は403で拒否する。 |
 
 
-### F06 条件分岐
+### F06 一覧は公開版と審査版を分離し続きの有無を返す
 
-対象: `backend/src/kotorelay/errors.py:13`。式: `not condition`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F06-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F06-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| 公開版と未承認の新版があり、複数の下書きもある。 | 閲覧・執筆・管理一覧をページングと検索で取得する。 | 公開情報と審査情報を混ぜず、続きの有無・状態・検索結果を正しく返す。 |
 
 
-### F07 条件分岐
+### F07 代替テキストと絵文字位置を承認版へ固定する
 
-対象: `backend/src/kotorelay/operations/documents/save_draft/functions.py:49`。式: `row.revision == data.revision`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F07-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F07-false | 不成立 | 'conflict' / 409 |
+| 絵文字を含む本文に画像配置と代替テキストがある。 | 承認後に下書きの代替テキストを変更する。 | 承認版は当時の配置・コードポイント位置・代替テキストを保持する。 |
 
 
-### F08 条件分岐
+### F08 審査とジョブの表示名を対象版から得る
 
-対象: `backend/src/kotorelay/operations/documents/save_draft/functions.py:18`。式: `len({p.id for p in data.placements}) == len(data.placements)`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F08-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F08-false | 不成立 | 'invalid_placement' / 422 |
+| 承認済み版と未承認のタイトルがある。 | 審査とジョブの詳細一覧を取得する。 | 対象版の表示名と版番号を返し、未承認名を混ぜず、運用権限のない詳細取得は403となる。 |
 
 
-### F09 条件分岐
+### F09 Markdownの空白改行を保存してコードポイント位置を維持する
 
-対象: `backend/src/kotorelay/operations/documents/save_draft/functions.py:26`。式: `bool(assets) and bool(runs)`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F09-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F09-false | 不成立 | 'invalid_placement' / 422 |
+| 空白・改行・絵文字を含むMarkdownがある。 | タイトルと本文を保存し、空白だけのタイトルでも保存を試す。 | 本文をそのまま維持し、タイトルだけを整形し、空タイトルは422で拒否する。 |
 
 
-### F10 条件分岐
+### F10 保存と再読込でMarkdownを維持する
 
-対象: `backend/src/kotorelay/operations/documents/save_draft/functions.py:27`。式: `assets[0].document_id == doc.id and runs[0].asset_id == assets[0].id and (runs[0].document_id == doc.id) and (placement.offset <= len(data.body))`
-
-| 要素ID | 要素 | 期待観点 |
+| 前提となる要因 | 操作する条件 | 期待する結果 |
 | --- | --- | --- |
-| F10-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F10-false | 不成立 | 'invalid_placement' / 422 |
+| 執筆者がMarkdownの下書きを保存している。 | 下書きを再取得する。 | 本文と保存番号が一致し、応答をキャッシュしない。 |
+
+
+### F11 競合保存は先行内容を上書きしない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 保存番号2の下書きがある。 | 古い保存番号1で別の本文を保存する。 | 409を返し、先に保存した本文を上書きしない。 |
+
+
+### F12 下書きの本文と履歴を担当外に返さない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 執筆者が下書きを作成している。 | 閲覧者・リーダー・他部署・運用者が下書きと履歴を取得する。 | 直接取得は404となり、執筆一覧にも表示されない。 |
+
+
+### F13 未承認文書は閲覧と検索へ現れない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 申請済みで未承認の文書がある。 | 閲覧一覧・文書詳細・質問回答を取得する。 | 一覧は空、詳細は404、回答は根拠なしの保留となる。 |
+
+
+### F14 承認された版だけを引用付きで回答する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認と索引反映が完了した文書がある。 | 関連する質問を送信し会話履歴を取得する。 | 200で承認版を引用して回答し、履歴にも同じ回答を残す。 |
+
+
+### F15 却下理由と不変版を履歴に残す
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 申請した版が理由付きで却下されている。 | 本文を修正して再申請し、履歴と版間差分を取得する。 | 版番号が増え、旧版の却下理由と変更差分を保持し、旧版の直接更新は404となる。 |
+
+
+### F16 新しい下書きは公開タイトルと本文を変更しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開済みの文書がある。 | 新しい下書きに未公開のタイトルと本文を保存する。 | 閲覧一覧と文書詳細は既存の公開版を維持し、質問にも回答できる。 |
+
+
+### F17 新版承認後の未反映期間は旧版を使わない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 旧版が公開・索引反映されている。 | 新版を承認し、索引反映の前後に質問する。 | 未反映中は保留し、反映後は新版だけを引用し、旧版の直接閲覧は404となる。 |
+
+
+### F18 公開停止と削除で回答履歴も失効する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開版を引用した会話履歴がある。 | 文書を公開停止または削除して再質問・履歴取得する。 | 新規回答を保留し、過去の回答本文と引用を非表示にする。 |
+
+
+### F19 他部署は直接IDと一覧とRAGから取得できない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 部署内限定の文書が公開されている。 | 他部署の利用者が直接閲覧・一覧取得・質問を実行する。 | 文書は取得できず、根拠なしの質問は保留、未所属部署を指定した質問は403となる。 |
+
+
+### F20 共有は閲覧だけを許可する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 部署内限定の文書が公開されている。 | 他部署へ閲覧共有し、その部署から詳細・下書き・公開設定を操作する。 | 公開版は閲覧できるが、下書き取得と公開設定変更は404で拒否する。 |
+
+
+### F21 所属停止は古いトークンでも即時反映する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 所属中の利用者に公開版と会話履歴がある。 | 所属を停止し、停止前のトークンで文書と履歴を取得する。 | 文書は404、履歴の回答は非表示となる。 |
+
+
+### F22 審査の再送は結果とジョブを重複作成しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認待ちの版がある。 | 同一操作IDで承認を再送し、さらに内容を変えて再送する。 | 同一内容は同じ結果と1件のジョブを返し、内容変更と再審査は409で拒否する。 |
+
+
+### F23 申請の再送で版番号を重複発行しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 保存済みの下書きがある。 | 同一操作IDで申請を2回送る。 | 同じ申請結果を返し、版履歴は1件だけとなる。 |
+
+
+### F24 自己承認とリーダーの暗黙承認を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 執筆者の申請に対し、執筆者へ審査権限も付与している。 | 執筆者自身と審査権限のないリーダーが承認する。 | 自己承認は403、リーダーの暗黙の承認は404で拒否する。 |
+
+
+### F25 未確認manifestと理由のない却下を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認待ちの版がある。 | 異なるmanifestハッシュで承認するか、理由なしで却下する。 | ハッシュ不一致は409、却下理由の欠落は422となる。 |
+
+
+### F26 古い版の遅着承認でも公開版は戻らない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 同じ文書に旧版と新版の申請がある。 | 新版を先に承認してから旧版を承認する。 | 公開版は新版のままで古い版に戻らない。 |
+
+
+### F27 閲覧と質問の再送を重複計上しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開済み文書がある。 | 同じ閲覧IDと質問の操作IDをそれぞれ再送し、部署統計を取得する。 | 閲覧・質問・利用者・貢献を各1件だけ計上し、統計に質問本文を含めない。 |
+
+
+### F28 他人の会話と管理統計を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 閲覧者が質問して会話を作成している。 | 他の利用者が会話を参照・継続し、閲覧者が管理統計を取得する。 | 他人の会話は404、管理権限のない統計取得は403となる。 |
+
+
+### F29 画像のOCR確認をmanifestへ固定する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 画像を添付できる下書きがある。 | 画像を登録し、未確認で申請した後にOCRを訂正・確認して承認する。 | 未確認申請は409、承認版の画像とOCRだけが閲覧・引用でき、OCR参照を版へ固定する。 |
+
+
+### F30 不正画像を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 執筆者の下書きがある。 | 空ファイル・SVG・画像でないバイト列をPNGとして登録する。 | いずれも422で拒否する。 |
+
+
+### F31 未認証要求を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 有効な認証情報がない。 | トークンなし・不正トークン・存在しない利用者で文書一覧を取得する。 | 401でログインを要求する。 |
+
+
+### F32 認可情報の上書き入力を拒否する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 認証済みの執筆者がいる。 | 文書作成時に権限を書き換える余剰項目を送り、ヘルスチェックも取得する。 | 余剰入力は内容を反射せず422で拒否し、ヘルスチェックは製品名を返す。 |
+
+
+### F33 反映失敗を照合し再試行で回復する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認済みだが索引が未反映の文書がある。 | 照合後、索引の完了検証を失敗させてから復旧し同じジョブを再試行する。 | 失敗中は回答を保留し、復旧後は完了して回答でき、完了済み再送は試行数を増やさない。 |
+
+
+### F34 画像を含む削除を保持期間後に完了する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開文書とその会話履歴がある。 | 削除後に保持期間内と期間経過後で削除ジョブを実行する。 | 期間内は保持し、期間後はチャンクと下書きを消し、履歴の回答を非表示にする。 |
+
+
+### F35 モデル実行中の権限変更で回答を保留する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 回答に利用できる公開版がある。 | モデルの処理中に文書を公開停止する。 | 回答は保留となり、生成済みの機密本文を返さない。 |
+
+
+### F36 モデル呼び出し失敗を失敗件数として区別する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 回答に利用できる公開版がある。 | モデル呼出しをタイムアウトさせる。 | 回答状態をfailedとして根拠を空にし、通常の根拠不足と区別する。 |
+
+
+### F37 不正な索引来歴をモデルへ渡さない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 索引済みの公開文書がある。 | 索引のmanifestハッシュや本文参照を改変して質問する。 | 不正な根拠を使わず回答を保留する。 |
+
+
+### F38 失効したジョブは公開版を戻さない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 旧版と新版が承認され、それぞれの反映ジョブがある。 | 旧版ジョブを先に実行してから未反映分を処理する。 | 旧版ジョブはobsoleteとなり、回答は新版を引用する。 |
+
+
+### F39 外部索引失敗を記録して部分完了をreadyにしない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認済み版の索引ジョブがある。 | 外部索引の書込みで例外を発生させる。 | ジョブをfailed・external_failureとし、不完全な索引では回答を保留する。 |
+
+
+### F40 workerが未配送ジョブを処理する
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 承認済みで未配送のジョブが1件ある。 | workerを2回実行してから質問する。 | 処理件数は順に1件・0件となり、索引済み版から回答できる。 |
+
+
+### F41 回答根拠の欠落と改変は閲覧時に非表示とする
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 公開版を引用した回答履歴がある。 | 文書・版・チャンク・manifest・配置・本文のいずれかを欠落または改変して履歴を取得する。 | 該当する回答と引用を非表示にする。 |
+
+
+### F42 中断した質問は同じIDで再開し二重計上しない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 質問受付だけを保存し、回答確定前に中断している。 | 同じ操作IDで質問を再送する。 | 同じ会話で200を返し、質問イベントは1件のままになる。 |
+
+
+### F43 外部検索は返されたID以外を根拠にしない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| ローカルには索引済みの文書がある。 | 外部検索が該当IDなしを返す状態で質問する。 | 外部検索にない根拠を補わず回答を保留する。 |
+
+
+### F44 モデル入力直前に失効を検知した場合はモデルを呼ばない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 根拠の初回検証が成功している。 | モデル入力直前の再検証で根拠を失効させる。 | 回答を保留し、失効した根拠を利用しない。 |
+
+
+### F45 削除配送を100行単位で再開し共有本文を残す
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 削除対象に100件超のチャンクと、同じ本文を使う別文書がある。 | 保持期間を経過させてworkerを複数回実行する。 | 対象チャンクを全件削除し、共有本文を使う別文書は閲覧できる。 |
+
+
+### F46 HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない
+
+| 前提となる要因 | 操作する条件 | 期待する結果 |
+| --- | --- | --- |
+| 通常のINFOログ設定で動作している。 | 架空の機密本文を含む文書を保存する。 | 処理ログに相関IDを残し、本文と認証トークンは記録しない。 |
 
 
 ## 2. 直積したテストケース一覧
 
-参照先と同じ章名を保持しています。ここでは実在するテストを列挙します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
+実在するテストのdocstringに記載したGiven/When/Thenを表示します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。
 
 | Case ID | 日本語ケース | test node |
 | --- | --- | --- |
-| TC001 | PostgreSQLで承認とoutboxと回答を一貫して確定する | backend/tests/test_postgres.py::test_PostgreSQLで承認とoutboxと回答を一貫して確定する |
-| TC002 | 成功応答の送信時には別接続から保存済み文書が見える | backend/tests/test_postgres.py::test_成功応答の送信時には別接続から保存済み文書が見える |
-| TC003 | commit時の競合は成功応答を送らず409にしてrollbackする | backend/tests/test_postgres.py::test_commit時の競合は成功応答を送らず409にしてrollbackする |
-| TC004 | 複数部署の一覧を権限検査してページング前に絞る | backend/tests/test_ui_contract.py::test_複数部署の一覧を権限検査してページング前に絞る |
-| TC005 | 一覧は公開版と審査版を分離し続きの有無を返す | backend/tests/test_ui_contract.py::test_一覧は公開版と審査版を分離し続きの有無を返す |
-| TC006 | 代替テキストと絵文字位置を承認版へ固定する | backend/tests/test_ui_contract.py::test_代替テキストと絵文字位置を承認版へ固定する |
-| TC007 | 審査とジョブの表示名を対象版から得る | backend/tests/test_ui_contract.py::test_審査とジョブの表示名を対象版から得る |
-| TC008 | Markdownの空白改行を保存してコードポイント位置を維持する | backend/tests/test_ui_contract.py::test_Markdownの空白改行を保存してコードポイント位置を維持する |
-| TC009 | 保存と再読込でMarkdownを維持する | backend/tests/test_workflow.py::test_保存と再読込でMarkdownを維持する |
-| TC010 | 競合保存は先行内容を上書きしない | backend/tests/test_workflow.py::test_競合保存は先行内容を上書きしない |
-| TC011 | 下書きの本文と履歴を担当外に返さない | backend/tests/test_workflow.py::test_下書きの本文と履歴を担当外に返さない |
-| TC012 | 未承認文書は閲覧と検索へ現れない | backend/tests/test_workflow.py::test_未承認文書は閲覧と検索へ現れない |
-| TC013 | 承認された版だけを引用付きで回答する | backend/tests/test_workflow.py::test_承認された版だけを引用付きで回答する |
-| TC014 | 却下理由と不変版を履歴に残す | backend/tests/test_workflow.py::test_却下理由と不変版を履歴に残す |
-| TC015 | 新しい下書きは公開タイトルと本文を変更しない | backend/tests/test_workflow.py::test_新しい下書きは公開タイトルと本文を変更しない |
-| TC016 | 新版承認後の未反映期間は旧版を使わない | backend/tests/test_workflow.py::test_新版承認後の未反映期間は旧版を使わない |
-| TC017 | 公開停止と削除で回答履歴も失効する | backend/tests/test_workflow.py::test_公開停止と削除で回答履歴も失効する |
-| TC018 | 他部署は直接IDと一覧とRAGから取得できない | backend/tests/test_workflow.py::test_他部署は直接IDと一覧とRAGから取得できない |
-| TC019 | 共有は閲覧だけを許可する | backend/tests/test_workflow.py::test_共有は閲覧だけを許可する |
-| TC020 | 所属停止は古いトークンでも即時反映する | backend/tests/test_workflow.py::test_所属停止は古いトークンでも即時反映する |
-| TC021 | 審査の再送は結果とジョブを重複作成しない | backend/tests/test_workflow.py::test_審査の再送は結果とジョブを重複作成しない |
-| TC022 | 申請の再送で版番号を重複発行しない | backend/tests/test_workflow.py::test_申請の再送で版番号を重複発行しない |
-| TC023 | 自己承認とリーダーの暗黙承認を拒否する | backend/tests/test_workflow.py::test_自己承認とリーダーの暗黙承認を拒否する |
-| TC024 | 未確認manifestと理由のない却下を拒否する | backend/tests/test_workflow.py::test_未確認manifestと理由のない却下を拒否する |
-| TC025 | 古い版の遅着承認でも公開版は戻らない | backend/tests/test_workflow.py::test_古い版の遅着承認でも公開版は戻らない |
-| TC026 | 閲覧と質問の再送を重複計上しない | backend/tests/test_workflow.py::test_閲覧と質問の再送を重複計上しない |
-| TC027 | 他人の会話と管理統計を拒否する | backend/tests/test_workflow.py::test_他人の会話と管理統計を拒否する |
-| TC028 | 画像のOCR確認をmanifestへ固定する | backend/tests/test_workflow.py::test_画像のOCR確認をmanifestへ固定する |
-| TC029 | 不正画像を拒否する | backend/tests/test_workflow.py::test_不正画像を拒否する |
-| TC030 | 未認証要求を拒否する | backend/tests/test_workflow.py::test_未認証要求を拒否する |
-| TC031 | 認可情報の上書き入力を拒否する | backend/tests/test_workflow.py::test_認可情報の上書き入力を拒否する |
-| TC032 | 反映失敗を照合し再試行で回復する | backend/tests/test_workflow.py::test_反映失敗を照合し再試行で回復する |
-| TC033 | 画像を含む削除を保持期間後に完了する | backend/tests/test_workflow.py::test_画像を含む削除を保持期間後に完了する |
-| TC034 | モデル実行中の権限変更で回答を保留する | backend/tests/test_workflow.py::test_モデル実行中の権限変更で回答を保留する |
-| TC035 | モデル呼び出し失敗を失敗件数として区別する | backend/tests/test_workflow.py::test_モデル呼び出し失敗を失敗件数として区別する |
-| TC036 | 不正な索引来歴をモデルへ渡さない | backend/tests/test_workflow.py::test_不正な索引来歴をモデルへ渡さない |
-| TC037 | 失効したジョブは公開版を戻さない | backend/tests/test_workflow.py::test_失効したジョブは公開版を戻さない |
-| TC038 | 外部索引失敗を記録して部分完了をreadyにしない | backend/tests/test_workflow.py::test_外部索引失敗を記録して部分完了をreadyにしない |
-| TC039 | workerが未配送ジョブを処理する | backend/tests/test_workflow.py::test_workerが未配送ジョブを処理する |
-| TC040 | 回答根拠の欠落と改変は閲覧時に非表示とする | backend/tests/test_workflow.py::test_回答根拠の欠落と改変は閲覧時に非表示とする |
-| TC041 | 中断した質問は同じIDで再開し二重計上しない | backend/tests/test_workflow.py::test_中断した質問は同じIDで再開し二重計上しない |
-| TC042 | 外部検索は返されたID以外を根拠にしない | backend/tests/test_workflow.py::test_外部検索は返されたID以外を根拠にしない |
-| TC043 | モデル入力直前に失効を検知した場合はモデルを呼ばない | backend/tests/test_workflow.py::test_モデル入力直前に失効を検知した場合はモデルを呼ばない |
-| TC044 | 削除配送を100行単位で再開し共有本文を残す | backend/tests/test_workflow.py::test_削除配送を100行単位で再開し共有本文を残す |
-| TC045 | HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない | backend/tests/test_workflow.py::test_HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない |
+| TC001 | 入力と認証の拒否を安全な応答とログで照合する | backend/tests/test_operational_logging.py::test_入力と認証の拒否を安全な応答とログで照合する |
+| TC002 | PostgreSQLで承認とoutboxと回答を一貫して確定する | backend/tests/test_postgres.py::test_PostgreSQLで承認とoutboxと回答を一貫して確定する |
+| TC003 | 成功応答の送信時には別接続から保存済み文書が見える | backend/tests/test_postgres.py::test_成功応答の送信時には別接続から保存済み文書が見える |
+| TC004 | commit時の競合は成功応答を送らず409にしてrollbackする | backend/tests/test_postgres.py::test_commit時の競合は成功応答を送らず409にしてrollbackする |
+| TC005 | 複数部署の一覧を権限検査してページング前に絞る | backend/tests/test_ui_contract.py::test_複数部署の一覧を権限検査してページング前に絞る |
+| TC006 | 一覧は公開版と審査版を分離し続きの有無を返す | backend/tests/test_ui_contract.py::test_一覧は公開版と審査版を分離し続きの有無を返す |
+| TC007 | 代替テキストと絵文字位置を承認版へ固定する | backend/tests/test_ui_contract.py::test_代替テキストと絵文字位置を承認版へ固定する |
+| TC008 | 審査とジョブの表示名を対象版から得る | backend/tests/test_ui_contract.py::test_審査とジョブの表示名を対象版から得る |
+| TC009 | Markdownの空白改行を保存してコードポイント位置を維持する | backend/tests/test_ui_contract.py::test_Markdownの空白改行を保存してコードポイント位置を維持する |
+| TC010 | 保存と再読込でMarkdownを維持する | backend/tests/test_workflow.py::test_保存と再読込でMarkdownを維持する |
+| TC011 | 競合保存は先行内容を上書きしない | backend/tests/test_workflow.py::test_競合保存は先行内容を上書きしない |
+| TC012 | 下書きの本文と履歴を担当外に返さない | backend/tests/test_workflow.py::test_下書きの本文と履歴を担当外に返さない |
+| TC013 | 未承認文書は閲覧と検索へ現れない | backend/tests/test_workflow.py::test_未承認文書は閲覧と検索へ現れない |
+| TC014 | 承認された版だけを引用付きで回答する | backend/tests/test_workflow.py::test_承認された版だけを引用付きで回答する |
+| TC015 | 却下理由と不変版を履歴に残す | backend/tests/test_workflow.py::test_却下理由と不変版を履歴に残す |
+| TC016 | 新しい下書きは公開タイトルと本文を変更しない | backend/tests/test_workflow.py::test_新しい下書きは公開タイトルと本文を変更しない |
+| TC017 | 新版承認後の未反映期間は旧版を使わない | backend/tests/test_workflow.py::test_新版承認後の未反映期間は旧版を使わない |
+| TC018 | 公開停止と削除で回答履歴も失効する | backend/tests/test_workflow.py::test_公開停止と削除で回答履歴も失効する |
+| TC019 | 他部署は直接IDと一覧とRAGから取得できない | backend/tests/test_workflow.py::test_他部署は直接IDと一覧とRAGから取得できない |
+| TC020 | 共有は閲覧だけを許可する | backend/tests/test_workflow.py::test_共有は閲覧だけを許可する |
+| TC021 | 所属停止は古いトークンでも即時反映する | backend/tests/test_workflow.py::test_所属停止は古いトークンでも即時反映する |
+| TC022 | 審査の再送は結果とジョブを重複作成しない | backend/tests/test_workflow.py::test_審査の再送は結果とジョブを重複作成しない |
+| TC023 | 申請の再送で版番号を重複発行しない | backend/tests/test_workflow.py::test_申請の再送で版番号を重複発行しない |
+| TC024 | 自己承認とリーダーの暗黙承認を拒否する | backend/tests/test_workflow.py::test_自己承認とリーダーの暗黙承認を拒否する |
+| TC025 | 未確認manifestと理由のない却下を拒否する | backend/tests/test_workflow.py::test_未確認manifestと理由のない却下を拒否する |
+| TC026 | 古い版の遅着承認でも公開版は戻らない | backend/tests/test_workflow.py::test_古い版の遅着承認でも公開版は戻らない |
+| TC027 | 閲覧と質問の再送を重複計上しない | backend/tests/test_workflow.py::test_閲覧と質問の再送を重複計上しない |
+| TC028 | 他人の会話と管理統計を拒否する | backend/tests/test_workflow.py::test_他人の会話と管理統計を拒否する |
+| TC029 | 画像のOCR確認をmanifestへ固定する | backend/tests/test_workflow.py::test_画像のOCR確認をmanifestへ固定する |
+| TC030 | 不正画像を拒否する | backend/tests/test_workflow.py::test_不正画像を拒否する |
+| TC031 | 未認証要求を拒否する | backend/tests/test_workflow.py::test_未認証要求を拒否する |
+| TC032 | 認可情報の上書き入力を拒否する | backend/tests/test_workflow.py::test_認可情報の上書き入力を拒否する |
+| TC033 | 反映失敗を照合し再試行で回復する | backend/tests/test_workflow.py::test_反映失敗を照合し再試行で回復する |
+| TC034 | 画像を含む削除を保持期間後に完了する | backend/tests/test_workflow.py::test_画像を含む削除を保持期間後に完了する |
+| TC035 | モデル実行中の権限変更で回答を保留する | backend/tests/test_workflow.py::test_モデル実行中の権限変更で回答を保留する |
+| TC036 | モデル呼び出し失敗を失敗件数として区別する | backend/tests/test_workflow.py::test_モデル呼び出し失敗を失敗件数として区別する |
+| TC037 | 不正な索引来歴をモデルへ渡さない | backend/tests/test_workflow.py::test_不正な索引来歴をモデルへ渡さない |
+| TC038 | 失効したジョブは公開版を戻さない | backend/tests/test_workflow.py::test_失効したジョブは公開版を戻さない |
+| TC039 | 外部索引失敗を記録して部分完了をreadyにしない | backend/tests/test_workflow.py::test_外部索引失敗を記録して部分完了をreadyにしない |
+| TC040 | workerが未配送ジョブを処理する | backend/tests/test_workflow.py::test_workerが未配送ジョブを処理する |
+| TC041 | 回答根拠の欠落と改変は閲覧時に非表示とする | backend/tests/test_workflow.py::test_回答根拠の欠落と改変は閲覧時に非表示とする |
+| TC042 | 中断した質問は同じIDで再開し二重計上しない | backend/tests/test_workflow.py::test_中断した質問は同じIDで再開し二重計上しない |
+| TC043 | 外部検索は返されたID以外を根拠にしない | backend/tests/test_workflow.py::test_外部検索は返されたID以外を根拠にしない |
+| TC044 | モデル入力直前に失効を検知した場合はモデルを呼ばない | backend/tests/test_workflow.py::test_モデル入力直前に失効を検知した場合はモデルを呼ばない |
+| TC045 | 削除配送を100行単位で再開し共有本文を残す | backend/tests/test_workflow.py::test_削除配送を100行単位で再開し共有本文を残す |
+| TC046 | HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない | backend/tests/test_workflow.py::test_HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない |
 
 
 ## 3. テスト詳細
@@ -169,492 +392,503 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | PostgreSQLで承認とoutboxと回答を一貫して確定する |
-| test node | backend/tests/test_postgres.py::test_PostgreSQLで承認とoutboxと回答を一貫して確定する |
-| Given | postgres |
-| When | client.get(f"/api/documents/{doc['id']}", headers=headers('other')) |
-| Then | result['status'] == 'answered' and result['citations'][0]['version_id'] == version['id'] ; client.get(f"/api/documents/{doc['id']}", headers=headers('other')).status_code == 404 |
+| 日本語ケース | 入力と認証の拒否を安全な応答とログで照合する |
+| test node | backend/tests/test_operational_logging.py::test_入力と認証の拒否を安全な応答とログで照合する |
+| Given | 未認証の要求と、余剰の機密項目を含む入力がある。 |
+| When | 一覧取得と不正な文書作成を要求する。 |
+| Then | 401と422を返し、ログには入力値を反射せず応答コードと例外型を残す。 |
 
 
 ### TC002
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 成功応答の送信時には別接続から保存済み文書が見える |
-| test node | backend/tests/test_postgres.py::test_成功応答の送信時には別接続から保存済み文書が見える |
-| Given | postgres |
-| When | client.post('/api/documents', headers=headers(), json={'title': title, 'department_id': department}) ; client.get('/api/groups/me', headers=headers()) |
-| Then | observed == [True] ; result.status_code == 201 |
+| 日本語ケース | PostgreSQLで承認とoutboxと回答を一貫して確定する |
+| test node | backend/tests/test_postgres.py::test_PostgreSQLで承認とoutboxと回答を一貫して確定する |
+| Given | 実PostgreSQLで文書と利用者を準備している。 |
+| When | 申請・承認・索引反映・質問をHTTPで実行する。 |
+| Then | 承認版を引用して回答し、他部署の直接閲覧は404となる。 |
 
 
 ### TC003
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | commit時の競合は成功応答を送らず409にしてrollbackする |
-| test node | backend/tests/test_postgres.py::test_commit時の競合は成功応答を送らず409にしてrollbackする |
-| Given | postgres, monkeypatch |
-| When | client.post('/api/documents', headers=headers(), json={'title': '競合して確定しない文書', 'department_id': department}) ; client.get('/api/groups/me', headers=headers()) |
-| Then | result.status_code == 409 ; result.json()['code'] == 'conflict' ; not q.documents_list(db, q.DocumentsListParams(organization_id=postgres.organization_id)) |
+| 日本語ケース | 成功応答の送信時には別接続から保存済み文書が見える |
+| test node | backend/tests/test_postgres.py::test_成功応答の送信時には別接続から保存済み文書が見える |
+| Given | 実PostgreSQLを使うAPIの応答送信を観測できる。 |
+| When | 文書作成の201応答が始まる時点で別接続から文書を読む。 |
+| Then | 成功応答前にcommit済みで、作成した文書が別接続から見える。 |
 
 
 ### TC004
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 複数部署の一覧を権限検査してページング前に絞る |
-| test node | backend/tests/test_ui_contract.py::test_複数部署の一覧を権限検査してページング前に絞る |
-| Given | client |
-| When | client.get(f'/api/documents?scope=manage&page=true&department_id={department}&limit=1', headers=headers('leader')) ; client.post('/api/documents', headers=headers('other'), json={'title': '営業部の文書', 'department_id': OTHER}) ; client.get(f'/api/documents?scope=work&department_id={OTHER}', headers=headers('author')) ; client.get(f'/api/documents?scope=manage&department_id={DEPT}', headers=headers('reader')) ; client.put('/api/groups/memberships', headers=headers('operator'), json={'user_id': user, 'department_id': department, **permissions}) ; client.get('/api/groups/me', headers=headers(persona)) |
-| Then | pytest.raises / mock assertionで例外・依存先を検証 |
+| 日本語ケース | commit時の競合は成功応答を送らず409にしてrollbackする |
+| test node | backend/tests/test_postgres.py::test_commit時の競合は成功応答を送らず409にしてrollbackする |
+| Given | 文書作成後のcommitで競合する接続を用意している。 |
+| When | 文書作成を実行して保存状態を別接続から確認する。 |
+| Then | 201を送らず409・conflictを返し、文書はrollbackされて残らない。 |
 
 
 ### TC005
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 一覧は公開版と審査版を分離し続きの有無を返す |
-| test node | backend/tests/test_ui_contract.py::test_一覧は公開版と審査版を分離し続きの有無を返す |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '未承認タイトル', 'body': '未承認本文', 'revision': current['revision']}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.get('/api/documents?scope=manage&page=true&status=withdrawn', headers=headers('leader')) ; client.get('/api/documents?page=true&search=不存在', headers=headers('reader')) ; client.get('/api/documents?page=true', headers=headers('reader')) ; client.get('/api/documents?scope=work&page=true', headers=headers()) ; client.get('/api/documents?scope=work&page=true&limit=1', headers=headers()) ; client.get('/api/documents?scope=work&page=true&limit=1&offset=1', headers=headers()) |
-| Then | read['title'] == version['title'] and '未承認' not in read['summary'] ; read['published_number'] == 1 and read['index_ready'] is True ; read['review_status'] is None and read['approved_at'] ; work['review_number'] == next_version['number'] and work['review_status'] == 'pending' ; client.get('/api/documents?scope=work&page=true&limit=1', headers=headers()).json()['has_next'] is True ; client.get('/api/documents?scope=work&page=true&limit=1&offset=1', headers=headers()).json()['has_next'] is False ; [d['id'] for d in filtered['items']] == [doc['id']] ; client.get('/api/documents?page=true&search=不存在', headers=headers('reader')).json() == {'items': [], 'has_next': False} |
+| 日本語ケース | 複数部署の一覧を権限検査してページング前に絞る |
+| test node | backend/tests/test_ui_contract.py::test_複数部署の一覧を権限検査してページング前に絞る |
+| Given | 複数部署の管理権限と各部署の文書がある。 |
+| When | 部署を指定し1件ずつの管理一覧を取得する。 |
+| Then | ページング前に部署で絞り、権限のない部署や用途は403で拒否する。 |
 
 
 ### TC006
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 代替テキストと絵文字位置を承認版へ固定する |
-| test node | backend/tests/test_ui_contract.py::test_代替テキストと絵文字位置を承認版へ固定する |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '画像手順', 'body': '日😀本文', 'revision': 2, 'placements': [placement]}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '次版', 'body': '日😀本文', 'revision': 3, 'placements': [placement]}) ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.post(f"/api/images/{data['asset']['id']}/ocr", headers=headers(), json={'regions': [], 'confirmed': True}) ; client.post(f"/api/images/documents/{doc['id']}", headers=headers(), files={'file': ('x.png', buf.getvalue(), 'image/png')}) |
-| Then | saved.status_code == 200 ; json.loads(version['manifest'])['images'][0]['placement'] == placement ; json.loads(old['version']['manifest'])['images'][0]['placement']['alt_text'] == '受付から承認へ進む図' |
+| 日本語ケース | 一覧は公開版と審査版を分離し続きの有無を返す |
+| test node | backend/tests/test_ui_contract.py::test_一覧は公開版と審査版を分離し続きの有無を返す |
+| Given | 公開版と未承認の新版があり、複数の下書きもある。 |
+| When | 閲覧・執筆・管理一覧をページングと検索で取得する。 |
+| Then | 公開情報と審査情報を混ぜず、続きの有無・状態・検索結果を正しく返す。 |
 
 
 ### TC007
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 審査とジョブの表示名を対象版から得る |
-| test node | backend/tests/test_ui_contract.py::test_審査とジョブの表示名を対象版から得る |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '未承認名', 'body': '本文', 'revision': 2}) ; client.get('/api/operations/jobs?details=true', headers=headers('operator')) ; client.get('/api/operations/jobs?details=true', headers=headers('reader')) ; client.get('/api/operations/jobs?details=true', headers=headers('operator')) ; client.get('/api/reviews', headers=headers('reviewer')) |
-| Then | review['title'] == version['title'] and review['version_number'] == 1 ; review['requested_by'] and review['department_name'] ; jobs[0]['version_number'] == 1 ; client.get('/api/operations/jobs?details=true', headers=headers('reader')).status_code == 403 ; any((j['version_number'] is None for j in jobs)) |
+| 日本語ケース | 代替テキストと絵文字位置を承認版へ固定する |
+| test node | backend/tests/test_ui_contract.py::test_代替テキストと絵文字位置を承認版へ固定する |
+| Given | 絵文字を含む本文に画像配置と代替テキストがある。 |
+| When | 承認後に下書きの代替テキストを変更する。 |
+| Then | 承認版は当時の配置・コードポイント位置・代替テキストを保持する。 |
 
 
 ### TC008
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | Markdownの空白改行を保存してコードポイント位置を維持する |
-| test node | backend/tests/test_ui_contract.py::test_Markdownの空白改行を保存してコードポイント位置を維持する |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '  手順  ', 'body': body, 'revision': 2}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '  ', 'body': body, 'revision': 3}) |
-| Then | saved.status_code == 200 ; saved.json()['body'] == body and saved.json()['document']['title'] == '手順' ; invalid.status_code == 422 |
+| 日本語ケース | 審査とジョブの表示名を対象版から得る |
+| test node | backend/tests/test_ui_contract.py::test_審査とジョブの表示名を対象版から得る |
+| Given | 承認済み版と未承認のタイトルがある。 |
+| When | 審査とジョブの詳細一覧を取得する。 |
+| Then | 対象版の表示名と版番号を返し、未承認名を混ぜず、運用権限のない詳細取得は403となる。 |
 
 
 ### TC009
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 保存と再読込でMarkdownを維持する |
-| test node | backend/tests/test_workflow.py::test_保存と再読込でMarkdownを維持する |
-| Given | client |
-| When | client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | response.json()['body'] == '# 開発フロー\n承認後にリリースします。' ; response.json()['revision'] == 2 ; response.headers['cache-control'] == 'no-store' |
+| 日本語ケース | Markdownの空白改行を保存してコードポイント位置を維持する |
+| test node | backend/tests/test_ui_contract.py::test_Markdownの空白改行を保存してコードポイント位置を維持する |
+| Given | 空白・改行・絵文字を含むMarkdownがある。 |
+| When | タイトルと本文を保存し、空白だけのタイトルでも保存を試す。 |
+| Then | 本文をそのまま維持し、タイトルだけを整形し、空タイトルは422で拒否する。 |
 
 
 ### TC010
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 競合保存は先行内容を上書きしない |
-| test node | backend/tests/test_workflow.py::test_競合保存は先行内容を上書きしない |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '改変', 'body': '消えない', 'revision': 1}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | result.status_code == 409 ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()).json()['body'].startswith('# 開発') |
+| 日本語ケース | 保存と再読込でMarkdownを維持する |
+| test node | backend/tests/test_workflow.py::test_保存と再読込でMarkdownを維持する |
+| Given | 執筆者がMarkdownの下書きを保存している。 |
+| When | 下書きを再取得する。 |
+| Then | 本文と保存番号が一致し、応答をキャッシュしない。 |
 
 
 ### TC011
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 下書きの本文と履歴を担当外に返さない |
-| test node | backend/tests/test_workflow.py::test_下書きの本文と履歴を担当外に返さない |
-| Given | client, persona |
-| When | client.get(f"/api/documents/{doc['id']}/{suffix}", headers=headers(persona)) ; client.get('/api/documents?scope=work', headers=headers(persona)) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | client.get('/api/documents?scope=work', headers=headers(persona)).json() == [] ; client.get(f"/api/documents/{doc['id']}/{suffix}", headers=headers(persona)).status_code == 404 |
+| 日本語ケース | 競合保存は先行内容を上書きしない |
+| test node | backend/tests/test_workflow.py::test_競合保存は先行内容を上書きしない |
+| Given | 保存番号2の下書きがある。 |
+| When | 古い保存番号1で別の本文を保存する。 |
+| Then | 409を返し、先に保存した本文を上書きしない。 |
 
 
 ### TC012
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 未承認文書は閲覧と検索へ現れない |
-| test node | backend/tests/test_workflow.py::test_未承認文書は閲覧と検索へ現れない |
-| Given | client |
-| When | client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.get('/api/documents', headers=headers('reader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | client.get('/api/documents', headers=headers('reader')).json() == [] ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')).status_code == 404 ; result['status'] == 'held' and result['citations'] == [] |
+| 日本語ケース | 下書きの本文と履歴を担当外に返さない |
+| test node | backend/tests/test_workflow.py::test_下書きの本文と履歴を担当外に返さない |
+| Given | 執筆者が下書きを作成している。 |
+| When | 閲覧者・リーダー・他部署・運用者が下書きと履歴を取得する。 |
+| Then | 直接取得は404となり、執筆一覧にも表示されない。 |
 
 
 ### TC013
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 承認された版だけを引用付きで回答する |
-| test node | backend/tests/test_workflow.py::test_承認された版だけを引用付きで回答する |
-| Given | client |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result.status_code == 200 ; answer['status'] == 'answered' ; '承認後にリリース' in answer['answer'] ; answer['citations'][0]['version_id'] == version['id'] ; answer['citations'][0]['document_id'] == doc['id'] ; history[0]['answer'] == answer['answer'] |
+| 日本語ケース | 未承認文書は閲覧と検索へ現れない |
+| test node | backend/tests/test_workflow.py::test_未承認文書は閲覧と検索へ現れない |
+| Given | 申請済みで未承認の文書がある。 |
+| When | 閲覧一覧・文書詳細・質問回答を取得する。 |
+| Then | 一覧は空、詳細は404、回答は根拠なしの保留となる。 |
 
 
 ### TC014
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 却下理由と不変版を履歴に残す |
-| test node | backend/tests/test_workflow.py::test_却下理由と不変版を履歴に残す |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '改訂', 'body': '# 開発フロー\n説明を追加。', 'revision': 2}) ; client.get(f"/api/documents/{doc['id']}/history", headers=headers()) ; client.get(f"/api/documents/{doc['id']}/diff?left={v1['id']}&right={v2['id']}", headers=headers()) ; client.put(f"/api/documents/{doc['id']}/versions/{v1['id']}", headers=headers(), json={}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) |
-| Then | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '改訂', 'body': '# 開発フロー\n説明を追加。', 'revision': 2}).status_code == 200 ; v1['id'] != v2['id'] and v2['number'] == 2 ; history[1]['submission']['reason'] == '説明を追加してください' ; '+説明を追加。' in diff['diff'] and '-承認後にリリースします。' in diff['diff'] ; client.put(f"/api/documents/{doc['id']}/versions/{v1['id']}", headers=headers(), json={}).status_code == 404 |
+| 日本語ケース | 承認された版だけを引用付きで回答する |
+| test node | backend/tests/test_workflow.py::test_承認された版だけを引用付きで回答する |
+| Given | 承認と索引反映が完了した文書がある。 |
+| When | 関連する質問を送信し会話履歴を取得する。 |
+| Then | 200で承認版を引用して回答し、履歴にも同じ回答を残す。 |
 
 
 ### TC015
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 新しい下書きは公開タイトルと本文を変更しない |
-| test node | backend/tests/test_workflow.py::test_新しい下書きは公開タイトルと本文を変更しない |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '極秘タイトル', 'body': '公開不可', 'revision': 2}) ; client.get('/api/documents', headers=headers('reader')) ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.get('/api/documents', headers=headers('reader')).json()[0]['title'] == '開発ガイド' ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')).json()['version']['id'] == v1['id'] ; ask(client).json()['status'] == 'answered' |
+| 日本語ケース | 却下理由と不変版を履歴に残す |
+| test node | backend/tests/test_workflow.py::test_却下理由と不変版を履歴に残す |
+| Given | 申請した版が理由付きで却下されている。 |
+| When | 本文を修正して再申請し、履歴と版間差分を取得する。 |
+| Then | 版番号が増え、旧版の却下理由と変更差分を保持し、旧版の直接更新は404となる。 |
 
 
 ### TC016
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 新版承認後の未反映期間は旧版を使わない |
-| test node | backend/tests/test_workflow.py::test_新版承認後の未反映期間は旧版を使わない |
-| Given | client |
-| When | client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '新版', 'body': '開発フローを変更しました。', 'revision': 2}) ; client.get(f"/api/documents/{doc['id']}?version_id={v1['id']}", headers=headers('reader')) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | ask(client).json()['status'] == 'held' ; ask(client).json()['citations'][0]['version_id'] == v2['id'] ; client.get(f"/api/documents/{doc['id']}?version_id={v1['id']}", headers=headers('reader')).status_code == 404 |
+| 日本語ケース | 新しい下書きは公開タイトルと本文を変更しない |
+| test node | backend/tests/test_workflow.py::test_新しい下書きは公開タイトルと本文を変更しない |
+| Given | 公開済みの文書がある。 |
+| When | 新しい下書きに未公開のタイトルと本文を保存する。 |
+| Then | 閲覧一覧と文書詳細は既存の公開版を維持し、質問にも回答できる。 |
 
 
 ### TC017
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 公開停止と削除で回答履歴も失効する |
-| test node | backend/tests/test_workflow.py::test_公開停止と削除で回答履歴も失効する |
-| Given | client, status |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | policy(client, doc, status=status).status_code == 200 ; ask(client).json()['status'] == 'held' ; history[0]['status'] == 'hidden' and history[0]['citations'] == [] ; '承認後にリリース' not in history[0]['answer'] |
+| 日本語ケース | 新版承認後の未反映期間は旧版を使わない |
+| test node | backend/tests/test_workflow.py::test_新版承認後の未反映期間は旧版を使わない |
+| Given | 旧版が公開・索引反映されている。 |
+| When | 新版を承認し、索引反映の前後に質問する。 |
+| Then | 未反映中は保留し、反映後は新版だけを引用し、旧版の直接閲覧は404となる。 |
 
 
 ### TC018
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 他部署は直接IDと一覧とRAGから取得できない |
-| test node | backend/tests/test_workflow.py::test_他部署は直接IDと一覧とRAGから取得できない |
-| Given | client |
-| When | client.get(f"/api/documents/{doc['id']}", headers=headers('other')) ; client.get('/api/documents', headers=headers('other')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.get(f"/api/documents/{doc['id']}", headers=headers('other')).status_code == 404 ; client.get('/api/documents', headers=headers('other')).json() == [] ; ask(client, 'other', department_id=OTHER).json()['status'] == 'held' ; ask(client, 'other').status_code == 403 |
+| 日本語ケース | 公開停止と削除で回答履歴も失効する |
+| test node | backend/tests/test_workflow.py::test_公開停止と削除で回答履歴も失効する |
+| Given | 公開版を引用した会話履歴がある。 |
+| When | 文書を公開停止または削除して再質問・履歴取得する。 |
+| Then | 新規回答を保留し、過去の回答本文と引用を非表示にする。 |
 
 
 ### TC019
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 共有は閲覧だけを許可する |
-| test node | backend/tests/test_workflow.py::test_共有は閲覧だけを許可する |
-| Given | client |
-| When | client.get(f"/api/documents/{doc['id']}", headers=headers('other')) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers('other')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('other'), json={'revision': 1, 'visibility': 'organization', 'status': 'deleted'}) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | policy(client, doc, visibility='selected', shared_departments=[OTHER]).status_code == 200 ; client.get(f"/api/documents/{doc['id']}", headers=headers('other')).status_code == 200 ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers('other')).status_code == 404 ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('other'), json={'revision': 1, 'visibility': 'organization', 'status': 'deleted'}).status_code == 404 |
+| 日本語ケース | 他部署は直接IDと一覧とRAGから取得できない |
+| test node | backend/tests/test_workflow.py::test_他部署は直接IDと一覧とRAGから取得できない |
+| Given | 部署内限定の文書が公開されている。 |
+| When | 他部署の利用者が直接閲覧・一覧取得・質問を実行する。 |
+| Then | 文書は取得できず、根拠なしの質問は保留、未所属部署を指定した質問は403となる。 |
 
 
 ### TC020
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 所属停止は古いトークンでも即時反映する |
-| test node | backend/tests/test_workflow.py::test_所属停止は古いトークンでも即時反映する |
-| Given | client |
-| When | client.put('/api/groups/memberships', headers=headers('leader'), json={'user_id': stable_id('reader'), 'department_id': DEPT, 'active': False}) ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | response.status_code == 200 ; client.get(f"/api/documents/{doc['id']}", headers=headers('reader')).status_code == 404 ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')).json()[0]['status'] == 'hidden' |
+| 日本語ケース | 共有は閲覧だけを許可する |
+| test node | backend/tests/test_workflow.py::test_共有は閲覧だけを許可する |
+| Given | 部署内限定の文書が公開されている。 |
+| When | 他部署へ閲覧共有し、その部署から詳細・下書き・公開設定を操作する。 |
+| Then | 公開版は閲覧できるが、下書き取得と公開設定変更は404で拒否する。 |
 
 
 ### TC021
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 審査の再送は結果とジョブを重複作成しない |
-| test node | backend/tests/test_workflow.py::test_審査の再送は結果とジョブを重複作成しない |
-| Given | client |
-| When | client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json=data) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) |
-| Then | first.json() == second.json() ; len(client.get('/api/operations/jobs', headers=headers('operator')).json()) == 1 ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer', key), json=data).status_code == 409 ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json=data).status_code == 409 |
+| 日本語ケース | 所属停止は古いトークンでも即時反映する |
+| test node | backend/tests/test_workflow.py::test_所属停止は古いトークンでも即時反映する |
+| Given | 所属中の利用者に公開版と会話履歴がある。 |
+| When | 所属を停止し、停止前のトークンで文書と履歴を取得する。 |
+| Then | 文書は404、履歴の回答は非表示となる。 |
 
 
 ### TC022
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 申請の再送で版番号を重複発行しない |
-| test node | backend/tests/test_workflow.py::test_申請の再送で版番号を重複発行しない |
-| Given | client |
-| When | client.post(url, headers=headers(key=key), json={'revision': 2}) ; client.post(url, headers=headers(key=key), json={'revision': 2}) ; client.get(f"/api/documents/{doc['id']}/history", headers=headers()) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | a.json() == b.json() ; len(client.get(f"/api/documents/{doc['id']}/history", headers=headers()).json()) == 1 |
+| 日本語ケース | 審査の再送は結果とジョブを重複作成しない |
+| test node | backend/tests/test_workflow.py::test_審査の再送は結果とジョブを重複作成しない |
+| Given | 承認待ちの版がある。 |
+| When | 同一操作IDで承認を再送し、さらに内容を変えて再送する。 |
+| Then | 同一内容は同じ結果と1件のジョブを返し、内容変更と再審査は409で拒否する。 |
 
 
 ### TC023
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 自己承認とリーダーの暗黙承認を拒否する |
-| test node | backend/tests/test_workflow.py::test_自己承認とリーダーの暗黙承認を拒否する |
-| Given | client |
-| When | client.put('/api/groups/memberships', headers=headers('leader'), json={'user_id': stable_id('author'), 'department_id': DEPT, 'can_author': True, 'can_review': True}) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers(persona), json={'manifest_hash': version['manifest_hash'], 'decision': 'approved'}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) |
-| Then | client.post(f"/api/reviews/{review['id']}/decision", headers=headers(persona), json={'manifest_hash': version['manifest_hash'], 'decision': 'approved'}).status_code == code |
+| 日本語ケース | 申請の再送で版番号を重複発行しない |
+| test node | backend/tests/test_workflow.py::test_申請の再送で版番号を重複発行しない |
+| Given | 保存済みの下書きがある。 |
+| When | 同一操作IDで申請を2回送る。 |
+| Then | 同じ申請結果を返し、版履歴は1件だけとなる。 |
 
 
 ### TC024
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 未確認manifestと理由のない却下を拒否する |
-| test node | backend/tests/test_workflow.py::test_未確認manifestと理由のない却下を拒否する |
-| Given | client, data |
-| When | client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'manifest_hash': version['manifest_hash'], **data}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) |
-| Then | result.status_code in [409, 422] |
+| 日本語ケース | 自己承認とリーダーの暗黙承認を拒否する |
+| test node | backend/tests/test_workflow.py::test_自己承認とリーダーの暗黙承認を拒否する |
+| Given | 執筆者の申請に対し、執筆者へ審査権限も付与している。 |
+| When | 執筆者自身と審査権限のないリーダーが承認する。 |
+| Then | 自己承認は403、リーダーの暗黙の承認は404で拒否する。 |
 
 
 ### TC025
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 古い版の遅着承認でも公開版は戻らない |
-| test node | backend/tests/test_workflow.py::test_古い版の遅着承認でも公開版は戻らない |
-| Given | client |
-| When | client.get(f"/api/documents/{doc['id']}", headers=headers('reader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) |
-| Then | client.get(f"/api/documents/{doc['id']}", headers=headers('reader')).json()['version']['id'] == v2['id'] |
+| 日本語ケース | 未確認manifestと理由のない却下を拒否する |
+| test node | backend/tests/test_workflow.py::test_未確認manifestと理由のない却下を拒否する |
+| Given | 承認待ちの版がある。 |
+| When | 異なるmanifestハッシュで承認するか、理由なしで却下する。 |
+| Then | ハッシュ不一致は409、却下理由の欠落は422となる。 |
 
 
 ### TC026
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 閲覧と質問の再送を重複計上しない |
-| test node | backend/tests/test_workflow.py::test_閲覧と質問の再送を重複計上しない |
-| Given | client |
-| When | client.post('/api/chat', headers=headers('reader', key), json=question) ; client.post('/api/chat', headers=headers('reader', key), json=question) ; client.get(f'/api/metrics/{DEPT}?start=2020-01-01T00:00:00Z&end=2100-01-01T00:00:00Z', headers=headers('leader')) ; client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view) ; client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view).json()['recorded'] ; not client.post(f"/api/metrics/views/{doc['id']}", headers=headers('reader'), json=view).json()['recorded'] ; a.json() == b.json() ; metrics['questions'] == 1 and metrics['views'] == 1 and (metrics['unique_viewers'] == 1) ; metrics['documents'][0]['contributions'] == 1 ; 'question' not in str(metrics['documents']) |
+| 日本語ケース | 古い版の遅着承認でも公開版は戻らない |
+| test node | backend/tests/test_workflow.py::test_古い版の遅着承認でも公開版は戻らない |
+| Given | 同じ文書に旧版と新版の申請がある。 |
+| When | 新版を先に承認してから旧版を承認する。 |
+| Then | 公開版は新版のままで古い版に戻らない。 |
 
 
 ### TC027
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 他人の会話と管理統計を拒否する |
-| test node | backend/tests/test_workflow.py::test_他人の会話と管理統計を拒否する |
-| Given | client |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('leader')) ; client.get(f'/api/metrics/{DEPT}?start=2020-01-01T00:00:00Z&end=2100-01-01T00:00:00Z', headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('leader')).status_code == 404 ; ask(client, 'author', conversation_id=answer['conversation_id']).status_code == 404 ; client.get(f'/api/metrics/{DEPT}?start=2020-01-01T00:00:00Z&end=2100-01-01T00:00:00Z', headers=headers('reader')).status_code == 403 |
+| 日本語ケース | 閲覧と質問の再送を重複計上しない |
+| test node | backend/tests/test_workflow.py::test_閲覧と質問の再送を重複計上しない |
+| Given | 公開済み文書がある。 |
+| When | 同じ閲覧IDと質問の操作IDをそれぞれ再送し、部署統計を取得する。 |
+| Then | 閲覧・質問・利用者・貢献を各1件だけ計上し、統計に質問本文を含めない。 |
 
 
 ### TC028
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 画像のOCR確認をmanifestへ固定する |
-| test node | backend/tests/test_workflow.py::test_画像のOCR確認をmanifestへ固定する |
-| Given | client |
-| When | client.post(f"/api/images/documents/{doc['id']}", headers=headers(), files={'file': ('image.png', buf.getvalue(), 'image/png')}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '画像手順', 'body': '画像の開発フロー', 'revision': 2, 'placements': [p]}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': '画像手順', 'body': '画像の開発フロー', 'revision': 3, 'placements': [p]}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': 3}) ; client.post(f"/api/images/{asset['id']}/ocr", headers=headers(), json={'regions': [{'text': '承認後に開発を開始', 'x': 0, 'y': 0, 'width': 1, 'height': 1, 'confidence': 1, 'order': 0}], 'confirmed': True}) ; client.get(f"/api/images/{asset['id']}?version_id={version['id']}", headers=headers('reader')) ; client.get(f"/api/images/{asset['id']}", headers=headers('reader')) ; client.get(f"/api/images/ocr/{run['id']}?version_id={version['id']}", headers=headers('reader')) ; client.get(f"/api/images/ocr/{p['ocr_run_id']}", headers=headers()) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | upload.status_code == 201 ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': 3}).status_code == 409 ; client.get(f"/api/images/{asset['id']}?version_id={version['id']}", headers=headers('reader')).status_code == 200 ; client.get(f"/api/images/{asset['id']}", headers=headers('reader')).status_code == 404 ; client.get(f"/api/images/ocr/{run['id']}?version_id={version['id']}", headers=headers('reader')).status_code == 404 ; ask(client).json()['status'] == 'answered' ; client.get(f"/api/images/ocr/{p['ocr_run_id']}", headers=headers()).status_code == 200 ; ask(client).status_code == 200 ; ask(client).status_code == 200 |
+| 日本語ケース | 他人の会話と管理統計を拒否する |
+| test node | backend/tests/test_workflow.py::test_他人の会話と管理統計を拒否する |
+| Given | 閲覧者が質問して会話を作成している。 |
+| When | 他の利用者が会話を参照・継続し、閲覧者が管理統計を取得する。 |
+| Then | 他人の会話は404、管理権限のない統計取得は403となる。 |
 
 
 ### TC029
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 不正画像を拒否する |
-| test node | backend/tests/test_workflow.py::test_不正画像を拒否する |
-| Given | client, payload |
-| When | client.post(f"/api/images/documents/{doc['id']}", headers=headers(), files={'file': ('bad.png', payload, 'image/png')}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | client.post(f"/api/images/documents/{doc['id']}", headers=headers(), files={'file': ('bad.png', payload, 'image/png')}).status_code == 422 |
+| 日本語ケース | 画像のOCR確認をmanifestへ固定する |
+| test node | backend/tests/test_workflow.py::test_画像のOCR確認をmanifestへ固定する |
+| Given | 画像を添付できる下書きがある。 |
+| When | 画像を登録し、未確認で申請した後にOCRを訂正・確認して承認する。 |
+| Then | 未確認申請は409、承認版の画像とOCRだけが閲覧・引用でき、OCR参照を版へ固定する。 |
 
 
 ### TC030
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 未認証要求を拒否する |
-| test node | backend/tests/test_workflow.py::test_未認証要求を拒否する |
-| Given | client, token |
-| When | client.get('/api/documents', headers={'Authorization': token}) |
-| Then | client.get('/api/documents', headers={'Authorization': token}).status_code == 401 |
+| 日本語ケース | 不正画像を拒否する |
+| test node | backend/tests/test_workflow.py::test_不正画像を拒否する |
+| Given | 執筆者の下書きがある。 |
+| When | 空ファイル・SVG・画像でないバイト列をPNGとして登録する。 |
+| Then | いずれも422で拒否する。 |
 
 
 ### TC031
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 認可情報の上書き入力を拒否する |
-| test node | backend/tests/test_workflow.py::test_認可情報の上書き入力を拒否する |
-| Given | client |
-| When | client.post('/api/documents', headers=headers(), json={'title': '無効', 'department_id': DEPT, 'can_author': True}) ; client.get('/api/health') |
-| Then | result.status_code == 422 and 'can_author' not in result.text ; client.get('/api/health').json()['product'] == 'KotoRelay' |
+| 日本語ケース | 未認証要求を拒否する |
+| test node | backend/tests/test_workflow.py::test_未認証要求を拒否する |
+| Given | 有効な認証情報がない。 |
+| When | トークンなし・不正トークン・存在しない利用者で文書一覧を取得する。 |
+| Then | 401でログインを要求する。 |
 
 
 ### TC032
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 反映失敗を照合し再試行で回復する |
-| test node | backend/tests/test_workflow.py::test_反映失敗を照合し再試行で回復する |
-| Given | client, monkeypatch |
-| When | client.get('/api/operations/reconcile', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.get('/api/operations/reconcile', headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | differences[0]['reason'] == '最新承認版が未反映' ; result['status'] == 'failed' ; ask(client).json()['status'] == 'held' ; result['status'] == 'done' ; ask(client).json()['status'] == 'answered' ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')).json()['attempts'] == 2 ; '停止済み' in client.get('/api/operations/reconcile', headers=headers('operator')).json()[0]['reason'] |
+| 日本語ケース | 認可情報の上書き入力を拒否する |
+| test node | backend/tests/test_workflow.py::test_認可情報の上書き入力を拒否する |
+| Given | 認証済みの執筆者がいる。 |
+| When | 文書作成時に権限を書き換える余剰項目を送り、ヘルスチェックも取得する。 |
+| Then | 余剰入力は内容を反射せず422で拒否し、ヘルスチェックは製品名を返す。 |
 
 
 ### TC033
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 画像を含む削除を保持期間後に完了する |
-| test node | backend/tests/test_workflow.py::test_画像を含む削除を保持期間後に完了する |
-| Given | client, db |
-| When | client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(url, headers=headers('operator')) ; client.post(url, headers=headers('operator')) ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | policy(client, doc, status='deleted').status_code == 200 ; client.post(url, headers=headers('operator')).json()['status'] == 'retained' ; client.post(url, headers=headers('operator')).json()['status'] == 'done' ; not any((c['document_id'] == doc['id'] for c in db.tables['chunks'].values())) ; not any((d['document_id'] == doc['id'] for d in db.tables['drafts'].values())) ; client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')).json()[0]['status'] == 'hidden' |
+| 日本語ケース | 反映失敗を照合し再試行で回復する |
+| test node | backend/tests/test_workflow.py::test_反映失敗を照合し再試行で回復する |
+| Given | 承認済みだが索引が未反映の文書がある。 |
+| When | 照合後、索引の完了検証を失敗させてから復旧し同じジョブを再試行する。 |
+| Then | 失敗中は回答を保留し、復旧後は完了して回答でき、完了済み再送は試行数を増やさない。 |
 
 
 ### TC034
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | モデル実行中の権限変更で回答を保留する |
-| test node | backend/tests/test_workflow.py::test_モデル実行中の権限変更で回答を保留する |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result['status'] == 'held' and '絶対に送信' not in result['answer'] |
+| 日本語ケース | 画像を含む削除を保持期間後に完了する |
+| test node | backend/tests/test_workflow.py::test_画像を含む削除を保持期間後に完了する |
+| Given | 公開文書とその会話履歴がある。 |
+| When | 削除後に保持期間内と期間経過後で削除ジョブを実行する。 |
+| Then | 期間内は保持し、期間後はチャンクと下書きを消し、履歴の回答を非表示にする。 |
 
 
 ### TC035
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | モデル呼び出し失敗を失敗件数として区別する |
-| test node | backend/tests/test_workflow.py::test_モデル呼び出し失敗を失敗件数として区別する |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result['status'] == 'failed' and result['citations'] == [] |
+| 日本語ケース | モデル実行中の権限変更で回答を保留する |
+| test node | backend/tests/test_workflow.py::test_モデル実行中の権限変更で回答を保留する |
+| Given | 回答に利用できる公開版がある。 |
+| When | モデルの処理中に文書を公開停止する。 |
+| Then | 回答は保留となり、生成済みの機密本文を返さない。 |
 
 
 ### TC036
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 不正な索引来歴をモデルへ渡さない |
-| test node | backend/tests/test_workflow.py::test_不正な索引来歴をモデルへ渡さない |
-| Given | client, db |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | ask(client).json()['status'] == 'held' ; ask(client).json()['status'] == 'held' |
+| 日本語ケース | モデル呼び出し失敗を失敗件数として区別する |
+| test node | backend/tests/test_workflow.py::test_モデル呼び出し失敗を失敗件数として区別する |
+| Given | 回答に利用できる公開版がある。 |
+| When | モデル呼出しをタイムアウトさせる。 |
+| Then | 回答状態をfailedとして根拠を空にし、通常の根拠不足と区別する。 |
 
 
 ### TC037
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 失効したジョブは公開版を戻さない |
-| test node | backend/tests/test_workflow.py::test_失効したジョブは公開版を戻さない |
-| Given | client |
-| When | client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{old['id']}", headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | client.post(f"/api/operations/jobs/{old['id']}", headers=headers('operator')).json()['status'] == 'obsolete' ; ask(client).json()['citations'][0]['version_id'] == v2['id'] |
+| 日本語ケース | 不正な索引来歴をモデルへ渡さない |
+| test node | backend/tests/test_workflow.py::test_不正な索引来歴をモデルへ渡さない |
+| Given | 索引済みの公開文書がある。 |
+| When | 索引のmanifestハッシュや本文参照を改変して質問する。 |
+| Then | 不正な根拠を使わず回答を保留する。 |
 
 
 ### TC038
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 外部索引失敗を記録して部分完了をreadyにしない |
-| test node | backend/tests/test_workflow.py::test_外部索引失敗を記録して部分完了をreadyにしない |
-| Given | client, monkeypatch |
-| When | client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | result['status'] == 'failed' and result['error_code'] == 'external_failure' ; ask(client).json()['status'] == 'held' |
+| 日本語ケース | 失効したジョブは公開版を戻さない |
+| test node | backend/tests/test_workflow.py::test_失効したジョブは公開版を戻さない |
+| Given | 旧版と新版が承認され、それぞれの反映ジョブがある。 |
+| When | 旧版ジョブを先に実行してから未反映分を処理する。 |
+| Then | 旧版ジョブはobsoleteとなり、回答は新版を引用する。 |
 
 
 ### TC039
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | workerが未配送ジョブを処理する |
-| test node | backend/tests/test_workflow.py::test_workerが未配送ジョブを処理する |
-| Given | client |
-| When | client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) |
-| Then | run_once(client.app.state.runtime) == 1 ; run_once(client.app.state.runtime) == 0 ; ask(client).json()['status'] == 'answered' |
+| 日本語ケース | 外部索引失敗を記録して部分完了をreadyにしない |
+| test node | backend/tests/test_workflow.py::test_外部索引失敗を記録して部分完了をreadyにしない |
+| Given | 承認済み版の索引ジョブがある。 |
+| When | 外部索引の書込みで例外を発生させる。 |
+| Then | ジョブをfailed・external_failureとし、不完全な索引では回答を保留する。 |
 
 
 ### TC040
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 回答根拠の欠落と改変は閲覧時に非表示とする |
-| test node | backend/tests/test_workflow.py::test_回答根拠の欠落と改変は閲覧時に非表示とする |
-| Given | client, db, target |
-| When | client.get(f"/api/chat/{answer['conversation_id']}", headers=headers('reader')) ; client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result[0]['status'] == 'hidden' and result[0]['citations'] == [] |
+| 日本語ケース | workerが未配送ジョブを処理する |
+| test node | backend/tests/test_workflow.py::test_workerが未配送ジョブを処理する |
+| Given | 承認済みで未配送のジョブが1件ある。 |
+| When | workerを2回実行してから質問する。 |
+| Then | 処理件数は順に1件・0件となり、索引済み版から回答できる。 |
 
 
 ### TC041
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 中断した質問は同じIDで再開し二重計上しない |
-| test node | backend/tests/test_workflow.py::test_中断した質問は同じIDで再開し二重計上しない |
-| Given | client, db |
-| When | client.post('/api/chat', headers=headers('reader', key), json=data.model_dump()) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | result.status_code == 200 ; result.json()['conversation_id'] == first.conversation_id ; len([e for e in db.tables['events'].values() if e['kind'] == 'question']) == 1 |
+| 日本語ケース | 回答根拠の欠落と改変は閲覧時に非表示とする |
+| test node | backend/tests/test_workflow.py::test_回答根拠の欠落と改変は閲覧時に非表示とする |
+| Given | 公開版を引用した回答履歴がある。 |
+| When | 文書・版・チャンク・manifest・配置・本文のいずれかを欠落または改変して履歴を取得する。 |
+| Then | 該当する回答と引用を非表示にする。 |
 
 
 ### TC042
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 外部検索は返されたID以外を根拠にしない |
-| test node | backend/tests/test_workflow.py::test_外部検索は返されたID以外を根拠にしない |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | ask(client).json()['status'] == 'held' |
+| 日本語ケース | 中断した質問は同じIDで再開し二重計上しない |
+| test node | backend/tests/test_workflow.py::test_中断した質問は同じIDで再開し二重計上しない |
+| Given | 質問受付だけを保存し、回答確定前に中断している。 |
+| When | 同じ操作IDで質問を再送する。 |
+| Then | 同じ会話で200を返し、質問イベントは1件のままになる。 |
 
 
 ### TC043
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | モデル入力直前に失効を検知した場合はモデルを呼ばない |
-| test node | backend/tests/test_workflow.py::test_モデル入力直前に失効を検知した場合はモデルを呼ばない |
-| Given | client, monkeypatch |
-| When | client.post('/api/chat', headers=headers(persona), json={'question': '開発フローの承認を教えて', 'department_id': DEPT, **kwargs}) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | ask(client).json()['status'] == 'held' |
+| 日本語ケース | 外部検索は返されたID以外を根拠にしない |
+| test node | backend/tests/test_workflow.py::test_外部検索は返されたID以外を根拠にしない |
+| Given | ローカルには索引済みの文書がある。 |
+| When | 外部検索が該当IDなしを返す状態で質問する。 |
+| Then | 外部検索にない根拠を補わず回答を保留する。 |
 
 
 ### TC044
 
 | 項目 | 内容 |
 | --- | --- |
-| 日本語ケース | 削除配送を100行単位で再開し共有本文を残す |
-| test node | backend/tests/test_workflow.py::test_削除配送を100行単位で再開し共有本文を残す |
-| Given | client, db |
-| When | client.get(f"/api/documents/{other['id']}", headers=headers('reader')) ; client.put(f"/api/documents/{doc['id']}/policy", headers=headers('leader'), json={'revision': current['revision'], 'visibility': 'department', 'shared_departments': [], 'status': 'active', 'reason': '検証文書の利用終了', **kwargs}) ; client.get('/api/documents?scope=manage', headers=headers('leader')) ; client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) ; client.post(f"/api/documents/{doc['id']}/submissions", headers=headers(), json={'revision': revision}) ; client.get(f"/api/documents/{doc['id']}/draft", headers=headers()) ; client.post(f"/api/reviews/{review['id']}/decision", headers=headers('reviewer'), json={'decision': decision, 'reason': reason, 'manifest_hash': version['manifest_hash']}) ; client.get('/api/reviews', headers=headers('reviewer')) ; client.get('/api/operations/jobs', headers=headers('operator')) ; client.post(f"/api/operations/jobs/{job['id']}", headers=headers('operator')) |
-| Then | not [c for c in db.tables['chunks'].values() if c['document_id'] == doc['id']] ; client.get(f"/api/documents/{other['id']}", headers=headers('reader')).status_code == 200 |
+| 日本語ケース | モデル入力直前に失効を検知した場合はモデルを呼ばない |
+| test node | backend/tests/test_workflow.py::test_モデル入力直前に失効を検知した場合はモデルを呼ばない |
+| Given | 根拠の初回検証が成功している。 |
+| When | モデル入力直前の再検証で根拠を失効させる。 |
+| Then | 回答を保留し、失効した根拠を利用しない。 |
 
 
 ### TC045
 
 | 項目 | 内容 |
 | --- | --- |
+| 日本語ケース | 削除配送を100行単位で再開し共有本文を残す |
+| test node | backend/tests/test_workflow.py::test_削除配送を100行単位で再開し共有本文を残す |
+| Given | 削除対象に100件超のチャンクと、同じ本文を使う別文書がある。 |
+| When | 保持期間を経過させてworkerを複数回実行する。 |
+| Then | 対象チャンクを全件削除し、共有本文を使う別文書は閲覧できる。 |
+
+
+### TC046
+
+| 項目 | 内容 |
+| --- | --- |
 | 日本語ケース | HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない |
 | test node | backend/tests/test_workflow.py::test_HTTP処理ログを通常のINFO設定で出力し本文とトークンを含めない |
-| Given | client, caplog |
-| When | client.post('/api/documents', headers=headers(), json={'title': '開発ガイド', 'department_id': DEPT}) ; client.put(f"/api/documents/{doc['id']}/draft", headers=headers(), json={'title': doc['title'], 'body': body, 'revision': 1}) |
-| Then | messages and all(('request_id=' in message for message in messages)) ; 'ログへ出さない' not in ''.join(messages) ; 'demo-author' not in ''.join(messages) |
+| Given | 通常のINFOログ設定で動作している。 |
+| When | 架空の機密本文を含む文書を保存する。 |
+| Then | 処理ログに相関IDを残し、本文と認証トークンは記録しない。 |

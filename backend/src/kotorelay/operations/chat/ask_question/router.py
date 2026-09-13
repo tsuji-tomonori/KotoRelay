@@ -12,6 +12,7 @@ from kotorelay.engines import Engine
 from kotorelay.errors import Problem
 from kotorelay.generated import models
 from kotorelay.http_types import Key
+from kotorelay.operational_logging import MessageId, continuation_context, ops_logger
 from kotorelay.operations.chat.ask_question import functions as f
 from kotorelay.operations.chat.ask_question.contract import CONTRACT
 from kotorelay.operations.chat.ask_question.response_builders import build_response
@@ -48,7 +49,11 @@ def ask_question(rt: Rt, subject: Subject, data: Ask, key: Key) -> AnswerView:
         if prepared.citations:
             try:
                 answer = f.generate_answer(prepared, rt)
-            except (BotoCoreError, ClientError, TimeoutError):
+            except (BotoCoreError, ClientError, TimeoutError) as exc:
+                ops_logger.error(
+                    MessageId.MODEL_FAILED,
+                    context_model=continuation_context(MessageId.MODEL_FAILED, exc),
+                )
                 failed = True
     with rt.context(subject) as ctx:
         return build_response(finalize(ctx, prepared, answer, rt.engine, failed))
@@ -87,7 +92,11 @@ def prepare(ctx: Context, data: Ask, key: str, engine: Engine) -> Prepared:
             continue
         try:
             text = f.load_chunk_text(chunk, ctx)
-        except Problem:
+        except Problem as exc:
+            ops_logger.warning(
+                MessageId.EVIDENCE_REJECTED,
+                context_model=continuation_context(MessageId.EVIDENCE_REJECTED, exc),
+            )
             continue
         score = f.score_chunk(data.question, text, vector_keys, chunk.id)
         if f.has_sufficient_relevance(score, vector_keys, data):

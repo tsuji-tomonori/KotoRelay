@@ -43,6 +43,10 @@ def postgres(tmp_path):
 
 
 def test_PostgreSQLで承認とoutboxと回答を一貫して確定する(postgres):
+    """Given: 実PostgreSQLで文書と利用者を準備している。
+    When: 申請・承認・索引反映・質問をHTTPで実行する。
+    Then: 承認版を引用して回答し、他部署の直接閲覧は404となる。
+    """
     with TestClient(create_app(postgres)) as client:
         doc, version = published(client)
         result = ask(client).json()
@@ -55,6 +59,10 @@ def test_PostgreSQLで承認とoutboxと回答を一貫して確定する(postgr
 
 
 def test_DB自身が別文書への誤った版参照を拒否する(postgres):
+    """Given: 異なる文書に属する版が実DBにある。
+    When: 別文書の版を参照するチャンクを保存する。
+    Then: 外部キー制約が拒否し、誤った関連を保存しない。
+    """
     with TestClient(create_app(postgres)) as client:
         doc = create(client)
         other = create(client)
@@ -89,6 +97,10 @@ def test_DB自身が別文書への誤った版参照を拒否する(postgres):
 
 
 def test_DBの競合時はtransaction全体がrollbackされる(postgres):
+    """Given: 2接続が同じ組織の更新前状態を読んでいる。
+    When: 一方を確定後、もう一方も同じ状態で更新する。
+    Then: 後続更新は競合し、確定済みの1回分だけ保存番号が増える。
+    """
     org = postgres.organization_id
     with Database(postgres).transaction() as first:
         row = q.organizations_get(first, q.OrganizationsGetParams(organization_id=org, id=org))[0]
@@ -113,6 +125,10 @@ def test_DBの競合時はtransaction全体がrollbackされる(postgres):
 
 
 def test_実SQLで複数部署の管理一覧と権限を絞り込む(postgres):
+    """Given: 実PostgreSQLに複数部署と文書がある。
+    When: 部署別の管理一覧を少ない件数で取得する。
+    Then: 実SQLでも部署を先に絞り、権限のない用途は403で拒否する。
+    """
     from test_ui_contract import department_page_case
 
     with TestClient(create_app(postgres)) as client:
@@ -120,6 +136,10 @@ def test_実SQLで複数部署の管理一覧と権限を絞り込む(postgres):
 
 
 def test_成功応答の送信時には別接続から保存済み文書が見える(postgres):
+    """Given: 実PostgreSQLを使うAPIの応答送信を観測できる。
+    When: 文書作成の201応答が始まる時点で別接続から文書を読む。
+    Then: 成功応答前にcommit済みで、作成した文書が別接続から見える。
+    """
     app = create_app(postgres)
     observed = []
     title = "コミット済みの応答"
@@ -147,6 +167,10 @@ def test_成功応答の送信時には別接続から保存済み文書が見�
 
 
 def test_commit時の競合は成功応答を送らず409にしてrollbackする(postgres, monkeypatch):
+    """Given: 文書作成後のcommitで競合する接続を用意している。
+    When: 文書作成を実行して保存状態を別接続から確認する。
+    Then: 201を送らず409・conflictを返し、文書はrollbackされて残らない。
+    """
     from contextlib import contextmanager
 
     app = create_app(postgres)

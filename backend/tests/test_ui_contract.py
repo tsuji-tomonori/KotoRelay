@@ -51,10 +51,18 @@ def department_page_case(client):
 
 
 def test_複数部署の一覧を権限検査してページング前に絞る(client):
+    """Given: 複数部署の管理権限と各部署の文書がある。
+    When: 部署を指定し1件ずつの管理一覧を取得する。
+    Then: ページング前に部署で絞り、権限のない部署や用途は403で拒否する。
+    """
     department_page_case(client)
 
 
 def test_一覧は公開版と審査版を分離し続きの有無を返す(client):
+    """Given: 公開版と未承認の新版があり、複数の下書きもある。
+    When: 閲覧・執筆・管理一覧をページングと検索で取得する。
+    Then: 公開情報と審査情報を混ぜず、続きの有無・状態・検索結果を正しく返す。
+    """
     doc, version = published(client)
     current = client.get(f"/api/documents/{doc['id']}/draft", headers=headers()).json()
     client.put(
@@ -93,6 +101,10 @@ def test_一覧は公開版と審査版を分離し続きの有無を返す(clie
 
 
 def test_削除は理由必須で状態変更と同じtransactionに監査を残す(client, db):
+    """Given: 有効な文書がある。
+    When: 空の理由で削除し、続いて理由付きで削除する。
+    Then: 理由なしは422で状態を維持し、理由ありは状態変更と監査を1回だけ保存する。
+    """
     doc = create(client)
     assert policy(client, doc, status="deleted", reason="  ").status_code == 422
     assert db.tables["documents"][doc["id"]]["status"] == "active"
@@ -103,6 +115,10 @@ def test_削除は理由必須で状態変更と同じtransactionに監査を残
 
 
 def test_会話内の利用部署変更を拒否し新規会話なら許可する(client):
+    """Given: 利用者が複数部署に所属し、既存の会話がある。
+    When: 同じ会話で部署を変え、その後新しい会話で別部署を指定する。
+    Then: 既存会話の部署変更は409、新規会話は別IDで200となる。
+    """
     published(client)
     grant(client, "reader", OTHER)
     first = ask(client).json()
@@ -124,6 +140,10 @@ def upload(client, doc):
 
 
 def test_OCR領域の複数行訂正と削除追加でも識別座標を保つ(client):
+    """Given: 画像のOCRに識別子と座標付きの領域がある。
+    When: 複数行訂正・領域削除・追加を行い、過去のOCRと重複ID入力も確認する。
+    Then: 識別子と座標を保ち、人の訂正として記録し、過去のOCRは不変、重複IDは422となる。
+    """
     doc = create(client)
     asset = upload(client, doc)["asset"]
     ids = [str(uuid4()), str(uuid4())]
@@ -180,6 +200,10 @@ def test_OCR領域の複数行訂正と削除追加でも識別座標を保つ(c
 
 
 def test_旧OCRの読取は安定IDを補うだけで保存済みハッシュを変えない(client, db):
+    """Given: 領域識別子のない旧形式OCRを保存している。
+    When: 同じOCRを2回取得して保存済み実体も読む。
+    Then: 同じ安定IDを補い、保存済みハッシュと元の内容は変更しない。
+    """
     doc = create(client)
     uploaded = upload(client, doc)
     rid = uploaded["ocr_run"]["id"]
@@ -215,6 +239,10 @@ def test_旧OCRの読取は安定IDを補うだけで保存済みハッシュを
 
 
 def test_代替テキストと絵文字位置を承認版へ固定する(client):
+    """Given: 絵文字を含む本文に画像配置と代替テキストがある。
+    When: 承認後に下書きの代替テキストを変更する。
+    Then: 承認版は当時の配置・コードポイント位置・代替テキストを保持する。
+    """
     doc = create(client)
     data = upload(client, doc)
     run = client.post(
@@ -254,6 +282,10 @@ def test_代替テキストと絵文字位置を承認版へ固定する(client)
 
 
 def test_審査とジョブの表示名を対象版から得る(client):
+    """Given: 承認済み版と未承認のタイトルがある。
+    When: 審査とジョブの詳細一覧を取得する。
+    Then: 対象版の表示名と版番号を返し、未承認名を混ぜず、運用権限のない詳細取得は403となる。
+    """
     doc, version = published(client)
     client.put(
         f"/api/documents/{doc['id']}/draft",
@@ -276,6 +308,10 @@ def test_審査とジョブの表示名を対象版から得る(client):
 
 
 def test_Markdownの空白改行を保存してコードポイント位置を維持する(client):
+    """Given: 空白・改行・絵文字を含むMarkdownがある。
+    When: タイトルと本文を保存し、空白だけのタイトルでも保存を試す。
+    Then: 本文をそのまま維持し、タイトルだけを整形し、空タイトルは422で拒否する。
+    """
     doc = create(client)
     body = "  日😀\n\n    コード\n\n"
     saved = client.put(

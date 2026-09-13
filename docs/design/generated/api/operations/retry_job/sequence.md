@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 反映ジョブを再処理 — シーケンス
 
@@ -9,39 +9,56 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
+    participant E as HTTP例外ハンドラ
+    participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体
     participant M as モデル・検索エンジン
     U->>A: POST /api/operations/jobs/{job_id}
     Note over A,D: 依存注入でtransaction開始・組織と所属を確認
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(users) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: ジョブを実行できる運用権限を確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：ctx.user.operator
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    end
     end
     A->>F: 現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を取得する。
     A->>D: 現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を取得する。
     A->>F: 実行対象のジョブが存在することを確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：bool(rows)
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    end
     end
     A->>F: ジョブの再試行回数の上限を確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：job.attempts < 5
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 429 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID}
+    end
     end
     A->>F: ジョブが完了または旧版として終了しているかを判定する。
     alt f.is_finished_job(job)
@@ -161,9 +178,8 @@ sequenceDiagram
     A->>F: split_chunks
     end
     A->>F: 生成する検索断片の件数上限を確認する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(parts) <= 300
+    Note over A: Problemを kotorelay.operations.indexing.shared.router.process：104 で捕捉 / HTTP 422 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     A->>F: 取得したデータを識別子別に参照できる辞書へ変換する。
     A->>D: 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
@@ -189,9 +205,8 @@ sequenceDiagram
     opt 前条件が成立
     A->>M: verify
     end
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：len(actual) == len(parts) and engine.verify([c.id for c in actual])
+    Note over A: Problemを kotorelay.operations.indexing.shared.router.process：104 で捕捉 / HTTP 503 / {code： "integrity", message： "保存内容の整合性を確認できません。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     loop actual
     A->>F: 記録された保存先から実体を取得してハッシュを照合する。
@@ -204,9 +219,13 @@ sequenceDiagram
     A->>F: 後続処理に渡すデータを組み立てる。
     end
     opt 例外発生：Problem
+    A->>L: KR_INDEX_FAILED / 索引または削除ジョブの実行が失敗しました。
+    Note over A,U: 後続の保存が成功すれば再試行APIはHTTP 200、OutboxRow.status=failed、error_code=context.code。Problemはその業務code、それ以外はexternal_failure。workerはHTTP応答なし。
     A->>F: 後続処理に渡すデータを組み立てる。
     end
     opt 例外発生：(OSError, BotoCoreError, ClientError)
+    A->>L: KR_INDEX_FAILED / 索引または削除ジョブの実行が失敗しました。
+    Note over A,U: 後続の保存が成功すれば再試行APIはHTTP 200、OutboxRow.status=failed、error_code=context.code。Problemはその業務code、それ以外はexternal_failure。workerはHTTP応答なし。
     A->>F: 後続処理に渡すデータを組み立てる。
     end
     A->>F: 現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を更新する。
@@ -214,16 +233,57 @@ sequenceDiagram
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: fence
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-    A->>F: require
-    alt not condition
-    Note over A: 例外を送出し通常経路を終了
+    opt 検証不成立：q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    end
     end
     Note over A: この処理からreturn
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     Note over A: この処理からreturn
     Note over A,D: 成功応答前に依存transactionをcommit・失敗時rollback
-    A-->>U: HTTP応答
+    A-->>U: HTTP 200 / models.OutboxRow
+    Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
+    opt 入力検証の失敗（RequestValidationError）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    end
+    end
+    opt SQL実行またはcommitの競合（psycopg.Error）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
+    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    end
+    end
+    opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
+    break エラー応答を返して終了（後続の正常処理は実行しない）
+    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
+    E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
+    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    end
+    end
 ```
+
+**例外応答一覧（HTTP境界へ到達した場合）**
+
+| HTTP | code | message | 相関ID |
+| --- | --- | --- | --- |
+| 401 | unauthenticated | ログインが必要です。 | request_id |
+| 403 | forbidden | この操作は許可されていません。 | request_id |
+| 404 | not_found | 対象を利用できません。 | request_id |
+| 409 | conflict | 他の操作で更新されました。最新の状態を確認してください。 | request_id |
+| 409 | conflict | 競合しました。再読込してください。 | request_id |
+| 422 | invalid_input | 入力形式を確認してください。 | request_id |
+| 422 | limit | 利用上限に達しました。 | request_id |
+| 429 | limit | 利用上限に達しました。 | request_id |
+| 503 | integrity | 保存内容の整合性を確認できません。 | request_id |
+| 503 | unavailable | 一時的に利用できません。 | request_id |
+
 
 **制御順序（関数内の行順）**
 
@@ -233,6 +293,7 @@ sequenceDiagram
 | kotorelay.context.stable_id | 27 | Return | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
+| kotorelay.operational_logging.continuation_context | 150 | Return | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
 | kotorelay.operations.indexing.retry_job.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
 | kotorelay.operations.indexing.retry_job.router.retry_job | 27 | Return | build_response(process(ctx, rt.engine, str(job_id))) |
 | kotorelay.operations.indexing.shared.functions.answers_list | 284 | Return | q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) |
@@ -310,37 +371,37 @@ sequenceDiagram
 | kotorelay.operations.indexing.shared.functions.verify_index_completion | 220 | Return | require(len(actual) == len(parts) and engine.verify([c.id for c in actual]), 'integrity', 503) |
 | kotorelay.operations.indexing.shared.functions.versions_get | 86 | Return | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=version_id)) |
 | kotorelay.operations.indexing.shared.functions.versions_list | 279 | Return | q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org)) |
-| kotorelay.operations.indexing.shared.router.build_index | 16 | If | not job.version_id or f.is_obsolete_version(doc, job) |
-| kotorelay.operations.indexing.shared.router.build_index | 17 | Return | 'obsolete' |
-| kotorelay.operations.indexing.shared.router.build_index | 20 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 22 | If | f.has_more_stale_chunks(stale) |
-| kotorelay.operations.indexing.shared.router.build_index | 23 | Return | 'pending' |
-| kotorelay.operations.indexing.shared.router.build_index | 24 | If | f.is_inactive_document(doc) |
-| kotorelay.operations.indexing.shared.router.build_index | 25 | Return | 'done' |
-| kotorelay.operations.indexing.shared.router.build_index | 30 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 38 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 42 | If | f.is_existing_chunk(previous, chunk) |
-| kotorelay.operations.indexing.shared.router.build_index | 48 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 51 | Return | 'done' |
-| kotorelay.operations.indexing.shared.router.process | 98 | If | f.is_finished_job(job) |
-| kotorelay.operations.indexing.shared.router.process | 99 | Return | job |
-| kotorelay.operations.indexing.shared.router.process | 100 | Try | Try |
-| kotorelay.operations.indexing.shared.router.process | 103 | ExceptHandler | Problem |
-| kotorelay.operations.indexing.shared.router.process | 105 | ExceptHandler | (OSError, BotoCoreError, ClientError) |
-| kotorelay.operations.indexing.shared.router.process | 109 | Return | updated |
-| kotorelay.operations.indexing.shared.router.purge | 56 | If | f.is_restored_document(doc) |
-| kotorelay.operations.indexing.shared.router.purge | 57 | Return | 'obsolete' |
-| kotorelay.operations.indexing.shared.router.purge | 58 | If | f.is_within_retention(ctx, job) |
-| kotorelay.operations.indexing.shared.router.purge | 59 | Return | 'retained' |
-| kotorelay.operations.indexing.shared.router.purge | 70 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 74 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 76 | If | f.has_more_target_chunks(target_chunks) |
-| kotorelay.operations.indexing.shared.router.purge | 77 | Return | 'pending' |
-| kotorelay.operations.indexing.shared.router.purge | 79 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 81 | If | f.has_more_target_ocr(target_runs) |
-| kotorelay.operations.indexing.shared.router.purge | 82 | Return | 'pending' |
-| kotorelay.operations.indexing.shared.router.purge | 83 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 84 | If | f.is_target_asset(asset, doc) |
-| kotorelay.operations.indexing.shared.router.purge | 86 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 87 | If | f.is_target_draft(draft, doc) |
-| kotorelay.operations.indexing.shared.router.purge | 89 | Return | 'done' |
+| kotorelay.operations.indexing.shared.router.build_index | 17 | If | not job.version_id or f.is_obsolete_version(doc, job) |
+| kotorelay.operations.indexing.shared.router.build_index | 18 | Return | 'obsolete' |
+| kotorelay.operations.indexing.shared.router.build_index | 21 | For | For |
+| kotorelay.operations.indexing.shared.router.build_index | 23 | If | f.has_more_stale_chunks(stale) |
+| kotorelay.operations.indexing.shared.router.build_index | 24 | Return | 'pending' |
+| kotorelay.operations.indexing.shared.router.build_index | 25 | If | f.is_inactive_document(doc) |
+| kotorelay.operations.indexing.shared.router.build_index | 26 | Return | 'done' |
+| kotorelay.operations.indexing.shared.router.build_index | 31 | For | For |
+| kotorelay.operations.indexing.shared.router.build_index | 39 | For | For |
+| kotorelay.operations.indexing.shared.router.build_index | 43 | If | f.is_existing_chunk(previous, chunk) |
+| kotorelay.operations.indexing.shared.router.build_index | 49 | For | For |
+| kotorelay.operations.indexing.shared.router.build_index | 52 | Return | 'done' |
+| kotorelay.operations.indexing.shared.router.process | 99 | If | f.is_finished_job(job) |
+| kotorelay.operations.indexing.shared.router.process | 100 | Return | job |
+| kotorelay.operations.indexing.shared.router.process | 101 | Try | Try |
+| kotorelay.operations.indexing.shared.router.process | 104 | ExceptHandler | Problem |
+| kotorelay.operations.indexing.shared.router.process | 109 | ExceptHandler | (OSError, BotoCoreError, ClientError) |
+| kotorelay.operations.indexing.shared.router.process | 116 | Return | updated |
+| kotorelay.operations.indexing.shared.router.purge | 57 | If | f.is_restored_document(doc) |
+| kotorelay.operations.indexing.shared.router.purge | 58 | Return | 'obsolete' |
+| kotorelay.operations.indexing.shared.router.purge | 59 | If | f.is_within_retention(ctx, job) |
+| kotorelay.operations.indexing.shared.router.purge | 60 | Return | 'retained' |
+| kotorelay.operations.indexing.shared.router.purge | 71 | For | For |
+| kotorelay.operations.indexing.shared.router.purge | 75 | For | For |
+| kotorelay.operations.indexing.shared.router.purge | 77 | If | f.has_more_target_chunks(target_chunks) |
+| kotorelay.operations.indexing.shared.router.purge | 78 | Return | 'pending' |
+| kotorelay.operations.indexing.shared.router.purge | 80 | For | For |
+| kotorelay.operations.indexing.shared.router.purge | 82 | If | f.has_more_target_ocr(target_runs) |
+| kotorelay.operations.indexing.shared.router.purge | 83 | Return | 'pending' |
+| kotorelay.operations.indexing.shared.router.purge | 84 | For | For |
+| kotorelay.operations.indexing.shared.router.purge | 85 | If | f.is_target_asset(asset, doc) |
+| kotorelay.operations.indexing.shared.router.purge | 87 | For | For |
+| kotorelay.operations.indexing.shared.router.purge | 88 | If | f.is_target_draft(draft, doc) |
+| kotorelay.operations.indexing.shared.router.purge | 90 | Return | 'done' |

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # オブジェクト保存 CRUD対応表
 
@@ -102,8 +102,8 @@ flowchart LR
 | read_document | objects | content_object | R | backend/src/kotorelay/operations/documents/read_document/functions.py:54 |
 | version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/version_diff/functions.py:33 |
 | version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/version_diff/functions.py:38 |
-| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:99 |
-| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:132 |
+| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:103 |
+| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:136 |
 | get_image | objects | content_object | R | backend/src/kotorelay/operations/images/get_image/functions.py:11 |
 | get_ocr | objects | content_object | R | backend/src/kotorelay/operations/images/get_ocr/functions.py:52 |
 | correct_ocr | objects | content_object | CU | backend/src/kotorelay/operations/images/correct_ocr/functions.py:62 |
@@ -118,15 +118,15 @@ flowchart LR
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:175 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:224 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:59 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:77 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:78 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:46 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:82 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:83 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:47 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:63 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:48 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:64 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:77 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:78 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:46 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:65 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:82 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:83 |
 | chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:47 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:63 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:48 |
 | chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:64 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:65 |

@@ -68,6 +68,8 @@ def sources() -> list[Path]:
                 ROOT / "tools/project/api_documents.py",
                 ROOT / "tools/project/api_layout.py",
                 ROOT / "tools/project/router_sequence.py",
+                ROOT / "tools/project/error_design.py",
+                ROOT / "tools/project/test_narrative.py",
             ]
         )
     )
@@ -129,6 +131,8 @@ class Inventory:
 
 
 def tests() -> list[dict[str, object]]:
+    from tools.project.test_narrative import parse
+
     result = []
     for path in sorted((ROOT / "backend/tests").glob("test*.py")):
         tree = ast.parse(path.read_text())
@@ -158,15 +162,13 @@ def tests() -> list[dict[str, object]]:
                 and n.func.attr in {"get", "post", "put"}
                 and ast.unparse(n.func.value) == "client"
             ]
-            assertions = [ast.unparse(n.test) for n in ast.walk(node) if isinstance(n, ast.Assert)]
+            narrative = parse(ast.get_docstring(node), f"{path}:{node.lineno}")
             result.append(
                 {
                     "id": path.relative_to(ROOT).as_posix() + "::" + name,
                     "name": name.removeprefix("test_"),
                     "requests": requests,
-                    "given": ", ".join(node.args.args[i].arg for i in range(len(node.args.args)))
-                    or "モジュールの固定fixture",
-                    "assertions": assertions,
+                    **narrative,
                     "helpers": sorted(seen),
                 }
             )
@@ -197,11 +199,13 @@ def sql_heading(path: Path) -> str:
 
 def build() -> tuple[dict[str, str], dict[str, object]]:
     from fastapi.routing import APIRoute
-    from kotorelay.main import LOG_MESSAGES, app
+    from kotorelay.main import app
 
     from tools.project import api_documents as layout
     from tools.project.api_layout import inspect
+    from tools.project.error_design import validate_logging
 
+    validate_logging(ROOT / "backend/src")
     api_layouts = inspect()
 
     files = sources()
@@ -485,47 +489,20 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                 or "DB操作はありません。このAPIは固定の稼働状態を返します。"
             ),
         )
+        from tools.project.error_design import contracts, message_sections
+
+        error_outcomes = contracts(inventory, reached, authenticated=operation_id != "health")
         emit(
             "messages",
             layout.sections(
                 "messages",
-                [
-                    table(
-                        ["項目", "値"],
-                        [
-                            ["operation", operation_id],
-                            ["endpoint", f"{method.upper()} {route.path}"],
-                            ["router", inventory.paths[key].relative_to(ROOT).as_posix()],
-                        ],
-                    ),
-                    "共通HTTP middlewareのlogger呼出しと実行時LOG_MESSAGESを読み取ります。"
-                    "HTTPエラーメッセージをログとして置換しません。",
-                    table(
-                        ["id", "message_id", "ログ概要"],
-                        [["M001", "KR_REQUEST", "HTTP応答時の相関ID・メソッド・ステータス"]],
-                    ),
-                    "### `M001` `KR_REQUEST`\n\n"
-                    + table(
-                        ["項目", "内容"],
-                        [
-                            ["level", "INFO"],
-                            ["テンプレート", LOG_MESSAGES["KR_REQUEST"]],
-                            ["条件", "HTTP応答生成時"],
-                            ["場所", "backend/src/kotorelay/main.py:security_headers"],
-                            ["運用対応", "5xxはrequest_idから照合。409は再読込後に再試行。"],
-                        ],
-                    )
-                    + "\n#### 出力項目\n\n"
-                    + table(
-                        ["出力項目", "型", "マスク規則"],
-                        [
-                            ["request_id", "UUID文字列", "相関用ID"],
-                            ["method", "str", "HTTPメソッドのみ"],
-                            ["status", "int", "HTTPコードのみ"],
-                        ],
-                    ),
-                    "LOG_MESSAGESとlogger呼出しが実装に存在すること。本文・JWT・OCR本文をログに含めないこと。lazunex固有のloggerラッパーやWARNING以上の運用規則は、本実装の規則として転記しません。",
-                ],
+                message_sections(
+                    inventory,
+                    reached,
+                    error_outcomes,
+                    operation_id,
+                    f"{method.upper()} {route.path}",
+                ),
             ),
         )
         from tools.project.router_sequence import render as render_sequence
@@ -554,26 +531,21 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             "sequence",
             "```mermaid\n"
             + "\n".join(sequence)
-            + "\n```\n\n**制御順序（関数内の行順）**\n\n"
+            + "\n```\n\n**例外応答一覧（HTTP境界へ到達した場合）**\n\n"
+            + table(
+                ["HTTP", "code", "message", "相関ID"],
+                [[r.status, r.code, r.message, "request_id"] for r in error_outcomes],
+            )
+            + "\n\n**制御順序（関数内の行順）**\n\n"
             + table(["関数", "行", "要素", "条件・早期終了・例外"], flow),
         )
-        factor_details = (
-            "\n\n".join(
-                f"### F{i:02d} 条件分岐\n\n対象: `{f[0]}`。式: `{f[1]}`\n\n"
-                + table(
-                    ["要素ID", "要素", "期待観点"],
-                    [
-                        [
-                            f"F{i:02d}-true",
-                            "成立",
-                            "成立側の実装を実行。正常／異常は上記式と処理に依存する。",
-                        ],
-                        [f"F{i:02d}-false", "不成立", f"{f[2]} / {f[3]}"],
-                    ],
-                )
-                for i, f in enumerate(factors, 1)
+        factor_details = "\n\n".join(
+            f"### F{i:02d} {c['name']}\n\n"
+            + table(
+                ["前提となる要因", "操作する条件", "期待する結果"],
+                [[c["given"], c["when"], c["then"]]],
             )
-            or "明示的な条件分岐はありません。"
+            for i, c in enumerate(relevant, 1)
         )
         case_rows = [[f"TC{i:03d}", c["name"], c["id"]] for i, c in enumerate(relevant, 1)]
         case_details = "\n\n".join(
@@ -584,12 +556,8 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                     ["日本語ケース", c["name"]],
                     ["test node", c["id"]],
                     ["Given", c["given"]],
-                    ["When", " ; ".join(c["requests"]) or "SDK境界を実行"],
-                    [
-                        "Then",
-                        " ; ".join(c["assertions"])
-                        or "pytest.raises / mock assertionで例外・依存先を検証",
-                    ],
+                    ["When", c["when"]],
+                    ["Then", c["then"]],
                 ],
             )
             for i, c in enumerate(relevant, 1)
@@ -601,7 +569,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                 [
                     "FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用します。healthは認証不要です。型制約違反は422、認証失敗は401、commit競合は409です。",
                     factor_details,
-                    "参照先と同じ章名を保持しています。ここでは実在するテストを列挙します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。\n\n"
+                    "実在するテストのdocstringに記載したGiven/When/Thenを表示します。要因の完全な直積や到達不能条件の自動証明は実装していないため、全組合せの網羅を示す表ではありません。API群に共通する境界試験を含みます。\n\n"
                     + table(["Case ID", "日本語ケース", "test node"], case_rows),
                     case_details or "このAPI群に対応する実在ケースがありません。",
                 ],

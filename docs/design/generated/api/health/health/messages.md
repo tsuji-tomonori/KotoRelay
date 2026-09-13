@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 死活確認 — ログメッセージ
 
@@ -10,41 +10,39 @@
 | --- | --- |
 | operation | health |
 | endpoint | GET /api/health |
-| router | backend/src/kotorelay/operations/system/health/router.py |
 
 
 ## 生成・検証方針
 
-共通HTTP middlewareのlogger呼出しと実行時LOG_MESSAGESを読み取ります。HTTPエラーメッセージをログとして置換しません。
+lazunexのops_loggerと同じく、独自型のcontext、ログID、例外型、応答、確認・復旧手順を必須にします。実行時catalogと実際のops_logger呼出しから生成します。通常アクセスのINFO KR_REQUESTは相関ID・メソッド・statusだけを記録します。
 
 ## メッセージ一覧
 
-| id | message_id | ログ概要 |
+| message_id | level | ログ概要 |
 | --- | --- | --- |
-| M001 | KR_REQUEST | HTTP応答時の相関ID・メソッド・ステータス |
 
 
 ## ログ詳細
 
-### `M001` `KR_REQUEST`
+### 例外からHTTPエラー応答への対応
 
-| 項目 | 内容 |
-| --- | --- |
-| level | INFO |
-| テンプレート | request_id=%s method=%s status=%s |
-| 条件 | HTTP応答生成時 |
-| 場所 | backend/src/kotorelay/main.py:security_headers |
-| 運用対応 | 5xxはrequest_idから照合。409は再読込後に再試行。 |
+以下は例外が内部で処理されずHTTP境界に到達した場合の応答です。内部で捕捉して継続する経路はシーケンスのcatchと上記ログ別の継続結果を参照してください。
 
-#### 出力項目
+| 例外 | HTTP | code | message | ログID |
+| --- | --- | --- | --- | --- |
 
-| 出力項目 | 型 | マスク規則 |
+
+### 型付き出力項目
+
+| 項目 | 型 | 内容 |
 | --- | --- | --- |
-| request_id | UUID文字列 | 相関用ID |
-| method | str | HTTPメソッドのみ |
-| status | int | HTTPコードのみ |
+| request_id | uuid.UUID &#124; None | HTTP要求との相関ID。workerではnull。 |
+| exception_type | str | 捕捉した例外の型名。 |
+| status | int &#124; None | 確定したHTTPエラーのstatus。継続処理ではnull。 |
+| code | str &#124; None | 安全なHTTP応答またはジョブの失敗コード。その他の継続処理ではnull。 |
+| message | str | HTTP応答の安全なメッセージ、またはcatalogの継続結果。 |
 
 
 ## strict検証で要求する項目
 
-LOG_MESSAGESとlogger呼出しが実装に存在すること。本文・JWT・OCR本文をログに含めないこと。lazunex固有のloggerラッパーやWARNING以上の運用規則は、本実装の規則として転記しません。
+型・catalogの未登録ID、未知context項目、level不一致を拒否します。例外の生メッセージ、本文、JWT、OCR原文は渡しません。HTTPエラーにはrequest_idを付け、同じIDのログと照合します。

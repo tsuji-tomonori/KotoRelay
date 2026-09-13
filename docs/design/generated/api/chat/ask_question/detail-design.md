@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
 
 # 最新承認版の根拠で回答 — 詳細設計
 
@@ -60,28 +60,28 @@
 | backend/src/kotorelay/operations/chat/ask_question/functions.py:45 | ctx.member(data.department_id) | 'forbidden' | 403 |
 | backend/src/kotorelay/operations/chat/ask_question/functions.py:117 | all((a.department_id == data.department_id for a in q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) if a.conversation_id == conversation_id)) | 'conversation_department' | 409 |
 | backend/src/kotorelay/operations/chat/ask_question/functions.py:57 | prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id) | 'idempotency_conflict' | 409 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:44 | prepared.citations | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:48 | prepared.citations | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:38 | f.is_unhandled_problem(exc) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:46 | not all((validate_citation(ctx, c) for c in prepared.citations)) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:61 | prior | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:69 | resumed is not None | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:115 | f.is_new_question(resumed) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:71 | data.conversation_id | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:84 | f.is_unavailable_chunk(docs, chunk) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:86 | f.is_outside_search_results(vector_keys, chunk) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:93 | f.has_sufficient_relevance(score, vector_keys, data) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:102 | not validate_citation(ctx, citation) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:106 | f.exceeds_image_limit(images, related, ctx) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:113 | f.has_enough_citations(citations) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:71 | answer.user_id == ctx.user.id | not_found | 404 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:19 | not docs | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:22 | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:32 | not versions or not chunks | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:35 | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:50 | placements - {image.placement.id for image in manifest.images} | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:53 | image.placement.id in json.loads(chunk.placements) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:61 | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:45 | prepared.citations | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:49 | prepared.citations | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:39 | f.is_unhandled_problem(exc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:47 | not all((validate_citation(ctx, c) for c in prepared.citations)) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:66 | prior | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:74 | resumed is not None | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:124 | f.is_new_question(resumed) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:76 | data.conversation_id | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:89 | f.is_unavailable_chunk(docs, chunk) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:91 | f.is_outside_search_results(vector_keys, chunk) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:102 | f.has_sufficient_relevance(score, vector_keys, data) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:111 | not validate_citation(ctx, citation) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:115 | f.exceeds_image_limit(images, related, ctx) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:122 | f.has_enough_citations(citations) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:76 | answer.user_id == ctx.user.id | not_found | 404 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:20 | not docs | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:23 | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:33 | not versions or not chunks | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:36 | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:51 | placements - {image.placement.id for image in manifest.images} | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:54 | image.placement.id in json.loads(chunk.placements) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:62 | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -178,6 +178,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/context.py:27 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | backend/src/kotorelay/engines.py:30 | {value[i:i + 2] for i in range(max(0, len(value) - 1))} &#124; set(re.findall('[a-z0-9]+', value)) |
 | backend/src/kotorelay/objects.py:17 | hashlib.sha256(data).hexdigest() |
+| backend/src/kotorelay/operational_logging.py:150 | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
 | backend/src/kotorelay/operations/chat/ask_question/functions.py:30 | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=exc.message)) |
 | backend/src/kotorelay/operations/chat/ask_question/functions.py:50 | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=answer_id)) |
 | backend/src/kotorelay/operations/chat/ask_question/functions.py:298 | q.answers_insert(ctx.db, q.AnswersInsertParams.model_validate(row, from_attributes=True)) |
@@ -233,19 +234,19 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/chat/ask_question/generated/queries.py:291 | db.query('operations/chat/ask_question/sql/010_events_list.sql', params.model_dump(), EventsListRow) |
 | backend/src/kotorelay/operations/chat/ask_question/generated/queries.py:323 | db.query('operations/chat/ask_question/sql/011_versions_get.sql', params.model_dump(), VersionsGetRow) |
 | backend/src/kotorelay/operations/chat/ask_question/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:54 | build_response(finalize(ctx, prepared, answer, rt.engine, failed)) |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:41 | build_response(present(ctx, f.answers_get(ctx, exc)[0])) |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:143 | present(ctx, row) |
-| backend/src/kotorelay/operations/chat/ask_question/router.py:119 | Prepared(answer_id=answer_id, conversation_id=conversation_id, question=data.question, department_id=data.department_id, citations=citations, texts=texts, images=images) |
-| backend/src/kotorelay/operations/chat/shared/functions.py:74 | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
-| backend/src/kotorelay/operations/chat/shared/functions.py:20 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:27 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:33 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:44 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:65 | True |
-| backend/src/kotorelay/operations/chat/shared/functions.py:51 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:67 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:62 | False |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:59 | build_response(finalize(ctx, prepared, answer, rt.engine, failed)) |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:42 | build_response(present(ctx, f.answers_get(ctx, exc)[0])) |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:152 | present(ctx, row) |
+| backend/src/kotorelay/operations/chat/ask_question/router.py:128 | Prepared(answer_id=answer_id, conversation_id=conversation_id, question=data.question, department_id=data.department_id, citations=citations, texts=texts, images=images) |
+| backend/src/kotorelay/operations/chat/shared/functions.py:79 | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| backend/src/kotorelay/operations/chat/shared/functions.py:21 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:28 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:34 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:45 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:66 | True |
+| backend/src/kotorelay/operations/chat/shared/functions.py:52 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:72 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:63 | False |
 | backend/src/kotorelay/operations/chat/shared/generated/queries.py:45 | db.query('operations/chat/shared/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
 | backend/src/kotorelay/operations/chat/shared/generated/queries.py:76 | db.query('operations/chat/shared/sql/002_chunks_get.sql', params.model_dump(), ChunksGetRow) |
 | backend/src/kotorelay/operations/chat/shared/generated/queries.py:109 | db.query('operations/chat/shared/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |

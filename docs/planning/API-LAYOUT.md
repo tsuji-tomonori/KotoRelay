@@ -36,3 +36,15 @@ SQL正本は`sql/NNN_name.sql`、生成境界は各責務の`generated/queries.p
 シーケンスはrouterと実call graphのASTから呼出し順、条件、反復、例外、transactionを投影する。SQLを名前順に並べたり、実装にない外部呼出しやcommitを定型で追加しない。SQL矢印は正本の日本語一文コメントを使う。構文未対応は生成失敗として検出する。実装の条件式は図と制御構造表から追跡できる。
 
 以前のファイル配置検査はfunctionsに残った全体フローを検出できず、型生成も全体行型を流用していた。追加検査はfunctionsのtransaction・routerへの逆依存・複数更新段階の集約を拒否し、routerの直接DB/provider実行を拒否する。SQL投影、引数の余剰・NULL、呼出し順と分岐の生成、負例の拒否をテストする。詳細な原因と標準側への改善提案は[dev-standard issue #69](https://github.com/tsuji-tomonori/dev-standard/issues/69)へ報告した。
+
+## 例外応答・運用ログ・テスト説明（2026年9月13日追補）
+
+lazunexの`list_apis/functions.py`と`core/logging.py`を確認し、運用ログに独自型を必須とする方式を適用する。`MessageId`と`OperationalLogContext`を必須にした`ops_logger.warning/error`を使用する。catalogには出力条件、例外型、返す応答、確認手順、復旧手順を日本語で持つ。未知項目、未登録ID、level不一致を拒否し、生の例外文・質問・本文・JWTを渡さない。
+
+HTTP境界ではProblem、入力検証、DB競合・停止、外部サービス例外を安全なstatus/code/messageへ変換し、応答とログのrequest_idを一致させる。モデル失敗、OCR失敗、索引失敗、根拠の除外は内部で捕捉して継続する。途中のログに未確定のHTTP statusを確定値として記録せず、後続の再認可・保存が成功した場合の応答をcatalogに明記する。workerの索引処理にはHTTP応答がない。
+
+シーケンスは実際のrequire/Problemの引数・既定値、try/catch、応答契約を読んで例外のstatus・code・message・ログを表示する。already_answeredは内部制御例外であり、既存回答を再取得して200を返す。catch内の再送出とHTTP終了を区別する。静的に解決できないProblemを汎用の説明で埋めず生成失敗とする。
+
+単体テストのdocstringに、実際の試験を説明する日本語のGiven/When/Thenを記述する。API帳票の要因とケース詳細、pytestの実行一覧はこの説明を参照し、fixture名やassert式を説明の代用にしない。説明の欠落・重複は検査で拒否する。条件式の技術的な追跡は詳細設計とシーケンスの補助表を使う。
+
+前回は呼出し順や章の一致を検査した一方、HTTP応答への変換と型付きログを適用範囲から落とし、テストのASTを説明として代用していた。原因・改善案は[dev-standard issue #70](https://github.com/tsuji-tomonori/dev-standard/issues/70)へ報告した。

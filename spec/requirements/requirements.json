@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 7,
+  "catalog_revision": 8,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -5793,6 +5793,196 @@
       "verification": {
         "evidence": "同一コミットの品質Pages",
         "method": "配置と型の負例、生成差分、既存業務と実DBとCompose E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIとテストと設計generatorが存在する",
+          "id": "AC-DESIGN-10",
+          "then": "例外のHTTP status・code・messageと内部捕捉後の継続または再送出を区別し、解決不能な応答を汎用文で隠さず検出する",
+          "when": "実行して設計と品質Pagesを生成する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-10",
+      "last_changed_by": "error-reporting-2026-09-13",
+      "object": "シーケンスに例外応答を具体的に表示する",
+      "rationale": "利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "シーケンスに例外応答を具体的に表示する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/router_sequence.py",
+          "tools/project/error_design.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_error_reporting.py",
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "実HTTP応答・ログ・生成の正例負例・Pages E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIとテストと設計generatorが存在する",
+          "id": "AC-DESIGN-11",
+          "then": "例外型・安全な応答・相関ID・確認復旧手順を持つ独自型ログを出し、未登録IDや未知項目を拒否し、生の例外文や本文やJWTを記録しない",
+          "when": "実行して設計と品質Pagesを生成する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-11",
+      "last_changed_by": "error-reporting-2026-09-13",
+      "object": "型付き運用ログとHTTP応答を照合可能にする",
+      "rationale": "利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "型付き運用ログとHTTP応答を照合可能にする",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "backend/src/kotorelay/operational_logging.py",
+          "backend/src/kotorelay/error_responses.py",
+          "backend/src/kotorelay/main.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "backend/tests/test_operational_logging.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "実HTTP応答・ログ・生成の正例負例・Pages E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIとテストと設計generatorが存在する",
+          "id": "AC-DESIGN-12",
+          "then": "実catalogとログ呼出しから例外・メッセージ・応答・運用手順を記載し、途中の捕捉を確定したHTTPエラーと誤記しない",
+          "when": "実行して設計と品質Pagesを生成する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-12",
+      "last_changed_by": "error-reporting-2026-09-13",
+      "object": "ログ帳票を実装された例外と応答とログから生成する",
+      "rationale": "利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "ログ帳票を実装された例外と応答とログから生成する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/error_design.py",
+          "tools/project/design.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_error_reporting.py",
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "実HTTP応答・ログ・生成の正例負例・Pages E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIとテストと設計generatorが存在する",
+          "id": "AC-DESIGN-13",
+          "then": "テストソースの日本語Given/When/ThenをAPI帳票と実行結果に表示し、説明の欠落・重複を拒否する",
+          "when": "実行して設計と品質Pagesを生成する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-13",
+      "last_changed_by": "error-reporting-2026-09-13",
+      "object": "単体テストを日本語の検証単位で表示する",
+      "rationale": "利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "単体テストを日本語の検証単位で表示する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/test_narrative.py",
+          "tools/project/collector.py",
+          "tools/project/design.py",
+          "frontend/portal/App.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_error_reporting.py",
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "実HTTP応答・ログ・生成の正例負例・Pages E2E"
       }
     }
   ],

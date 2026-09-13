@@ -17,6 +17,7 @@ import kotorelay.operations.images.upload_image.generated.queries as q
 import kotorelay.schemas as shared_schemas
 from kotorelay.context import new_id, now
 from kotorelay.errors import Problem, require
+from kotorelay.operational_logging import MessageId, continuation_context, ops_logger
 from kotorelay.schemas import OcrResult, Region
 
 
@@ -54,7 +55,10 @@ def run_ocr(data: bytes, width: int, height: int, command: str) -> OcrResult:
                 timeout=30,
                 check=True,
             )
-        except (OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError):
+        except (OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
+            ops_logger.error(
+                MessageId.OCR_FAILED, context_model=continuation_context(MessageId.OCR_FAILED, exc)
+            )
             return OcrResult(regions=[], engine="tesseract-jpn-eng-v1", status="failed")
         regions: list[Region] = []
         for line in csv.DictReader(io.StringIO(result.stdout.decode()), delimiter="\t"):

@@ -8,6 +8,7 @@ from kotorelay.context import Context
 from kotorelay.engines import Engine
 from kotorelay.errors import Problem
 from kotorelay.generated import models
+from kotorelay.operational_logging import MessageId, continuation_context, ops_logger
 from kotorelay.operations.indexing.shared import functions as f
 
 
@@ -101,8 +102,14 @@ def process(ctx: Context, engine: Engine, job_id: str) -> models.OutboxRow:
         status = purge(ctx, job, engine) if f.is_purge_job(job) else build_index(ctx, job, engine)
         updated = f.build_updated(job, status)
     except Problem as exc:
+        ops_logger.error(
+            MessageId.INDEX_FAILED, context_model=continuation_context(MessageId.INDEX_FAILED, exc)
+        )
         updated = f.build_updated_2(job, exc)
-    except (OSError, BotoCoreError, ClientError):
+    except (OSError, BotoCoreError, ClientError) as exc:
+        ops_logger.error(
+            MessageId.INDEX_FAILED, context_model=continuation_context(MessageId.INDEX_FAILED, exc)
+        )
         updated = f.build_updated_3(job)
     f.outbox_update(ctx, updated)
     f.check_concurrent_access(ctx)
