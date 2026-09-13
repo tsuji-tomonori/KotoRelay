@@ -63,35 +63,53 @@ def test_DB自身が別文書への誤った版参照を拒否する(postgres):
         with Database(postgres).transaction() as db:
             q.chunks_insert(
                 db,
-                q.ChunksRow(
-                    id=str(uuid4()),
-                    organization_id=postgres.organization_id,
-                    document_id=doc["id"],
-                    version_id=version["id"],
-                    body_key="0" * 64,
-                    sha256="0" * 64,
-                    heading="本文",
-                    placements="[]",
-                    manifest_hash=version["manifest_hash"],
-                    ready=False,
+                q.ChunksInsertParams.model_validate(
+                    q.ChunksRow(
+                        id=str(uuid4()),
+                        organization_id=postgres.organization_id,
+                        document_id=doc["id"],
+                        version_id=version["id"],
+                        body_key="0" * 64,
+                        sha256="0" * 64,
+                        heading="本文",
+                        placements="[]",
+                        manifest_hash=version["manifest_hash"],
+                        ready=False,
+                    ),
+                    from_attributes=True,
                 ),
             )
     with Database(postgres).transaction() as db:
         assert all(
-            row.document_id != doc["id"] for row in q.submissions_list(db, postgres.organization_id)
+            row.document_id != doc["id"]
+            for row in q.submissions_list(
+                db, q.SubmissionsListParams(organization_id=postgres.organization_id)
+            )
         )
 
 
 def test_DBの競合時はtransaction全体がrollbackされる(postgres):
     org = postgres.organization_id
     with Database(postgres).transaction() as first:
-        row = q.organizations_get(first, org, org)[0]
+        row = q.organizations_get(first, q.OrganizationsGetParams(organization_id=org, id=org))[0]
         with Database(postgres).transaction() as second:
-            assert q.organizations_fence(second, row) == 1
+            assert (
+                q.organizations_fence(
+                    second, q.OrganizationsFenceParams.model_validate(row, from_attributes=True)
+                )
+                == 1
+            )
         with pytest.raises(psycopg.errors.SerializationFailure):
-            q.organizations_fence(first, row)
+            q.organizations_fence(
+                first, q.OrganizationsFenceParams.model_validate(row, from_attributes=True)
+            )
     with Database(postgres).transaction() as check:
-        assert q.organizations_get(check, org, org)[0].revision == row.revision + 1
+        assert (
+            q.organizations_get(check, q.OrganizationsGetParams(organization_id=org, id=org))[
+                0
+            ].revision
+            == row.revision + 1
+        )
 
 
 def test_実SQLで複数部署の管理一覧と権限を絞り込む(postgres):
@@ -107,10 +125,13 @@ def test_成功応答の送信時には別接続から保存済み文書が見�
     title = "コミット済みの応答"
 
     async def checked(scope, receive, send):
+
         async def check_send(message):
             if message["type"] == "http.response.start" and message["status"] == 201:
                 with Database(postgres).transaction() as db:
-                    rows = q.documents_list(db, postgres.organization_id)
+                    rows = q.documents_list(
+                        db, q.DocumentsListParams(organization_id=postgres.organization_id)
+                    )
                     observed.append(any(row.title == title for row in rows))
             await send(message)
 
@@ -119,12 +140,7 @@ def test_成功応答の送信時には別接続から保存済み文書が見�
     with TestClient(checked) as client:
         department = client.get("/api/groups/me", headers=headers()).json()["departments"][0]["id"]
         result = client.post(
-            "/api/documents",
-            headers=headers(),
-            json={
-                "title": title,
-                "department_id": department,
-            },
+            "/api/documents", headers=headers(), json={"title": title, "department_id": department}
         )
         assert result.status_code == 201
     assert observed == [True]
@@ -149,12 +165,11 @@ def test_commit時の競合は成功応答を送らず409にしてrollbackする
             result = client.post(
                 "/api/documents",
                 headers=headers(),
-                json={
-                    "title": "競合して確定しない文書",
-                    "department_id": department,
-                },
+                json={"title": "競合して確定しない文書", "department_id": department},
             )
         assert result.status_code == 409
         assert result.json()["code"] == "conflict"
     with Database(postgres).transaction() as db:
-        assert not q.documents_list(db, postgres.organization_id)
+        assert not q.documents_list(
+            db, q.DocumentsListParams(organization_id=postgres.organization_id)
+        )

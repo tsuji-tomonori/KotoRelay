@@ -13,7 +13,9 @@ from kotorelay.schemas import AnswerView, Citation, Evidence, Manifest
 
 
 def validate_citation(ctx: Context, citation: Citation) -> bool:
-    docs = q.documents_get(ctx.db, ctx.org, citation.document_id)
+    docs = q.documents_get(
+        ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=citation.document_id)
+    )
     if not docs:
         return False
     doc = docs[0]
@@ -23,19 +25,21 @@ def validate_citation(ctx: Context, citation: Citation) -> bool:
         or doc.revision != citation.document_revision
     ):
         return False
-    versions = q.versions_get(ctx.db, ctx.org, citation.version_id)
-    chunks = q.chunks_get(ctx.db, ctx.org, citation.chunk_id)
+    versions = q.versions_get(
+        ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=citation.version_id)
+    )
+    chunks = q.chunks_get(ctx.db, q.ChunksGetParams(organization_id=ctx.org, id=citation.chunk_id))
     if not versions or not chunks:
         return False
-    version, chunk = versions[0], chunks[0]
+    version, chunk = (versions[0], chunks[0])
     if not (
         digest(version.manifest.encode()) == version.manifest_hash
         and version.document_id == doc.id
         and chunk.ready
-        and chunk.version_id == version.id
-        and chunk.document_id == doc.id
-        and chunk.manifest_hash == version.manifest_hash == citation.manifest_hash
-        and chunk.sha256 == citation.chunk_hash
+        and (chunk.version_id == version.id)
+        and (chunk.document_id == doc.id)
+        and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash)
+        and (chunk.sha256 == citation.chunk_hash)
     ):
         return False
     try:
@@ -47,9 +51,14 @@ def validate_citation(ctx: Context, citation: Citation) -> bool:
             return False
         for image in manifest.images:
             if image.placement.id in json.loads(chunk.placements):
-                assets = q.assets_get(ctx.db, ctx.org, image.placement.asset_id)
-                runs = q.ocr_runs_get(ctx.db, ctx.org, image.placement.ocr_run_id)
-                if not assets or not runs or not runs[0].confirmed or runs[0].status != "ready":
+                assets = q.assets_get(
+                    ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=image.placement.asset_id)
+                )
+                runs = q.ocr_runs_get(
+                    ctx.db,
+                    q.OcrRunsGetParams(organization_id=ctx.org, id=image.placement.ocr_run_id),
+                )
+                if not assets or not runs or (not runs[0].confirmed) or (runs[0].status != "ready"):
                     return False
                 ctx.objects.get(assets[0].object_key, image.image_hash)
                 ctx.objects.get(runs[0].result_key, image.ocr_hash)

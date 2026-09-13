@@ -1,5 +1,7 @@
 """list_reviewsのHTTP入力と業務処理の順序を宣言する。"""
 
+from __future__ import annotations
+
 from fastapi import APIRouter
 
 from kotorelay.operations.reviews.list_reviews import functions as f
@@ -18,4 +20,8 @@ router = APIRouter(prefix="/api/reviews", tags=["審査"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def list_reviews(ctx: Ctx) -> list[dict[str, object]]:
-    return build_response(f.list_reviews(ctx))
+    documents = f.map_documents(ctx)
+    versions = f.map_versions(ctx)
+    users = f.map_users(ctx)
+    departments = f.map_departments(ctx)
+    return build_response(f.select_list_reviews(users, departments, documents, versions, ctx))

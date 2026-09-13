@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 反映ジョブを再処理 — 詳細設計
 
@@ -38,33 +38,33 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:54 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:41 | doc.latest_version_id != job.version_id or not job.version_id | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:51 | len(stale) > 100 | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:53 | doc.status != 'active' | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:71 | len(parts) <= 300 | 'limit' | 422 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:88 | chunk.id in previous | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:93 | len(actual) == len(parts) and engine.verify([c.id for c in actual]) | 'integrity' | 503 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:171 | job.status in {'done', 'obsolete'} | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:166 | ctx.user.operator | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:168 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:170 | job.attempts < 5 | 'limit' | 429 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:102 | doc.status != 'deleted' | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:104 | (now() - job.created_at).total_seconds() < ctx.settings.retention_days * 86400 | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:149 | len(target_chunks) > 100 | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:154 | len(target_runs) > 100 | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:157 | asset.document_id == doc.id | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:160 | draft.document_id == doc.id | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:133 | row.document_id == doc.id | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:135 | row.document_id in live | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:34 | buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:22 | line.startswith('#') or len(buffer) + len(line) > 1200 | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:23 | buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:26 | line.startswith('#') | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:30 | len(buffer) + len(part) > 1200 and buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:473 | row.document_id == document_id | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:475 | row.document_id in live | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:138 | len(parts) <= 300 | 'limit' | 422 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:377 | job.attempts < 5 | 'limit' | 429 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:372 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:362 | ctx.user.operator | 'forbidden' | 403 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:36 | buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:24 | line.startswith('#') or len(buffer) + len(line) > 1200 | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:25 | buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:28 | line.startswith('#') | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:32 | len(buffer) + len(part) > 1200 and buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:220 | len(actual) == len(parts) and engine.verify([c.id for c in actual]) | 'integrity' | 503 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:16 | not job.version_id or f.is_obsolete_version(doc, job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:22 | f.has_more_stale_chunks(stale) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:24 | f.is_inactive_document(doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:42 | f.is_existing_chunk(previous, chunk) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:98 | f.is_finished_job(job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:56 | f.is_restored_document(doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:58 | f.is_within_retention(ctx, job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:76 | f.has_more_target_chunks(target_chunks) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:81 | f.has_more_target_ocr(target_runs) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:84 | f.is_target_asset(asset, doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/router.py:87 | f.is_target_draft(draft, doc) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -142,42 +142,103 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | --- | --- |
 | backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
 | backend/src/kotorelay/context.py:27 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
-| backend/src/kotorelay/operations/indexing/retry_job/functions.py:13 | process(ctx, engine, job_id) |
 | backend/src/kotorelay/operations/indexing/retry_job/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/indexing/retry_job/router.py:24 | build_response(f.retry(ctx, rt.engine, str(job_id))) |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:97 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:42 | 'obsolete' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:52 | 'pending' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:54 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:196 | updated |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:172 | job |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:162 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:103 | 'obsolete' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:105 | 'retained' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:150 | 'pending' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:155 | 'pending' |
-| backend/src/kotorelay/operations/indexing/shared/functions.py:36 | chunks |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:20 | db.query('operations/indexing/shared/sql/answers_list.sql', {'organization_id': organization_id}, AnswersRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:29 | db.execute('operations/indexing/shared/sql/assets_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:37 | db.query('operations/indexing/shared/sql/assets_get.sql', {'organization_id': organization_id, 'id': id}, AssetsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:46 | db.query('operations/indexing/shared/sql/assets_list.sql', {'organization_id': organization_id}, AssetsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:55 | db.execute('operations/indexing/shared/sql/chunks_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:63 | db.execute('operations/indexing/shared/sql/chunks_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:68 | db.query('operations/indexing/shared/sql/chunks_list.sql', {'organization_id': organization_id}, ChunksRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:77 | db.execute('operations/indexing/shared/sql/chunks_update.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:82 | db.query('operations/indexing/shared/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:91 | db.query('operations/indexing/shared/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:100 | db.execute('operations/indexing/shared/sql/drafts_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:108 | db.query('operations/indexing/shared/sql/drafts_list.sql', {'organization_id': organization_id}, DraftsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:117 | db.execute('operations/indexing/shared/sql/ocr_runs_delete.sql', {'organization_id': organization_id, 'id': id}) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:125 | db.query('operations/indexing/shared/sql/ocr_runs_get.sql', {'organization_id': organization_id, 'id': id}, OcrRunsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:134 | db.query('operations/indexing/shared/sql/ocr_runs_list.sql', {'organization_id': organization_id}, OcrRunsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:143 | db.query('operations/indexing/shared/sql/outbox_get.sql', {'organization_id': organization_id, 'id': id}, OutboxRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:152 | db.execute('operations/indexing/shared/sql/outbox_update.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:157 | db.query('operations/indexing/shared/sql/versions_get.sql', {'organization_id': organization_id, 'id': id}, VersionsRow) |
-| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:166 | db.query('operations/indexing/shared/sql/versions_list.sql', {'organization_id': organization_id}, VersionsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:68 | db.execute('operations/system/authorization/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/indexing/retry_job/router.py:27 | build_response(process(ctx, rt.engine, str(job_id))) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:284 | q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:347 | q.assets_delete(ctx.db, q.AssetsDeleteParams(organization_id=ctx.org, id=asset.id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:108 | q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=image.placement.asset_id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:264 | q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:167 | models.ChunksRow(id=stable_id(version.id + str(number)), organization_id=ctx.org, document_id=doc.id, version_id=version.id, body_key=key, sha256=key, heading=heading, placements=placements, manifest_hash=version.manifest_hash, ready=False) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:91 | Manifest.model_validate_json(version.manifest) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:133 | OcrResult.model_validate_json(ctx.objects.get(run.result_key, image.ocr_hash)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:387 | job.model_copy(update={'status': status, 'attempts': job.attempts if status in {'retained', 'pending'} else job.attempts + 1, 'error_code': ''}) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:398 | job.model_copy(update={'status': 'failed', 'attempts': job.attempts + 1, 'error_code': exc.code}) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:405 | job.model_copy(update={'status': 'failed', 'attempts': job.attempts + 1, 'error_code': 'external_failure'}) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:419 | ctx.fence() |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:71 | q.chunks_delete(ctx.db, q.ChunksDeleteParams(organization_id=ctx.org, id=stale_chunk.id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:315 | q.chunks_delete(ctx.db, q.ChunksDeleteParams(organization_id=ctx.org, id=chunk.id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:204 | q.chunks_insert(ctx.db, q.ChunksInsertParams.model_validate(chunk, from_attributes=True)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:259 | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:199 | q.chunks_update(ctx.db, q.ChunksUpdateParams.model_validate(chunk, from_attributes=True)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:232 | q.chunks_update(ctx.db, q.ChunksUpdateParams.model_validate(current.model_copy(update={'ready': True}), from_attributes=True)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:289 | {d.id for d in q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) if d.status != 'deleted'} |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:484 | (keys, protected) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:96 | ctx.objects.get(version.body_key, version.body_hash).decode() |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:66 | engine.delete([c.id for c in stale[:100]]) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:298 | ctx.objects.delete(key) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:310 | engine.delete([c.id for c in target_chunks]) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:43 | q.documents_get(ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=job.document_id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:242 | q.documents_get(ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=job.document_id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:357 | q.drafts_delete(ctx.db, q.DraftsDeleteParams(organization_id=ctx.org, id=draft.id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:274 | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:138 | require(len(parts) <= 300, 'limit', 422) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:377 | require(job.attempts < 5, 'limit', 429) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:126 | ctx.objects.get(asset.object_key, image.image_hash) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:227 | ctx.objects.get(current.body_key, current.sha256) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:76 | bool(len(stale) > 100) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:320 | bool(len(target_chunks) > 100) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:337 | bool(len(target_runs) > 100) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:429 | [(image.placement.heading or heading, text, json.dumps([image.placement.id])) for heading, text in split_chunks(text or '添付画像')] |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:189 | engine.index(chunk.id, text, doc.id, version.id) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:194 | bool(chunk.id in previous) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:382 | bool(job.status in {'done', 'obsolete'}) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:81 | bool(doc.status != 'active') |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:50 | bool(doc.latest_version_id != job.version_id or not job.version_id) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:437 | job.kind == 'purge' |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:249 | bool(doc.status != 'deleted') |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:342 | bool(asset.document_id == doc.id) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:352 | bool(draft.document_id == doc.id) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:254 | bool((now() - job.created_at).total_seconds() < ctx.settings.retention_days * 86400) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:145 | {c.id: c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.version_id == version.id} |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:332 | q.ocr_runs_delete(ctx.db, q.OcrRunsDeleteParams(organization_id=ctx.org, id=run.id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:117 | q.ocr_runs_get(ctx.db, q.OcrRunsGetParams(organization_id=ctx.org, id=image.placement.ocr_run_id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:269 | q.ocr_runs_list(ctx.db, q.OcrRunsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:367 | q.outbox_get(ctx.db, q.OutboxGetParams(organization_id=ctx.org, id=job_id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:412 | q.outbox_update(ctx.db, q.OutboxUpdateParams.model_validate(updated, from_attributes=True)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:154 | ctx.objects.put(text.encode(), 'text/plain') |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:372 | require(bool(rows)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:362 | require(ctx.user.operator, 'forbidden', 403) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:209 | [c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.version_id == version.id] |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:101 | [(heading, text, '[]') for heading, text in split_chunks(body)] |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:57 | [c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.document_id == doc.id and (doc.status != 'active' or c.version_id != job.version_id)] |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:305 | [c for c in chunks if c.document_id == doc.id] |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:327 | [r for r in runs if r.document_id == doc.id] |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:38 | chunks |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:220 | require(len(actual) == len(parts) and engine.verify([c.id for c in actual]), 'integrity', 503) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:86 | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=version_id)) |
+| backend/src/kotorelay/operations/indexing/shared/functions.py:279 | q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:48 | db.query('operations/indexing/shared/sql/001_answers_list.sql', params.model_dump(), AnswersListRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:63 | db.execute('operations/indexing/shared/sql/002_assets_delete.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:92 | db.query('operations/indexing/shared/sql/003_assets_get.sql', params.model_dump(), AssetsGetRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:122 | db.query('operations/indexing/shared/sql/004_assets_list.sql', params.model_dump(), AssetsListRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:137 | db.execute('operations/indexing/shared/sql/005_chunks_delete.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:158 | db.execute('operations/indexing/shared/sql/006_chunks_insert.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:186 | db.query('operations/indexing/shared/sql/007_chunks_list.sql', params.model_dump(), ChunksListRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:209 | db.execute('operations/indexing/shared/sql/008_chunks_update.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:240 | db.query('operations/indexing/shared/sql/009_documents_get.sql', params.model_dump(), DocumentsGetRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:272 | db.query('operations/indexing/shared/sql/010_documents_list.sql', params.model_dump(), DocumentsListRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:289 | db.execute('operations/indexing/shared/sql/011_drafts_delete.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:315 | db.query('operations/indexing/shared/sql/012_drafts_list.sql', params.model_dump(), DraftsListRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:330 | db.execute('operations/indexing/shared/sql/013_ocr_runs_delete.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:359 | db.query('operations/indexing/shared/sql/014_ocr_runs_get.sql', params.model_dump(), OcrRunsGetRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:389 | db.query('operations/indexing/shared/sql/015_ocr_runs_list.sql', params.model_dump(), OcrRunsListRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:419 | db.query('operations/indexing/shared/sql/016_outbox_get.sql', params.model_dump(), OutboxGetRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:441 | db.execute('operations/indexing/shared/sql/017_outbox_update.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:471 | db.query('operations/indexing/shared/sql/018_versions_get.sql', params.model_dump(), VersionsGetRow) |
+| backend/src/kotorelay/operations/indexing/shared/generated/queries.py:502 | db.query('operations/indexing/shared/sql/019_versions_list.sql', params.model_dump(), VersionsListRow) |
+| backend/src/kotorelay/operations/indexing/shared/router.py:51 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:17 | 'obsolete' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:23 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:25 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:109 | updated |
+| backend/src/kotorelay/operations/indexing/shared/router.py:99 | job |
+| backend/src/kotorelay/operations/indexing/shared/router.py:89 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:57 | 'obsolete' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:59 | 'retained' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:77 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/router.py:82 | 'pending' |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:194 | db.execute('operations/system/authorization/sql/007_organizations_fence.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

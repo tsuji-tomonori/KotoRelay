@@ -46,7 +46,7 @@ def test_型付きqueryが自分の責務のSQL正本だけを実行する():
                 assert source.is_file()
 
 
-@pytest.mark.parametrize("change", ["削除", "手編集", "SQL変更"])
+@pytest.mark.parametrize("change", ["削除", "手編集", "SQL変更", "DDL変更"])
 def test_型付きqueryの欠落と手編集とSQL変更を差分検査で拒否する(tmp_path, monkeypatch, change):
     generator = module("queries")
     monkeypatch.setattr(generator, "ROOT", tmp_path)
@@ -54,7 +54,7 @@ def test_型付きqueryの欠落と手編集とSQL変更を差分検査で拒否
     ddl = tmp_path / "backend/migrations/001.sql"
     ddl.parent.mkdir(parents=True)
     ddl.write_text("CREATE TABLE items (id TEXT NOT NULL, organization_id TEXT NOT NULL)")
-    sql = generator.APP / "operations/items/read_item/sql/items_get.sql"
+    sql = generator.APP / "operations/items/read_item/sql/001_items_get.sql"
     sql.parent.mkdir(parents=True)
     sql.write_text(
         "-- 現在の組織の項目を取得する。\n"
@@ -67,6 +67,8 @@ def test_型付きqueryの欠落と手編集とSQL変更を差分検査で拒否
         generated.unlink()
     elif change == "手編集":
         generated.write_text(generated.read_text() + "# 手編集\n")
+    elif change == "DDL変更":
+        ddl.write_text(ddl.read_text().replace("id TEXT", "id BIGINT", 1))
     else:
         sql.write_text(sql.read_text() + " ORDER BY id")
     monkeypatch.setattr(generator.sys, "argv", ["queries.py", "--check"])

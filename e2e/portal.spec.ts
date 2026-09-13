@@ -2,6 +2,40 @@ import { test, expect, type Page, type TestInfo } from '@playwright/test';
 
 async function capture(page: Page, info: TestInfo, phase: string, text: string) {
   await test.step(`${phase}: ${text}`, async () => {
+    const invalidCoordinates = await page
+      .locator('figure svg')
+      .evaluateAll((diagrams) =>
+        diagrams.flatMap((diagram) =>
+          [...diagram.querySelectorAll('*')].flatMap((node) =>
+            [...node.attributes]
+              .filter(
+                (attribute) =>
+                  [
+                    'x',
+                    'y',
+                    'x1',
+                    'x2',
+                    'y1',
+                    'y2',
+                    'cx',
+                    'cy',
+                    'r',
+                    'rx',
+                    'ry',
+                    'width',
+                    'height',
+                    'd',
+                    'points',
+                    'viewBox',
+                    'transform',
+                    'pathLength',
+                  ].includes(attribute.name) && /NaN|undefined|Infinity/.test(attribute.value),
+              )
+              .map((attribute) => `${node.tagName}.${attribute.name}=${attribute.value}`),
+          ),
+        ),
+      );
+    expect(invalidCoordinates, '図の数値座標に不正値がない').toEqual([]);
     const path = info.outputPath(`${phase}.png`);
     await page.screenshot({ path, fullPage: false });
     await info.attach(`${phase}: ${text}`, { path, contentType: 'image/png' });
@@ -214,11 +248,52 @@ test('APIごとのファイル責務と所有SQLを生成設計で確認する',
     .click();
   await expect(
     page.locator('.markdown').getByRole('heading', {
-      name: 'documents/create_document/documents_insert.sql',
+      name: 'documents/create_document/001_documents_insert.sql',
       exact: true,
     }),
   ).toBeVisible();
   await expect(page.locator('.markdown')).toContainText(
-    'backend/src/kotorelay/operations/documents/create_document/sql/documents_insert.sql',
+    'backend/src/kotorelay/operations/documents/create_document/sql/001_documents_insert.sql',
   );
+  await expect(page.locator('.markdown')).toContainText('DocumentsInsertParams');
+  await expect(page.locator('.markdown')).toContainText('params.latest_version_id');
+  await expect(page.locator('.markdown')).toContainText('str | None');
+});
+
+test('routerの文書作成順をSQLの役割ラベルで確認し長い図をスクロールする', async ({ page }) => {
+  await page
+    .getByRole('navigation', { name: '品質ナビゲーション' })
+    .getByRole('button', { name: /設計書/ })
+    .click();
+  await page.getByRole('searchbox').fill('create_document');
+  await page
+    .locator('.inventory button')
+    .filter({ hasText: /^文書を作成 — シーケンス$/ })
+    .click();
+  const diagram = page.getByRole('region', { name: '設計図' });
+  await expect(diagram.locator('svg')).toBeVisible({ timeout: 45000 });
+  const roles = await diagram
+    .locator('text.messageText')
+    .evaluateAll((nodes) => nodes.map((node) => node.textContent ?? ''));
+  const document = roles.findIndex((text) =>
+    text.includes('現在の組織の文書を、所有部署・公開範囲・状態を指定して登録する。'),
+  );
+  const draft = roles.findIndex((text) =>
+    text.includes(
+      '現在の組織の文書の下書きを、本文の保存先・画像配置・改訂番号を指定して登録する。',
+    ),
+  );
+  expect(document).toBeGreaterThanOrEqual(0);
+  expect(draft).toBeGreaterThan(document);
+  expect(await diagram.evaluate((node) => node.scrollHeight > node.clientHeight)).toBe(true);
+  await diagram.evaluate((node) => {
+    node.scrollTop = node.scrollHeight;
+  });
+  await capture(
+    page,
+    test.info(),
+    'When',
+    '実装順のSQL説明と確定までのフローを図の内部スクロールで確認する',
+  );
+  await expect(page.getByRole('alert')).toHaveCount(0);
 });

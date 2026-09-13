@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 本人と現在の所属権限を取得 — 詳細設計
 
@@ -35,8 +35,8 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 
 
@@ -71,12 +71,12 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:57 | any((m.department_id == department_id for m in self.memberships)) |
-| backend/src/kotorelay/operations/groups/get_identity/functions.py:10 | {'user': ctx.user, 'memberships': ctx.memberships, 'departments': [d for d in q.departments_list(ctx.db, ctx.org) if ctx.member(d.id)], 'directory': [d for d in q.departments_list(ctx.db, ctx.org) if d.active], 'mode': ctx.settings.mode} |
-| backend/src/kotorelay/operations/groups/get_identity/generated/queries.py:11 | db.query('operations/groups/get_identity/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/context.py:75 | any((m.department_id == department_id for m in self.memberships)) |
+| backend/src/kotorelay/operations/groups/get_identity/functions.py:11 | {'user': ctx.user, 'memberships': ctx.memberships, 'departments': [d for d in q.departments_list(ctx.db, q.DepartmentsListParams(organization_id=ctx.org)) if ctx.member(d.id)], 'directory': [d for d in q.departments_list(ctx.db, q.DepartmentsListParams(organization_id=ctx.org)) if d.active], 'mode': ctx.settings.mode} |
+| backend/src/kotorelay/operations/groups/get_identity/generated/queries.py:32 | db.query('operations/groups/get_identity/sql/001_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/groups/get_identity/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/groups/get_identity/router.py:21 | build_response(f.identity(ctx)) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/groups/get_identity/router.py:23 | build_response(f.build_get_identity(ctx)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

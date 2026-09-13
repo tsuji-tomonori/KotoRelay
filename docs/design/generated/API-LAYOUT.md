@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # APIごとのファイルと責務
 
@@ -10,8 +10,8 @@
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
@@ -29,14 +29,14 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/documents/create_document/sql/documents_insert.sql`, `backend/src/kotorelay/operations/documents/create_document/sql/drafts_insert.sql`
+SQL正本: `backend/src/kotorelay/operations/documents/create_document/sql/001_documents_insert.sql`, `backend/src/kotorelay/operations/documents/create_document/sql/002_drafts_insert.sql`
 
 型付きquery: backend/src/kotorelay/operations/documents/create_document/generated/queries.py
 
@@ -48,14 +48,14 @@ SQL正本: `backend/src/kotorelay/operations/documents/create_document/sql/docum
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/documents/list_documents/sql/chunks_list.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/documents_by_department.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/documents_list.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/submissions_list.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/versions_list.sql`
+SQL正本: `backend/src/kotorelay/operations/documents/list_documents/sql/001_chunks_list.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/002_documents_by_department.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/003_documents_list.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/004_submissions_list.sql`, `backend/src/kotorelay/operations/documents/list_documents/sql/005_versions_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/documents/list_documents/generated/queries.py
 
@@ -67,8 +67,8 @@ SQL正本: `backend/src/kotorelay/operations/documents/list_documents/sql/chunks
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
@@ -78,7 +78,7 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 型付きquery: 直接所有なし
 
-共有処理: kotorelay.operations.documents.shared.functions
+共有処理: 直接参照なし
 
 ## save_draft
 
@@ -86,18 +86,18 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/documents/save_draft/sql/assets_get.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/documents_update.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/drafts_list.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/drafts_update.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/ocr_runs_get.sql`
+SQL正本: `backend/src/kotorelay/operations/documents/save_draft/sql/001_assets_get.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/002_documents_update.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/003_drafts_list.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/004_drafts_update.sql`, `backend/src/kotorelay/operations/documents/save_draft/sql/005_ocr_runs_get.sql`
 
 型付きquery: backend/src/kotorelay/operations/documents/save_draft/generated/queries.py
 
-共有処理: kotorelay.operations.documents.shared.functions
+共有処理: 直接参照なし
 
 ## submit_version
 
@@ -105,14 +105,14 @@ SQL正本: `backend/src/kotorelay/operations/documents/save_draft/sql/assets_get
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/documents/submit_version/sql/assets_get.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/documents_update.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/drafts_list.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/ocr_runs_get.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/submissions_insert.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/versions_insert.sql`
+SQL正本: `backend/src/kotorelay/operations/documents/submit_version/sql/001_assets_get.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/002_documents_update.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/003_drafts_list.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/004_ocr_runs_get.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/005_submissions_insert.sql`, `backend/src/kotorelay/operations/documents/submit_version/sql/006_versions_insert.sql`
 
 型付きquery: backend/src/kotorelay/operations/documents/submit_version/generated/queries.py
 
@@ -124,14 +124,14 @@ SQL正本: `backend/src/kotorelay/operations/documents/submit_version/sql/assets
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/documents/read_document/sql/chunks_list.sql`, `backend/src/kotorelay/operations/documents/read_document/sql/documents_get.sql`
+SQL正本: `backend/src/kotorelay/operations/documents/read_document/sql/001_chunks_list.sql`, `backend/src/kotorelay/operations/documents/read_document/sql/002_documents_get.sql`
 
 型付きquery: backend/src/kotorelay/operations/documents/read_document/generated/queries.py
 
@@ -143,14 +143,14 @@ SQL正本: `backend/src/kotorelay/operations/documents/read_document/sql/chunks_
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/documents/version_history/sql/submissions_list.sql`, `backend/src/kotorelay/operations/documents/version_history/sql/versions_list.sql`
+SQL正本: `backend/src/kotorelay/operations/documents/version_history/sql/001_submissions_list.sql`, `backend/src/kotorelay/operations/documents/version_history/sql/002_versions_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/documents/version_history/generated/queries.py
 
@@ -162,8 +162,8 @@ SQL正本: `backend/src/kotorelay/operations/documents/version_history/sql/submi
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
@@ -181,14 +181,14 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/documents/change_policy/sql/departments_list.sql`, `backend/src/kotorelay/operations/documents/change_policy/sql/documents_update.sql`, `backend/src/kotorelay/operations/documents/change_policy/sql/outbox_insert.sql`
+SQL正本: `backend/src/kotorelay/operations/documents/change_policy/sql/001_departments_list.sql`, `backend/src/kotorelay/operations/documents/change_policy/sql/002_documents_update.sql`, `backend/src/kotorelay/operations/documents/change_policy/sql/003_outbox_insert.sql`
 
 型付きquery: backend/src/kotorelay/operations/documents/change_policy/generated/queries.py
 
@@ -200,14 +200,14 @@ SQL正本: `backend/src/kotorelay/operations/documents/change_policy/sql/departm
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/reviews/list_reviews/sql/departments_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/documents_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/submissions_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/users_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/versions_list.sql`
+SQL正本: `backend/src/kotorelay/operations/reviews/list_reviews/sql/001_departments_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/002_documents_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/003_submissions_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/004_users_list.sql`, `backend/src/kotorelay/operations/reviews/list_reviews/sql/005_versions_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/reviews/list_reviews/generated/queries.py
 
@@ -219,14 +219,14 @@ SQL正本: `backend/src/kotorelay/operations/reviews/list_reviews/sql/department
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/reviews/decide_review/sql/documents_update.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/outbox_insert.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/submissions_get.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/submissions_update.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/versions_get.sql`
+SQL正本: `backend/src/kotorelay/operations/reviews/decide_review/sql/001_documents_update.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/002_outbox_insert.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/003_submissions_get.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/004_submissions_update.sql`, `backend/src/kotorelay/operations/reviews/decide_review/sql/005_versions_get.sql`
 
 型付きquery: backend/src/kotorelay/operations/reviews/decide_review/generated/queries.py
 
@@ -238,14 +238,14 @@ SQL正本: `backend/src/kotorelay/operations/reviews/decide_review/sql/documents
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/images/upload_image/sql/assets_insert.sql`, `backend/src/kotorelay/operations/images/upload_image/sql/assets_list.sql`, `backend/src/kotorelay/operations/images/upload_image/sql/ocr_runs_insert.sql`
+SQL正本: `backend/src/kotorelay/operations/images/upload_image/sql/001_assets_insert.sql`, `backend/src/kotorelay/operations/images/upload_image/sql/002_assets_list.sql`, `backend/src/kotorelay/operations/images/upload_image/sql/003_ocr_runs_insert.sql`
 
 型付きquery: backend/src/kotorelay/operations/images/upload_image/generated/queries.py
 
@@ -257,8 +257,8 @@ SQL正本: `backend/src/kotorelay/operations/images/upload_image/sql/assets_inse
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
@@ -268,7 +268,7 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 型付きquery: 直接所有なし
 
-共有処理: kotorelay.operations.images.shared.functions
+共有処理: 直接参照なし
 
 ## get_ocr
 
@@ -276,18 +276,18 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/images/get_ocr/sql/documents_get.sql`, `backend/src/kotorelay/operations/images/get_ocr/sql/ocr_runs_get.sql`
+SQL正本: `backend/src/kotorelay/operations/images/get_ocr/sql/001_documents_get.sql`, `backend/src/kotorelay/operations/images/get_ocr/sql/002_ocr_runs_get.sql`
 
 型付きquery: backend/src/kotorelay/operations/images/get_ocr/generated/queries.py
 
-共有処理: kotorelay.operations.images.shared.functions
+共有処理: 直接参照なし
 
 ## correct_ocr
 
@@ -295,14 +295,14 @@ SQL正本: `backend/src/kotorelay/operations/images/get_ocr/sql/documents_get.sq
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/images/correct_ocr/sql/assets_get.sql`, `backend/src/kotorelay/operations/images/correct_ocr/sql/ocr_runs_insert.sql`
+SQL正本: `backend/src/kotorelay/operations/images/correct_ocr/sql/001_assets_get.sql`, `backend/src/kotorelay/operations/images/correct_ocr/sql/002_ocr_runs_insert.sql`
 
 型付きquery: backend/src/kotorelay/operations/images/correct_ocr/generated/queries.py
 
@@ -314,14 +314,14 @@ SQL正本: `backend/src/kotorelay/operations/images/correct_ocr/sql/assets_get.s
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/groups/get_identity/sql/departments_list.sql`
+SQL正本: `backend/src/kotorelay/operations/groups/get_identity/sql/001_departments_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/groups/get_identity/generated/queries.py
 
@@ -333,14 +333,14 @@ SQL正本: `backend/src/kotorelay/operations/groups/get_identity/sql/departments
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/groups/list_members/sql/memberships_list.sql`, `backend/src/kotorelay/operations/groups/list_members/sql/users_list.sql`
+SQL正本: `backend/src/kotorelay/operations/groups/list_members/sql/001_memberships_list.sql`, `backend/src/kotorelay/operations/groups/list_members/sql/002_users_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/groups/list_members/generated/queries.py
 
@@ -352,14 +352,14 @@ SQL正本: `backend/src/kotorelay/operations/groups/list_members/sql/memberships
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/groups/change_membership/sql/departments_get.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/memberships_insert.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/memberships_list.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/memberships_update.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/users_get.sql`
+SQL正本: `backend/src/kotorelay/operations/groups/change_membership/sql/001_departments_get.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/002_memberships_insert.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/003_memberships_list.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/004_memberships_update.sql`, `backend/src/kotorelay/operations/groups/change_membership/sql/005_users_get.sql`
 
 型付きquery: backend/src/kotorelay/operations/groups/change_membership/generated/queries.py
 
@@ -371,14 +371,14 @@ SQL正本: `backend/src/kotorelay/operations/groups/change_membership/sql/depart
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/metrics/record_view/sql/events_get.sql`, `backend/src/kotorelay/operations/metrics/record_view/sql/events_insert.sql`
+SQL正本: `backend/src/kotorelay/operations/metrics/record_view/sql/001_events_get.sql`, `backend/src/kotorelay/operations/metrics/record_view/sql/002_events_insert.sql`
 
 型付きquery: backend/src/kotorelay/operations/metrics/record_view/generated/queries.py
 
@@ -390,14 +390,14 @@ SQL正本: `backend/src/kotorelay/operations/metrics/record_view/sql/events_get.
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/metrics/department_metrics/sql/documents_list.sql`, `backend/src/kotorelay/operations/metrics/department_metrics/sql/events_list.sql`
+SQL正本: `backend/src/kotorelay/operations/metrics/department_metrics/sql/001_documents_list.sql`, `backend/src/kotorelay/operations/metrics/department_metrics/sql/002_events_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/metrics/department_metrics/generated/queries.py
 
@@ -409,8 +409,8 @@ SQL正本: `backend/src/kotorelay/operations/metrics/department_metrics/sql/docu
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
@@ -420,7 +420,7 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 型付きquery: 直接所有なし
 
-共有処理: kotorelay.operations.indexing.shared.functions
+共有処理: 直接参照なし
 
 ## list_jobs
 
@@ -428,14 +428,14 @@ SQL正本: 直接所有なし（共有処理のSQLはAPI別クエリ帳票を参
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/indexing/list_jobs/sql/documents_list.sql`, `backend/src/kotorelay/operations/indexing/list_jobs/sql/outbox_list.sql`, `backend/src/kotorelay/operations/indexing/list_jobs/sql/versions_list.sql`
+SQL正本: `backend/src/kotorelay/operations/indexing/list_jobs/sql/001_documents_list.sql`, `backend/src/kotorelay/operations/indexing/list_jobs/sql/002_outbox_list.sql`, `backend/src/kotorelay/operations/indexing/list_jobs/sql/003_versions_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py
 
@@ -447,14 +447,14 @@ SQL正本: `backend/src/kotorelay/operations/indexing/list_jobs/sql/documents_li
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/indexing/reconcile_index/sql/chunks_list.sql`, `backend/src/kotorelay/operations/indexing/reconcile_index/sql/documents_list.sql`
+SQL正本: `backend/src/kotorelay/operations/indexing/reconcile_index/sql/001_chunks_list.sql`, `backend/src/kotorelay/operations/indexing/reconcile_index/sql/002_documents_list.sql`
 
 型付きquery: backend/src/kotorelay/operations/indexing/reconcile_index/generated/queries.py
 
@@ -466,18 +466,18 @@ SQL正本: `backend/src/kotorelay/operations/indexing/reconcile_index/sql/chunks
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/chat/ask_question/sql/answers_get.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/answers_insert.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/answers_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/assets_get.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/chunks_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/conversations_get.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/conversations_insert.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/documents_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/events_insert.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/events_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/versions_get.sql`
+SQL正本: `backend/src/kotorelay/operations/chat/ask_question/sql/001_answers_get.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/002_answers_insert.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/003_answers_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/004_assets_get.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/005_chunks_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/006_conversations_get.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/007_conversations_insert.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/008_documents_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/009_events_insert.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/010_events_list.sql`, `backend/src/kotorelay/operations/chat/ask_question/sql/011_versions_get.sql`
 
 型付きquery: backend/src/kotorelay/operations/chat/ask_question/generated/queries.py
 
-共有処理: kotorelay.operations.chat.shared.functions
+共有処理: 直接参照なし
 
 ## chat_history
 
@@ -485,14 +485,14 @@ SQL正本: `backend/src/kotorelay/operations/chat/ask_question/sql/answers_get.s
 
 | ファイル | 責務 |
 | --- | --- |
-| router.py | HTTP入力・依存注入・業務処理の順序 |
-| functions.py | API固有の業務判定・処理 |
+| router.py | HTTP入力・依存注入・全体フロー・分岐・例外・transaction |
+| functions.py | 全体フローを持たない個別の業務判定・処理 |
 | schemas.py | API固有の入力制約・応答型 |
 | response_builders.py | 応答型の検証・HTTP応答への変換 |
 | contract.py | operation ID・method/path・認証方式・所有先 |
 | samples.py | 実HTTP試験で確認する入力と期待値 |
 
-SQL正本: `backend/src/kotorelay/operations/chat/chat_history/sql/answers_list.sql`, `backend/src/kotorelay/operations/chat/chat_history/sql/conversations_get.sql`
+SQL正本: `backend/src/kotorelay/operations/chat/chat_history/sql/001_answers_list.sql`, `backend/src/kotorelay/operations/chat/chat_history/sql/002_conversations_get.sql`
 
 型付きquery: backend/src/kotorelay/operations/chat/chat_history/generated/queries.py
 

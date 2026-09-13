@@ -1,5 +1,7 @@
 """version_historyのHTTP入力と業務処理の順序を宣言する。"""
 
+from __future__ import annotations
+
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -20,4 +22,6 @@ router = APIRouter(prefix="/api/documents", tags=["文書"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def version_history(ctx: Ctx, document_id: UUID) -> list[dict[str, object]]:
-    return build_response(f.history(ctx, str(document_id)))
+    doc = f.document_doc(ctx, document_id)
+    submissions = f.map_submissions(ctx)
+    return build_response(f.select_version_history(submissions, doc, ctx))

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 文書を作成 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:54`。式: `q.organizations_fence(self.db, self.organization) == 1`
+対象: `backend/src/kotorelay/context.py:64`。式: `q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F04 条件分岐
 
-対象: `backend/src/kotorelay/context.py:61`。式: `m.department_id == department_id`
+対象: `backend/src/kotorelay/context.py:79`。式: `m.department_id == department_id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F06 条件分岐
 
-対象: `backend/src/kotorelay/operations/documents/create_document/functions.py:13`。式: `ctx.permission(data.department_id, 'author')`
+対象: `backend/src/kotorelay/operations/documents/create_document/functions.py:17`。式: `ctx.permission(data.department_id, 'author')`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -155,7 +155,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | test node | backend/tests/test_postgres.py::test_commit時の競合は成功応答を送らず409にしてrollbackする |
 | Given | postgres, monkeypatch |
 | When | client.post('/api/documents', headers=headers(), json={'title': '競合して確定しない文書', 'department_id': department}) ; client.get('/api/groups/me', headers=headers()) |
-| Then | result.status_code == 409 ; result.json()['code'] == 'conflict' ; not q.documents_list(db, postgres.organization_id) |
+| Then | result.status_code == 409 ; result.json()['code'] == 'conflict' ; not q.documents_list(db, q.DocumentsListParams(organization_id=postgres.organization_id)) |
 
 
 ### TC004

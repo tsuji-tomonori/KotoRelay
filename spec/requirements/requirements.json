@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 6,
+  "catalog_revision": 7,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -14,11 +14,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-DOC-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "Markdown本文の編集",
       "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u01"
@@ -35,7 +35,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/documents/save_draft/functions.py",
-          "backend/src/kotorelay/operations/documents/get_draft/functions.py"
+          "backend/src/kotorelay/operations/documents/save_draft/router.py",
+          "backend/src/kotorelay/operations/documents/get_draft/functions.py",
+          "backend/src/kotorelay/operations/documents/get_draft/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -63,11 +65,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-DOC-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "Markdownの表示確認",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u01"
@@ -83,7 +85,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/read_document/functions.py"
+          "backend/src/kotorelay/operations/documents/read_document/functions.py",
+          "backend/src/kotorelay/operations/documents/read_document/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -111,11 +114,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-DOC-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "保存状態の表示",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u01"
@@ -131,7 +134,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/save_draft/functions.py"
+          "backend/src/kotorelay/operations/documents/save_draft/functions.py",
+          "backend/src/kotorelay/operations/documents/save_draft/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -159,11 +163,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-DOC-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "文書IDと文書版IDの分離",
       "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u02"
@@ -180,7 +184,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/documents/create_document/functions.py",
-          "backend/src/kotorelay/operations/documents/submit_version/functions.py"
+          "backend/src/kotorelay/operations/documents/create_document/router.py",
+          "backend/src/kotorelay/operations/documents/submit_version/functions.py",
+          "backend/src/kotorelay/operations/documents/submit_version/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -208,11 +214,11 @@
       "action": "enforce",
       "category": "nonfunctional",
       "id": "REQ-DOC-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "文書版の不変性",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u02"
@@ -228,7 +234,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/submit_version/functions.py"
+          "backend/src/kotorelay/operations/documents/submit_version/functions.py",
+          "backend/src/kotorelay/operations/documents/submit_version/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -256,11 +263,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-DOC-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "版履歴の閲覧",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u02"
@@ -276,7 +283,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/version_history/functions.py"
+          "backend/src/kotorelay/operations/documents/version_history/functions.py",
+          "backend/src/kotorelay/operations/documents/version_history/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -304,11 +312,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-DOC-07",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "版間差分の表示",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u02"
@@ -324,7 +332,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/version_diff/functions.py"
+          "backend/src/kotorelay/operations/documents/version_diff/functions.py",
+          "backend/src/kotorelay/operations/documents/version_diff/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -352,11 +361,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-DOC-08",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "同時編集の更新競合検出",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u02"
@@ -372,7 +381,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/save_draft/functions.py"
+          "backend/src/kotorelay/operations/documents/save_draft/functions.py",
+          "backend/src/kotorelay/operations/documents/save_draft/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -400,11 +410,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-WF-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "文書版の承認申請",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u03",
@@ -422,7 +432,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/submit_version/functions.py"
+          "backend/src/kotorelay/operations/documents/submit_version/functions.py",
+          "backend/src/kotorelay/operations/documents/submit_version/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -450,11 +461,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-WF-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "版単位の承認",
       "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u03",
@@ -472,7 +483,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/reviews/decide_review/functions.py"
+          "backend/src/kotorelay/operations/reviews/decide_review/functions.py",
+          "backend/src/kotorelay/operations/reviews/decide_review/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -500,11 +512,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-WF-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "版単位の却下",
       "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u03"
@@ -520,7 +532,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/reviews/decide_review/functions.py"
+          "backend/src/kotorelay/operations/reviews/decide_review/functions.py",
+          "backend/src/kotorelay/operations/reviews/decide_review/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -548,11 +561,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-WF-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "再申請の履歴維持",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u03"
@@ -569,7 +582,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/documents/save_draft/functions.py",
-          "backend/src/kotorelay/operations/documents/submit_version/functions.py"
+          "backend/src/kotorelay/operations/documents/save_draft/router.py",
+          "backend/src/kotorelay/operations/documents/submit_version/functions.py",
+          "backend/src/kotorelay/operations/documents/submit_version/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -597,11 +612,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-WF-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "承認と却下の競合制御",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u03"
@@ -617,7 +632,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/reviews/decide_review/functions.py"
+          "backend/src/kotorelay/operations/reviews/decide_review/functions.py",
+          "backend/src/kotorelay/operations/reviews/decide_review/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -645,11 +661,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-WF-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "審査要求の冪等性",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u03"
@@ -665,7 +681,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/reviews/decide_review/functions.py"
+          "backend/src/kotorelay/operations/reviews/decide_review/functions.py",
+          "backend/src/kotorelay/operations/reviews/decide_review/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -693,11 +710,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-WF-07",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "サーバーによる審査認可",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u03"
@@ -713,7 +730,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/reviews/decide_review/functions.py"
+          "backend/src/kotorelay/operations/reviews/decide_review/functions.py",
+          "backend/src/kotorelay/operations/reviews/decide_review/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1231,11 +1249,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-ACL-11",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "会話の所有者境界",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u07"
@@ -1252,7 +1270,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
-          "backend/src/kotorelay/operations/chat/chat_history/functions.py"
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
+          "backend/src/kotorelay/operations/chat/chat_history/functions.py",
+          "backend/src/kotorelay/operations/chat/chat_history/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1329,11 +1349,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-PUB-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "最新承認版の決定",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1349,7 +1369,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/read_document/functions.py"
+          "backend/src/kotorelay/operations/documents/read_document/functions.py",
+          "backend/src/kotorelay/operations/documents/read_document/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1377,11 +1398,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-PUB-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "審査中の公開継続",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u04"
@@ -1398,7 +1419,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/documents/save_draft/functions.py",
-          "backend/src/kotorelay/operations/documents/read_document/functions.py"
+          "backend/src/kotorelay/operations/documents/save_draft/router.py",
+          "backend/src/kotorelay/operations/documents/read_document/functions.py",
+          "backend/src/kotorelay/operations/documents/read_document/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1426,11 +1449,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-PUB-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "旧承認版の回答利用停止",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1446,7 +1469,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/read_document/functions.py"
+          "backend/src/kotorelay/operations/documents/read_document/functions.py",
+          "backend/src/kotorelay/operations/documents/read_document/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1474,11 +1498,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-PUB-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "文書公開とRAG準備状態の分離",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1494,7 +1518,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/read_document/functions.py"
+          "backend/src/kotorelay/operations/documents/read_document/functions.py",
+          "backend/src/kotorelay/operations/documents/read_document/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1522,11 +1547,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-PUB-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "公開停止文書の利用停止",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u07"
@@ -1542,7 +1567,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/change_policy/functions.py"
+          "backend/src/kotorelay/operations/documents/change_policy/functions.py",
+          "backend/src/kotorelay/operations/documents/change_policy/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1570,11 +1596,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-PUB-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "非同期処理の版順保証",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1590,7 +1616,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/read_document/functions.py"
+          "backend/src/kotorelay/operations/documents/read_document/functions.py",
+          "backend/src/kotorelay/operations/documents/read_document/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1618,11 +1645,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IDX-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "検索用データの入力制限",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1638,7 +1665,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/indexing/shared/functions.py"
+          "backend/src/kotorelay/operations/indexing/shared/functions.py",
+          "backend/src/kotorelay/operations/indexing/shared/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1666,11 +1694,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IDX-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "根拠断片の出所記録",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1686,7 +1714,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/indexing/shared/functions.py"
+          "backend/src/kotorelay/operations/indexing/shared/functions.py",
+          "backend/src/kotorelay/operations/indexing/shared/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1714,11 +1743,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IDX-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "索引反映の公開判定",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1734,7 +1763,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/indexing/shared/functions.py"
+          "backend/src/kotorelay/operations/indexing/shared/functions.py",
+          "backend/src/kotorelay/operations/indexing/shared/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1762,11 +1792,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IDX-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "必須属性の検証",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u07"
@@ -1782,7 +1812,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/indexing/shared/functions.py"
+          "backend/src/kotorelay/operations/indexing/shared/functions.py",
+          "backend/src/kotorelay/operations/indexing/shared/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1810,11 +1841,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IDX-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "失敗した索引反映の回復",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1830,7 +1861,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/indexing/shared/functions.py"
+          "backend/src/kotorelay/operations/indexing/shared/functions.py",
+          "backend/src/kotorelay/operations/indexing/shared/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1858,11 +1890,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IDX-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "反映漏れの照合",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1878,7 +1910,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/indexing/reconcile_index/functions.py"
+          "backend/src/kotorelay/operations/indexing/reconcile_index/functions.py",
+          "backend/src/kotorelay/operations/indexing/reconcile_index/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1906,11 +1939,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "根拠に基づくチャット回答",
       "rationale": "優先度: Must（初期版の必須）。明示要求を具体化する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -1927,6 +1960,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -1955,11 +1989,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "必須検索条件の適用",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u07"
@@ -1976,6 +2010,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -2004,11 +2039,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "生成入力の有効性検証",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -2025,6 +2060,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -2053,11 +2089,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "処理中の権限と版変更の反映",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u07"
@@ -2074,6 +2110,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -2102,11 +2139,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "回答と根拠の対応表示",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -2123,6 +2160,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -2151,11 +2189,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "未裏付け回答の抑止",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -2172,6 +2210,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -2200,11 +2239,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-07",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "会話継続時の根拠更新",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u06"
@@ -2221,6 +2260,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -2249,11 +2289,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-RAG-08",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "プロンプトインジェクションへの境界維持",
       "rationale": "優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。",
       "retirement_reason": "",
-      "revision": 3,
+      "revision": 4,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u07"
@@ -2270,6 +2310,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
           "backend/src/kotorelay/operations/chat/shared/functions.py"
         ],
         "standards": [
@@ -3089,11 +3130,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "ブラウザの画像付きMarkdown編集",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u12"
@@ -3109,7 +3150,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/images/upload_image/functions.py"
+          "backend/src/kotorelay/operations/images/upload_image/functions.py",
+          "backend/src/kotorelay/operations/images/upload_image/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3137,11 +3179,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "画像中の日本語を含む文字起こし",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u13"
@@ -3157,7 +3199,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/images/upload_image/functions.py"
+          "backend/src/kotorelay/operations/images/upload_image/functions.py",
+          "backend/src/kotorelay/operations/images/upload_image/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3185,11 +3228,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "画像内の矩形と多角形座標",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u13"
@@ -3206,7 +3249,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/images/upload_image/functions.py",
-          "backend/src/kotorelay/operations/images/correct_ocr/functions.py"
+          "backend/src/kotorelay/operations/images/upload_image/router.py",
+          "backend/src/kotorelay/operations/images/correct_ocr/functions.py",
+          "backend/src/kotorelay/operations/images/correct_ocr/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3234,11 +3279,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "画像ノードの安定IDと原文範囲",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u13"
@@ -3254,7 +3299,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/save_draft/functions.py"
+          "backend/src/kotorelay/operations/documents/save_draft/functions.py",
+          "backend/src/kotorelay/operations/documents/save_draft/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3282,11 +3328,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "不変な画像付き版manifest",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u12"
@@ -3302,7 +3348,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/submit_version/functions.py"
+          "backend/src/kotorelay/operations/documents/submit_version/functions.py",
+          "backend/src/kotorelay/operations/documents/submit_version/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3330,11 +3377,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "OCR確認と訂正の版管理",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u13"
@@ -3350,7 +3397,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/images/correct_ocr/functions.py"
+          "backend/src/kotorelay/operations/images/correct_ocr/functions.py",
+          "backend/src/kotorelay/operations/images/correct_ocr/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3378,11 +3426,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-07",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "chunkと画像配置・OCR領域の対応",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u13"
@@ -3399,7 +3447,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/chat/ask_question/functions.py"
+          "backend/src/kotorelay/operations/indexing/shared/router.py",
+          "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3427,11 +3477,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-08",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "文字と画像を組み合わせた生成入力",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u14"
@@ -3447,7 +3497,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/chat/ask_question/functions.py"
+          "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3475,11 +3526,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-IMG-09",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "画像入力予算と根拠の完全性",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u14"
@@ -3495,7 +3546,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/chat/ask_question/functions.py"
+          "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3523,11 +3575,11 @@
       "action": "enforce",
       "category": "nonfunctional",
       "id": "REQ-IMG-10",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "派生画像・OCR・モデル入力の保護",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u14"
@@ -3544,7 +3596,8 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/images/shared/functions.py",
-          "backend/src/kotorelay/operations/images/get_ocr/functions.py"
+          "backend/src/kotorelay/operations/images/get_ocr/functions.py",
+          "backend/src/kotorelay/operations/images/get_ocr/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3572,11 +3625,11 @@
       "action": "enforce",
       "category": "nonfunctional",
       "id": "REQ-IMG-11",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "画像ファイルと外部参照の検証",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u12"
@@ -3592,7 +3645,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/images/upload_image/functions.py"
+          "backend/src/kotorelay/operations/images/upload_image/functions.py",
+          "backend/src/kotorelay/operations/images/upload_image/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3668,11 +3722,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-GRP-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署・構成員・リーダー・兼務",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -3689,6 +3743,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/groups/change_membership/functions.py",
+          "backend/src/kotorelay/operations/groups/change_membership/router.py",
           "backend/src/kotorelay/context.py"
         ],
         "standards": [
@@ -3717,11 +3772,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-GRP-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署所有と部署間共有",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -3737,7 +3792,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/change_policy/functions.py"
+          "backend/src/kotorelay/operations/documents/change_policy/functions.py",
+          "backend/src/kotorelay/operations/documents/change_policy/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3765,11 +3821,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-GRP-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署文書の管理一覧",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -3785,7 +3841,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/list_documents/functions.py"
+          "backend/src/kotorelay/operations/documents/list_documents/functions.py",
+          "backend/src/kotorelay/operations/documents/list_documents/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3813,11 +3870,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-GRP-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署文書の申請・決定状況",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -3833,7 +3890,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/reviews/list_reviews/functions.py"
+          "backend/src/kotorelay/operations/reviews/list_reviews/functions.py",
+          "backend/src/kotorelay/operations/reviews/list_reviews/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3861,11 +3919,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-GRP-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署文書の削除",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -3881,7 +3939,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/documents/change_policy/functions.py"
+          "backend/src/kotorelay/operations/documents/change_policy/functions.py",
+          "backend/src/kotorelay/operations/documents/change_policy/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3909,11 +3968,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-GRP-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "保持と物理削除ジョブ",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -3929,7 +3988,8 @@
         ],
         "implementation": [
           "frontend/src/components/App.tsx",
-          "backend/src/kotorelay/operations/indexing/shared/functions.py"
+          "backend/src/kotorelay/operations/indexing/shared/functions.py",
+          "backend/src/kotorelay/operations/indexing/shared/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3957,11 +4017,11 @@
       "action": "enforce",
       "category": "nonfunctional",
       "id": "REQ-GRP-07",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "管理と審査の職務境界",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -3978,7 +4038,8 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/context.py",
-          "backend/src/kotorelay/operations/groups/change_membership/functions.py"
+          "backend/src/kotorelay/operations/groups/change_membership/functions.py",
+          "backend/src/kotorelay/operations/groups/change_membership/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -4006,11 +4067,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-MET-01",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署の質問数と処理結果",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -4027,7 +4088,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/metrics/department_metrics/functions.py",
-          "backend/src/kotorelay/operations/metrics/record_view/functions.py"
+          "backend/src/kotorelay/operations/metrics/department_metrics/router.py",
+          "backend/src/kotorelay/operations/metrics/record_view/functions.py",
+          "backend/src/kotorelay/operations/metrics/record_view/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -4055,11 +4118,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-MET-02",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署別・所有文書別の表示件数",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -4076,7 +4139,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/metrics/department_metrics/functions.py",
-          "backend/src/kotorelay/operations/metrics/record_view/functions.py"
+          "backend/src/kotorelay/operations/metrics/department_metrics/router.py",
+          "backend/src/kotorelay/operations/metrics/record_view/functions.py",
+          "backend/src/kotorelay/operations/metrics/record_view/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -4104,11 +4169,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-MET-03",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "所有文書のRAG貢献",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -4125,7 +4190,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/metrics/department_metrics/functions.py",
-          "backend/src/kotorelay/operations/metrics/record_view/functions.py"
+          "backend/src/kotorelay/operations/metrics/department_metrics/router.py",
+          "backend/src/kotorelay/operations/metrics/record_view/functions.py",
+          "backend/src/kotorelay/operations/metrics/record_view/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -4153,11 +4220,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-MET-04",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "利用時の部署スナップショット",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -4174,8 +4241,11 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/metrics/department_metrics/functions.py",
+          "backend/src/kotorelay/operations/metrics/department_metrics/router.py",
           "backend/src/kotorelay/operations/metrics/record_view/functions.py",
-          "backend/src/kotorelay/operations/chat/ask_question/functions.py"
+          "backend/src/kotorelay/operations/metrics/record_view/router.py",
+          "backend/src/kotorelay/operations/chat/ask_question/functions.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -4203,11 +4273,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-MET-05",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "利用イベントと集計の整合性",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -4224,7 +4294,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/metrics/department_metrics/functions.py",
-          "backend/src/kotorelay/operations/metrics/record_view/functions.py"
+          "backend/src/kotorelay/operations/metrics/department_metrics/router.py",
+          "backend/src/kotorelay/operations/metrics/record_view/functions.py",
+          "backend/src/kotorelay/operations/metrics/record_view/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -4252,11 +4324,11 @@
       "action": "enforce",
       "category": "nonfunctional",
       "id": "REQ-MET-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "部署境界と集計データの最小化",
       "rationale": "優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/REQUESTS.md#u15"
@@ -4273,7 +4345,9 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/metrics/department_metrics/functions.py",
-          "backend/src/kotorelay/operations/metrics/record_view/functions.py"
+          "backend/src/kotorelay/operations/metrics/department_metrics/router.py",
+          "backend/src/kotorelay/operations/metrics/record_view/functions.py",
+          "backend/src/kotorelay/operations/metrics/record_view/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -4828,11 +4902,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-UX-06",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "OCRの文字と領域を一対一で保持する",
       "rationale": "提供されたUIデザイン設計の受入条件。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/UI-REVISION.md"
@@ -4847,7 +4921,9 @@
         ],
         "implementation": [
           "backend/src/kotorelay/operations/images/correct_ocr/functions.py",
-          "backend/src/kotorelay/operations/images/get_ocr/functions.py"
+          "backend/src/kotorelay/operations/images/correct_ocr/router.py",
+          "backend/src/kotorelay/operations/images/get_ocr/functions.py",
+          "backend/src/kotorelay/operations/images/get_ocr/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -5017,11 +5093,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-UX-10",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "管理対象部署を一覧と操作へ一致させる",
       "rationale": "提供されたUIデザイン設計の受入条件。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/UI-REVISION.md"
@@ -5036,8 +5112,11 @@
         ],
         "implementation": [
           "backend/src/kotorelay/operations/documents/list_documents/functions.py",
+          "backend/src/kotorelay/operations/documents/list_documents/router.py",
           "backend/src/kotorelay/operations/metrics/department_metrics/functions.py",
-          "backend/src/kotorelay/operations/groups/list_members/functions.py"
+          "backend/src/kotorelay/operations/metrics/department_metrics/router.py",
+          "backend/src/kotorelay/operations/groups/list_members/functions.py",
+          "backend/src/kotorelay/operations/groups/list_members/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -5113,11 +5192,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-UX-12",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "削除理由を監査へ保存する",
       "rationale": "提供されたUIデザイン設計の受入条件。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/UI-REVISION.md"
@@ -5131,7 +5210,8 @@
           "docs/design/generated/FRONTEND.md"
         ],
         "implementation": [
-          "backend/src/kotorelay/operations/documents/change_policy/functions.py"
+          "backend/src/kotorelay/operations/documents/change_policy/functions.py",
+          "backend/src/kotorelay/operations/documents/change_policy/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -5160,11 +5240,11 @@
       "action": "provide",
       "category": "functional",
       "id": "REQ-UX-13",
-      "last_changed_by": "api-layout-trace-2026-09-13",
+      "last_changed_by": "router-flow-2026-09-13",
       "object": "利用部署を閲覧と会話へ明示する",
       "rationale": "提供されたUIデザイン設計の受入条件。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "product",
       "source_refs": [
         "docs/planning/UI-REVISION.md"
@@ -5179,7 +5259,9 @@
         ],
         "implementation": [
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
-          "backend/src/kotorelay/operations/metrics/record_view/functions.py"
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
+          "backend/src/kotorelay/operations/metrics/record_view/functions.py",
+          "backend/src/kotorelay/operations/metrics/record_view/router.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -5567,6 +5649,150 @@
       "verification": {
         "evidence": "同一コミットの品質Pages",
         "method": "配置と依存の検査、実HTTPサンプル、生成差分、業務と実DBとCompose E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIとSQLと設計generatorが存在する",
+          "id": "AC-DESIGN-07",
+          "then": "routerに処理順・分岐・例外・transactionを記述し、functionsは個別処理だけを持ち、複数更新段階の委譲と直接DB・provider実行を拒否する",
+          "when": "実装と設計を生成し検査する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-07",
+      "last_changed_by": "router-flow-2026-09-13",
+      "object": "routerがAPIの全体フローを所有する",
+      "rationale": "利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "routerがAPIの全体フローを所有する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/api_layout.py",
+          "backend/src/kotorelay/operations/chat/ask_question/router.py",
+          "backend/src/kotorelay/operations/indexing/shared/router.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_router_flow.py",
+          "backend/tests/test_workflow.py",
+          "backend/tests/test_postgres.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "配置と型の負例、生成差分、既存業務と実DBとCompose E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIとSQLと設計generatorが存在する",
+          "id": "AC-DESIGN-08",
+          "then": "SQLの束縛位置とDDLから専用Paramsを生成し、SELECTの列・別名・NULLに一致する専用Rowを生成して余剰入力と未対応投影と生成差分を拒否する",
+          "when": "実装と設計を生成し検査する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-08",
+      "last_changed_by": "router-flow-2026-09-13",
+      "object": "SQLごとの引数と取得投影を型として生成する",
+      "rationale": "利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "SQLごとの引数と取得投影を型として生成する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/queries.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_router_flow.py",
+          "backend/tests/test_workflow.py",
+          "backend/tests/test_postgres.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "配置と型の負例、生成差分、既存業務と実DBとCompose E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIとSQLと設計generatorが存在する",
+          "id": "AC-DESIGN-09",
+          "then": "実call graphの呼出し位置でSQLの役割コメントを表示し、順序・条件・反復・例外・transactionを生成して未対応構文を拒否する",
+          "when": "実装と設計を生成し検査する"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-09",
+      "last_changed_by": "router-flow-2026-09-13",
+      "object": "routerの実行順序と制御構造からシーケンスを生成する",
+      "rationale": "利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "routerの実行順序と制御構造からシーケンスを生成する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/router_sequence.py",
+          "tools/project/design.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_router_flow.py",
+          "backend/tests/test_workflow.py",
+          "backend/tests/test_postgres.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "同一コミットの品質Pages",
+        "method": "配置と型の負例、生成差分、既存業務と実DBとCompose E2E"
       }
     }
   ],

@@ -1491,6 +1491,7 @@
     },
     "/api/documents/{document_id}/draft": {
       "get": {
+        "description": "担当権限を検証して下書きの本文と配置を取得する。",
         "operationId": "get_draft",
         "parameters": [
           {
@@ -2009,6 +2010,7 @@
     },
     "/api/health": {
       "get": {
+        "description": "外部依存へ接続せずプロセスの稼働状態を返す。",
         "operationId": "health",
         "responses": {
           "200": {
@@ -2501,6 +2503,7 @@
     },
     "/api/operations/jobs": {
       "get": {
+        "description": "要求された詳細度に合わせて運用者向けジョブ一覧を取得する。",
         "operationId": "list_jobs",
         "parameters": [
           {
@@ -2567,6 +2570,7 @@
     },
     "/api/operations/jobs/{job_id}": {
       "post": {
+        "description": "運用権限と現行状態を確認して共有のジョブ配送処理を再実行する。",
         "operationId": "retry_job",
         "parameters": [
           {

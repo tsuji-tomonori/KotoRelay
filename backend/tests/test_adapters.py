@@ -123,7 +123,7 @@ def test_OCRの座標と読み順を正規化する():
         "kotorelay.operations.images.upload_image.functions.subprocess.run", return_value=result
     ):
         ocr = run_ocr(b"png", 100, 200, "tesseract")
-    assert ocr.status == "ready" and ocr.regions[0].x == 0.1 and ocr.regions[0].y == 0.1
+    assert ocr.status == "ready" and ocr.regions[0].x == 0.1 and (ocr.regions[0].y == 0.1)
     assert ocr.regions[0].confidence == 0.9 and ocr.regions[0].order == 0
     with patch(
         "kotorelay.operations.images.upload_image.functions.subprocess.run",
@@ -151,8 +151,8 @@ def test_画像の解像度と正規化後サイズを制限する():
 
 def test_見出しと長文を上限内のチャンクへ分割する():
     assert split_chunks("") == []
-    chunks = split_chunks("# 見出し\n" + ("あ" * 3000) + "\n# 次\n本文")
-    assert all(len(text) <= 1200 for _, text in chunks)
+    chunks = split_chunks("# 見出し\n" + "あ" * 3000 + "\n# 次\n本文")
+    assert all((len(text) <= 1200 for _, text in chunks))
     assert chunks[-1][0] == "次" and "本文" in chunks[-1][1]
     assert len(split_chunks("行\n" * 1500)) >= 3
 
@@ -167,12 +167,20 @@ def test_DBポートのparameter_bindingとtransaction終了を検証する(sett
     db = Database(settings)
     with patch("kotorelay.db.psycopg.connect", return_value=connection):
         with db.transaction():
-            assert q.organizations_get(db, "1", "1")[0].name == "組織"
+            assert (
+                q.organizations_get(db, q.OrganizationsGetParams(organization_id="1", id="1"))[
+                    0
+                ].name
+                == "組織"
+            )
             assert (
                 q.organizations_fence(
                     db,
-                    q.OrganizationsRow(
-                        id="1", organization_id="1", name="組織", revision=1, suspended=False
+                    q.OrganizationsFenceParams.model_validate(
+                        q.OrganizationsRow(
+                            id="1", organization_id="1", name="組織", revision=1, suspended=False
+                        ),
+                        from_attributes=True,
                     ),
                 )
                 == 1
@@ -180,7 +188,7 @@ def test_DBポートのparameter_bindingとtransaction終了を検証する(sett
         assert db.connection is None
     assert connection.isolation_level == psycopg.IsolationLevel.REPEATABLE_READ
     with pytest.raises(RuntimeError):
-        q.organizations_get(db, "1", "1")
+        q.organizations_get(db, q.OrganizationsGetParams(organization_id="1", id="1"))
     with pytest.raises(RuntimeError):
         db.execute("unused", {})
 
@@ -267,4 +275,4 @@ def test_モデルへ送信できない画像寸法を受付時に拒否する()
     value = io.BytesIO()
     Image.new("RGB", (8001, 1), "white").save(value, format="PNG")
     with pytest.raises(Problem):
-        normalize_image(value.getvalue(), 3 * 1024 * 1024, 20_000_000)
+        normalize_image(value.getvalue(), 3 * 1024 * 1024, 20000000)

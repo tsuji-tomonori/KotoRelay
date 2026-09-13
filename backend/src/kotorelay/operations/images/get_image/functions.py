@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from kotorelay.context import Context
-from kotorelay.operations.images.shared.functions import authorize_asset
+import kotorelay.context as context_types
+import kotorelay.generated.models as models
 
 
-def image(ctx: Context, asset_id: str, version_id: str | None) -> bytes:
-    asset = authorize_asset(ctx, asset_id, version_id)
+def get_get_image(asset: models.AssetsRow, ctx: context_types.Context) -> bytes:
+    """記録された保存先から実体を取得してハッシュを照合する。"""
     return ctx.objects.get(asset.object_key, asset.sha256)

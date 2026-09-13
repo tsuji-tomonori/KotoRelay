@@ -40,7 +40,7 @@ def test_SQL正本の役割コメントが図とクエリ概要と型付き関�
 
     wrappers = [ast.parse(body) for body in module("queries").build().values()]
     descriptions = {
-        path.stem: path.read_text().splitlines()[0].removeprefix("-- ")
+        re.sub(r"^[0-9]{3}_", "", path.stem): path.read_text().splitlines()[0].removeprefix("-- ")
         for path in Path("backend/src/kotorelay/operations").rglob("*.sql")
     }
     for node in [node for wrapper in wrappers for node in wrapper.body]:
@@ -52,7 +52,7 @@ def test_SQL正本の役割コメントが図とクエリ概要と型付き関�
             continue
         diagram = generated[path.replace("/query.md", "/sequence.md")].split("```mermaid")[1]
         diagram = diagram.split("```")[0]
-        for name in re.findall(r"^## (?:[^\n]+/)?(\w+)\.sql$", body, re.MULTILINE):
+        for name in re.findall(r"^## (?:[^\n]+/)?(?:[0-9]{3}_)?(\w+)\.sql$", body, re.MULTILINE):
             checked.add(name)
             assert "A->>D: " + descriptions[name] in diagram
             assert "A->>D: " + name not in diagram

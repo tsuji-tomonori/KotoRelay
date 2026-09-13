@@ -14,11 +14,7 @@ def grant(client, persona, department, **permissions):
     response = client.put(
         "/api/groups/memberships",
         headers=headers("operator"),
-        json={
-            "user_id": user,
-            "department_id": department,
-            **permissions,
-        },
+        json={"user_id": user, "department_id": department, **permissions},
     )
     assert response.status_code == 200
 
@@ -30,10 +26,7 @@ def department_page_case(client):
     second = client.post(
         "/api/documents",
         headers=headers("other"),
-        json={
-            "title": "営業部の文書",
-            "department_id": OTHER,
-        },
+        json={"title": "営業部の文書", "department_id": OTHER},
     ).json()
     for department, expected in [(DEPT, first["id"]), (OTHER, second["id"])]:
         response = client.get(
@@ -67,11 +60,7 @@ def test_一覧は公開版と審査版を分離し続きの有無を返す(clie
     client.put(
         f"/api/documents/{doc['id']}/draft",
         headers=headers(),
-        json={
-            "title": "未承認タイトル",
-            "body": "未承認本文",
-            "revision": current["revision"],
-        },
+        json={"title": "未承認タイトル", "body": "未承認本文", "revision": current["revision"]},
     )
     next_version = submit(client, doc)
     read = client.get("/api/documents?page=true", headers=headers("reader")).json()["items"][0]
@@ -177,7 +166,7 @@ def test_OCR領域の複数行訂正と削除追加でも識別座標を保つ(c
     )
     value = last["ocr"]["regions"][0]
     assert (
-        value["region_id"] == ids[1] and value["x"] == 0.3 and value["text"] == "複数行\n訂正内容"
+        value["region_id"] == ids[1] and value["x"] == 0.3 and (value["text"] == "複数行\n訂正内容")
     )
     assert value["confidence"] is None and value["source"] == "human"
     before = client.get(f"/api/images/ocr/{first['ocr_run']['id']}", headers=headers()).json()
@@ -216,7 +205,12 @@ def test_旧OCRの読取は安定IDを補うだけで保存済みハッシュを
     second = client.get(f"/api/images/ocr/{rid}", headers=headers()).json()
     assert first["regions"][0]["region_id"] == second["regions"][0]["region_id"]
     with client.app.state.runtime.context("demo-author") as ctx:
-        assert q.ocr_runs_get(ctx.db, ctx.org, rid)[0].result_hash == key
+        assert (
+            q.ocr_runs_get(ctx.db, q.OcrRunsGetParams(organization_id=ctx.org, id=rid))[
+                0
+            ].result_hash
+            == key
+        )
         assert json.loads(ctx.objects.get(key)) == value
 
 

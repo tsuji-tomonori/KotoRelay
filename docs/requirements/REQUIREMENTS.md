@@ -2,7 +2,7 @@
 # KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG 要件一覧
 
 - スキーマ版: 1
-- カタログ版: 6
+- カタログ版: 7
 - Product(JSON): <code>"KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG"</code>
 - 更新日(JSON): <code>"2026-09-12"</code>
 - 正本: `spec/requirements/requirements.qnt`
@@ -10,21 +10,21 @@
 
 | ID | 版 | 状態 | 種別 | 原子的な義務 | 検証方法 |
 |---|---:|---|---|---|---|
-| <code>"REQ-DOC-01"</code> | 2 | 有効 | 機能 | システムは、Markdown本文の編集を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-DOC-02"</code> | 2 | 有効 | 機能 | システムは、Markdownの表示確認を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-DOC-03"</code> | 2 | 有効 | 機能 | システムは、保存状態の表示を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-DOC-04"</code> | 3 | 有効 | 機能 | システムは、文書IDと文書版IDの分離を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-DOC-05"</code> | 3 | 有効 | 制約 | システムは、文書版の不変性を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-DOC-06"</code> | 3 | 有効 | 機能 | システムは、版履歴の閲覧を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-DOC-07"</code> | 3 | 有効 | 機能 | システムは、版間差分の表示を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-DOC-08"</code> | 3 | 有効 | 機能 | システムは、同時編集の更新競合検出を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-WF-01"</code> | 3 | 有効 | 機能 | システムは、文書版の承認申請を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-WF-02"</code> | 3 | 有効 | 機能 | システムは、版単位の承認を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-WF-03"</code> | 3 | 有効 | 機能 | システムは、版単位の却下を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-WF-04"</code> | 3 | 有効 | 機能 | システムは、再申請の履歴維持を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-WF-05"</code> | 3 | 有効 | 機能 | システムは、承認と却下の競合制御を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-WF-06"</code> | 3 | 有効 | 機能 | システムは、審査要求の冪等性を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-WF-07"</code> | 3 | 有効 | 機能 | システムは、サーバーによる審査認可を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-01"</code> | 3 | 有効 | 機能 | システムは、Markdown本文の編集を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-02"</code> | 3 | 有効 | 機能 | システムは、Markdownの表示確認を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-03"</code> | 3 | 有効 | 機能 | システムは、保存状態の表示を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-04"</code> | 4 | 有効 | 機能 | システムは、文書IDと文書版IDの分離を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-05"</code> | 4 | 有効 | 制約 | システムは、文書版の不変性を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-06"</code> | 4 | 有効 | 機能 | システムは、版履歴の閲覧を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-07"</code> | 4 | 有効 | 機能 | システムは、版間差分の表示を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-DOC-08"</code> | 4 | 有効 | 機能 | システムは、同時編集の更新競合検出を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-WF-01"</code> | 4 | 有効 | 機能 | システムは、文書版の承認申請を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-WF-02"</code> | 4 | 有効 | 機能 | システムは、版単位の承認を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-WF-03"</code> | 4 | 有効 | 機能 | システムは、版単位の却下を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-WF-04"</code> | 4 | 有効 | 機能 | システムは、再申請の履歴維持を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-WF-05"</code> | 4 | 有効 | 機能 | システムは、承認と却下の競合制御を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-WF-06"</code> | 4 | 有効 | 機能 | システムは、審査要求の冪等性を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-WF-07"</code> | 4 | 有効 | 機能 | システムは、サーバーによる審査認可を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-ACL-01"</code> | 3 | 有効 | 機能 | システムは、保護された操作の認証を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-ACL-02"</code> | 3 | 有効 | 機能 | システムは、役割と資源権限の組合せを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-ACL-03"</code> | 3 | 有効 | 機能 | システムは、未承認版へのアクセス制御を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
@@ -35,28 +35,28 @@
 | <code>"REQ-ACL-08"</code> | 3 | 有効 | 機能 | システムは、信頼できる属性による認可を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-ACL-09"</code> | 3 | 有効 | 制約 | システムは、最新権限によるアクセス停止を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-ACL-10"</code> | 3 | 有効 | 機能 | システムは、チャンクと添付の権限継承を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-ACL-11"</code> | 3 | 有効 | 機能 | システムは、会話の所有者境界を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-ACL-11"</code> | 4 | 有効 | 機能 | システムは、会話の所有者境界を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-ACL-12"</code> | 3 | 有効 | 機能 | システムは、保存された回答の再認可を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-PUB-01"</code> | 3 | 有効 | 機能 | システムは、最新承認版の決定を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-PUB-02"</code> | 3 | 有効 | 機能 | システムは、審査中の公開継続を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-PUB-03"</code> | 3 | 有効 | 機能 | システムは、旧承認版の回答利用停止を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-PUB-04"</code> | 3 | 有効 | 機能 | システムは、文書公開とRAG準備状態の分離を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-PUB-05"</code> | 3 | 有効 | 機能 | システムは、公開停止文書の利用停止を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-PUB-06"</code> | 3 | 有効 | 機能 | システムは、非同期処理の版順保証を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IDX-01"</code> | 3 | 有効 | 機能 | システムは、検索用データの入力制限を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IDX-02"</code> | 3 | 有効 | 機能 | システムは、根拠断片の出所記録を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IDX-03"</code> | 3 | 有効 | 機能 | システムは、索引反映の公開判定を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IDX-04"</code> | 3 | 有効 | 機能 | システムは、必須属性の検証を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IDX-05"</code> | 3 | 有効 | 機能 | システムは、失敗した索引反映の回復を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IDX-06"</code> | 3 | 有効 | 機能 | システムは、反映漏れの照合を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-01"</code> | 3 | 有効 | 機能 | システムは、根拠に基づくチャット回答を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-02"</code> | 3 | 有効 | 機能 | システムは、必須検索条件の適用を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-03"</code> | 3 | 有効 | 機能 | システムは、生成入力の有効性検証を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-04"</code> | 3 | 有効 | 機能 | システムは、処理中の権限と版変更の反映を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-05"</code> | 3 | 有効 | 機能 | システムは、回答と根拠の対応表示を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-06"</code> | 3 | 有効 | 機能 | システムは、未裏付け回答の抑止を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-07"</code> | 3 | 有効 | 機能 | システムは、会話継続時の根拠更新を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-RAG-08"</code> | 3 | 有効 | 機能 | システムは、プロンプトインジェクションへの境界維持を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-PUB-01"</code> | 4 | 有効 | 機能 | システムは、最新承認版の決定を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-PUB-02"</code> | 4 | 有効 | 機能 | システムは、審査中の公開継続を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-PUB-03"</code> | 4 | 有効 | 機能 | システムは、旧承認版の回答利用停止を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-PUB-04"</code> | 4 | 有効 | 機能 | システムは、文書公開とRAG準備状態の分離を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-PUB-05"</code> | 4 | 有効 | 機能 | システムは、公開停止文書の利用停止を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-PUB-06"</code> | 4 | 有効 | 機能 | システムは、非同期処理の版順保証を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IDX-01"</code> | 4 | 有効 | 機能 | システムは、検索用データの入力制限を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IDX-02"</code> | 4 | 有効 | 機能 | システムは、根拠断片の出所記録を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IDX-03"</code> | 4 | 有効 | 機能 | システムは、索引反映の公開判定を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IDX-04"</code> | 4 | 有効 | 機能 | システムは、必須属性の検証を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IDX-05"</code> | 4 | 有効 | 機能 | システムは、失敗した索引反映の回復を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IDX-06"</code> | 4 | 有効 | 機能 | システムは、反映漏れの照合を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-01"</code> | 4 | 有効 | 機能 | システムは、根拠に基づくチャット回答を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-02"</code> | 4 | 有効 | 機能 | システムは、必須検索条件の適用を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-03"</code> | 4 | 有効 | 機能 | システムは、生成入力の有効性検証を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-04"</code> | 4 | 有効 | 機能 | システムは、処理中の権限と版変更の反映を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-05"</code> | 4 | 有効 | 機能 | システムは、回答と根拠の対応表示を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-06"</code> | 4 | 有効 | 機能 | システムは、未裏付け回答の抑止を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-07"</code> | 4 | 有効 | 機能 | システムは、会話継続時の根拠更新を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-RAG-08"</code> | 4 | 有効 | 機能 | システムは、プロンプトインジェクションへの境界維持を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-RAG-09"</code> | 3 | 有効 | 制約 | システムは、診断データの保護を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-OPS-01"</code> | 2 | 有効 | 制約 | システムは、AWS上の実行基盤を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-OPS-02"</code> | 2 | 有効 | 制約 | システムは、利用量に連動する運用費を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
@@ -73,31 +73,31 @@
 | <code>"REQ-DAT-02"</code> | 1 | 有効 | 制約 | システムは、主キー・一意制約・複合外部キーを**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-DAT-03"</code> | 1 | 有効 | 制約 | システムは、DSQLと非同期処理の連携を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-DAT-04"</code> | 1 | 有効 | 制約 | システムは、OCR領域・チャンク・削除の分割処理を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-01"</code> | 2 | 有効 | 機能 | システムは、ブラウザの画像付きMarkdown編集を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-02"</code> | 2 | 有効 | 機能 | システムは、画像中の日本語を含む文字起こしを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-03"</code> | 2 | 有効 | 機能 | システムは、画像内の矩形と多角形座標を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-04"</code> | 2 | 有効 | 機能 | システムは、画像ノードの安定IDと原文範囲を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-05"</code> | 2 | 有効 | 機能 | システムは、不変な画像付き版manifestを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-06"</code> | 2 | 有効 | 機能 | システムは、OCR確認と訂正の版管理を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-07"</code> | 2 | 有効 | 機能 | システムは、chunkと画像配置・OCR領域の対応を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-08"</code> | 2 | 有効 | 機能 | システムは、文字と画像を組み合わせた生成入力を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-09"</code> | 2 | 有効 | 機能 | システムは、画像入力予算と根拠の完全性を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-10"</code> | 2 | 有効 | 制約 | システムは、派生画像・OCR・モデル入力の保護を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-IMG-11"</code> | 2 | 有効 | 制約 | システムは、画像ファイルと外部参照の検証を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-01"</code> | 3 | 有効 | 機能 | システムは、ブラウザの画像付きMarkdown編集を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-02"</code> | 3 | 有効 | 機能 | システムは、画像中の日本語を含む文字起こしを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-03"</code> | 3 | 有効 | 機能 | システムは、画像内の矩形と多角形座標を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-04"</code> | 3 | 有効 | 機能 | システムは、画像ノードの安定IDと原文範囲を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-05"</code> | 3 | 有効 | 機能 | システムは、不変な画像付き版manifestを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-06"</code> | 3 | 有効 | 機能 | システムは、OCR確認と訂正の版管理を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-07"</code> | 3 | 有効 | 機能 | システムは、chunkと画像配置・OCR領域の対応を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-08"</code> | 3 | 有効 | 機能 | システムは、文字と画像を組み合わせた生成入力を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-09"</code> | 3 | 有効 | 機能 | システムは、画像入力予算と根拠の完全性を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-10"</code> | 3 | 有効 | 制約 | システムは、派生画像・OCR・モデル入力の保護を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-IMG-11"</code> | 3 | 有効 | 制約 | システムは、画像ファイルと外部参照の検証を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-IMG-12"</code> | 2 | 有効 | 制約 | システムは、Base64とOCR内容の診断情報保護を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-GRP-01"</code> | 2 | 有効 | 機能 | システムは、部署・構成員・リーダー・兼務を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-GRP-02"</code> | 2 | 有効 | 機能 | システムは、部署所有と部署間共有を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-GRP-03"</code> | 2 | 有効 | 機能 | システムは、部署文書の管理一覧を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-GRP-04"</code> | 2 | 有効 | 機能 | システムは、部署文書の申請・決定状況を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-GRP-05"</code> | 2 | 有効 | 機能 | システムは、部署文書の削除を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-GRP-06"</code> | 2 | 有効 | 機能 | システムは、保持と物理削除ジョブを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-GRP-07"</code> | 2 | 有効 | 制約 | システムは、管理と審査の職務境界を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-MET-01"</code> | 2 | 有効 | 機能 | システムは、部署の質問数と処理結果を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-MET-02"</code> | 2 | 有効 | 機能 | システムは、部署別・所有文書別の表示件数を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-MET-03"</code> | 2 | 有効 | 機能 | システムは、所有文書のRAG貢献を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-MET-04"</code> | 2 | 有効 | 機能 | システムは、利用時の部署スナップショットを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-MET-05"</code> | 2 | 有効 | 機能 | システムは、利用イベントと集計の整合性を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
-| <code>"REQ-MET-06"</code> | 2 | 有効 | 制約 | システムは、部署境界と集計データの最小化を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-GRP-01"</code> | 3 | 有効 | 機能 | システムは、部署・構成員・リーダー・兼務を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-GRP-02"</code> | 3 | 有効 | 機能 | システムは、部署所有と部署間共有を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-GRP-03"</code> | 3 | 有効 | 機能 | システムは、部署文書の管理一覧を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-GRP-04"</code> | 3 | 有効 | 機能 | システムは、部署文書の申請・決定状況を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-GRP-05"</code> | 3 | 有効 | 機能 | システムは、部署文書の削除を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-GRP-06"</code> | 3 | 有効 | 機能 | システムは、保持と物理削除ジョブを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-GRP-07"</code> | 3 | 有効 | 制約 | システムは、管理と審査の職務境界を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-MET-01"</code> | 3 | 有効 | 機能 | システムは、部署の質問数と処理結果を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-MET-02"</code> | 3 | 有効 | 機能 | システムは、部署別・所有文書別の表示件数を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-MET-03"</code> | 3 | 有効 | 機能 | システムは、所有文書のRAG貢献を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-MET-04"</code> | 3 | 有効 | 機能 | システムは、利用時の部署スナップショットを**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-MET-05"</code> | 3 | 有効 | 機能 | システムは、利用イベントと集計の整合性を**提供する**（<code>"provide"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
+| <code>"REQ-MET-06"</code> | 3 | 有効 | 制約 | システムは、部署境界と集計データの最小化を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-PRJ-03"</code> | 1 | 有効 | 制約 | 開発担当は、名称と識別子を**強制する**（<code>"enforce"</code>） | 設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証） |
 | <code>"REQ-PRJ-04"</code> | 1 | 有効 | 制約 | 開発担当は、指定技術で実装するを**強制する**（<code>"enforce"</code>） | CIとローカルの実コマンド |
 | <code>"REQ-PRJ-05"</code> | 1 | 有効 | 制約 | 開発担当は、品質の閾値を検査するを**強制する**（<code>"enforce"</code>） | CIとローカルの実コマンド |
@@ -109,14 +109,14 @@
 | <code>"REQ-UX-03"</code> | 1 | 有効 | 制約 | システムは、キーボードのフォーカスを維持するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-04"</code> | 1 | 有効 | 機能 | システムは、全画面遷移で未保存入力を保護するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-05"</code> | 1 | 有効 | 機能 | システムは、同じ版の本文と画像配置を再現するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
-| <code>"REQ-UX-06"</code> | 2 | 有効 | 機能 | システムは、OCRの文字と領域を一対一で保持するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-06"</code> | 3 | 有効 | 機能 | システムは、OCRの文字と領域を一対一で保持するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-07"</code> | 1 | 有効 | 機能 | システムは、画像の代替情報を版へ含めるを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-08"</code> | 1 | 有効 | 機能 | システムは、絵文字を含む挿入位置を統一するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-09"</code> | 1 | 有効 | 機能 | システムは、引用版と最新公開版を混同しないを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
-| <code>"REQ-UX-10"</code> | 2 | 有効 | 機能 | システムは、管理対象部署を一覧と操作へ一致させるを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-10"</code> | 3 | 有効 | 機能 | システムは、管理対象部署を一覧と操作へ一致させるを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-11"</code> | 1 | 有効 | 機能 | システムは、公開設定を明示確認して保存するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
-| <code>"REQ-UX-12"</code> | 2 | 有効 | 機能 | システムは、削除理由を監査へ保存するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
-| <code>"REQ-UX-13"</code> | 2 | 有効 | 機能 | システムは、利用部署を閲覧と会話へ明示するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-12"</code> | 3 | 有効 | 機能 | システムは、削除理由を監査へ保存するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
+| <code>"REQ-UX-13"</code> | 3 | 有効 | 機能 | システムは、利用部署を閲覧と会話へ明示するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-14"</code> | 1 | 有効 | 機能 | システムは、公開版と作業状態を分離表示するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-UX-15"</code> | 1 | 有効 | 機能 | システムは、一覧の取得状態とページ件数を区別するを**提供する**（<code>"provide"</code>） | 関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。 |
 | <code>"REQ-DESIGN-01"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、API帳票の章構成を参照設計に揃えるを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
@@ -125,6 +125,9 @@
 | <code>"REQ-DESIGN-04"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、品質Pagesで設計の階層を維持するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
 | <code>"REQ-DESIGN-05"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、SQLの役割を日本語一文で説明し図へ反映するを**提供する**（<code>"provide"</code>） | 生成差分、SQLコメントの検査、品質SPAのE2E |
 | <code>"REQ-DESIGN-06"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、API操作ごとにファイルと責務を分離するを**提供する**（<code>"provide"</code>） | 配置と依存の検査、実HTTPサンプル、生成差分、業務と実DBとCompose E2E |
+| <code>"REQ-DESIGN-07"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、routerがAPIの全体フローを所有するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
+| <code>"REQ-DESIGN-08"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、SQLごとの引数と取得投影を型として生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
+| <code>"REQ-DESIGN-09"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、routerの実行順序と制御構造からシーケンスを生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 
 ## REQ-DOC-01: ブラウザでMarkdownを編集する
 
@@ -138,8 +141,8 @@
 根拠: 優先度: Must（初期版の必須）。明示要求を具体化する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。明示要求を具体化する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -152,7 +155,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/get_draft/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/save_draft/router.py","backend/src/kotorelay/operations/documents/get_draft/functions.py","backend/src/kotorelay/operations/documents/get_draft/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -170,8 +173,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -184,7 +187,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py","backend/src/kotorelay/operations/documents/read_document/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -202,8 +205,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -216,7 +219,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/save_draft/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -234,8 +237,8 @@
 根拠: 優先度: Must（初期版の必須）。明示要求を具体化する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。明示要求を具体化する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -248,7 +251,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/create_document/functions.py","backend/src/kotorelay/operations/documents/submit_version/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/create_document/functions.py","backend/src/kotorelay/operations/documents/create_document/router.py","backend/src/kotorelay/operations/documents/submit_version/functions.py","backend/src/kotorelay/operations/documents/submit_version/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -266,8 +269,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
@@ -280,7 +283,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/submit_version/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/submit_version/functions.py","backend/src/kotorelay/operations/documents/submit_version/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -298,8 +301,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -312,7 +315,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/version_history/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/version_history/functions.py","backend/src/kotorelay/operations/documents/version_history/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -330,8 +333,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -344,7 +347,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/version_diff/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/version_diff/functions.py","backend/src/kotorelay/operations/documents/version_diff/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -362,8 +365,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -376,7 +379,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/save_draft/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -394,8 +397,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -408,7 +411,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/submit_version/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/submit_version/functions.py","backend/src/kotorelay/operations/documents/submit_version/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -426,8 +429,8 @@
 根拠: 優先度: Must（初期版の必須）。明示要求を具体化する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。明示要求を具体化する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -440,7 +443,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py","backend/src/kotorelay/operations/reviews/decide_review/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -458,8 +461,8 @@
 根拠: 優先度: Must（初期版の必須）。明示要求を具体化する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。明示要求を具体化する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -472,7 +475,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py","backend/src/kotorelay/operations/reviews/decide_review/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -490,8 +493,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -504,7 +507,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/submit_version/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/save_draft/router.py","backend/src/kotorelay/operations/documents/submit_version/functions.py","backend/src/kotorelay/operations/documents/submit_version/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -522,8 +525,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -536,7 +539,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py","backend/src/kotorelay/operations/reviews/decide_review/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -554,8 +557,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -568,7 +571,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py","backend/src/kotorelay/operations/reviews/decide_review/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -586,8 +589,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -600,7 +603,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/decide_review/functions.py","backend/src/kotorelay/operations/reviews/decide_review/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -938,8 +941,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -952,7 +955,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/chat_history/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/chat_history/functions.py","backend/src/kotorelay/operations/chat/chat_history/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1002,8 +1005,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1016,7 +1019,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py","backend/src/kotorelay/operations/documents/read_document/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1034,8 +1037,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1048,7 +1051,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/read_document/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/save_draft/router.py","backend/src/kotorelay/operations/documents/read_document/functions.py","backend/src/kotorelay/operations/documents/read_document/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1066,8 +1069,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1080,7 +1083,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py","backend/src/kotorelay/operations/documents/read_document/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1098,8 +1101,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1112,7 +1115,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py","backend/src/kotorelay/operations/documents/read_document/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1130,8 +1133,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1144,7 +1147,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/change_policy/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/change_policy/functions.py","backend/src/kotorelay/operations/documents/change_policy/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1162,8 +1165,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1176,7 +1179,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/read_document/functions.py","backend/src/kotorelay/operations/documents/read_document/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1194,8 +1197,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1208,7 +1211,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1226,8 +1229,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1240,7 +1243,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1258,8 +1261,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1272,7 +1275,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1290,8 +1293,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1304,7 +1307,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1322,8 +1325,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1336,7 +1339,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1354,8 +1357,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1368,7 +1371,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/reconcile_index/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/reconcile_index/functions.py","backend/src/kotorelay/operations/indexing/reconcile_index/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1386,8 +1389,8 @@
 根拠: 優先度: Must（初期版の必須）。明示要求を具体化する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。明示要求を具体化する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1400,7 +1403,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1418,8 +1421,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1432,7 +1435,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1450,8 +1453,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1464,7 +1467,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1482,8 +1485,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1496,7 +1499,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1514,8 +1517,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1528,7 +1531,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1546,8 +1549,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1560,7 +1563,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1578,8 +1581,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1592,7 +1595,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1610,8 +1613,8 @@
 根拠: 優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。利用者の明示要求を一貫して成立させるための派生条件。業務運用の選択肢は企画書の提案欄で別管理する。"</code>
 
-項目版: 3 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 4 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -1624,7 +1627,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/chat/shared/functions.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2154,8 +2157,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2168,7 +2171,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py","backend/src/kotorelay/operations/images/upload_image/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2186,8 +2189,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2200,7 +2203,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py","backend/src/kotorelay/operations/images/upload_image/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2218,8 +2221,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2232,7 +2235,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py","backend/src/kotorelay/operations/images/correct_ocr/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py","backend/src/kotorelay/operations/images/upload_image/router.py","backend/src/kotorelay/operations/images/correct_ocr/functions.py","backend/src/kotorelay/operations/images/correct_ocr/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2250,8 +2253,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2264,7 +2267,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/save_draft/functions.py","backend/src/kotorelay/operations/documents/save_draft/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2282,8 +2285,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2296,7 +2299,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/submit_version/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/submit_version/functions.py","backend/src/kotorelay/operations/documents/submit_version/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2314,8 +2317,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2328,7 +2331,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/correct_ocr/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/correct_ocr/functions.py","backend/src/kotorelay/operations/images/correct_ocr/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2346,8 +2349,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2360,7 +2363,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/chat/ask_question/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2378,8 +2381,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2392,7 +2395,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2410,8 +2413,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2424,7 +2427,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2442,8 +2445,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
@@ -2456,7 +2459,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/shared/functions.py","backend/src/kotorelay/operations/images/get_ocr/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/shared/functions.py","backend/src/kotorelay/operations/images/get_ocr/functions.py","backend/src/kotorelay/operations/images/get_ocr/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2474,8 +2477,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
@@ -2488,7 +2491,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/images/upload_image/functions.py","backend/src/kotorelay/operations/images/upload_image/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2538,8 +2541,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2552,7 +2555,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/groups/change_membership/functions.py","backend/src/kotorelay/context.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/groups/change_membership/functions.py","backend/src/kotorelay/operations/groups/change_membership/router.py","backend/src/kotorelay/context.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2570,8 +2573,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2584,7 +2587,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/change_policy/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/change_policy/functions.py","backend/src/kotorelay/operations/documents/change_policy/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2602,8 +2605,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2616,7 +2619,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/list_documents/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/list_documents/functions.py","backend/src/kotorelay/operations/documents/list_documents/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2634,8 +2637,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2648,7 +2651,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/list_reviews/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/reviews/list_reviews/functions.py","backend/src/kotorelay/operations/reviews/list_reviews/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2666,8 +2669,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2680,7 +2683,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/change_policy/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/documents/change_policy/functions.py","backend/src/kotorelay/operations/documents/change_policy/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2698,8 +2701,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2712,7 +2715,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2730,8 +2733,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
@@ -2744,7 +2747,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/context.py","backend/src/kotorelay/operations/groups/change_membership/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/context.py","backend/src/kotorelay/operations/groups/change_membership/functions.py","backend/src/kotorelay/operations/groups/change_membership/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2762,8 +2765,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2776,7 +2779,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/record_view/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/router.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/metrics/record_view/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2794,8 +2797,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2808,7 +2811,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/record_view/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/router.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/metrics/record_view/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2826,8 +2829,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2840,7 +2843,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/record_view/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/router.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/metrics/record_view/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2858,8 +2861,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2872,7 +2875,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/chat/ask_question/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/router.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/metrics/record_view/router.py","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2890,8 +2893,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -2904,7 +2907,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/record_view/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/router.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/metrics/record_view/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2922,8 +2925,8 @@
 根拠: 優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。
 根拠(JSON): <code>"優先度: Must（初期版の必須）。追加の明示要求と、それを一貫して成立させる派生条件。具体的な上限値や運用選択は提案設計で別管理する。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
@@ -2936,7 +2939,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/record_view/functions.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/router.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/metrics/record_view/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -3306,8 +3309,8 @@
 根拠: 提供されたUIデザイン設計の受入条件。
 根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -3320,7 +3323,7 @@
 検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["backend/src/kotorelay/operations/images/correct_ocr/functions.py","backend/src/kotorelay/operations/images/get_ocr/functions.py"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/images/correct_ocr/functions.py","backend/src/kotorelay/operations/images/correct_ocr/router.py","backend/src/kotorelay/operations/images/get_ocr/functions.py","backend/src/kotorelay/operations/images/get_ocr/router.py"]</code>
 - テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -3434,8 +3437,8 @@
 根拠: 提供されたUIデザイン設計の受入条件。
 根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -3448,7 +3451,7 @@
 検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["backend/src/kotorelay/operations/documents/list_documents/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/groups/list_members/functions.py"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/documents/list_documents/functions.py","backend/src/kotorelay/operations/documents/list_documents/router.py","backend/src/kotorelay/operations/metrics/department_metrics/functions.py","backend/src/kotorelay/operations/metrics/department_metrics/router.py","backend/src/kotorelay/operations/groups/list_members/functions.py","backend/src/kotorelay/operations/groups/list_members/router.py"]</code>
 - テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -3498,8 +3501,8 @@
 根拠: 提供されたUIデザイン設計の受入条件。
 根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -3512,7 +3515,7 @@
 検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["backend/src/kotorelay/operations/documents/change_policy/functions.py"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/documents/change_policy/functions.py","backend/src/kotorelay/operations/documents/change_policy/router.py"]</code>
 - テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -3530,8 +3533,8 @@
 根拠: 提供されたUIデザイン設計の受入条件。
 根拠(JSON): <code>"提供されたUIデザイン設計の受入条件。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `functional`
-変更識別子: <code>"api-layout-trace-2026-09-13"</code>
+項目版: 3 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"router-flow-2026-09-13"</code>
 分類: scope=<code>"product"</code> / category=<code>"functional"</code>
 
 受入条件:
@@ -3544,7 +3547,7 @@
 検証(JSON Object): <code>{"evidence":"品質ポータルの同一runの検証結果","method":"関連する単体・実DB結合・Compose E2E。支援技術の実読み上げは未検証。"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/metrics/record_view/functions.py"]</code>
+- 実装: <code>["backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/metrics/record_view/functions.py","backend/src/kotorelay/operations/metrics/record_view/router.py"]</code>
 - テスト: <code>["frontend/tests/ui-design.test.tsx","backend/tests/test_ui_contract.py","e2e/workflow.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -3802,6 +3805,102 @@
 - 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
 - 実装: <code>["backend/src/kotorelay/api_contract.py","tools/project/api_layout.py","tools/project/queries.py"]</code>
 - テスト: <code>["backend/tests/test_api_layout.py","tools/project/tests/test_api_layout_gates.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-07: routerがAPIの全体フローを所有する
+
+要件ID(JSON): <code>"REQ-DESIGN-07"</code>
+タイトル(JSON): <code>"routerがAPIの全体フローを所有する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"routerがAPIの全体フローを所有する"</code>
+開発プロジェクトは、routerがAPIの全体フローを所有するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。
+根拠(JSON): <code>"利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-07"</code> 前提: APIとSQLと設計generatorが存在する。条件: 実装と設計を生成し検査する。期待結果: routerに処理順・分岐・例外・transactionを記述し、functionsは個別処理だけを持ち、複数更新段階の委譲と直接DB・provider実行を拒否する。
+  - criterion(JSON Object): <code>{"given":"APIとSQLと設計generatorが存在する","id":"AC-DESIGN-07","then":"routerに処理順・分岐・例外・transactionを記述し、functionsは個別処理だけを持ち、複数更新段階の委譲と直接DB・provider実行を拒否する","when":"実装と設計を生成し検査する"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 配置と型の負例、生成差分、既存業務と実DBとCompose E2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"配置と型の負例、生成差分、既存業務と実DBとCompose E2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/api_layout.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- テスト: <code>["tools/project/tests/test_router_flow.py","backend/tests/test_workflow.py","backend/tests/test_postgres.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-08: SQLごとの引数と取得投影を型として生成する
+
+要件ID(JSON): <code>"REQ-DESIGN-08"</code>
+タイトル(JSON): <code>"SQLごとの引数と取得投影を型として生成する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"SQLごとの引数と取得投影を型として生成する"</code>
+開発プロジェクトは、SQLごとの引数と取得投影を型として生成するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。
+根拠(JSON): <code>"利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-08"</code> 前提: APIとSQLと設計generatorが存在する。条件: 実装と設計を生成し検査する。期待結果: SQLの束縛位置とDDLから専用Paramsを生成し、SELECTの列・別名・NULLに一致する専用Rowを生成して余剰入力と未対応投影と生成差分を拒否する。
+  - criterion(JSON Object): <code>{"given":"APIとSQLと設計generatorが存在する","id":"AC-DESIGN-08","then":"SQLの束縛位置とDDLから専用Paramsを生成し、SELECTの列・別名・NULLに一致する専用Rowを生成して余剰入力と未対応投影と生成差分を拒否する","when":"実装と設計を生成し検査する"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 配置と型の負例、生成差分、既存業務と実DBとCompose E2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"配置と型の負例、生成差分、既存業務と実DBとCompose E2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/queries.py"]</code>
+- テスト: <code>["tools/project/tests/test_router_flow.py","backend/tests/test_workflow.py","backend/tests/test_postgres.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-09: routerの実行順序と制御構造からシーケンスを生成する
+
+要件ID(JSON): <code>"REQ-DESIGN-09"</code>
+タイトル(JSON): <code>"routerの実行順序と制御構造からシーケンスを生成する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"routerの実行順序と制御構造からシーケンスを生成する"</code>
+開発プロジェクトは、routerの実行順序と制御構造からシーケンスを生成するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。
+根拠(JSON): <code>"利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-flow-2026-09-13"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-09"</code> 前提: APIとSQLと設計generatorが存在する。条件: 実装と設計を生成し検査する。期待結果: 実call graphの呼出し位置でSQLの役割コメントを表示し、順序・条件・反復・例外・transactionを生成して未対応構文を拒否する。
+  - criterion(JSON Object): <code>{"given":"APIとSQLと設計generatorが存在する","id":"AC-DESIGN-09","then":"実call graphの呼出し位置でSQLの役割コメントを表示し、順序・条件・反復・例外・transactionを生成して未対応構文を拒否する","when":"実装と設計を生成し検査する"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 配置と型の負例、生成差分、既存業務と実DBとCompose E2E
+検証証跡: 同一コミットの品質Pages
+検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"配置と型の負例、生成差分、既存業務と実DBとCompose E2E"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/router_sequence.py","tools/project/design.py"]</code>
+- テスト: <code>["tools/project/tests/test_router_flow.py","backend/tests/test_workflow.py","backend/tests/test_postgres.py"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>

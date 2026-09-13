@@ -23,6 +23,47 @@ TYPES = {
 }
 
 
+def query_name(path: Path) -> str:
+    """SQLの表示順prefixを除いた安定したquery名を返す。"""
+    match = re.fullmatch(r"[0-9]{3}_([a-z][a-z0-9_]*)", path.stem)
+    if not match:
+        raise ValueError(f"SQLには3桁の番号prefixが必要です: {path}")
+    return match.group(1)
+
+
+def parameter_types(node: exp.Expression, columns: dict[str, str], path: Path) -> dict[str, str]:
+    """束縛位置に対応する列から引数型を決め、名前から型を推測しない。"""
+    result: dict[str, str] = {}
+
+    def bind(value: exp.Expression, column: str) -> None:
+        if column not in columns:
+            raise ValueError(f"DDLにない束縛先: {path}: {column}")
+        for placeholder in value.find_all(exp.Placeholder):
+            name = placeholder.name
+            kind = columns[column]
+            if name in result and result[name] != kind:
+                raise ValueError(f"束縛引数の型が矛盾します: {path}: {name}")
+            result[name] = kind
+
+    if isinstance(node, exp.Insert) and isinstance(node.this, exp.Schema):
+        values = node.expression
+        if not isinstance(values, exp.Values):
+            raise ValueError(f"未対応のINSERT: {path}")
+        for row in values.expressions:
+            for column, value in zip(node.this.expressions, row.expressions, strict=True):
+                bind(value, column.name)
+    for comparison in node.find_all(exp.Binary):
+        left, right = comparison.this, comparison.expression
+        if isinstance(left, exp.Column):
+            bind(right, left.name)
+        if isinstance(right, exp.Column):
+            bind(left, right.name)
+    placeholders = {p.name for p in node.find_all(exp.Placeholder)}
+    if placeholders != result.keys():
+        raise ValueError(f"束縛先を解決できない引数: {path}: {placeholders - result.keys()}")
+    return result
+
+
 def render(sql_sources: list[Path] | None = None, *, rows: bool = True) -> str:
     from tools.project.api_documents import sql_description
 
@@ -33,7 +74,7 @@ def render(sql_sources: list[Path] | None = None, *, rows: bool = True) -> str:
     lines = [
         f'"""DDL・SQLから生成した型付き境界。直接編集しない。\nSHA256: {digest}\n"""',
         "from datetime import datetime",
-        "from pydantic import BaseModel",
+        "from pydantic import BaseModel, ConfigDict",
         "from kotorelay.db import Database",
         "",
     ]
@@ -67,31 +108,48 @@ def render(sql_sources: list[Path] | None = None, *, rows: bool = True) -> str:
         table = tables.pop()
         cls, cols = models[table]
         params = list(dict.fromkeys(re.findall(r"%\((\w+)\)s", sql)))
-        if set(params) - dict(cols).keys():
-            raise ValueError(f"DDLにない引数: {path}")
+        bindings = parameter_types(parsed, dict(cols), path)
         relative = path.relative_to(APP).as_posix()
+        name = query_name(path)
+        title = "".join(part.title() for part in name.split("_"))
+        param_cls = title + "Params"
+        lines += [
+            f"class {param_cls}(BaseModel):",
+            f'    """{name}の束縛引数。SQLで使用する項目だけを受け付ける。"""',
+            '    model_config = ConfigDict(extra="forbid")',
+        ]
+        lines += [f"    {p}: {bindings[p]}" for p in params] + [""]
         if isinstance(parsed, exp.Select):
-            declarations = ", ".join(f"{p}: {dict(cols)[p]}" for p in params)
-            values = ", ".join(f'"{p}": {p}' for p in params)
+            selected = []
+            for projection in parsed.expressions:
+                if not isinstance(projection, (exp.Column, exp.Alias)) or not isinstance(
+                    projection.unalias(), exp.Column
+                ):
+                    raise ValueError(f"未対応の取得式: {path}: {projection}")
+                column = projection.unalias().name
+                if column not in dict(cols):
+                    raise ValueError(f"DDLにない取得列: {path}: {column}")
+                selected.append((projection.alias_or_name, dict(cols)[column]))
+            row_cls = title + "Row"
+            # 全列を取得する場合だけ既存の業務行型と代入互換にする。
+            base = cls if selected == cols else "BaseModel"
             lines += [
-                f"def {path.stem}(db: Database, {declarations}) -> list[{cls}]:",
+                f"class {row_cls}({base}):",
+                f'    """{name}のSELECT句に対応する取得行。"""',
+                '    model_config = ConfigDict(extra="forbid")',
+            ]
+            lines += [f"    {column}: {kind}" for column, kind in selected] + [""]
+            lines += [
+                f"def {name}(db: Database, params: {param_cls}) -> list[{row_cls}]:",
                 f"    {description!r}",
-                f'    return db.query("{relative}", {{{values}}}, {cls})',
+                f'    return db.query("{relative}", params.model_dump(), {row_cls})',
                 "",
             ]
-        elif isinstance(parsed, (exp.Insert, exp.Update)):
+        elif isinstance(parsed, (exp.Insert, exp.Update, exp.Delete)):
             lines += [
-                f"def {path.stem}(db: Database, row: {cls}) -> int:",
+                f"def {name}(db: Database, params: {param_cls}) -> int:",
                 f"    {description!r}",
-                f'    return db.execute("{relative}", row.model_dump())',
-                "",
-            ]
-        elif isinstance(parsed, exp.Delete):
-            lines += [
-                f"def {path.stem}(db: Database, organization_id: str, id: str) -> int:",
-                f"    {description!r}",
-                f'    return db.execute("{relative}", '
-                '{"organization_id": organization_id, "id": id})',
+                f'    return db.execute("{relative}", params.model_dump())',
                 "",
             ]
         else:

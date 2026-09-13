@@ -1,5 +1,7 @@
 """reconcile_indexのHTTP入力と業務処理の順序を宣言する。"""
 
+from __future__ import annotations
+
 from fastapi import APIRouter
 
 from kotorelay.operations.indexing.reconcile_index import functions as f
@@ -18,4 +20,13 @@ router = APIRouter(prefix="/api/operations", tags=["運用"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def reconcile_index(ctx: Ctx) -> list[dict[str, str]]:
-    return build_response(f.reconcile(ctx))
+    f.require_operator(ctx)
+    chunks = f.chunks_list(ctx)
+    differences: list[dict[str, str]] = []
+    for doc in f.documents_list(ctx):
+        current = f.select_current(chunks, doc)
+        if f.has_outdated_chunks(current, doc):
+            differences.append(f.build_reconcile_index(doc))
+        if f.needs_index_repair(doc, current):
+            differences.append(f.build_reconcile_index_2(doc))
+    return build_response(differences)

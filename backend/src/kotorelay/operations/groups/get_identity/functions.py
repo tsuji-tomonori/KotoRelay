@@ -2,15 +2,24 @@
 
 from __future__ import annotations
 
-from kotorelay.context import Context
+import kotorelay.context as context_types
 from kotorelay.operations.groups.get_identity.generated import queries as q
 
 
-def identity(ctx: Context) -> dict[str, object]:
+def build_get_identity(ctx: context_types.Context) -> dict[str, object]:
+    """後続処理に渡すデータを組み立てる。"""
     return {
         "user": ctx.user,
         "memberships": ctx.memberships,
-        "departments": [d for d in q.departments_list(ctx.db, ctx.org) if ctx.member(d.id)],
-        "directory": [d for d in q.departments_list(ctx.db, ctx.org) if d.active],
+        "departments": [
+            d
+            for d in q.departments_list(ctx.db, q.DepartmentsListParams(organization_id=ctx.org))
+            if ctx.member(d.id)
+        ],
+        "directory": [
+            d
+            for d in q.departments_list(ctx.db, q.DepartmentsListParams(organization_id=ctx.org))
+            if d.active
+        ],
         "mode": ctx.settings.mode,
     }

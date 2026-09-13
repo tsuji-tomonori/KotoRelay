@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 反映ジョブと失敗理由を確認 — 詳細設計
 
@@ -38,11 +38,11 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:12 | ctx.user.operator | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:32 | details | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:18 | ctx.user.operator | 'forbidden' | 403 |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:26 | details | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -91,16 +91,21 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:20 | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
-| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:13 | q.outbox_list(ctx.db, ctx.org) |
-| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:34 | [row.model_dump() for row in jobs(ctx)] |
-| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:33 | job_details(ctx) |
-| backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:15 | db.query('operations/indexing/list_jobs/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
-| backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:24 | db.query('operations/indexing/list_jobs/sql/outbox_list.sql', {'organization_id': organization_id}, OutboxRow) |
-| backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:33 | db.query('operations/indexing/list_jobs/sql/versions_list.sql', {'organization_id': organization_id}, VersionsRow) |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:28 | {d.id: d for d in q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org))} |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:35 | {v.id: v for v in q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org))} |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:23 | q.outbox_list(ctx.db, q.OutboxListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:18 | require(ctx.user.operator, 'forbidden', 403) |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:44 | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:13 | [row.model_dump() for row in rows] |
+| backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:44 | db.query('operations/indexing/list_jobs/sql/001_documents_list.sql', params.model_dump(), DocumentsListRow) |
+| backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:75 | db.query('operations/indexing/list_jobs/sql/002_outbox_list.sql', params.model_dump(), OutboxListRow) |
+| backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:106 | db.query('operations/indexing/list_jobs/sql/003_versions_list.sql', params.model_dump(), VersionsListRow) |
 | backend/src/kotorelay/operations/indexing/list_jobs/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/indexing/list_jobs/router.py:21 | build_response(f.list_jobs(ctx, details)) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:40 | f.select_job_details(rows, docs, versions) |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:33 | list(f.outbox_list(ctx)) |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:28 | build_response(f.select_list_jobs(jobs(ctx))) |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:27 | build_response(job_details(ctx)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

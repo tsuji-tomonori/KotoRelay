@@ -71,7 +71,7 @@ def published(client: TestClient) -> tuple[dict, dict]:
     version = submit(client, doc)
     approve(client, version)
     index(client)
-    return doc, version
+    return (doc, version)
 
 
 def ask(client: TestClient, persona: str = "reader", **kwargs: object):
@@ -389,7 +389,7 @@ def test_閲覧と質問の再送を重複計上しない(client):
         f"/api/metrics/{DEPT}?start=2020-01-01T00:00:00Z&end=2100-01-01T00:00:00Z",
         headers=headers("leader"),
     ).json()
-    assert metrics["questions"] == 1 and metrics["views"] == 1 and metrics["unique_viewers"] == 1
+    assert metrics["questions"] == 1 and metrics["views"] == 1 and (metrics["unique_viewers"] == 1)
     assert metrics["documents"][0]["contributions"] == 1
     assert "question" not in str(metrics["documents"])
 
@@ -482,7 +482,6 @@ def test_画像のOCR確認をmanifestへ固定する(client):
         == 404
     )
     assert ask(client).json()["status"] == "answered"
-
     assert client.get(f"/api/images/ocr/{p['ocr_run_id']}", headers=headers()).status_code == 200
     rt = client.app.state.runtime
     rt.settings.max_model_images = 0
@@ -601,7 +600,7 @@ def test_画像を含む削除を保持期間後に完了する(client, db):
 
 def test_モデル実行中の権限変更で回答を保留する(client, monkeypatch):
     import query_helpers as q
-    from kotorelay.operations.documents.change_policy.functions import policy as update
+    from kotorelay.operations.documents.change_policy.router import change_policy as update
     from kotorelay.operations.documents.change_policy.schemas import ChangePolicy
 
     doc, _ = published(client)
@@ -609,7 +608,9 @@ def test_モデル実行中の権限変更で回答を保留する(client, monke
 
     def generate(question, texts, images):
         with rt.context("demo-leader") as ctx:
-            current = q.documents_get(ctx.db, ctx.org, doc["id"])[0]
+            current = q.documents_get(
+                ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=doc["id"])
+            )[0]
             update(
                 ctx,
                 doc["id"],
@@ -719,7 +720,7 @@ def test_回答根拠の欠落と改変は閲覧時に非表示とする(client,
 
 
 def test_中断した質問は同じIDで再開し二重計上しない(client, db):
-    from kotorelay.operations.chat.ask_question.functions import prepare
+    from kotorelay.operations.chat.ask_question.router import prepare
     from kotorelay.operations.chat.ask_question.schemas import Ask
 
     published(client)
@@ -742,7 +743,7 @@ def test_外部検索は返されたID以外を根拠にしない(client, monkey
 
 
 def test_モデル入力直前に失効を検知した場合はモデルを呼ばない(client, monkeypatch):
-    from kotorelay.operations.chat.ask_question import functions as service
+    from kotorelay.operations.chat.ask_question import router as service
 
     published(client)
     original = service.validate_citation

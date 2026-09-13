@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # manifestを確認して承認・却下 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:83`。式: `bool(rows)`
+対象: `backend/src/kotorelay/context.py:103`。式: `bool(rows)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F04 条件分岐
 
-対象: `backend/src/kotorelay/context.py:90`。式: `allowed`
+対象: `backend/src/kotorelay/context.py:110`。式: `allowed`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F05 条件分岐
 
-対象: `backend/src/kotorelay/context.py:54`。式: `q.organizations_fence(self.db, self.organization) == 1`
+対象: `backend/src/kotorelay/context.py:64`。式: `q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F06 条件分岐
 
-対象: `backend/src/kotorelay/context.py:130`。式: `not rows`
+対象: `backend/src/kotorelay/context.py:153`。式: `not rows`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F07 条件分岐
 
-対象: `backend/src/kotorelay/context.py:133`。式: `record.operation == operation and record.request_hash == digest(request.encode())`
+対象: `backend/src/kotorelay/context.py:156`。式: `record.operation == operation and record.request_hash == digest(request.encode())`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F08 条件分岐
 
-対象: `backend/src/kotorelay/context.py:97`。式: `not self.permission(doc.department_id, 'draft')`
+対象: `backend/src/kotorelay/context.py:117`。式: `not self.permission(doc.department_id, 'draft')`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -92,7 +92,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F09 条件分岐
 
-対象: `backend/src/kotorelay/context.py:95`。式: `bool(rows) and rows[0].document_id == doc.id`
+対象: `backend/src/kotorelay/context.py:115`。式: `bool(rows) and rows[0].document_id == doc.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -102,7 +102,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F10 条件分岐
 
-対象: `backend/src/kotorelay/context.py:99`。式: `digest(version.manifest.encode()) == version.manifest_hash`
+対象: `backend/src/kotorelay/context.py:119`。式: `digest(version.manifest.encode()) == version.manifest_hash`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -112,7 +112,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F11 条件分岐
 
-対象: `backend/src/kotorelay/context.py:98`。式: `self.can_read(doc) and doc.latest_version_id == version.id`
+対象: `backend/src/kotorelay/context.py:118`。式: `self.can_read(doc) and doc.latest_version_id == version.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -132,77 +132,77 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F13 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:19`。式: `cached`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:60`。式: `version.created_by != ctx.user.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F13-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F13-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F13-false | 不成立 | 'self_approval' / 403 |
 
 
 ### F14 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:37`。式: `data.decision == 'approved'`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:48`。式: `submission.status == 'pending'`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F14-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F14-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F14-false | 不成立 | 'conflict' / 409 |
 
 
 ### F15 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:14`。式: `bool(rows)`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:74`。式: `data.decision != 'rejected' or bool(data.reason.strip())`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F15-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F15-false | 不成立 | not_found / 404 |
+| F15-false | 不成立 | 'reason_required' / 422 |
 
 
 ### F16 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:21`。式: `submission.status == 'pending'`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:26`。式: `bool(rows)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F16-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F16-false | 不成立 | 'conflict' / 409 |
+| F16-false | 不成立 | not_found / 404 |
 
 
 ### F17 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:23`。式: `version.created_by != ctx.user.id`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:67`。式: `submission.manifest_hash == data.manifest_hash == version.manifest_hash`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F17-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F17-false | 不成立 | 'self_approval' / 403 |
+| F17-false | 不成立 | 'conflict' / 409 |
 
 
 ### F18 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:24`。式: `submission.manifest_hash == data.manifest_hash == version.manifest_hash`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/router.py:34`。式: `cached`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F18-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F18-false | 不成立 | 'conflict' / 409 |
+| F18-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F19 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:27`。式: `data.decision != 'rejected' or bool(data.reason.strip())`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/router.py:43`。式: `f.is_approved(data)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F19-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F19-false | 不成立 | 'reason_required' / 422 |
+| F19-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F20 条件分岐
 
-対象: `backend/src/kotorelay/operations/reviews/decide_review/functions.py:41`。式: `not previous or previous[0].number < version.number`
+対象: `backend/src/kotorelay/operations/reviews/decide_review/router.py:45`。式: `f.is_newer_publication(previous, version)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |

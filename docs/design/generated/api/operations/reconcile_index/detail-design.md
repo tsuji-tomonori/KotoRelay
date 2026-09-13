@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 正本と索引の不一致を確認 — 詳細設計
 
@@ -35,12 +35,12 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:11 | ctx.user.operator | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:16 | any((c.version_id != doc.latest_version_id or doc.status != 'active' for c in current)) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:18 | doc.status == 'active' and doc.latest_version_id and (not any((c.version_id == doc.latest_version_id and c.ready for c in current))) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:12 | ctx.user.operator | 'forbidden' | 403 |
+| backend/src/kotorelay/operations/indexing/reconcile_index/router.py:28 | f.has_outdated_chunks(current, doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/reconcile_index/router.py:30 | f.needs_index_repair(doc, current) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -75,12 +75,19 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:24 | differences |
-| backend/src/kotorelay/operations/indexing/reconcile_index/generated/queries.py:11 | db.query('operations/indexing/reconcile_index/sql/chunks_list.sql', {'organization_id': organization_id}, ChunksRow) |
-| backend/src/kotorelay/operations/indexing/reconcile_index/generated/queries.py:20 | db.query('operations/indexing/reconcile_index/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:32 | {'document_id': doc.id, 'reason': '旧版または停止済みの断片が残留'} |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:46 | {'document_id': doc.id, 'reason': '最新承認版が未反映'} |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:17 | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:22 | q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:51 | any((chunk.version_id != doc.latest_version_id or doc.status != 'active' for chunk in current)) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:37 | bool(doc.status == 'active' and doc.latest_version_id and (not any((c.version_id == doc.latest_version_id and c.ready for c in current)))) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:12 | require(ctx.user.operator, 'forbidden', 403) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:27 | [c for c in chunks if c.document_id == doc.id] |
+| backend/src/kotorelay/operations/indexing/reconcile_index/generated/queries.py:41 | db.query('operations/indexing/reconcile_index/sql/001_chunks_list.sql', params.model_dump(), ChunksListRow) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/generated/queries.py:75 | db.query('operations/indexing/reconcile_index/sql/002_documents_list.sql', params.model_dump(), DocumentsListRow) |
 | backend/src/kotorelay/operations/indexing/reconcile_index/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/indexing/reconcile_index/router.py:21 | build_response(f.reconcile(ctx)) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/router.py:32 | build_response(differences) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

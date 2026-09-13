@@ -34,14 +34,14 @@ class MemoryDatabase(Database):
             raise
 
     def query(self, path: str, params: dict[str, object], model: type[T]) -> list[T]:
-        if Path(path).stem == "documents_by_department":
+        if Path(path).stem[4:] == "documents_by_department":
             return [
                 model.model_validate(deepcopy(r))
                 for r in self.tables.get("documents", {}).values()
                 if r["organization_id"] == params["organization_id"]
                 and r["department_id"] == params["department_id"]
             ]
-        table, _, operation = Path(path).stem.rpartition("_")
+        table, _, operation = Path(path).stem[4:].rpartition("_")
         rows = self.tables.get(table, {}).values()
         return [
             model.model_validate(deepcopy(r))
@@ -51,7 +51,7 @@ class MemoryDatabase(Database):
         ]
 
     def execute(self, path: str, params: dict[str, object]) -> int:
-        table, _, operation = Path(path).stem.rpartition("_")
+        table, _, operation = Path(path).stem[4:].rpartition("_")
         rows = self.tables.setdefault(table, {})
         key = str(params["id"])
         if operation == "fence":

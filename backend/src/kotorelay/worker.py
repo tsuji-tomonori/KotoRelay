@@ -6,7 +6,7 @@ import time
 from typing import TYPE_CHECKING
 
 from kotorelay.config import Settings
-from kotorelay.operations.indexing.shared.functions import process
+from kotorelay.operations.indexing.shared.router import process
 from kotorelay.operations.system.dispatch.generated import queries as q
 from kotorelay.runtime import Runtime
 
@@ -21,7 +21,7 @@ def run_once(runtime: Runtime) -> int:
     with runtime.context(subject) as ctx:
         pending = [
             j.id
-            for j in q.outbox_list(ctx.db, ctx.org)
+            for j in q.outbox_list(ctx.db, q.OutboxListParams(organization_id=ctx.org))
             if j.status in {"pending", "failed", "retained"} and j.attempts < 5
         ][:10]
     for job_id in pending:

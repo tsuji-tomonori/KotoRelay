@@ -1,5 +1,7 @@
 """list_membersのHTTP入力と業務処理の順序を宣言する。"""
 
+from __future__ import annotations
+
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -20,4 +22,6 @@ router = APIRouter(prefix="/api/groups", tags=["部署"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def list_members(ctx: Ctx, department_id: UUID) -> list[dict[str, object]]:
-    return build_response(f.members(ctx, str(department_id)))
+    f.require_manager_permission(ctx, department_id)
+    users = f.map_users(ctx)
+    return build_response(f.select_list_members(users, ctx, department_id))

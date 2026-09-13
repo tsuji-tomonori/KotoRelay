@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 現行認可で会話履歴を再表示 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:71`。式: `doc.status != 'active' or not self.memberships`
+対象: `backend/src/kotorelay/context.py:89`。式: `doc.status != 'active' or not self.memberships`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F04 条件分岐
 
-対象: `backend/src/kotorelay/context.py:73`。式: `doc.visibility == 'organization'`
+対象: `backend/src/kotorelay/context.py:91`。式: `doc.visibility == 'organization'`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F05 条件分岐
 
-対象: `backend/src/kotorelay/context.py:75`。式: `self.member(doc.department_id)`
+対象: `backend/src/kotorelay/context.py:93`。式: `self.member(doc.department_id)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F07 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/chat_history/functions.py:14`。式: `bool(conversations) and conversations[0].user_id == ctx.user.id`
+対象: `backend/src/kotorelay/operations/chat/chat_history/functions.py:27`。式: `bool(conversations) and conversations[0].user_id == ctx.user.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F08 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:62`。式: `answer.user_id == ctx.user.id`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:71`。式: `answer.user_id == ctx.user.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -92,7 +92,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F09 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:17`。式: `not docs`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:19`。式: `not docs`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -102,7 +102,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F10 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:20`。式: `not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:22`。式: `not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -112,7 +112,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F11 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:28`。式: `not versions or not chunks`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:32`。式: `not versions or not chunks`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -122,7 +122,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F12 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:31`。式: `not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash))`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:35`。式: `not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash))`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -132,7 +132,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F13 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:46`。式: `placements - {image.placement.id for image in manifest.images}`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:50`。式: `placements - {image.placement.id for image in manifest.images}`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -142,7 +142,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F14 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:49`。式: `image.placement.id in json.loads(chunk.placements)`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:53`。式: `image.placement.id in json.loads(chunk.placements)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -152,7 +152,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F15 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/shared/functions.py:52`。式: `not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready')`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:61`。式: `not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready')`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |

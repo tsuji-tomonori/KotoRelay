@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # OCRを訂正し新しいrunを保存 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:83`。式: `bool(rows)`
+対象: `backend/src/kotorelay/context.py:103`。式: `bool(rows)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F04 条件分岐
 
-対象: `backend/src/kotorelay/context.py:90`。式: `allowed`
+対象: `backend/src/kotorelay/context.py:110`。式: `allowed`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F05 条件分岐
 
-対象: `backend/src/kotorelay/context.py:54`。式: `q.organizations_fence(self.db, self.organization) == 1`
+対象: `backend/src/kotorelay/context.py:64`。式: `q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F07 条件分岐
 
-対象: `backend/src/kotorelay/operations/images/correct_ocr/functions.py:15`。式: `bool(assets)`
+対象: `backend/src/kotorelay/operations/images/correct_ocr/functions.py:23`。式: `bool(assets)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F08 条件分岐
 
-対象: `backend/src/kotorelay/operations/images/correct_ocr/functions.py:19`。式: `len(ids) == len(set(ids))`
+対象: `backend/src/kotorelay/operations/images/correct_ocr/functions.py:43`。式: `region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -92,7 +92,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F09 条件分岐
 
-対象: `backend/src/kotorelay/operations/images/correct_ocr/functions.py:21`。式: `region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001`
+対象: `backend/src/kotorelay/operations/images/correct_ocr/functions.py:38`。式: `len(ids) == len(set(ids))`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -134,7 +134,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | test node | backend/tests/test_ui_contract.py::test_旧OCRの読取は安定IDを補うだけで保存済みハッシュを変えない |
 | Given | client, db |
 | When | client.get(f'/api/images/ocr/{rid}', headers=headers()) ; client.get(f'/api/images/ocr/{rid}', headers=headers()) ; client.post(f"/api/images/documents/{doc['id']}", headers=headers(), files={'file': ('x.png', buf.getvalue(), 'image/png')}) |
-| Then | first['regions'][0]['region_id'] == second['regions'][0]['region_id'] ; q.ocr_runs_get(ctx.db, ctx.org, rid)[0].result_hash == key ; json.loads(ctx.objects.get(key)) == value |
+| Then | first['regions'][0]['region_id'] == second['regions'][0]['region_id'] ; q.ocr_runs_get(ctx.db, q.OcrRunsGetParams(organization_id=ctx.org, id=rid))[0].result_hash == key ; json.loads(ctx.objects.get(key)) == value |
 
 
 ### TC003

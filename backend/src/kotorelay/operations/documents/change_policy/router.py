@@ -1,5 +1,7 @@
 """change_policyのHTTP入力と業務処理の順序を宣言する。"""
 
+from __future__ import annotations
+
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -22,4 +24,14 @@ router = APIRouter(prefix="/api/documents", tags=["文書"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def change_policy(ctx: Ctx, document_id: UUID, data: ChangePolicy) -> models.DocumentsRow:
-    return build_response(f.policy(ctx, str(document_id), data))
+    doc = f.document_doc(ctx, document_id)
+    f.validate_document_revision(doc, data)
+    f.require_deletion_reason(data)
+    departments = f.collect_departments(ctx)
+    f.validate_shared_departments(departments, data)
+    updated = f.build_updated(doc, data)
+    f.documents_update(ctx, updated)
+    f.outbox_insert(ctx, doc, data)
+    f.record_change_policy_audit(ctx, doc, data)
+    f.check_concurrent_access(ctx)
+    return build_response(updated)

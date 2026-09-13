@@ -1,5 +1,7 @@
 """healthのHTTP入力と業務処理の順序を宣言する。"""
 
+from __future__ import annotations
+
 from fastapi import APIRouter
 
 from kotorelay.operations.system.health import functions as f
@@ -17,4 +19,5 @@ router = APIRouter(prefix="/api", tags=["システム"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def health() -> dict[str, str]:
-    return build_response(f.health())
+    """外部依存へ接続せずプロセスの稼働状態を返す。"""
+    return build_response(f.build_health())

@@ -13,16 +13,26 @@
 | sql/*.sql | その責務が直接使用するSQL正本。日本語一文の役割コメントを保持 |
 | generated/queries.py | DDLと上記SQLから生成する型付き実行関数 |
 
-グループ直下のrouter.pyは各APIのルーター登録だけを担当する。APIから別APIへの直接依存は拒否する。共通の下書き読込、画像認可、回答根拠検証・表示、索引配送は各グループの`shared/functions.py`に置き、その共有処理が実行するSQLも同じsharedの下へ置く。Contextが行う認可・監査・冪等性のSQLはsystem/authorization、初期データ投入はsystem/bootstrap、workerの配送候補取得はsystem/dispatchが所有する。接続・実行だけを担当するDB portへ業務SQLを置かない。
+グループ直下のrouter.pyは各APIのルーター登録だけを担当する。APIから別APIへの直接依存は拒否する。共通の下書き読込、画像認可、回答根拠検証・表示は各グループの`shared/functions.py`に置き、その共有処理が実行するSQLも同じsharedの下へ置く。Contextが行う認可・監査・冪等性のSQLはsystem/authorization、初期データ投入はsystem/bootstrap、workerの配送候補取得はsystem/dispatchが所有する。接続・実行だけを担当するDB portへ業務SQLを置かない。
 
-複数APIが直接使用する同形SQLは、それぞれの操作が所有する正本として分ける。生成設計のSQL識別はファイル名だけでなく所有グループ・操作を含め、同名SQLの上書きや混同を防ぐ。共通DDLからの行型は`generated/models.py`へ一度生成し、各queryから参照する。SQLを直接実行しないAPIへ空のSQLやqueryを追加しない。参照先の`queries.py`は互換用再exportであり、この実装は`generated/queries.py`を直接参照するため設置しない。
+複数APIが直接使用する同形SQLは、それぞれの操作が所有する正本として分ける。生成設計のSQL識別はファイル名だけでなく所有グループ・操作を含め、同名SQLの上書きや混同を防ぐ。共通DDLから業務行型を`generated/models.py`へ生成し、各queryの専用RowはSELECTの投影が全列と一致するときだけその業務行型を継承する。SQLを直接実行しないAPIへ空のSQLやqueryを追加しない。参照先の`queries.py`は互換用再exportであり、この実装は`generated/queries.py`を直接参照するため設置しない。
 
 FastAPI、psycopg、同期DB port、DSQL/PostgreSQL、既存のHTTP契約は維持する。成功応答前のcommit・競合時rollbackと、モデル呼出しをtransaction外で行い確定時に再認可する境界を維持する。参照先固有のSQLAlchemy、外部AWS制御API、エラーや副作用を転用しない。
 
 サンプルにはhealthの成功と、認証情報がない各APIの拒否を定義する。動的なrequest_id等を除く期待項目を実HTTPで比較する。業務成功・認可・競合・副作用の検証は既存の業務単体・PostgreSQL・Compose E2Eが担当し、サンプルで業務の全分岐を網羅したとは扱わない。
 
-`tools/project/api_layout.py`で1 operation 1 package、6責務ファイル、contractとOpenAPIの一致、samplesとresponse builderの接続、依存方向、routerへの業務反復・永続化混在を検査する。`tools/project/queries.py --check`はSQLごとの引数・行型・生成先と欠落・手編集・SQL変更のdriftを検査する。`tools/project/design.py`が実配置の責務一覧とAPI別6帳票・CRUD・呼出し追跡を再生成する。
+`tools/project/api_layout.py`で1 operation 1 package、6責務ファイル、contractとOpenAPIの一致、samplesとresponse builderの接続、依存方向、routerへの集計・永続化詳細の混在を検査する。`tools/project/queries.py --check`はSQLごとの引数・行型・生成先と欠落・手編集・SQL変更のdriftを検査する。`tools/project/design.py`が実配置の責務一覧とAPI別6帳票・CRUD・呼出し追跡を再生成する。
 
 前回はAPIの「operation」を部署・文書・チャット等のドメイングループと解釈し、複数操作を一つのrouter/functionsへ集約した。入力型とqueryも全体共通にした。標準のfastapi-contract.mdとsql-and-language.mdには既に操作単位の指示があり、私の適用と参照実装の比較が不十分だった。既存adapterはSQLの構文・型生成・設計の集合と差分を検査していたが、操作単位の所有先、責務ファイルと実呼出し、API間依存方向を検査していなかった。このためCI成功を構成の適合まで含むものとして扱ってしまった。今回、実構成に接続した検査を追加し、標準側へ明示的な構成profileと負例テストの整備を提案する。
 
 原因と標準側の改善提案は[dev-standard issue #68](https://github.com/tsuji-tomonori/dev-standard/issues/68)へ報告済み。移動した実装を参照する既存要件のtraceも、各APIの新しい所有先へ更新する。
+
+## routerのフローとSQLモデルの責務（2026年9月13日追補）
+
+利用者の追加指定により、認可・冪等性・個別処理・更新・監査・結果返却の全体フローをrouterに置く。functionsへ全体フローを委譲しない。routerには分岐、例外処理、手順に必要な反復とtransactionの範囲を記述し、SQL実行、外部portの実行、値の変換や集計の詳細は名前を持つ個別関数へ分ける。索引APIとworkerが共有するフローは`indexing/shared/router.py`が所有し、`shared/functions.py`はその個別処理を提供する。既存のFastAPI依存transactionは成功応答前に確定する。チャットのモデル呼出しはtransactionの外で行い、入力直前・回答確定時の再認可を維持する。
+
+SQL正本は`sql/NNN_name.sql`、生成境界は各責務の`generated/queries.py`とする。SQLに実際に束縛する引数だけを厳格なPydantic Paramsにし、DDLとSQL ASTの束縛位置から型を決める。SELECTには列を列挙し、その投影と別名とNULL制約から専用Rowを生成する。全列を取得するときだけ共通の業務行型と代入互換にし、部分投影には未取得列を持たせない。DBの戻り値を単一の全体行型で代用しない。MySQLやSQLAlchemyの構文は移植せず、PostgreSQL/DSQLとpsycopgのparameter bindingを使う。
+
+シーケンスはrouterと実call graphのASTから呼出し順、条件、反復、例外、transactionを投影する。SQLを名前順に並べたり、実装にない外部呼出しやcommitを定型で追加しない。SQL矢印は正本の日本語一文コメントを使う。構文未対応は生成失敗として検出する。実装の条件式は図と制御構造表から追跡できる。
+
+以前のファイル配置検査はfunctionsに残った全体フローを検出できず、型生成も全体行型を流用していた。追加検査はfunctionsのtransaction・routerへの逆依存・複数更新段階の集約を拒否し、routerの直接DB/provider実行を拒否する。SQL投影、引数の余剰・NULL、呼出し順と分岐の生成、負例の拒否をテストする。詳細な原因と標準側への改善提案は[dev-standard issue #69](https://github.com/tsuji-tomonori/dev-standard/issues/69)へ報告した。

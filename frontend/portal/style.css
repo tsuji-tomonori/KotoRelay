@@ -405,7 +405,8 @@ img {
   height: auto;
 }
 .diagram-scroll {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 75vh;
 }
 .markdown .diagram-scroll svg {
   max-width: none;

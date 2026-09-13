@@ -67,6 +67,7 @@ def sources() -> list[Path]:
                 Path(__file__),
                 ROOT / "tools/project/api_documents.py",
                 ROOT / "tools/project/api_layout.py",
+                ROOT / "tools/project/router_sequence.py",
             ]
         )
     )
@@ -85,6 +86,11 @@ class Inventory:
                 if isinstance(node, ast.ImportFrom) and node.module:
                     for alias in node.names:
                         aliases[alias.asname or alias.name] = node.module + "." + alias.name
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        aliases[alias.asname or alias.name.split(".")[0]] = (
+                            alias.name if alias.asname else alias.name.split(".")[0]
+                        )
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     self.nodes[module + "." + node.name] = node
                     self.paths[module + "." + node.name] = path
@@ -222,7 +228,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         query_id = (
             ".".join(path.parent.parent.relative_to(ROOT / "backend/src").parts)
             + ".generated.queries."
-            + path.stem
+            + re.sub(r"^[0-9]{3}_", "", path.stem)
         )
         queries[query_id] = (path, node)
         descriptions[query_id] = layout.sql_description(path)
@@ -409,6 +415,34 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                 for a in function.args.args
                 if a.arg != "db"
             ]
+            query_models = {
+                node.name: node
+                for node in ast.parse(inventory.paths[name].read_text()).body
+                if isinstance(node, ast.ClassDef)
+            }
+            for argument in function.args.args:
+                annotation = ast.unparse(argument.annotation) if argument.annotation else ""
+                if annotation in query_models:
+                    argument_rows.extend(
+                        [
+                            argument.arg + "." + ast.unparse(field.target),
+                            ast.unparse(field.annotation),
+                        ]
+                        for field in query_models[annotation].body
+                        if isinstance(field, ast.AnnAssign)
+                    )
+            result_text = f"型: `{ast.unparse(function.returns)}`"
+            if isinstance(function.returns, ast.Subscript):
+                row_name = ast.unparse(function.returns.slice)
+                if row_name in query_models:
+                    result_text += "\n\n" + table(
+                        ["取得項目", "型（NULL制約を含む）"],
+                        [
+                            [ast.unparse(field.target), ast.unparse(field.annotation)]
+                            for field in query_models[row_name].body
+                            if isinstance(field, ast.AnnAssign)
+                        ],
+                    )
             conditions = [
                 n.sql(dialect="postgres")
                 for n in sql_node.walk()
@@ -425,7 +459,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                     ],
                 ),
                 table(["引数", "型"], argument_rows) if argument_rows else "引数はありません。",
-                f"型: `{ast.unparse(function.returns)}`",
+                result_text,
                 "\n\n".join(conditions) or "SQL内にWHERE/JOIN/ORDER/LIMIT条件はありません。",
             ]
             query_bodies.append(
@@ -494,54 +528,10 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                 ],
             ),
         )
-        sequence = [
-            "sequenceDiagram",
-            "    participant U as 利用者",
-            "    participant A as API",
-            "    participant D as PostgreSQLまたはDSQL",
-            "    participant S as S3実体",
-            "    participant M as Bedrock",
-            f"    U->>A: {method.upper()} {route.path}",
-            "    A->>D: 有効組織・所属を取得",
-            "    alt 認可条件が不成立",
-            "        A-->>U: 401または403または404",
-            "    else 許可",
-        ]
-        for name in sql_names:
-            sequence.append("        A->>D: " + descriptions[name])
-        if segment in {"documents", "images", "chat", "operations", "reviews"}:
-            sequence += [
-                "        A->>S: 内容ハッシュ実体を照合",
-                "        opt 実体欠落・ハッシュ不一致",
-                "            A-->>U: 利用不可・回答保留",
-                "        end",
-            ]
-        if segment in {"chat", "operations"}:
-            sequence += [
-                "        opt 有効根拠または索引配送",
-                "            A->>M: 上限付きモデル実行",
-                "            alt 外部サービス失敗",
-                "                M-->>A: 例外",
-                "                A->>D: 失敗状態を記録",
-                "            else 成功",
-                "                M-->>A: 結果",
-                "            end",
-                "        end",
-            ]
-        sequence += [
-            "        A->>D: 必要な変更を確定（競合時rollback）",
-            "        A-->>U: 認可済み結果",
-            "    end",
-        ]
-        if operation_id == "health":
-            sequence = [
-                "sequenceDiagram",
-                "    participant U as 利用者",
-                "    participant A as API",
-                f"    U->>A: {method.upper()} {route.path}",
-                "    A-->>U: 固定の稼働状態",
-            ]
-        # 詳細な条件とtry/except順序はASTから再生成し、概略図に続けて掲載する。
+        from tools.project.router_sequence import render as render_sequence
+
+        sequence = render_sequence(inventory, key, method, route.path, descriptions)
+        # 詳細な条件とtry/except順序はASTから再生成し、実行順の図に続けて掲載する。
         flow = []
         for k in reached:
             if ".generated." in k:

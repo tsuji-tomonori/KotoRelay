@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # OCRを訂正し新しいrunを保存 — 詳細設計
 
@@ -53,15 +53,15 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:83 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:90 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:54 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:103 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/correct_ocr/functions.py:15 | bool(assets) | not_found | 404 |
-| backend/src/kotorelay/operations/images/correct_ocr/functions.py:19 | len(ids) == len(set(ids)) | 'invalid_region' | 422 |
-| backend/src/kotorelay/operations/images/correct_ocr/functions.py:21 | region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001 | 'invalid_region' | 422 |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:23 | bool(assets) | not_found | 404 |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:43 | region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001 | 'invalid_region' | 422 |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:38 | len(ids) == len(set(ids)) | 'invalid_region' | 422 |
 
 
 ## 3. 正常系リソース変更
@@ -112,18 +112,30 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:91 | doc |
+| backend/src/kotorelay/context.py:111 | doc |
 | backend/src/kotorelay/context.py:23 | str(uuid4()) |
 | backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
-| backend/src/kotorelay/operations/images/correct_ocr/functions.py:53 | {'ocr_run': run, 'ocr': result} |
-| backend/src/kotorelay/operations/images/correct_ocr/generated/queries.py:14 | db.query('operations/images/correct_ocr/sql/assets_get.sql', {'organization_id': organization_id, 'id': id}, AssetsRow) |
-| backend/src/kotorelay/operations/images/correct_ocr/generated/queries.py:23 | db.execute('operations/images/correct_ocr/sql/ocr_runs_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:18 | q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=str(asset_id))) |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:108 | {'ocr_run': run, 'ocr': result} |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:73 | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=asset.document_id, asset_id=asset.id, result_key=key, result_hash=key, engine=result.engine, status='ready', confirmed=data.confirmed, created_at=now()) |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:101 | ctx.fence() |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:28 | ctx.document(asset.document_id, 'author') |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:89 | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:62 | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:96 | ctx.audit('ocr_correction', asset.document_id) |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:23 | require(bool(assets)) |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:33 | [r.region_id for r in data.regions if r.region_id is not None] |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:52 | [r.model_copy(update={'region_id': r.region_id or new_id(), 'source': 'human', 'confidence': None}) for r in data.regions] |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:43 | require(region.x + region.width <= 1.000001 and region.y + region.height <= 1.000001, 'invalid_region', 422) |
+| backend/src/kotorelay/operations/images/correct_ocr/functions.py:38 | require(len(ids) == len(set(ids)), 'invalid_region', 422) |
+| backend/src/kotorelay/operations/images/correct_ocr/generated/queries.py:41 | db.query('operations/images/correct_ocr/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
+| backend/src/kotorelay/operations/images/correct_ocr/generated/queries.py:64 | db.execute('operations/images/correct_ocr/sql/002_ocr_runs_insert.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/images/correct_ocr/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/images/correct_ocr/router.py:24 | build_response(f.correct(ctx, str(asset_id), data)) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:20 | db.execute('operations/system/authorization/sql/audit_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:34 | db.query('operations/system/authorization/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:68 | db.execute('operations/system/authorization/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/images/correct_ocr/router.py:46 | build_response(f.build_correct_ocr(run, result)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:39 | db.execute('operations/system/authorization/sql/001_audit_insert.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:98 | db.query('operations/system/authorization/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:194 | db.execute('operations/system/authorization/sql/007_organizations_fence.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

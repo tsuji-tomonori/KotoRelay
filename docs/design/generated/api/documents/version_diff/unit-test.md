@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 版IDを指定して本文差分を比較 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:83`。式: `bool(rows)`
+対象: `backend/src/kotorelay/context.py:103`。式: `bool(rows)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F04 条件分岐
 
-対象: `backend/src/kotorelay/context.py:90`。式: `allowed`
+対象: `backend/src/kotorelay/context.py:110`。式: `allowed`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F05 条件分岐
 
-対象: `backend/src/kotorelay/context.py:97`。式: `not self.permission(doc.department_id, 'draft')`
+対象: `backend/src/kotorelay/context.py:117`。式: `not self.permission(doc.department_id, 'draft')`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F06 条件分岐
 
-対象: `backend/src/kotorelay/context.py:95`。式: `bool(rows) and rows[0].document_id == doc.id`
+対象: `backend/src/kotorelay/context.py:115`。式: `bool(rows) and rows[0].document_id == doc.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F07 条件分岐
 
-対象: `backend/src/kotorelay/context.py:99`。式: `digest(version.manifest.encode()) == version.manifest_hash`
+対象: `backend/src/kotorelay/context.py:119`。式: `digest(version.manifest.encode()) == version.manifest_hash`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F08 条件分岐
 
-対象: `backend/src/kotorelay/context.py:98`。式: `self.can_read(doc) and doc.latest_version_id == version.id`
+対象: `backend/src/kotorelay/context.py:118`。式: `self.can_read(doc) and doc.latest_version_id == version.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -185,7 +185,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 | test node | backend/tests/test_postgres.py::test_commit時の競合は成功応答を送らず409にしてrollbackする |
 | Given | postgres, monkeypatch |
 | When | client.post('/api/documents', headers=headers(), json={'title': '競合して確定しない文書', 'department_id': department}) ; client.get('/api/groups/me', headers=headers()) |
-| Then | result.status_code == 409 ; result.json()['code'] == 'conflict' ; not q.documents_list(db, postgres.organization_id) |
+| Then | result.status_code == 409 ; result.json()['code'] == 'conflict' ; not q.documents_list(db, q.DocumentsListParams(organization_id=postgres.organization_id)) |
 
 
 ### TC004

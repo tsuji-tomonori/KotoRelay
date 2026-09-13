@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # リーダーが公開範囲・公開停止・削除を管理 — クエリ
 
@@ -6,9 +6,9 @@
 
 DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更新し、競合は全体rollback→409。モデル呼出しはtransaction外、回答確定は別transactionで再認可。
 
-## documents/change_policy/departments_list.sql
+## documents/change_policy/001_departments_list.sql
 
-正本: `backend/src/kotorelay/operations/documents/change_policy/sql/departments_list.sql`
+正本: `backend/src/kotorelay/operations/documents/change_policy/sql/001_departments_list.sql`
 
 ### SQL種別
 
@@ -29,12 +29,21 @@ SELECT
 
 | 引数 | 型 |
 | --- | --- |
-| organization_id | str |
+| params | DepartmentsListParams |
+| params.organization_id | str |
 
 
 ### 戻り値
 
-型: `list[DepartmentsRow]`
+型: `list[DepartmentsListRow]`
+
+| 取得項目 | 型（NULL制約を含む） |
+| --- | --- |
+| id | str |
+| organization_id | str |
+| name | str |
+| active | bool |
+
 
 ### 条件
 
@@ -56,9 +65,9 @@ ORDER BY
   id
 ```
 
-## documents/change_policy/documents_update.sql
+## documents/change_policy/002_documents_update.sql
 
-正本: `backend/src/kotorelay/operations/documents/change_policy/sql/documents_update.sql`
+正本: `backend/src/kotorelay/operations/documents/change_policy/sql/002_documents_update.sql`
 
 ### SQL種別
 
@@ -79,7 +88,19 @@ UPDATE
 
 | 引数 | 型 |
 | --- | --- |
-| row | DocumentsRow |
+| params | DocumentsUpdateParams |
+| params.department_id | str |
+| params.title | str |
+| params.created_by | str |
+| params.visibility | str |
+| params.shared_departments | str |
+| params.status | str |
+| params.revision | int |
+| params.next_version | int |
+| params.latest_version_id | str &#124; None |
+| params.updated_at | datetime |
+| params.organization_id | str |
+| params.id | str |
 
 
 ### 戻り値
@@ -97,9 +118,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## documents/change_policy/outbox_insert.sql
+## documents/change_policy/003_outbox_insert.sql
 
-正本: `backend/src/kotorelay/operations/documents/change_policy/sql/outbox_insert.sql`
+正本: `backend/src/kotorelay/operations/documents/change_policy/sql/003_outbox_insert.sql`
 
 ### SQL種別
 
@@ -120,7 +141,16 @@ INSERT
 
 | 引数 | 型 |
 | --- | --- |
-| row | OutboxRow |
+| params | OutboxInsertParams |
+| params.id | str |
+| params.organization_id | str |
+| params.document_id | str |
+| params.version_id | str &#124; None |
+| params.kind | str |
+| params.status | str |
+| params.attempts | int |
+| params.error_code | str |
+| params.created_at | datetime |
 
 
 ### 戻り値
@@ -158,9 +188,9 @@ VALUES
   )
 ```
 
-## system/authorization/audit_insert.sql
+## system/authorization/001_audit_insert.sql
 
-正本: `backend/src/kotorelay/operations/system/authorization/sql/audit_insert.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/001_audit_insert.sql`
 
 ### SQL種別
 
@@ -181,7 +211,17 @@ INSERT
 
 | 引数 | 型 |
 | --- | --- |
-| row | AuditRow |
+| params | AuditInsertParams |
+| params.id | str |
+| params.organization_id | str |
+| params.user_id | str |
+| params.document_id | str &#124; None |
+| params.version_id | str &#124; None |
+| params.action | str |
+| params.before_state | str |
+| params.after_state | str |
+| params.reason | str |
+| params.created_at | datetime |
 
 
 ### 戻り値
@@ -221,9 +261,9 @@ VALUES
   )
 ```
 
-## system/authorization/departments_list.sql
+## system/authorization/002_departments_list.sql
 
-正本: `backend/src/kotorelay/operations/system/authorization/sql/departments_list.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/002_departments_list.sql`
 
 ### SQL種別
 
@@ -244,12 +284,21 @@ SELECT
 
 | 引数 | 型 |
 | --- | --- |
-| organization_id | str |
+| params | DepartmentsListParams |
+| params.organization_id | str |
 
 
 ### 戻り値
 
-型: `list[DepartmentsRow]`
+型: `list[DepartmentsListRow]`
+
+| 取得項目 | 型（NULL制約を含む） |
+| --- | --- |
+| id | str |
+| organization_id | str |
+| name | str |
+| active | bool |
+
 
 ### 条件
 
@@ -271,9 +320,9 @@ ORDER BY
   id
 ```
 
-## system/authorization/documents_get.sql
+## system/authorization/003_documents_get.sql
 
-正本: `backend/src/kotorelay/operations/system/authorization/sql/documents_get.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/003_documents_get.sql`
 
 ### SQL種別
 
@@ -294,13 +343,30 @@ SELECT
 
 | 引数 | 型 |
 | --- | --- |
-| organization_id | str |
-| id | str |
+| params | DocumentsGetParams |
+| params.organization_id | str |
+| params.id | str |
 
 
 ### 戻り値
 
-型: `list[DocumentsRow]`
+型: `list[DocumentsGetRow]`
+
+| 取得項目 | 型（NULL制約を含む） |
+| --- | --- |
+| id | str |
+| organization_id | str |
+| department_id | str |
+| title | str |
+| created_by | str |
+| visibility | str |
+| shared_departments | str |
+| status | str |
+| revision | int |
+| next_version | int |
+| latest_version_id | str &#124; None |
+| updated_at | datetime |
+
 
 ### 条件
 
@@ -326,9 +392,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## system/authorization/memberships_list.sql
+## system/authorization/006_memberships_list.sql
 
-正本: `backend/src/kotorelay/operations/system/authorization/sql/memberships_list.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/006_memberships_list.sql`
 
 ### SQL種別
 
@@ -349,12 +415,25 @@ SELECT
 
 | 引数 | 型 |
 | --- | --- |
-| organization_id | str |
+| params | MembershipsListParams |
+| params.organization_id | str |
 
 
 ### 戻り値
 
-型: `list[MembershipsRow]`
+型: `list[MembershipsListRow]`
+
+| 取得項目 | 型（NULL制約を含む） |
+| --- | --- |
+| id | str |
+| organization_id | str |
+| department_id | str |
+| user_id | str |
+| leader | bool |
+| can_author | bool |
+| can_review | bool |
+| active | bool |
+
 
 ### 条件
 
@@ -380,9 +459,9 @@ ORDER BY
   id
 ```
 
-## system/authorization/organizations_fence.sql
+## system/authorization/007_organizations_fence.sql
 
-正本: `backend/src/kotorelay/operations/system/authorization/sql/organizations_fence.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/007_organizations_fence.sql`
 
 ### SQL種別
 
@@ -403,7 +482,10 @@ UPDATE
 
 | 引数 | 型 |
 | --- | --- |
-| row | OrganizationsRow |
+| params | OrganizationsFenceParams |
+| params.organization_id | str |
+| params.id | str |
+| params.revision | int |
 
 
 ### 戻り値
@@ -421,9 +503,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
 ```
 
-## system/authorization/organizations_get.sql
+## system/authorization/008_organizations_get.sql
 
-正本: `backend/src/kotorelay/operations/system/authorization/sql/organizations_get.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/008_organizations_get.sql`
 
 ### SQL種別
 
@@ -444,13 +526,23 @@ SELECT
 
 | 引数 | 型 |
 | --- | --- |
-| organization_id | str |
-| id | str |
+| params | OrganizationsGetParams |
+| params.organization_id | str |
+| params.id | str |
 
 
 ### 戻り値
 
-型: `list[OrganizationsRow]`
+型: `list[OrganizationsGetRow]`
+
+| 取得項目 | 型（NULL制約を含む） |
+| --- | --- |
+| id | str |
+| organization_id | str |
+| name | str |
+| revision | int |
+| suspended | bool |
+
 
 ### 条件
 
@@ -469,9 +561,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## system/authorization/users_list.sql
+## system/authorization/009_users_list.sql
 
-正本: `backend/src/kotorelay/operations/system/authorization/sql/users_list.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/009_users_list.sql`
 
 ### SQL種別
 
@@ -492,12 +584,23 @@ SELECT
 
 | 引数 | 型 |
 | --- | --- |
-| organization_id | str |
+| params | UsersListParams |
+| params.organization_id | str |
 
 
 ### 戻り値
 
-型: `list[UsersRow]`
+型: `list[UsersListRow]`
+
+| 取得項目 | 型（NULL制約を含む） |
+| --- | --- |
+| id | str |
+| organization_id | str |
+| subject | str |
+| display_name | str |
+| active | bool |
+| operator | bool |
+
 
 ### 条件
 

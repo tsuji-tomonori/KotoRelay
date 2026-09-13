@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 部署の利用数と文書貢献を集計 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:43`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:50`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:61`。式: `m.department_id == department_id`
+対象: `backend/src/kotorelay/context.py:79`。式: `m.department_id == department_id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F05 条件分岐
 
-対象: `backend/src/kotorelay/operations/metrics/department_metrics/functions.py:14`。式: `ctx.permission(department_id, 'manage')`
+対象: `backend/src/kotorelay/operations/metrics/department_metrics/functions.py:17`。式: `ctx.permission(str(department_id), 'manage')`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F06 条件分岐
 
-対象: `backend/src/kotorelay/operations/metrics/department_metrics/functions.py:15`。式: `start.tzinfo is not None and end.tzinfo is not None`
+対象: `backend/src/kotorelay/operations/metrics/department_metrics/functions.py:22`。式: `start.tzinfo is not None and end.tzinfo is not None`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F07 条件分岐
 
-対象: `backend/src/kotorelay/operations/metrics/department_metrics/functions.py:16`。式: `start < end`
+対象: `backend/src/kotorelay/operations/metrics/department_metrics/functions.py:27`。式: `start < end`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 現行認可で会話履歴を再表示 — 詳細設計
 
@@ -38,21 +38,21 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:71 | doc.status != 'active' or not self.memberships | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/context.py:73 | doc.visibility == 'organization' | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/context.py:75 | self.member(doc.department_id) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:89 | doc.status != 'active' or not self.memberships | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:91 | doc.visibility == 'organization' | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:93 | self.member(doc.department_id) | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/chat_history/functions.py:14 | bool(conversations) and conversations[0].user_id == ctx.user.id | not_found | 404 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:62 | answer.user_id == ctx.user.id | not_found | 404 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:17 | not docs | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:20 | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:28 | not versions or not chunks | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:31 | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:46 | placements - {image.placement.id for image in manifest.images} | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:49 | image.placement.id in json.loads(chunk.placements) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:52 | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/chat_history/functions.py:27 | bool(conversations) and conversations[0].user_id == ctx.user.id | not_found | 404 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:71 | answer.user_id == ctx.user.id | not_found | 404 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:19 | not docs | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:22 | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:32 | not versions or not chunks | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:35 | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:50 | placements - {image.placement.id for image in manifest.images} | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:53 | image.placement.id in json.loads(chunk.placements) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:61 | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -124,31 +124,33 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:77 | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
-| backend/src/kotorelay/context.py:72 | False |
-| backend/src/kotorelay/context.py:74 | True |
-| backend/src/kotorelay/context.py:76 | True |
+| backend/src/kotorelay/context.py:95 | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
+| backend/src/kotorelay/context.py:90 | False |
+| backend/src/kotorelay/context.py:92 | True |
+| backend/src/kotorelay/context.py:94 | True |
 | backend/src/kotorelay/objects.py:17 | hashlib.sha256(data).hexdigest() |
-| backend/src/kotorelay/operations/chat/chat_history/functions.py:15 | [present(ctx, a) for a in sorted(q.answers_list(ctx.db, ctx.org), key=lambda a: a.created_at) if a.conversation_id == conversation_id] |
-| backend/src/kotorelay/operations/chat/chat_history/generated/queries.py:14 | db.query('operations/chat/chat_history/sql/answers_list.sql', {'organization_id': organization_id}, AnswersRow) |
-| backend/src/kotorelay/operations/chat/chat_history/generated/queries.py:23 | db.query('operations/chat/chat_history/sql/conversations_get.sql', {'organization_id': organization_id, 'id': id}, ConversationsRow) |
+| backend/src/kotorelay/operations/chat/chat_history/functions.py:18 | q.conversations_get(ctx.db, q.ConversationsGetParams(organization_id=ctx.org, id=str(conversation_id))) |
+| backend/src/kotorelay/operations/chat/chat_history/functions.py:27 | require(bool(conversations) and conversations[0].user_id == ctx.user.id) |
+| backend/src/kotorelay/operations/chat/chat_history/functions.py:34 | [present(ctx, a) for a in sorted(q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)), key=lambda a: a.created_at) if a.conversation_id == str(conversation_id)] |
+| backend/src/kotorelay/operations/chat/chat_history/generated/queries.py:42 | db.query('operations/chat/chat_history/sql/001_answers_list.sql', params.model_dump(), AnswersListRow) |
+| backend/src/kotorelay/operations/chat/chat_history/generated/queries.py:67 | db.query('operations/chat/chat_history/sql/002_conversations_get.sql', params.model_dump(), ConversationsGetRow) |
 | backend/src/kotorelay/operations/chat/chat_history/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/chat/chat_history/router.py:24 | build_response(f.history(ctx, str(conversation_id))) |
-| backend/src/kotorelay/operations/chat/shared/functions.py:65 | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
-| backend/src/kotorelay/operations/chat/shared/functions.py:18 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:25 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:29 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:40 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:56 | True |
-| backend/src/kotorelay/operations/chat/shared/functions.py:47 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:58 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:53 | False |
-| backend/src/kotorelay/operations/chat/shared/generated/queries.py:17 | db.query('operations/chat/shared/sql/assets_get.sql', {'organization_id': organization_id, 'id': id}, AssetsRow) |
-| backend/src/kotorelay/operations/chat/shared/generated/queries.py:26 | db.query('operations/chat/shared/sql/chunks_get.sql', {'organization_id': organization_id, 'id': id}, ChunksRow) |
-| backend/src/kotorelay/operations/chat/shared/generated/queries.py:35 | db.query('operations/chat/shared/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/operations/chat/shared/generated/queries.py:44 | db.query('operations/chat/shared/sql/ocr_runs_get.sql', {'organization_id': organization_id, 'id': id}, OcrRunsRow) |
-| backend/src/kotorelay/operations/chat/shared/generated/queries.py:53 | db.query('operations/chat/shared/sql/versions_get.sql', {'organization_id': organization_id, 'id': id}, VersionsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/chat/chat_history/router.py:28 | build_response(f.select_chat_history(ctx, conversation_id)) |
+| backend/src/kotorelay/operations/chat/shared/functions.py:74 | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| backend/src/kotorelay/operations/chat/shared/functions.py:20 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:27 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:33 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:44 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:65 | True |
+| backend/src/kotorelay/operations/chat/shared/functions.py:51 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:67 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:62 | False |
+| backend/src/kotorelay/operations/chat/shared/generated/queries.py:45 | db.query('operations/chat/shared/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
+| backend/src/kotorelay/operations/chat/shared/generated/queries.py:76 | db.query('operations/chat/shared/sql/002_chunks_get.sql', params.model_dump(), ChunksGetRow) |
+| backend/src/kotorelay/operations/chat/shared/generated/queries.py:109 | db.query('operations/chat/shared/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |
+| backend/src/kotorelay/operations/chat/shared/generated/queries.py:140 | db.query('operations/chat/shared/sql/004_ocr_runs_get.sql', params.model_dump(), OcrRunsGetRow) |
+| backend/src/kotorelay/operations/chat/shared/generated/queries.py:172 | db.query('operations/chat/shared/sql/005_versions_get.sql', params.model_dump(), VersionsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

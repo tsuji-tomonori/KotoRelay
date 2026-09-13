@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 閲覧可能な文書を検索 — 詳細設計
 
@@ -44,18 +44,18 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:71 | doc.status != 'active' or not self.memberships | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/context.py:73 | doc.visibility == 'organization' | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/context.py:75 | self.member(doc.department_id) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/context.py:61 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:89 | doc.status != 'active' or not self.memberships | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:91 | doc.visibility == 'organization' | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:93 | self.member(doc.department_id) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:79 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/documents/list_documents/functions.py:20 | department_id and scope in {'manage', 'work'} | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/documents/list_documents/functions.py:31 | scope == 'manage' | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/documents/list_documents/functions.py:33 | scope == 'work' | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/documents/list_documents/functions.py:21 | ctx.permission(department_id, 'manage' if scope == 'manage' else 'draft') | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/documents/list_documents/router.py:35 | page | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:22 | ctx.permission(department_id, 'manage' if scope == 'manage' else 'draft') | 'forbidden' | 403 |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:52 | department_id and f.requires_department_permission(department_id, scope) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:57 | f.is_management_scope(scope) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:59 | f.is_authoring_scope(scope) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:38 | page | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -119,23 +119,42 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:77 | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
-| backend/src/kotorelay/context.py:72 | False |
-| backend/src/kotorelay/context.py:74 | True |
-| backend/src/kotorelay/context.py:76 | True |
-| backend/src/kotorelay/context.py:68 | False |
-| backend/src/kotorelay/context.py:62 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
-| backend/src/kotorelay/operations/documents/list_documents/functions.py:90 | {'items': items, 'has_next': len(docs) > limit} |
-| backend/src/kotorelay/operations/documents/list_documents/functions.py:50 | sorted(docs, key=lambda d: d.updated_at, reverse=True)[offset:offset + limit] |
-| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:16 | db.query('operations/documents/list_documents/sql/chunks_list.sql', {'organization_id': organization_id}, ChunksRow) |
-| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:27 | db.query('operations/documents/list_documents/sql/documents_by_department.sql', {'organization_id': organization_id, 'department_id': department_id}, DocumentsRow) |
-| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:36 | db.query('operations/documents/list_documents/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
-| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:45 | db.query('operations/documents/list_documents/sql/submissions_list.sql', {'organization_id': organization_id}, SubmissionsRow) |
-| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:54 | db.query('operations/documents/list_documents/sql/versions_list.sql', {'organization_id': organization_id}, VersionsRow) |
+| backend/src/kotorelay/context.py:95 | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
+| backend/src/kotorelay/context.py:90 | False |
+| backend/src/kotorelay/context.py:92 | True |
+| backend/src/kotorelay/context.py:94 | True |
+| backend/src/kotorelay/context.py:86 | False |
+| backend/src/kotorelay/context.py:80 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:167 | item |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:131 | {'published_number': version.number if version else None, 'approved_at': approval.decided_at if approval else None, 'index_ready': bool(version and any((c.version_id == version.id and c.ready for c in chunks))), 'summary': ctx.objects.get(version.body_key, version.body_hash).decode()[:180] if version and scope == 'read' else '', 'review_status': latest.status if latest and scope != 'read' else None, 'review_number': versions[latest.version_id].number if latest and scope != 'read' else None} |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:149 | {'items': items, 'has_next': len(docs) > limit} |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:111 | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:31 | q.documents_by_department(ctx.db, q.DocumentsByDepartmentParams(organization_id=ctx.org, department_id=department_id)) |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:38 | q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:55 | bool(scope == 'work') |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:43 | bool(scope == 'manage') |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:74 | {v.id: v for v in q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org))} |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:101 | {v.id: v for v in q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org))} |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:22 | require(ctx.permission(department_id, 'manage' if scope == 'manage' else 'draft'), 'forbidden', 403) |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:15 | bool(department_id and scope in {'manage', 'work'}) |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:50 | [d for d in docs if ctx.permission(d.department_id, 'manage')] |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:62 | [d for d in docs if d.status != 'deleted' and ctx.permission(d.department_id, 'draft')] |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:69 | [d for d in docs if d.latest_version_id and ctx.can_read(d)] |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:81 | [d.model_copy(update={'title': versions[d.latest_version_id].title}) for d in docs if d.latest_version_id in versions] |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:92 | [d for d in docs if search.casefold() in d.title.casefold() and (not status or d.status == status)] |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:118 | [s for s in submissions if s.document_id == doc.id] |
+| backend/src/kotorelay/operations/documents/list_documents/functions.py:106 | q.submissions_list(ctx.db, q.SubmissionsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:43 | db.query('operations/documents/list_documents/sql/001_chunks_list.sql', params.model_dump(), ChunksListRow) |
+| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:80 | db.query('operations/documents/list_documents/sql/002_documents_by_department.sql', params.model_dump(), DocumentsByDepartmentRow) |
+| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:114 | db.query('operations/documents/list_documents/sql/003_documents_list.sql', params.model_dump(), DocumentsListRow) |
+| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:147 | db.query('operations/documents/list_documents/sql/004_submissions_list.sql', params.model_dump(), SubmissionsListRow) |
+| backend/src/kotorelay/operations/documents/list_documents/generated/queries.py:180 | db.query('operations/documents/list_documents/sql/005_versions_list.sql', params.model_dump(), VersionsListRow) |
 | backend/src/kotorelay/operations/documents/list_documents/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/documents/list_documents/router.py:39 | build_response(f.list_documents(ctx, scope, offset, limit, search, department, status)) |
-| backend/src/kotorelay/operations/documents/list_documents/router.py:36 | build_response(f.document_page(ctx, scope, offset, limit, search, department, status)) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:66 | sorted(docs, key=lambda d: d.updated_at, reverse=True)[offset:offset + limit] |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:85 | f.build_document_page_2(items, limit, docs) |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:40 | build_response(_select_documents(ctx, scope, offset, limit, search, department, status)) |
+| backend/src/kotorelay/operations/documents/list_documents/router.py:39 | build_response(document_page(ctx, scope, offset, limit, search, department, status)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / "backend/src")]
 APP = ROOT / "backend/src/kotorelay"
 FILES = {
-    "router.py": "HTTP入力・依存注入・業務処理の順序",
-    "functions.py": "API固有の業務判定・処理",
+    "router.py": "HTTP入力・依存注入・全体フロー・分岐・例外・transaction",
+    "functions.py": "全体フローを持たない個別の業務判定・処理",
     "schemas.py": "API固有の入力制約・応答型",
     "response_builders.py": "応答型の検証・HTTP応答への変換",
     "contract.py": "operation ID・method/path・認証方式・所有先",
@@ -21,11 +21,17 @@ FILES = {
 
 
 def check_source(path: Path, source: str) -> None:
-    """ルーターへの業務SQL・反復処理とAPI間の直接依存を拒否する。"""
+    """ルーターへのSQL・provider実行とfunctionsへの全体フローの逆流を拒否する。"""
     tree = ast.parse(source)
     relative = path.relative_to(APP)
     is_api = len(relative.parts) == 4 and relative.parts[0] == "operations"
     for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if path.name == "router.py" and ".generated.queries" in alias.name:
+                    raise ValueError(f"ルーターがSQL境界へ直接依存しています: {relative}")
+                if path.name == "functions.py" and alias.name.endswith(".router"):
+                    raise ValueError(f"functionsから全体フローへの逆依存: {relative}")
         if isinstance(node, ast.ImportFrom) and node.module:
             parts = node.module.split(".")
             if (
@@ -36,23 +42,78 @@ def check_source(path: Path, source: str) -> None:
                 and parts[3] != "shared"
             ):
                 raise ValueError(f"API間の直接依存: {relative} -> {node.module}")
-        if path.name == "router.py" and isinstance(
-            node, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
-        ):
+        if path.name == "router.py" and isinstance(node, (ast.ListComp, ast.DictComp, ast.SetComp)):
             raise ValueError(f"ルーターに業務反復処理があります: {relative}")
         if path.name in {"router.py", "response_builders.py", "schemas.py"}:
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-                if node.func.attr in {"execute", "query", "transaction", "connect"}:
+                if node.func.attr in {"execute", "query", "connect"}:
                     raise ValueError(f"永続化の責務が混在しています: {relative}")
         if path.name == "router.py" and isinstance(node, ast.ImportFrom):
-            if node.module and ".generated.queries" in node.module:
+            if (
+                node.module
+                and ".generated" in node.module
+                and ("queries" in node.module or any(a.name == "queries" for a in node.names))
+            ):
                 raise ValueError(f"ルーターがSQL境界へ直接依存しています: {relative}")
+
+        if path.name == "functions.py":
+            if isinstance(node, ast.ImportFrom) and node.module and node.module.endswith(".router"):
+                raise ValueError(f"functionsから全体フローへの逆依存: {relative}")
+            if isinstance(node, ast.Call) and ast.unparse(node.func) in {
+                "rt.context",
+                "runtime.context",
+                "session.commit",
+                "session.rollback",
+                "db.transaction",
+            }:
+                raise ValueError(f"functionsにtransactionフローがあります: {relative}")
+        if path.name == "router.py" and isinstance(node, ast.Call):
+            name = ast.unparse(node.func)
+            if name.startswith(("q.", "queries.", "ctx.objects.", "engine.", "rt.engine.")):
+                raise ValueError(f"ルーターにDB・provider実行があります: {relative}")
+
+
+def check_workflow_ownership() -> None:
+    """複数の更新段階や終端処理をfunctionsへまとめる逆流を検出する。"""
+    from tools.project.design import Inventory
+    from tools.project.router_sequence import resolve
+
+    inventory = Inventory()
+    phases = {"audit", "fence", "remember", "idempotent_result"}
+
+    def effects(key: str, seen: set[str]) -> set[str]:
+        if key in seen:
+            return set()
+        seen = seen | {key}
+        result: set[str] = set()
+        for call in (n for n in ast.walk(inventory.nodes[key]) if isinstance(n, ast.Call)):
+            target = resolve(inventory, key, call)
+            name = ast.unparse(call.func)
+            if name.startswith("ctx.") and name.split(".")[-1] in phases:
+                result.add(name)
+            elif ".generated.queries." in target:
+                if target.endswith(("_insert", "_update", "_delete", "_fence")):
+                    result.add(target)
+            elif target in inventory.nodes and ".functions." in target:
+                result |= effects(target, seen)
+        return result
+
+    for key, path in inventory.paths.items():
+        if path.name == "functions.py":
+            check_source(path, path.read_text())
+            boundaries = effects(key, set())
+            if len(boundaries) > 1:
+                raise ValueError(
+                    f"functionsに複数の更新段階を束ねたフローがあります: {key}: "
+                    f"{sorted(boundaries)}"
+                )
 
 
 def inspect() -> list[dict[str, object]]:
     from fastapi.routing import APIRoute
     from kotorelay.main import app
 
+    check_workflow_ownership()
     result = []
     owners = set()
     routes = list(app.routes)

@@ -1,5 +1,7 @@
 """create_documentのHTTP入力と業務処理の順序を宣言する。"""
 
+from __future__ import annotations
+
 from fastapi import APIRouter
 
 from kotorelay.generated import models
@@ -21,4 +23,11 @@ router = APIRouter(prefix="/api/documents", tags=["文書"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def create_document(ctx: Ctx, data: CreateDocument) -> models.DocumentsRow:
-    return build_response(f.create(ctx, data))
+    f.require_author_permission(ctx, data)
+    doc = f.initialize_document(ctx, data)
+    f.documents_insert(ctx, doc)
+    key = f.save_empty_body(ctx)
+    f.drafts_insert(ctx, key, doc)
+    f.record_create_document_audit(ctx, doc)
+    f.check_concurrent_access(ctx)
+    return build_response(doc)

@@ -3,6 +3,6 @@
 from __future__ import annotations
 
 
-def health() -> dict[str, str]:
-    """外部依存へ接続せずプロセスの稼働状態を返す。"""
+def build_health() -> dict[str, str]:
+    """後続処理に渡すデータを組み立てる。"""
     return {"status": "ok", "product": "KotoRelay"}

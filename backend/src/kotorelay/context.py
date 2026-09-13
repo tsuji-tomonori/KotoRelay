@@ -37,21 +37,39 @@ class Context:
         self.settings = settings
         self.objects = objects
         self.org = settings.organization_id
-        organizations = q.organizations_get(db, self.org, self.org)
-        require(bool(organizations) and not organizations[0].suspended, "unauthenticated", 401)
+        organizations = q.organizations_get(
+            db, q.OrganizationsGetParams(organization_id=self.org, id=self.org)
+        )
+        require(bool(organizations) and (not organizations[0].suspended), "unauthenticated", 401)
         self.organization = organizations[0]
-        users = [u for u in q.users_list(db, self.org) if u.subject == subject and u.active]
+        users = [
+            u
+            for u in q.users_list(db, q.UsersListParams(organization_id=self.org))
+            if u.subject == subject and u.active
+        ]
         require(len(users) == 1, "unauthenticated", 401)
         self.user = users[0]
-        active_depts = {d.id for d in q.departments_list(db, self.org) if d.active}
+        active_depts = {
+            d.id
+            for d in q.departments_list(db, q.DepartmentsListParams(organization_id=self.org))
+            if d.active
+        }
         self.memberships = [
             m
-            for m in q.memberships_list(db, self.org)
-            if m.user_id == self.user.id and m.active and m.department_id in active_depts
+            for m in q.memberships_list(db, q.MembershipsListParams(organization_id=self.org))
+            if m.user_id == self.user.id and m.active and (m.department_id in active_depts)
         ]
 
     def fence(self) -> None:
-        require(q.organizations_fence(self.db, self.organization) == 1, "conflict", 409)
+        require(
+            q.organizations_fence(
+                self.db,
+                q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True),
+            )
+            == 1,
+            "conflict",
+            409,
+        )
 
     def member(self, department_id: str) -> bool:
         return any(m.department_id == department_id for m in self.memberships)
@@ -79,19 +97,21 @@ class Context:
         )
 
     def document(self, document_id: str, operation: str = "read") -> models.DocumentsRow:
-        rows = q.documents_get(self.db, self.org, document_id)
+        rows = q.documents_get(
+            self.db, q.DocumentsGetParams(organization_id=self.org, id=document_id)
+        )
         require(bool(rows))
         doc = rows[0]
         allowed = (
             self.can_read(doc)
             if operation == "read"
-            else (doc.status != "deleted" and self.permission(doc.department_id, operation))
+            else doc.status != "deleted" and self.permission(doc.department_id, operation)
         )
         require(allowed)
         return doc
 
     def version(self, doc: models.DocumentsRow, version_id: str) -> models.VersionsRow:
-        rows = q.versions_get(self.db, self.org, version_id)
+        rows = q.versions_get(self.db, q.VersionsGetParams(organization_id=self.org, id=version_id))
         require(bool(rows) and rows[0].document_id == doc.id)
         version = rows[0]
         if not self.permission(doc.department_id, "draft"):
@@ -111,7 +131,7 @@ class Context:
     ) -> None:
         q.audit_insert(
             self.db,
-            models.AuditRow(
+            q.AuditInsertParams(
                 id=new_id(),
                 organization_id=self.org,
                 user_id=self.user.id,
@@ -126,7 +146,10 @@ class Context:
         )
 
     def idempotent_result(self, key: str, operation: str, request: str) -> str | None:
-        rows = q.idempotency_get(self.db, self.org, stable_id(self.user.id + key))
+        rows = q.idempotency_get(
+            self.db,
+            q.IdempotencyGetParams(organization_id=self.org, id=stable_id(self.user.id + key)),
+        )
         if not rows:
             return None
         record = rows[0]
@@ -140,7 +163,7 @@ class Context:
     def remember(self, key: str, operation: str, request: str, response: str) -> None:
         q.idempotency_insert(
             self.db,
-            models.IdempotencyRow(
+            q.IdempotencyInsertParams(
                 id=stable_id(self.user.id + key),
                 organization_id=self.org,
                 user_id=self.user.id,

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 1c655589065a087f66d0ae05a6e0b777b889337ba2d8cca7542a2988c7248164 -->
 
 # 画像を添付して位置付きOCRを実行 — 詳細設計
 
@@ -43,17 +43,17 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:83 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:90 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:54 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:103 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:61 | 0 < len(data) <= max_bytes | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:64 | source.format in {'PNG', 'JPEG'} and source.width * source.height <= max_pixels and (max(source.width, source.height) <= 8000) | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:77 | len(value) <= max_bytes | 'invalid_image' | 422 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:99 | text | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:23 | len(assets) < ctx.settings.max_document_images | 'limit' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:94 | len(assets) < ctx.settings.max_document_images | 'limit' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:24 | 0 < len(data) <= max_bytes | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:27 | source.format in {'PNG', 'JPEG'} and source.width * source.height <= max_pixels and (max(source.width, source.height) <= 8000) | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:40 | len(value) <= max_bytes | 'invalid_image' | 422 |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:62 | text | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -104,21 +104,31 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:91 | doc |
+| backend/src/kotorelay/context.py:111 | doc |
 | backend/src/kotorelay/context.py:23 | str(uuid4()) |
 | backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:78 | (value, image.width, image.height) |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:112 | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:95 | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
-| backend/src/kotorelay/operations/images/upload_image/functions.py:57 | {'asset': asset, 'ocr_run': run, 'ocr': result} |
-| backend/src/kotorelay/operations/images/upload_image/generated/queries.py:14 | db.execute('operations/images/upload_image/sql/assets_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/images/upload_image/generated/queries.py:19 | db.query('operations/images/upload_image/sql/assets_list.sql', {'organization_id': organization_id}, AssetsRow) |
-| backend/src/kotorelay/operations/images/upload_image/generated/queries.py:28 | db.execute('operations/images/upload_image/sql/ocr_runs_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:127 | q.assets_insert(ctx.db, q.AssetsInsertParams.model_validate(asset, from_attributes=True)) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:111 | models.AssetsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, object_key=key, sha256=key, media_type='image/png', width=width, height=height, size=len(value), created_at=now()) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:143 | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, asset_id=asset.id, result_key=result_key, result_hash=result_key, engine=result.engine, status=result.status, confirmed=False, created_at=now()) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:173 | {'asset': asset, 'ocr_run': run, 'ocr': result} |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:166 | ctx.fence() |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:80 | ctx.document(str(document_id), 'author') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:94 | require(len(assets) < ctx.settings.max_document_images, 'limit', 422) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:41 | (value, image.width, image.height) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:159 | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:99 | ctx.objects.put(value, 'image/png') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:132 | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:75 | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:58 | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
+| backend/src/kotorelay/operations/images/upload_image/functions.py:85 | [a for a in q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) if a.document_id == doc.id] |
+| backend/src/kotorelay/operations/images/upload_image/generated/queries.py:33 | db.execute('operations/images/upload_image/sql/001_assets_insert.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/images/upload_image/generated/queries.py:63 | db.query('operations/images/upload_image/sql/002_assets_list.sql', params.model_dump(), AssetsListRow) |
+| backend/src/kotorelay/operations/images/upload_image/generated/queries.py:86 | db.execute('operations/images/upload_image/sql/003_ocr_runs_insert.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/images/upload_image/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/images/upload_image/router.py:24 | build_response(f.upload(ctx, str(document_id), file.file.read(ctx.settings.max_image_bytes + 1))) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:34 | db.query('operations/system/authorization/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:68 | db.execute('operations/system/authorization/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
+| backend/src/kotorelay/operations/images/upload_image/router.py:42 | build_response(f.build_upload_image(asset, run, result)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:98 | db.query('operations/system/authorization/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:194 | db.execute('operations/system/authorization/sql/007_organizations_fence.sql', params.model_dump()) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:248 | db.query('operations/system/authorization/sql/009_users_list.sql', params.model_dump(), UsersListRow) |

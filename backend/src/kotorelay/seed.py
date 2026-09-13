@@ -4,7 +4,6 @@ from kotorelay.config import Settings
 from kotorelay.context import stable_id
 from kotorelay.db import Database
 from kotorelay.errors import require
-from kotorelay.generated import models
 from kotorelay.operations.system.bootstrap.generated import queries as q
 
 PERSONAS = {
@@ -21,11 +20,11 @@ def seed(settings: Settings) -> None:
     require(settings.mode == "local", "forbidden", 403)
     org = settings.organization_id
     with Database(settings).transaction() as db:
-        if q.organizations_get(db, org, org):
+        if q.organizations_get(db, q.OrganizationsGetParams(organization_id=org, id=org)):
             return
         q.organizations_insert(
             db,
-            models.OrganizationsRow(
+            q.OrganizationsInsertParams(
                 id=org,
                 organization_id=org,
                 name="KotoRelay サンプル組織",
@@ -36,7 +35,7 @@ def seed(settings: Settings) -> None:
         for name in ["開発部", "営業部"]:
             q.departments_insert(
                 db,
-                models.DepartmentsRow(
+                q.DepartmentsInsertParams(
                     id=stable_id(name), organization_id=org, name=name, active=True
                 ),
             )
@@ -44,7 +43,7 @@ def seed(settings: Settings) -> None:
             user_id = stable_id(persona)
             q.users_insert(
                 db,
-                models.UsersRow(
+                q.UsersInsertParams(
                     id=user_id,
                     organization_id=org,
                     subject="demo-" + persona,
@@ -55,7 +54,7 @@ def seed(settings: Settings) -> None:
             )
             q.memberships_insert(
                 db,
-                models.MembershipsRow(
+                q.MembershipsInsertParams(
                     id=stable_id(persona + department),
                     organization_id=org,
                     department_id=stable_id(department),
