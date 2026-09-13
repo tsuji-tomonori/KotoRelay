@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 死活確認 — 詳細設計
 
@@ -58,4 +58,6 @@ DBへのアクセスはありません。
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/operations/system/router.py:10 | {'status': 'ok', 'product': 'KotoRelay'} |
+| backend/src/kotorelay/operations/system/health/functions.py:8 | {'status': 'ok', 'product': 'KotoRelay'} |
+| backend/src/kotorelay/operations/system/health/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
+| backend/src/kotorelay/operations/system/health/router.py:20 | build_response(f.health()) |

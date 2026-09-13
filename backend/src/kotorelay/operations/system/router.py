@@ -1,10 +1,8 @@
-"""公開可能な死活確認のみを提供する。"""
+"""systemのAPIごとのルーターを登録する。"""
 
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/api", tags=["システム"])
+from kotorelay.operations.system.health.router import router as health
 
-
-@router.get("/health", summary="死活確認", operation_id="health")
-def health() -> dict[str, str]:
-    return {"status": "ok", "product": "KotoRelay"}
+router = APIRouter()
+router.include_router(health)

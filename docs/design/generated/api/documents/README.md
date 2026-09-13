@@ -1,9 +1,9 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # APIグループ: documents
 
-- [閲覧可能な文書を検索 (list_documents)](list_documents/README.md)
 - [文書を作成 (create_document)](create_document/README.md)
+- [閲覧可能な文書を検索 (list_documents)](list_documents/README.md)
 - [下書きを取得 (get_draft)](get_draft/README.md)
 - [競合を検出して下書きを保存 (save_draft)](save_draft/README.md)
 - [版を確定して承認申請 (submit_version)](submit_version/README.md)

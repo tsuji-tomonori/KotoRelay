@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 下書きを取得 — クエリ
 
@@ -6,9 +6,63 @@
 
 DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更新し、競合は全体rollback→409。モデル呼出しはtransaction外、回答確定は別transactionで再認可。
 
-## departments_list.sql
+## documents/shared/drafts_list.sql
 
-正本: `backend/src/kotorelay/operations/groups/sql/departments_list.sql`
+正本: `backend/src/kotorelay/operations/documents/shared/sql/drafts_list.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する下書きを識別子順に一覧取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | drafts | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+
+
+### 戻り値
+
+型: `list[DraftsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s
+
+ORDER BY id
+
+```sql
+/* 現在の組織に属する下書きを識別子順に一覧取得する。 */
+SELECT
+  id,
+  organization_id,
+  document_id,
+  body_key,
+  body_hash,
+  placements,
+  revision,
+  updated_by
+FROM drafts
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+## system/authorization/departments_list.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/departments_list.sql`
 
 ### SQL種別
 
@@ -56,9 +110,9 @@ ORDER BY
   id
 ```
 
-## documents_get.sql
+## system/authorization/documents_get.sql
 
-正本: `backend/src/kotorelay/operations/documents/sql/documents_get.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/documents_get.sql`
 
 ### SQL種別
 
@@ -111,63 +165,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## drafts_list.sql
+## system/authorization/memberships_list.sql
 
-正本: `backend/src/kotorelay/operations/documents/sql/drafts_list.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する下書きを識別子順に一覧取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | drafts | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-
-
-### 戻り値
-
-型: `list[DraftsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s
-
-ORDER BY id
-
-```sql
-/* 現在の組織に属する下書きを識別子順に一覧取得する。 */
-SELECT
-  id,
-  organization_id,
-  document_id,
-  body_key,
-  body_hash,
-  placements,
-  revision,
-  updated_by
-FROM drafts
-WHERE
-  organization_id = %(organization_id)s
-ORDER BY
-  id
-```
-
-## memberships_list.sql
-
-正本: `backend/src/kotorelay/operations/groups/sql/memberships_list.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/memberships_list.sql`
 
 ### SQL種別
 
@@ -219,9 +219,9 @@ ORDER BY
   id
 ```
 
-## organizations_get.sql
+## system/authorization/organizations_get.sql
 
-正本: `backend/src/kotorelay/operations/identity/sql/organizations_get.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/organizations_get.sql`
 
 ### SQL種別
 
@@ -267,9 +267,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## users_list.sql
+## system/authorization/users_list.sql
 
-正本: `backend/src/kotorelay/operations/identity/sql/users_list.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/users_list.sql`
 
 ### SQL種別
 

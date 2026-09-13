@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 担当文書の版履歴 — シーケンス
 
@@ -16,13 +16,13 @@ sequenceDiagram
     alt 認可条件が不成立
         A-->>U: 401または403または404
     else 許可
+        A->>D: 現在の組織に属する承認申請を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する文書版を識別子順に一覧取得する。
         A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
         A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
         A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-        A->>D: 現在の組織に属する承認申請を識別子順に一覧取得する。
         A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-        A->>D: 現在の組織に属する文書版を識別子順に一覧取得する。
         A->>S: 内容ハッシュ実体を照合
         opt 実体欠落・ハッシュ不一致
             A-->>U: 利用不可・回答保留
@@ -36,8 +36,9 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.document | 90 | Return | doc |
+| kotorelay.context.Context.document | 91 | Return | doc |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.functions.history | 285 | Return | [{'version': v, 'submission': submissions.get(v.id)} for v in sorted(q.versions_list(ctx.db, ctx.org), key=lambda v: v.number, reverse=True) if v.document_id == doc.id] |
-| kotorelay.operations.documents.router.version_history | 66 | Return | f.history(ctx, str(document_id)) |
+| kotorelay.operations.documents.version_history.functions.history | 12 | Return | [{'version': v, 'submission': submissions.get(v.id)} for v in sorted(q.versions_list(ctx.db, ctx.org), key=lambda v: v.number, reverse=True) if v.document_id == doc.id] |
+| kotorelay.operations.documents.version_history.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
+| kotorelay.operations.documents.version_history.router.version_history | 23 | Return | build_response(f.history(ctx, str(document_id))) |

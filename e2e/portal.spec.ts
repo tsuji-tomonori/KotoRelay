@@ -181,3 +181,44 @@ test('CRUDの表と図とSQL根拠を表示しCSVをダウンロードする', a
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('APIごとのファイル責務と所有SQLを生成設計で確認する', async ({ page }) => {
+  await page
+    .getByRole('navigation', { name: '品質ナビゲーション' })
+    .getByRole('button', { name: /設計書/ })
+    .click();
+  await page.getByRole('searchbox').fill('APIごとのファイルと責務');
+  await page
+    .locator('.inventory button')
+    .filter({ hasText: /^APIごとのファイルと責務$/ })
+    .click();
+  const source = page
+    .locator('.markdown')
+    .getByText('backend/src/kotorelay/operations/documents/create_document', { exact: true });
+  await source.scrollIntoViewIfNeeded();
+  await expect(source).toBeVisible();
+  for (const name of [
+    'router.py',
+    'functions.py',
+    'schemas.py',
+    'response_builders.py',
+    'contract.py',
+    'samples.py',
+  ])
+    await expect(page.locator('.markdown table').nth(1)).toContainText(name);
+  await capture(page, test.info(), 'When', '文書作成APIの所有先とファイルごとの責務を確認する');
+  await page.getByRole('searchbox').fill('create_document');
+  await page
+    .locator('.inventory button')
+    .filter({ hasText: /^文書を作成 — クエリ$/ })
+    .click();
+  await expect(
+    page.locator('.markdown').getByRole('heading', {
+      name: 'documents/create_document/documents_insert.sql',
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.locator('.markdown')).toContainText(
+    'backend/src/kotorelay/operations/documents/create_document/sql/documents_insert.sql',
+  );
+});

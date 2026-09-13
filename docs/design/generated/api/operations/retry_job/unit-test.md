@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 反映ジョブを再処理 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:40`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:43`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:53`。式: `q.organizations_fence(self.db, self.organization) == 1`
+対象: `backend/src/kotorelay/context.py:54`。式: `q.organizations_fence(self.db, self.organization) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F05 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:40`。式: `doc.latest_version_id != job.version_id or not job.version_id`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:41`。式: `doc.latest_version_id != job.version_id or not job.version_id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F06 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:50`。式: `len(stale) > 100`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:51`。式: `len(stale) > 100`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F07 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:52`。式: `doc.status != 'active'`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:53`。式: `doc.status != 'active'`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F08 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:70`。式: `len(parts) <= 300`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:71`。式: `len(parts) <= 300`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -92,7 +92,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F09 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:87`。式: `chunk.id in previous`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:88`。式: `chunk.id in previous`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -102,7 +102,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F10 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:92`。式: `len(actual) == len(parts) and engine.verify([c.id for c in actual])`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:93`。式: `len(actual) == len(parts) and engine.verify([c.id for c in actual])`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -112,7 +112,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F11 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:170`。式: `job.status in {'done', 'obsolete'}`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:171`。式: `job.status in {'done', 'obsolete'}`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -122,7 +122,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F12 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:165`。式: `ctx.user.operator`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:166`。式: `ctx.user.operator`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -132,7 +132,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F13 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:167`。式: `bool(rows)`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:168`。式: `bool(rows)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -142,7 +142,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F14 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:169`。式: `job.attempts < 5`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:170`。式: `job.attempts < 5`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -152,7 +152,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F15 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:101`。式: `doc.status != 'deleted'`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:102`。式: `doc.status != 'deleted'`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -162,7 +162,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F16 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:103`。式: `(now() - job.created_at).total_seconds() < ctx.settings.retention_days * 86400`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:104`。式: `(now() - job.created_at).total_seconds() < ctx.settings.retention_days * 86400`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -172,7 +172,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F17 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:148`。式: `len(target_chunks) > 100`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:149`。式: `len(target_chunks) > 100`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -182,7 +182,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F18 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:153`。式: `len(target_runs) > 100`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:154`。式: `len(target_runs) > 100`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -192,7 +192,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F19 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:156`。式: `asset.document_id == doc.id`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:157`。式: `asset.document_id == doc.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -202,7 +202,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F20 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:159`。式: `draft.document_id == doc.id`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:160`。式: `draft.document_id == doc.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -212,7 +212,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F21 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:132`。式: `row.document_id == doc.id`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:133`。式: `row.document_id == doc.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -222,7 +222,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F22 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:134`。式: `row.document_id in live`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:135`。式: `row.document_id in live`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -232,7 +232,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F23 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:33`。式: `buffer.strip()`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:34`。式: `buffer.strip()`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -242,7 +242,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F24 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:21`。式: `line.startswith('#') or len(buffer) + len(line) > 1200`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:22`。式: `line.startswith('#') or len(buffer) + len(line) > 1200`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -252,7 +252,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F25 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:22`。式: `buffer.strip()`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:23`。式: `buffer.strip()`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -262,7 +262,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F26 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:25`。式: `line.startswith('#')`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:26`。式: `line.startswith('#')`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -272,7 +272,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F27 条件分岐
 
-対象: `backend/src/kotorelay/operations/indexing/functions.py:29`。式: `len(buffer) + len(part) > 1200 and buffer.strip()`
+対象: `backend/src/kotorelay/operations/indexing/shared/functions.py:30`。式: `len(buffer) + len(part) > 1200 and buffer.strip()`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |

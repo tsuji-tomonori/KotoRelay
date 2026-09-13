@@ -1031,6 +1031,19 @@
         "summary": "最新承認版の根拠で回答",
         "tags": [
           "RAGチャット"
+        ],
+        "x-api-package": "operations/chat/ask_question",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/chat"
+          }
         ]
       }
     },
@@ -1083,6 +1096,19 @@
         "summary": "現行認可で会話履歴を再表示",
         "tags": [
           "RAGチャット"
+        ],
+        "x-api-package": "operations/chat/chat_history",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/chat/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -1225,6 +1251,19 @@
         "summary": "閲覧可能な文書を検索",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/list_documents",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents"
+          }
         ]
       },
       "post": {
@@ -1269,6 +1308,19 @@
         "summary": "文書を作成",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/create_document",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents"
+          }
         ]
       }
     },
@@ -1336,6 +1388,19 @@
         "summary": "承認版または担当版を表示",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/read_document",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -1408,6 +1473,19 @@
         "summary": "版IDを指定して本文差分を比較",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/version_diff",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents/00000000-0000-0000-0000-000000000001/diff"
+          }
         ]
       }
     },
@@ -1458,6 +1536,19 @@
         "summary": "下書きを取得",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/get_draft",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents/00000000-0000-0000-0000-000000000001/draft"
+          }
         ]
       },
       "put": {
@@ -1516,6 +1607,19 @@
         "summary": "競合を検出して下書きを保存",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/save_draft",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "PUT",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents/00000000-0000-0000-0000-000000000001/draft"
+          }
         ]
       }
     },
@@ -1569,6 +1673,19 @@
         "summary": "担当文書の版履歴",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/version_history",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents/00000000-0000-0000-0000-000000000001/history"
+          }
         ]
       }
     },
@@ -1627,6 +1744,19 @@
         "summary": "リーダーが公開範囲・公開停止・削除を管理",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/change_policy",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "PUT",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents/00000000-0000-0000-0000-000000000001/policy"
+          }
         ]
       }
     },
@@ -1695,6 +1825,19 @@
         "summary": "版を確定して承認申請",
         "tags": [
           "文書"
+        ],
+        "x-api-package": "operations/documents/submit_version",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/documents/00000000-0000-0000-0000-000000000001/submissions"
+          }
         ]
       }
     },
@@ -1723,6 +1866,19 @@
         "summary": "本人と現在の所属権限を取得",
         "tags": [
           "部署"
+        ],
+        "x-api-package": "operations/groups/get_identity",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/groups/me"
+          }
         ]
       }
     },
@@ -1769,6 +1925,19 @@
         "summary": "部署の所属権限を変更",
         "tags": [
           "部署"
+        ],
+        "x-api-package": "operations/groups/change_membership",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "PUT",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/groups/memberships"
+          }
         ]
       }
     },
@@ -1822,6 +1991,19 @@
         "summary": "自部署の所属を一覧",
         "tags": [
           "部署"
+        ],
+        "x-api-package": "operations/groups/list_members",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/groups/00000000-0000-0000-0000-000000000001/members"
+          }
         ]
       }
     },
@@ -1847,6 +2029,20 @@
         "summary": "死活確認",
         "tags": [
           "システム"
+        ],
+        "x-api-package": "operations/system/health",
+        "x-auth-mode": "public",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "product": "KotoRelay",
+              "status": "ok"
+            },
+            "expected_status": 200,
+            "method": "GET",
+            "name": "死活確認の成功",
+            "path": "/api/health"
+          }
         ]
       }
     },
@@ -1907,6 +2103,19 @@
         "summary": "画像を添付して位置付きOCRを実行",
         "tags": [
           "画像・OCR"
+        ],
+        "x-api-package": "operations/images/upload_image",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/images/documents/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -1972,6 +2181,19 @@
         "summary": "認可されたOCR領域を取得",
         "tags": [
           "画像・OCR"
+        ],
+        "x-api-package": "operations/images/get_ocr",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/images/ocr/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -2030,6 +2252,19 @@
         "summary": "現在の認可で画像を配信",
         "tags": [
           "画像・OCR"
+        ],
+        "x-api-package": "operations/images/get_image",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/images/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -2090,6 +2325,19 @@
         "summary": "OCRを訂正し新しいrunを保存",
         "tags": [
           "画像・OCR"
+        ],
+        "x-api-package": "operations/images/correct_ocr",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/images/00000000-0000-0000-0000-000000000001/ocr"
+          }
         ]
       }
     },
@@ -2152,6 +2400,19 @@
         "summary": "実閲覧を一意IDで記録",
         "tags": [
           "利用統計"
+        ],
+        "x-api-package": "operations/metrics/record_view",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/metrics/views/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -2222,6 +2483,19 @@
         "summary": "部署の利用数と文書貢献を集計",
         "tags": [
           "利用統計"
+        ],
+        "x-api-package": "operations/metrics/department_metrics",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/metrics/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -2275,6 +2549,19 @@
         "summary": "反映ジョブと失敗理由を確認",
         "tags": [
           "運用"
+        ],
+        "x-api-package": "operations/indexing/list_jobs",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/operations/jobs"
+          }
         ]
       }
     },
@@ -2323,6 +2610,19 @@
         "summary": "反映ジョブを再処理",
         "tags": [
           "運用"
+        ],
+        "x-api-package": "operations/indexing/retry_job",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/operations/jobs/00000000-0000-0000-0000-000000000001"
+          }
         ]
       }
     },
@@ -2356,6 +2656,19 @@
         "summary": "正本と索引の不一致を確認",
         "tags": [
           "運用"
+        ],
+        "x-api-package": "operations/indexing/reconcile_index",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/operations/reconcile"
+          }
         ]
       }
     },
@@ -2387,6 +2700,19 @@
         "summary": "審査状況を一覧",
         "tags": [
           "審査"
+        ],
+        "x-api-package": "operations/reviews/list_reviews",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "GET",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/reviews"
+          }
         ]
       }
     },
@@ -2455,6 +2781,19 @@
         "summary": "manifestを確認して承認・却下",
         "tags": [
           "審査"
+        ],
+        "x-api-package": "operations/reviews/decide_review",
+        "x-auth-mode": "bearer",
+        "x-test-samples": [
+          {
+            "expected_fields": {
+              "code": "unauthenticated"
+            },
+            "expected_status": 401,
+            "method": "POST",
+            "name": "認証情報がない要求の拒否",
+            "path": "/api/reviews/00000000-0000-0000-0000-000000000001/decision"
+          }
         ]
       }
     }

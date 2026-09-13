@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 実装データモデル
 
@@ -69,11 +69,10 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| organizations_fence | UPDATE |
-| organizations_get | SELECT |
-| organizations_insert | INSERT |
-| organizations_list | SELECT |
-| organizations_update | UPDATE |
+| kotorelay.operations.system.authorization.generated.queries.organizations_fence | UPDATE |
+| kotorelay.operations.system.authorization.generated.queries.organizations_get | SELECT |
+| kotorelay.operations.system.bootstrap.generated.queries.organizations_get | SELECT |
+| kotorelay.operations.system.bootstrap.generated.queries.organizations_insert | INSERT |
 
 ## users
 
@@ -92,10 +91,11 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| users_get | SELECT |
-| users_insert | INSERT |
-| users_list | SELECT |
-| users_update | UPDATE |
+| kotorelay.operations.groups.change_membership.generated.queries.users_get | SELECT |
+| kotorelay.operations.groups.list_members.generated.queries.users_list | SELECT |
+| kotorelay.operations.reviews.list_reviews.generated.queries.users_list | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.users_list | SELECT |
+| kotorelay.operations.system.bootstrap.generated.queries.users_insert | INSERT |
 
 ## departments
 
@@ -111,10 +111,12 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| departments_get | SELECT |
-| departments_insert | INSERT |
-| departments_list | SELECT |
-| departments_update | UPDATE |
+| kotorelay.operations.documents.change_policy.generated.queries.departments_list | SELECT |
+| kotorelay.operations.groups.change_membership.generated.queries.departments_get | SELECT |
+| kotorelay.operations.groups.get_identity.generated.queries.departments_list | SELECT |
+| kotorelay.operations.reviews.list_reviews.generated.queries.departments_list | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.departments_list | SELECT |
+| kotorelay.operations.system.bootstrap.generated.queries.departments_insert | INSERT |
 
 ## memberships
 
@@ -137,11 +139,12 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| memberships_delete | DELETE |
-| memberships_get | SELECT |
-| memberships_insert | INSERT |
-| memberships_list | SELECT |
-| memberships_update | UPDATE |
+| kotorelay.operations.groups.change_membership.generated.queries.memberships_insert | INSERT |
+| kotorelay.operations.groups.change_membership.generated.queries.memberships_list | SELECT |
+| kotorelay.operations.groups.change_membership.generated.queries.memberships_update | UPDATE |
+| kotorelay.operations.groups.list_members.generated.queries.memberships_list | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.memberships_list | SELECT |
+| kotorelay.operations.system.bootstrap.generated.queries.memberships_insert | INSERT |
 
 ## documents
 
@@ -169,12 +172,25 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| documents_by_department | SELECT |
-| documents_delete | DELETE |
-| documents_get | SELECT |
-| documents_insert | INSERT |
-| documents_list | SELECT |
-| documents_update | UPDATE |
+| kotorelay.operations.chat.ask_question.generated.queries.documents_list | SELECT |
+| kotorelay.operations.chat.shared.generated.queries.documents_get | SELECT |
+| kotorelay.operations.documents.change_policy.generated.queries.documents_update | UPDATE |
+| kotorelay.operations.documents.create_document.generated.queries.documents_insert | INSERT |
+| kotorelay.operations.documents.list_documents.generated.queries.documents_by_department | SELECT |
+| kotorelay.operations.documents.list_documents.generated.queries.documents_list | SELECT |
+| kotorelay.operations.documents.read_document.generated.queries.documents_get | SELECT |
+| kotorelay.operations.documents.save_draft.generated.queries.documents_update | UPDATE |
+| kotorelay.operations.documents.submit_version.generated.queries.documents_update | UPDATE |
+| kotorelay.operations.images.get_ocr.generated.queries.documents_get | SELECT |
+| kotorelay.operations.images.shared.generated.queries.documents_get | SELECT |
+| kotorelay.operations.indexing.list_jobs.generated.queries.documents_list | SELECT |
+| kotorelay.operations.indexing.reconcile_index.generated.queries.documents_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.documents_get | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.documents_list | SELECT |
+| kotorelay.operations.metrics.department_metrics.generated.queries.documents_list | SELECT |
+| kotorelay.operations.reviews.decide_review.generated.queries.documents_update | UPDATE |
+| kotorelay.operations.reviews.list_reviews.generated.queries.documents_list | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.documents_get | SELECT |
 
 ## drafts
 
@@ -197,11 +213,13 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| drafts_delete | DELETE |
-| drafts_get | SELECT |
-| drafts_insert | INSERT |
-| drafts_list | SELECT |
-| drafts_update | UPDATE |
+| kotorelay.operations.documents.create_document.generated.queries.drafts_insert | INSERT |
+| kotorelay.operations.documents.save_draft.generated.queries.drafts_list | SELECT |
+| kotorelay.operations.documents.save_draft.generated.queries.drafts_update | UPDATE |
+| kotorelay.operations.documents.shared.generated.queries.drafts_list | SELECT |
+| kotorelay.operations.documents.submit_version.generated.queries.drafts_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.drafts_delete | DELETE |
+| kotorelay.operations.indexing.shared.generated.queries.drafts_list | SELECT |
 
 ## versions
 
@@ -228,10 +246,17 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| versions_delete | DELETE |
-| versions_get | SELECT |
-| versions_insert | INSERT |
-| versions_list | SELECT |
+| kotorelay.operations.chat.ask_question.generated.queries.versions_get | SELECT |
+| kotorelay.operations.chat.shared.generated.queries.versions_get | SELECT |
+| kotorelay.operations.documents.list_documents.generated.queries.versions_list | SELECT |
+| kotorelay.operations.documents.submit_version.generated.queries.versions_insert | INSERT |
+| kotorelay.operations.documents.version_history.generated.queries.versions_list | SELECT |
+| kotorelay.operations.indexing.list_jobs.generated.queries.versions_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.versions_get | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.versions_list | SELECT |
+| kotorelay.operations.reviews.decide_review.generated.queries.versions_get | SELECT |
+| kotorelay.operations.reviews.list_reviews.generated.queries.versions_list | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.versions_get | SELECT |
 
 ## submissions
 
@@ -260,11 +285,12 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| submissions_delete | DELETE |
-| submissions_get | SELECT |
-| submissions_insert | INSERT |
-| submissions_list | SELECT |
-| submissions_update | UPDATE |
+| kotorelay.operations.documents.list_documents.generated.queries.submissions_list | SELECT |
+| kotorelay.operations.documents.submit_version.generated.queries.submissions_insert | INSERT |
+| kotorelay.operations.documents.version_history.generated.queries.submissions_list | SELECT |
+| kotorelay.operations.reviews.decide_review.generated.queries.submissions_get | SELECT |
+| kotorelay.operations.reviews.decide_review.generated.queries.submissions_update | UPDATE |
+| kotorelay.operations.reviews.list_reviews.generated.queries.submissions_list | SELECT |
 
 ## assets
 
@@ -288,10 +314,17 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| assets_delete | DELETE |
-| assets_get | SELECT |
-| assets_insert | INSERT |
-| assets_list | SELECT |
+| kotorelay.operations.chat.ask_question.generated.queries.assets_get | SELECT |
+| kotorelay.operations.chat.shared.generated.queries.assets_get | SELECT |
+| kotorelay.operations.documents.save_draft.generated.queries.assets_get | SELECT |
+| kotorelay.operations.documents.submit_version.generated.queries.assets_get | SELECT |
+| kotorelay.operations.images.correct_ocr.generated.queries.assets_get | SELECT |
+| kotorelay.operations.images.shared.generated.queries.assets_get | SELECT |
+| kotorelay.operations.images.upload_image.generated.queries.assets_insert | INSERT |
+| kotorelay.operations.images.upload_image.generated.queries.assets_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.assets_delete | DELETE |
+| kotorelay.operations.indexing.shared.generated.queries.assets_get | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.assets_list | SELECT |
 
 ## ocr_runs
 
@@ -315,10 +348,15 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| ocr_runs_delete | DELETE |
-| ocr_runs_get | SELECT |
-| ocr_runs_insert | INSERT |
-| ocr_runs_list | SELECT |
+| kotorelay.operations.chat.shared.generated.queries.ocr_runs_get | SELECT |
+| kotorelay.operations.documents.save_draft.generated.queries.ocr_runs_get | SELECT |
+| kotorelay.operations.documents.submit_version.generated.queries.ocr_runs_get | SELECT |
+| kotorelay.operations.images.correct_ocr.generated.queries.ocr_runs_insert | INSERT |
+| kotorelay.operations.images.get_ocr.generated.queries.ocr_runs_get | SELECT |
+| kotorelay.operations.images.upload_image.generated.queries.ocr_runs_insert | INSERT |
+| kotorelay.operations.indexing.shared.generated.queries.ocr_runs_delete | DELETE |
+| kotorelay.operations.indexing.shared.generated.queries.ocr_runs_get | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.ocr_runs_list | SELECT |
 
 ## chunks
 
@@ -342,11 +380,15 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| chunks_delete | DELETE |
-| chunks_get | SELECT |
-| chunks_insert | INSERT |
-| chunks_list | SELECT |
-| chunks_update | UPDATE |
+| kotorelay.operations.chat.ask_question.generated.queries.chunks_list | SELECT |
+| kotorelay.operations.chat.shared.generated.queries.chunks_get | SELECT |
+| kotorelay.operations.documents.list_documents.generated.queries.chunks_list | SELECT |
+| kotorelay.operations.documents.read_document.generated.queries.chunks_list | SELECT |
+| kotorelay.operations.indexing.reconcile_index.generated.queries.chunks_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.chunks_delete | DELETE |
+| kotorelay.operations.indexing.shared.generated.queries.chunks_insert | INSERT |
+| kotorelay.operations.indexing.shared.generated.queries.chunks_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.chunks_update | UPDATE |
 
 ## outbox
 
@@ -369,11 +411,12 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| outbox_delete | DELETE |
-| outbox_get | SELECT |
-| outbox_insert | INSERT |
-| outbox_list | SELECT |
-| outbox_update | UPDATE |
+| kotorelay.operations.documents.change_policy.generated.queries.outbox_insert | INSERT |
+| kotorelay.operations.indexing.list_jobs.generated.queries.outbox_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.outbox_get | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.outbox_update | UPDATE |
+| kotorelay.operations.reviews.decide_review.generated.queries.outbox_insert | INSERT |
+| kotorelay.operations.system.dispatch.generated.queries.outbox_list | SELECT |
 
 ## conversations
 
@@ -390,11 +433,9 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| conversations_delete | DELETE |
-| conversations_get | SELECT |
-| conversations_insert | INSERT |
-| conversations_list | SELECT |
-| conversations_update | UPDATE |
+| kotorelay.operations.chat.ask_question.generated.queries.conversations_get | SELECT |
+| kotorelay.operations.chat.ask_question.generated.queries.conversations_insert | INSERT |
+| kotorelay.operations.chat.chat_history.generated.queries.conversations_get | SELECT |
 
 ## answers
 
@@ -420,11 +461,11 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| answers_delete | DELETE |
-| answers_get | SELECT |
-| answers_insert | INSERT |
-| answers_list | SELECT |
-| answers_update | UPDATE |
+| kotorelay.operations.chat.ask_question.generated.queries.answers_get | SELECT |
+| kotorelay.operations.chat.ask_question.generated.queries.answers_insert | INSERT |
+| kotorelay.operations.chat.ask_question.generated.queries.answers_list | SELECT |
+| kotorelay.operations.chat.chat_history.generated.queries.answers_list | SELECT |
+| kotorelay.operations.indexing.shared.generated.queries.answers_list | SELECT |
 
 ## events
 
@@ -449,9 +490,11 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| events_get | SELECT |
-| events_insert | INSERT |
-| events_list | SELECT |
+| kotorelay.operations.chat.ask_question.generated.queries.events_insert | INSERT |
+| kotorelay.operations.chat.ask_question.generated.queries.events_list | SELECT |
+| kotorelay.operations.metrics.department_metrics.generated.queries.events_list | SELECT |
+| kotorelay.operations.metrics.record_view.generated.queries.events_get | SELECT |
+| kotorelay.operations.metrics.record_view.generated.queries.events_insert | INSERT |
 
 ## idempotency
 
@@ -470,9 +513,8 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| idempotency_get | SELECT |
-| idempotency_insert | INSERT |
-| idempotency_list | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.idempotency_get | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.idempotency_insert | INSERT |
 
 ## audit
 
@@ -497,6 +539,4 @@ erDiagram
 
 | access pattern | 操作 |
 | --- | --- |
-| audit_get | SELECT |
-| audit_insert | INSERT |
-| audit_list | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.audit_insert | INSERT |

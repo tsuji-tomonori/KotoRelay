@@ -8,14 +8,14 @@ from unittest.mock import MagicMock, patch
 import jwt
 import psycopg
 import pytest
+import query_helpers as q
 from botocore.response import StreamingBody
 from kotorelay.db import Database
 from kotorelay.engines import BedrockEngine, LocalEngine, terms
 from kotorelay.errors import Problem
-from kotorelay.generated import queries as q
 from kotorelay.objects import LocalObjects, S3Objects
-from kotorelay.operations.images.functions import normalize_image, run_ocr
-from kotorelay.operations.indexing.functions import split_chunks
+from kotorelay.operations.images.upload_image.functions import normalize_image, run_ocr
+from kotorelay.operations.indexing.shared.functions import split_chunks
 from kotorelay.runtime import Runtime
 from PIL import Image
 
@@ -119,12 +119,14 @@ def test_OCRの座標と読み順を正規化する():
     result = MagicMock(
         stdout=b"left\ttop\twidth\theight\tconf\ttext\n10\t20\t30\t40\t90\tHello\n0\t0\t0\t0\t-1\t\n"
     )
-    with patch("kotorelay.operations.images.functions.subprocess.run", return_value=result):
+    with patch(
+        "kotorelay.operations.images.upload_image.functions.subprocess.run", return_value=result
+    ):
         ocr = run_ocr(b"png", 100, 200, "tesseract")
     assert ocr.status == "ready" and ocr.regions[0].x == 0.1 and ocr.regions[0].y == 0.1
     assert ocr.regions[0].confidence == 0.9 and ocr.regions[0].order == 0
     with patch(
-        "kotorelay.operations.images.functions.subprocess.run",
+        "kotorelay.operations.images.upload_image.functions.subprocess.run",
         return_value=MagicMock(stdout=b"left\ttop\twidth\theight\tconf\ttext\n"),
     ):
         assert run_ocr(b"png", 1, 1, "tesseract").regions == []
@@ -140,7 +142,9 @@ def test_画像の解像度と正規化後サイズを制限する():
         normalize_image(data, 5000, 10)
     with pytest.raises(Problem):
         normalize_image(data, 1, 1000)
-    with patch("kotorelay.operations.images.functions.Image.open", side_effect=OSError("bad")):
+    with patch(
+        "kotorelay.operations.images.upload_image.functions.Image.open", side_effect=OSError("bad")
+    ):
         with pytest.raises(Problem):
             normalize_image(b"x", 5000, 1000)
 

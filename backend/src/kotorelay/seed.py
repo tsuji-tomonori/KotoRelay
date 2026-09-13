@@ -4,7 +4,8 @@ from kotorelay.config import Settings
 from kotorelay.context import stable_id
 from kotorelay.db import Database
 from kotorelay.errors import require
-from kotorelay.generated import queries as q
+from kotorelay.generated import models
+from kotorelay.operations.system.bootstrap.generated import queries as q
 
 PERSONAS = {
     "author": ("青木 はるか", "開発部", False, True, False, False),
@@ -24,7 +25,7 @@ def seed(settings: Settings) -> None:
             return
         q.organizations_insert(
             db,
-            q.OrganizationsRow(
+            models.OrganizationsRow(
                 id=org,
                 organization_id=org,
                 name="KotoRelay サンプル組織",
@@ -35,13 +36,15 @@ def seed(settings: Settings) -> None:
         for name in ["開発部", "営業部"]:
             q.departments_insert(
                 db,
-                q.DepartmentsRow(id=stable_id(name), organization_id=org, name=name, active=True),
+                models.DepartmentsRow(
+                    id=stable_id(name), organization_id=org, name=name, active=True
+                ),
             )
         for persona, (name, department, leader, author, reviewer, operator) in PERSONAS.items():
             user_id = stable_id(persona)
             q.users_insert(
                 db,
-                q.UsersRow(
+                models.UsersRow(
                     id=user_id,
                     organization_id=org,
                     subject="demo-" + persona,
@@ -52,7 +55,7 @@ def seed(settings: Settings) -> None:
             )
             q.memberships_insert(
                 db,
-                q.MembershipsRow(
+                models.MembershipsRow(
                     id=stable_id(persona + department),
                     organization_id=org,
                     department_id=stable_id(department),

@@ -8,10 +8,10 @@ from uuid import uuid4
 
 import psycopg
 import pytest
+import query_helpers as q
 from fastapi.testclient import TestClient
 from kotorelay.config import Settings
 from kotorelay.db import Database
-from kotorelay.generated import queries as q
 from kotorelay.main import create_app
 from kotorelay.seed import seed
 from psycopg import sql

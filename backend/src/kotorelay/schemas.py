@@ -1,11 +1,11 @@
-"""API入出力と不変manifestを検証する。"""
+"""API間で共有する値型、manifest、エラー型を定義する。"""
 
 from __future__ import annotations
 
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field
 
 Id = Annotated[
     str, Field(pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
@@ -43,63 +43,6 @@ class OcrResult(Input):
     regions: list[Region] = Field(max_length=1000)
     engine: str = Field(max_length=100)
     status: Literal["ready", "failed"]
-
-
-class CreateDocument(Input):
-    title: str = Field(min_length=1, max_length=200)
-    department_id: Id
-
-
-class SaveDraft(Input):
-    # 本文先頭の空白と末尾改行はMarkdownと配置offsetの一部として保存する。
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=False)
-    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
-    body: str = Field(max_length=100_000)
-    revision: int = Field(ge=1)
-    placements: list[Placement] = Field(default_factory=list, max_length=10)
-
-
-class Submit(Input):
-    revision: int = Field(ge=1)
-
-
-class Decide(Input):
-    manifest_hash: str = Field(pattern="^[0-9a-f]{64}$")
-    decision: Literal["approved", "rejected"]
-    reason: str = Field(default="", max_length=2000)
-
-
-class ChangePolicy(Input):
-    reason: str = Field(default="", max_length=2000)
-    revision: int = Field(ge=1)
-    visibility: Literal["department", "selected", "organization"]
-    shared_departments: list[Id] = Field(default_factory=list, max_length=30)
-    status: Literal["active", "withdrawn", "deleted"]
-
-
-class ChangeMembership(Input):
-    user_id: Id
-    department_id: Id
-    leader: bool = False
-    can_author: bool = False
-    can_review: bool = False
-    active: bool = True
-
-
-class Ask(Input):
-    question: str = Field(min_length=1, max_length=2000)
-    department_id: Id
-    conversation_id: Id | None = None
-
-
-class ViewEvent(Input):
-    id: Id
-    department_id: Id
-
-
-class OcrCorrection(Input):
-    regions: list[Region] = Field(max_length=1000)
-    confirmed: bool
 
 
 class ManifestImage(BaseModel):

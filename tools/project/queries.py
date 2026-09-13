@@ -23,13 +23,12 @@ TYPES = {
 }
 
 
-def render() -> str:
+def render(sql_sources: list[Path] | None = None, *, rows: bool = True) -> str:
     from tools.project.api_documents import sql_description
 
     models: dict[str, tuple[str, list[tuple[str, str]]]] = {}
-    sources = sorted((ROOT / "backend/migrations").glob("*.sql")) + sorted(
-        (APP / "operations").rglob("*.sql")
-    )
+    sql_sources = sql_sources or []
+    sources = sorted((ROOT / "backend/migrations").glob("*.sql")) + sql_sources
     digest = hashlib.sha256(b"".join(p.read_bytes() for p in sources)).hexdigest()
     lines = [
         f'"""DDL・SQLから生成した型付き境界。直接編集しない。\nSHA256: {digest}\n"""',
@@ -53,9 +52,12 @@ def render() -> str:
                 columns.append((column.name, TYPES[kind] + (" | None" if nullable else "")))
         cls = "".join(s.title() for s in table.split("_")) + "Row"
         models[table] = cls, columns
-        lines += [f"class {cls}(BaseModel):", f'    """{table}のDDL由来の行型。"""']
-        lines += [f"    {name}: {kind}" for name, kind in columns] + [""]
-    for path in sorted((APP / "operations").rglob("*.sql")):
+        if rows:
+            lines += [f"class {cls}(BaseModel):", f'    """{table}のDDL由来の行型。"""']
+            lines += [f"    {name}: {kind}" for name, kind in columns] + [""]
+        else:
+            lines.append(f"from kotorelay.generated.models import {cls}")
+    for path in sql_sources:
         sql = path.read_text()
         description = sql_description(path)
         parsed = sqlglot.parse_one(re.sub(r"%\((\w+)\)s", r":\1", sql), read="postgres")
@@ -97,10 +99,8 @@ def render() -> str:
     return "\n".join(lines)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true")
-    args = parser.parse_args()
+def formatted(source: str) -> str:
+    """型生成の出力を同じRuff設定で決定的に整形する。"""
     import subprocess
 
     cleaned = subprocess.run(
@@ -109,12 +109,12 @@ def main() -> None:
             "check",
             "--fix",
             "--select",
-            "I",
+            "I,F401",
             "--stdin-filename",
             "backend/src/kotorelay/generated/queries.py",
             "-",
         ],
-        input=render(),
+        input=source,
         text=True,
         capture_output=True,
         check=True,
@@ -132,13 +132,37 @@ def main() -> None:
         capture_output=True,
         check=True,
     )
-    path = APP / "generated/queries.py"
+    return result.stdout
+
+
+def build() -> dict[Path, str]:
+    result = {APP / "generated/models.py": formatted(render())}
+    for folder in sorted({p.parent for p in (APP / "operations").rglob("*.sql")}):
+        if folder.name != "sql" or len(folder.relative_to(APP).parts) != 4:
+            raise ValueError(f"APIまたは共有責務ごとのSQL配置ではありません: {folder}")
+        result[folder.parent / "generated/queries.py"] = formatted(
+            render(sorted(folder.glob("*.sql")), rows=False)
+        )
+    return result
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    output = build()
+    existing = set((APP / "operations").glob("*/*/generated/queries.py"))
+    stale = existing - output.keys()
     if args.check:
-        if not path.exists() or path.read_text() != result.stdout:
+        if stale or any(not p.exists() or p.read_text() != body for p, body in output.items()):
             raise SystemExit("型付きquery生成物に差分または欠落があります")
     else:
-        path.parent.mkdir(exist_ok=True)
-        path.write_text(result.stdout)
+        for path in stale:
+            path.unlink()
+        for path, body in output.items():
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(body)
+    print(f"型付きSQL: {len(output) - 1}責務 / 共有DDL行型")
 
 
 if __name__ == "__main__":

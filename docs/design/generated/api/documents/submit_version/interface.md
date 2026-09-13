@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 版を確定して承認申請 — インターフェース
 
@@ -74,4 +74,18 @@
 
 ## Samples
 
-このAPIのOpenAPIにHTTP応答exampleは定義されていません。架空の成功応答は生成しません。入力形式は上記のData、実際の入力と期待値は単体テスト詳細を参照してください。
+### 認証情報がない要求の拒否
+
+認証情報なしのHTTP要求と不変項目を実テストで確認します。
+
+```json
+{
+  "name": "認証情報がない要求の拒否",
+  "method": "POST",
+  "path": "/api/documents/00000000-0000-0000-0000-000000000001/submissions",
+  "expected_status": 401,
+  "expected_fields": {
+    "code": "unauthenticated"
+  }
+}
+```

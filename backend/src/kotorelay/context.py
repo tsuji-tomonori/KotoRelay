@@ -9,8 +9,9 @@ from uuid import NAMESPACE_URL, uuid4, uuid5
 from kotorelay.config import Settings
 from kotorelay.db import Database
 from kotorelay.errors import require
-from kotorelay.generated import queries as q
+from kotorelay.generated import models
 from kotorelay.objects import Objects, digest
+from kotorelay.operations.system.authorization.generated import queries as q
 from kotorelay.schemas import Manifest
 
 
@@ -66,7 +67,7 @@ class Context:
                 }.get(operation, False)
         return False
 
-    def can_read(self, doc: q.DocumentsRow) -> bool:
+    def can_read(self, doc: models.DocumentsRow) -> bool:
         if doc.status != "active" or not self.memberships:
             return False
         if doc.visibility == "organization":
@@ -77,7 +78,7 @@ class Context:
             self.member(department) for department in json.loads(doc.shared_departments)
         )
 
-    def document(self, document_id: str, operation: str = "read") -> q.DocumentsRow:
+    def document(self, document_id: str, operation: str = "read") -> models.DocumentsRow:
         rows = q.documents_get(self.db, self.org, document_id)
         require(bool(rows))
         doc = rows[0]
@@ -89,7 +90,7 @@ class Context:
         require(allowed)
         return doc
 
-    def version(self, doc: q.DocumentsRow, version_id: str) -> q.VersionsRow:
+    def version(self, doc: models.DocumentsRow, version_id: str) -> models.VersionsRow:
         rows = q.versions_get(self.db, self.org, version_id)
         require(bool(rows) and rows[0].document_id == doc.id)
         version = rows[0]
@@ -110,7 +111,7 @@ class Context:
     ) -> None:
         q.audit_insert(
             self.db,
-            q.AuditRow(
+            models.AuditRow(
                 id=new_id(),
                 organization_id=self.org,
                 user_id=self.user.id,
@@ -139,7 +140,7 @@ class Context:
     def remember(self, key: str, operation: str, request: str, response: str) -> None:
         q.idempotency_insert(
             self.db,
-            q.IdempotencyRow(
+            models.IdempotencyRow(
                 id=stable_id(self.user.id + key),
                 organization_id=self.org,
                 user_id=self.user.id,

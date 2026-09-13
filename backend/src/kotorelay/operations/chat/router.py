@@ -1,23 +1,10 @@
-"""根拠を再取得するチャットAPIを公開する。"""
-
-from uuid import UUID
+"""chatのAPIごとのルーターを登録する。"""
 
 from fastapi import APIRouter
 
-from kotorelay.operations.chat import functions as f
-from kotorelay.operations.chat import service
-from kotorelay.operations.documents.router import Key
-from kotorelay.runtime import Ctx, Rt, Subject
-from kotorelay.schemas import AnswerView, Ask
+from kotorelay.operations.chat.ask_question.router import router as ask_question
+from kotorelay.operations.chat.chat_history.router import router as chat_history
 
-router = APIRouter(prefix="/api/chat", tags=["RAGチャット"])
-
-
-@router.post("", summary="最新承認版の根拠で回答", operation_id="ask_question")
-def ask_question(rt: Rt, subject: Subject, data: Ask, key: Key) -> AnswerView:
-    return service.ask(rt, subject, data, str(key))
-
-
-@router.get("/{conversation_id}", summary="現行認可で会話履歴を再表示", operation_id="chat_history")
-def chat_history(ctx: Ctx, conversation_id: UUID) -> list[AnswerView]:
-    return f.history(ctx, str(conversation_id))
+router = APIRouter()
+router.include_router(ask_question)
+router.include_router(chat_history)

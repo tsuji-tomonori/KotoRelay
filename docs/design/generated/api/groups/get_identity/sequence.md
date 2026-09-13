@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 本人と現在の所属権限を取得 — シーケンス
 
@@ -17,6 +17,7 @@ sequenceDiagram
         A-->>U: 401または403または404
     else 許可
         A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
         A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
         A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
@@ -29,8 +30,9 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.member | 56 | Return | any((m.department_id == department_id for m in self.memberships)) |
+| kotorelay.context.Context.member | 57 | Return | any((m.department_id == department_id for m in self.memberships)) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.groups.functions.identity | 10 | Return | {'user': ctx.user, 'memberships': ctx.memberships, 'departments': [d for d in q.departments_list(ctx.db, ctx.org) if ctx.member(d.id)], 'directory': [d for d in q.departments_list(ctx.db, ctx.org) if d.active], 'mode': ctx.settings.mode} |
-| kotorelay.operations.groups.router.get_identity | 17 | Return | f.identity(ctx) |
+| kotorelay.operations.groups.get_identity.functions.identity | 10 | Return | {'user': ctx.user, 'memberships': ctx.memberships, 'departments': [d for d in q.departments_list(ctx.db, ctx.org) if ctx.member(d.id)], 'directory': [d for d in q.departments_list(ctx.db, ctx.org) if d.active], 'mode': ctx.settings.mode} |
+| kotorelay.operations.groups.get_identity.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
+| kotorelay.operations.groups.get_identity.router.get_identity | 21 | Return | build_response(f.identity(ctx)) |

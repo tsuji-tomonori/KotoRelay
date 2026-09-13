@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 反映ジョブと失敗理由を確認 — シーケンス
 
@@ -16,13 +16,13 @@ sequenceDiagram
     alt 認可条件が不成立
         A-->>U: 401または403または404
     else 許可
-        A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する文書を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。
+        A->>D: 現在の組織に属する文書版を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
         A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-        A->>D: 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。
         A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-        A->>D: 現在の組織に属する文書版を識別子順に一覧取得する。
         A->>S: 内容ハッシュ実体を照合
         opt 実体欠落・ハッシュ不一致
             A-->>U: 利用不可・回答保留
@@ -47,6 +47,10 @@ sequenceDiagram
 | --- | --- | --- | --- |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.indexing.functions.job_details | 207 | Return | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
-| kotorelay.operations.indexing.functions.jobs | 200 | Return | q.outbox_list(ctx.db, ctx.org) |
-| kotorelay.operations.indexing.router.list_jobs | 16 | Return | f.job_details(ctx) if details else [row.model_dump() for row in f.jobs(ctx)] |
+| kotorelay.operations.indexing.list_jobs.functions.job_details | 20 | Return | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
+| kotorelay.operations.indexing.list_jobs.functions.jobs | 13 | Return | q.outbox_list(ctx.db, ctx.org) |
+| kotorelay.operations.indexing.list_jobs.functions.list_jobs | 32 | If | details |
+| kotorelay.operations.indexing.list_jobs.functions.list_jobs | 33 | Return | job_details(ctx) |
+| kotorelay.operations.indexing.list_jobs.functions.list_jobs | 34 | Return | [row.model_dump() for row in jobs(ctx)] |
+| kotorelay.operations.indexing.list_jobs.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
+| kotorelay.operations.indexing.list_jobs.router.list_jobs | 21 | Return | build_response(f.list_jobs(ctx, details)) |

@@ -4,7 +4,7 @@ import io
 import json
 from uuid import uuid4
 
-from kotorelay.generated import queries as q
+import query_helpers as q
 from PIL import Image
 from test_workflow import DEPT, OTHER, approve, ask, create, headers, policy, published, submit
 

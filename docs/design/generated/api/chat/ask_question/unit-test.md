@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 最新承認版の根拠で回答 — 単体テスト詳細
 
@@ -12,7 +12,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F01 条件分岐
 
-対象: `backend/src/kotorelay/context.py:40`。式: `bool(organizations) and (not organizations[0].suspended)`
+対象: `backend/src/kotorelay/context.py:41`。式: `bool(organizations) and (not organizations[0].suspended)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F02 条件分岐
 
-対象: `backend/src/kotorelay/context.py:43`。式: `len(users) == 1`
+対象: `backend/src/kotorelay/context.py:44`。式: `len(users) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F03 条件分岐
 
-対象: `backend/src/kotorelay/context.py:70`。式: `doc.status != 'active' or not self.memberships`
+対象: `backend/src/kotorelay/context.py:71`。式: `doc.status != 'active' or not self.memberships`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F04 条件分岐
 
-対象: `backend/src/kotorelay/context.py:72`。式: `doc.visibility == 'organization'`
+対象: `backend/src/kotorelay/context.py:73`。式: `doc.visibility == 'organization'`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F05 条件分岐
 
-対象: `backend/src/kotorelay/context.py:74`。式: `self.member(doc.department_id)`
+対象: `backend/src/kotorelay/context.py:75`。式: `self.member(doc.department_id)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F06 条件分岐
 
-対象: `backend/src/kotorelay/context.py:53`。式: `q.organizations_fence(self.db, self.organization) == 1`
+対象: `backend/src/kotorelay/context.py:54`。式: `q.organizations_fence(self.db, self.organization) == 1`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F07 条件分岐
 
-対象: `backend/src/kotorelay/context.py:129`。式: `not rows`
+対象: `backend/src/kotorelay/context.py:130`。式: `not rows`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F08 条件分岐
 
-対象: `backend/src/kotorelay/context.py:132`。式: `record.operation == operation and record.request_hash == digest(request.encode())`
+対象: `backend/src/kotorelay/context.py:133`。式: `record.operation == operation and record.request_hash == digest(request.encode())`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -102,17 +102,17 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F10 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:217`。式: `ctx.member(prepared.department_id)`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:243`。式: `prepared.citations`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F10-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F10-false | 不成立 | 'forbidden' / 403 |
+| F10-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F11 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:78`。式: `prior`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:248`。式: `prepared.citations`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -122,7 +122,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F12 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:103`。式: `resumed is not None`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:237`。式: `exc.code != 'already_answered'`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -132,7 +132,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F13 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:186`。式: `resumed is None`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:246`。式: `not all((validate_citation(ctx, c) for c in prepared.citations))`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -142,7 +142,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F14 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:75`。式: `ctx.member(data.department_id)`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:175`。式: `ctx.member(prepared.department_id)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -152,17 +152,17 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F15 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:92`。式: `resumed is not None or sum((1 for e in events if e.user_id == ctx.user.id and e.kind == 'question' and (e.created_at.date() == today))) < ctx.settings.max_questions_per_day`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:36`。式: `prior`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F15-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F15-false | 不成立 | 'limit' / 429 |
+| F15-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F16 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:105`。式: `data.conversation_id`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:61`。式: `resumed is not None`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -172,7 +172,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F17 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:134`。式: `chunk.document_id not in docs or chunk.version_id != docs[chunk.document_id].latest_version_id or (not chunk.ready)`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:144`。式: `resumed is None`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -182,27 +182,27 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F18 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:140`。式: `vector_keys is not None and chunk.id not in vector_keys`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:33`。式: `ctx.member(data.department_id)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F18-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F18-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F18-false | 不成立 | 'forbidden' / 403 |
 
 
 ### F19 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:151`。式: `score > 0 and (vector_keys is not None or score >= max(1, len(terms(data.question)) * 0.3))`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:50`。式: `resumed is not None or sum((1 for e in events if e.user_id == ctx.user.id and e.kind == 'question' and (e.created_at.date() == today))) < ctx.settings.max_questions_per_day`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F19-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F19-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F19-false | 不成立 | 'limit' / 429 |
 
 
 ### F20 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:173`。式: `not validate_citation(ctx, citation)`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:63`。式: `data.conversation_id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -212,7 +212,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F21 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:177`。式: `len(images) + len(related) > ctx.settings.max_model_images`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:92`。式: `chunk.document_id not in docs or chunk.version_id != docs[chunk.document_id].latest_version_id or (not chunk.ready)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -222,7 +222,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F22 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:184`。式: `len(citations) >= 5`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:98`。式: `vector_keys is not None and chunk.id not in vector_keys`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -232,87 +232,87 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F23 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:79`。式: `prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id)`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:109`。式: `score > 0 and (vector_keys is not None or score >= max(1, len(terms(data.question)) * 0.3))`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F23-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F23-false | 不成立 | 'idempotency_conflict' / 409 |
+| F23-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F24 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:107`。式: `bool(conversations) and conversations[0].user_id == ctx.user.id`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:131`。式: `not validate_citation(ctx, citation)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F24-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F24-false | 不成立 | not_found / 404 |
+| F24-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F25 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:109`。式: `all((a.department_id == data.department_id for a in q.answers_list(ctx.db, ctx.org) if a.conversation_id == conversation_id))`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:135`。式: `len(images) + len(related) > ctx.settings.max_model_images`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F25-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F25-false | 不成立 | 'conversation_department' / 409 |
+| F25-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F26 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:275`。式: `answer.user_id == ctx.user.id`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:142`。式: `len(citations) >= 5`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F26-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F26-false | 不成立 | not_found / 404 |
+| F26-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
 
 
 ### F27 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:30`。式: `not docs`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:37`。式: `prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F27-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F27-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F27-false | 不成立 | 'idempotency_conflict' / 409 |
 
 
 ### F28 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:33`。式: `not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:65`。式: `bool(conversations) and conversations[0].user_id == ctx.user.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F28-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F28-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F28-false | 不成立 | not_found / 404 |
 
 
 ### F29 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:41`。式: `not versions or not chunks`
+対象: `backend/src/kotorelay/operations/chat/ask_question/functions.py:67`。式: `all((a.department_id == data.department_id for a in q.answers_list(ctx.db, ctx.org) if a.conversation_id == conversation_id))`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F29-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F29-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F29-false | 不成立 | 'conversation_department' / 409 |
 
 
 ### F30 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:44`。式: `not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash))`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:62`。式: `answer.user_id == ctx.user.id`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
 | F30-true | 成立 | 成立側の実装を実行。正常／異常は上記式と処理に依存する。 |
-| F30-false | 不成立 | then / else の実装分岐 / 制御フロー参照 |
+| F30-false | 不成立 | not_found / 404 |
 
 
 ### F31 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:59`。式: `placements - {image.placement.id for image in manifest.images}`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:17`。式: `not docs`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -322,7 +322,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F32 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:62`。式: `image.placement.id in json.loads(chunk.placements)`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:20`。式: `not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -332,7 +332,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F33 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/functions.py:65`。式: `not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready')`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:28`。式: `not versions or not chunks`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -342,7 +342,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F34 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/service.py:23`。式: `prepared.citations`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:31`。式: `not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash))`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -352,7 +352,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F35 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/service.py:28`。式: `prepared.citations`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:46`。式: `placements - {image.placement.id for image in manifest.images}`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -362,7 +362,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F36 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/service.py:17`。式: `exc.code != 'already_answered'`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:49`。式: `image.placement.id in json.loads(chunk.placements)`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |
@@ -372,7 +372,7 @@ FastAPI/Pydanticの入力検証、認証依存、共通middlewareを適用しま
 
 ### F37 条件分岐
 
-対象: `backend/src/kotorelay/operations/chat/service.py:26`。式: `not all((f.validate_citation(ctx, c) for c in prepared.citations))`
+対象: `backend/src/kotorelay/operations/chat/shared/functions.py:52`。式: `not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready')`
 
 | 要素ID | 要素 | 期待観点 |
 | --- | --- | --- |

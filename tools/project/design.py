@@ -66,6 +66,7 @@ def sources() -> list[Path]:
                 ROOT / "spec/requirements/requirements.json",
                 Path(__file__),
                 ROOT / "tools/project/api_documents.py",
+                ROOT / "tools/project/api_layout.py",
             ]
         )
     )
@@ -183,11 +184,19 @@ def synth() -> dict[str, object]:
     return template
 
 
+def sql_heading(path: Path) -> str:
+    """同名SQLも所有APIと共有責務を区別できる見出しにする。"""
+    return "/".join((*path.parts[-4:-2], path.name))
+
+
 def build() -> tuple[dict[str, str], dict[str, object]]:
     from fastapi.routing import APIRoute
     from kotorelay.main import LOG_MESSAGES, app
 
     from tools.project import api_documents as layout
+    from tools.project.api_layout import inspect
+
+    api_layouts = inspect()
 
     files = sources()
     hashes = {
@@ -210,8 +219,13 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         node = sqlglot.parse_one(re.sub(r"%\((\w+)\)s", r":\1", path.read_text()), read="postgres")
         if not isinstance(node, (exp.Select, exp.Insert, exp.Update, exp.Delete)):
             raise ValueError(f"未対応SQL: {path}")
-        queries[path.stem] = (path, node)
-        descriptions[path.stem] = layout.sql_description(path)
+        query_id = (
+            ".".join(path.parent.parent.relative_to(ROOT / "backend/src").parts)
+            + ".generated.queries."
+            + path.stem
+        )
+        queries[query_id] = (path, node)
+        descriptions[query_id] = layout.sql_description(path)
     schema = app.openapi()
     output["OPENAPI.gen.json"] = dump(schema)
     operations = {}
@@ -237,9 +251,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             reached = sorted(
                 set(reached + inventory.reachable("kotorelay.context.Context.__init__"))
             )
-        sql_names = sorted(
-            {k.rsplit(".", 1)[-1] for k in reached if k.startswith("kotorelay.generated.queries.")}
-        )
+        sql_names = sorted({k for k in reached if k in queries})
         factors = []
         returns = []
         for k in reached:
@@ -328,7 +340,9 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             body: str,
             base: str = base,
             summary: str = summary,
-            query_names: tuple[str, ...] = tuple(queries[name][0].name for name in sql_names),
+            query_names: tuple[str, ...] = tuple(
+                sql_heading(queries[name][0]) for name in sql_names
+            ),
         ) -> None:
             layout.validate(kind, body, list(query_names))
             output[f"{base}/{kind}.md"] = (
@@ -389,7 +403,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         query_bodies = []
         for name in sql_names:
             path, sql_node = queries[name]
-            function = inventory.nodes["kotorelay.generated.queries." + name]
+            function = inventory.nodes[name]
             argument_rows = [
                 [a.arg, ast.unparse(a.annotation) if a.annotation else "なし"]
                 for a in function.args.args
@@ -416,7 +430,7 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             ]
             query_bodies.append(
                 "## "
-                + path.name
+                + sql_heading(path)
                 + "\n\n正本: `"
                 + path.relative_to(ROOT).as_posix()
                 + "`\n\n"
@@ -603,6 +617,30 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
                 ],
             ),
         )
+    output["API-LAYOUT.md"] = (
+        header
+        + "# APIごとのファイルと責務\n\n"
+        + "参照: lazunex `096e1e580ab1c0670c57e4febad2bd9fdd4698ee` の "
+        + "`src/app/apis/apis/publish_api`。\n\n"
+        + "\n\n".join(
+            "## "
+            + item["operation"]
+            + "\n\n正本: `"
+            + item["package"]
+            + "`\n\n"
+            + table(["ファイル", "責務"], [[name, role] for name, role in item["files"].items()])
+            + "\nSQL正本: "
+            + (
+                ", ".join("`" + name + "`" for name in item["sql"])
+                or "直接所有なし（共有処理のSQLはAPI別クエリ帳票を参照）"
+            )
+            + "\n\n型付きquery: "
+            + str(item["queries"] or "直接所有なし")
+            + "\n\n共有処理: "
+            + (", ".join(item["shared"]) or "直接参照なし")
+            for item in api_layouts
+        )
+    )
     expected_operations = {
         operation["operationId"]
         for path in schema["paths"].values()
@@ -796,7 +834,11 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             "api": {
                 "status": "required",
                 "sources": ["backend/src"],
-                "markdown": markdown("api/") + ["docs/design/generated/API.md"],
+                "markdown": markdown("api/")
+                + [
+                    "docs/design/generated/API.md",
+                    "docs/design/generated/API-LAYOUT.md",
+                ],
                 "generate": command,
                 "check": command + ["--check"],
                 "openapi": "docs/design/generated/OPENAPI.gen.json",

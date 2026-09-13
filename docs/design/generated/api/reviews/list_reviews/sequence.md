@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 審査状況を一覧 — シーケンス
 
@@ -18,11 +18,13 @@ sequenceDiagram
     else 許可
         A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する文書を識別子順に一覧取得する。
-        A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
-        A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
         A->>D: 現在の組織に属する承認申請を識別子順に一覧取得する。
         A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
         A->>D: 現在の組織に属する文書版を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
+        A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
+        A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
         A->>S: 内容ハッシュ実体を照合
         opt 実体欠落・ハッシュ不一致
             A-->>U: 利用不可・回答保留
@@ -36,11 +38,12 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.permission | 59 | For | For |
-| kotorelay.context.Context.permission | 60 | If | m.department_id == department_id |
-| kotorelay.context.Context.permission | 61 | Return | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
-| kotorelay.context.Context.permission | 67 | Return | False |
+| kotorelay.context.Context.permission | 60 | For | For |
+| kotorelay.context.Context.permission | 61 | If | m.department_id == department_id |
+| kotorelay.context.Context.permission | 62 | Return | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
+| kotorelay.context.Context.permission | 68 | Return | False |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.reviews.functions.list_reviews | 21 | Return | [{'submission': s, 'title': versions[s.version_id].title, 'version_number': versions[s.version_id].number, 'requested_by': users[s.requested_by], 'department_name': departments[documents[s.document_id].department_id], 'self_requested': s.requested_by == ctx.user.id, 'can_review': ctx.permission(documents[s.document_id].department_id, 'review')} for s in q.submissions_list(ctx.db, ctx.org) if s.document_id in documents] |
-| kotorelay.operations.reviews.router.list_reviews | 18 | Return | f.list_reviews(ctx) |
+| kotorelay.operations.reviews.list_reviews.functions.list_reviews | 19 | Return | [{'submission': s, 'title': versions[s.version_id].title, 'version_number': versions[s.version_id].number, 'requested_by': users[s.requested_by], 'department_name': departments[documents[s.document_id].department_id], 'self_requested': s.requested_by == ctx.user.id, 'can_review': ctx.permission(documents[s.document_id].department_id, 'review')} for s in q.submissions_list(ctx.db, ctx.org) if s.document_id in documents] |
+| kotorelay.operations.reviews.list_reviews.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
+| kotorelay.operations.reviews.list_reviews.router.list_reviews | 21 | Return | build_response(f.list_reviews(ctx)) |

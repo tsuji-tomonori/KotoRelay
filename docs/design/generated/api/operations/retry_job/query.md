@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 反映ジョブを再処理 — クエリ
 
@@ -6,9 +6,9 @@
 
 DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更新し、競合は全体rollback→409。モデル呼出しはtransaction外、回答確定は別transactionで再認可。
 
-## answers_list.sql
+## indexing/shared/answers_list.sql
 
-正本: `backend/src/kotorelay/operations/chat/sql/answers_list.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/answers_list.sql`
 
 ### SQL種別
 
@@ -63,9 +63,9 @@ ORDER BY
   id
 ```
 
-## assets_delete.sql
+## indexing/shared/assets_delete.sql
 
-正本: `backend/src/kotorelay/operations/images/sql/assets_delete.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/assets_delete.sql`
 
 ### SQL種別
 
@@ -105,9 +105,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## assets_get.sql
+## indexing/shared/assets_get.sql
 
-正本: `backend/src/kotorelay/operations/images/sql/assets_get.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/assets_get.sql`
 
 ### SQL種別
 
@@ -158,9 +158,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## assets_list.sql
+## indexing/shared/assets_list.sql
 
-正本: `backend/src/kotorelay/operations/images/sql/assets_list.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/assets_list.sql`
 
 ### SQL種別
 
@@ -214,9 +214,9 @@ ORDER BY
   id
 ```
 
-## chunks_delete.sql
+## indexing/shared/chunks_delete.sql
 
-正本: `backend/src/kotorelay/operations/indexing/sql/chunks_delete.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/chunks_delete.sql`
 
 ### SQL種別
 
@@ -256,9 +256,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## chunks_insert.sql
+## indexing/shared/chunks_insert.sql
 
-正本: `backend/src/kotorelay/operations/indexing/sql/chunks_insert.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/chunks_insert.sql`
 
 ### SQL種別
 
@@ -319,9 +319,9 @@ VALUES
   )
 ```
 
-## chunks_list.sql
+## indexing/shared/chunks_list.sql
 
-正本: `backend/src/kotorelay/operations/indexing/sql/chunks_list.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/chunks_list.sql`
 
 ### SQL種別
 
@@ -375,9 +375,9 @@ ORDER BY
   id
 ```
 
-## chunks_update.sql
+## indexing/shared/chunks_update.sql
 
-正本: `backend/src/kotorelay/operations/indexing/sql/chunks_update.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/chunks_update.sql`
 
 ### SQL種別
 
@@ -416,59 +416,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## departments_list.sql
+## indexing/shared/documents_get.sql
 
-正本: `backend/src/kotorelay/operations/groups/sql/departments_list.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する部署を識別子順に一覧取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | departments | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-
-
-### 戻り値
-
-型: `list[DepartmentsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s
-
-ORDER BY id
-
-```sql
-/* 現在の組織に属する部署を識別子順に一覧取得する。 */
-SELECT
-  id,
-  organization_id,
-  name,
-  active
-FROM departments
-WHERE
-  organization_id = %(organization_id)s
-ORDER BY
-  id
-```
-
-## documents_get.sql
-
-正本: `backend/src/kotorelay/operations/documents/sql/documents_get.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/documents_get.sql`
 
 ### SQL種別
 
@@ -521,9 +471,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## documents_list.sql
+## indexing/shared/documents_list.sql
 
-正本: `backend/src/kotorelay/operations/documents/sql/documents_list.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/documents_list.sql`
 
 ### SQL種別
 
@@ -579,9 +529,9 @@ ORDER BY
   id
 ```
 
-## drafts_delete.sql
+## indexing/shared/drafts_delete.sql
 
-正本: `backend/src/kotorelay/operations/documents/sql/drafts_delete.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/drafts_delete.sql`
 
 ### SQL種別
 
@@ -621,9 +571,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## drafts_list.sql
+## indexing/shared/drafts_list.sql
 
-正本: `backend/src/kotorelay/operations/documents/sql/drafts_list.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/drafts_list.sql`
 
 ### SQL種別
 
@@ -675,63 +625,9 @@ ORDER BY
   id
 ```
 
-## memberships_list.sql
+## indexing/shared/ocr_runs_delete.sql
 
-正本: `backend/src/kotorelay/operations/groups/sql/memberships_list.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する部署所属を識別子順に一覧取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | memberships | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-
-
-### 戻り値
-
-型: `list[MembershipsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s
-
-ORDER BY id
-
-```sql
-/* 現在の組織に属する部署所属を識別子順に一覧取得する。 */
-SELECT
-  id,
-  organization_id,
-  department_id,
-  user_id,
-  leader,
-  can_author,
-  can_review,
-  active
-FROM memberships
-WHERE
-  organization_id = %(organization_id)s
-ORDER BY
-  id
-```
-
-## ocr_runs_delete.sql
-
-正本: `backend/src/kotorelay/operations/images/sql/ocr_runs_delete.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/ocr_runs_delete.sql`
 
 ### SQL種別
 
@@ -771,9 +667,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## ocr_runs_get.sql
+## indexing/shared/ocr_runs_get.sql
 
-正本: `backend/src/kotorelay/operations/images/sql/ocr_runs_get.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/ocr_runs_get.sql`
 
 ### SQL種別
 
@@ -824,9 +720,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## ocr_runs_list.sql
+## indexing/shared/ocr_runs_list.sql
 
-正本: `backend/src/kotorelay/operations/images/sql/ocr_runs_list.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/ocr_runs_list.sql`
 
 ### SQL種別
 
@@ -880,98 +776,9 @@ ORDER BY
   id
 ```
 
-## organizations_fence.sql
+## indexing/shared/outbox_get.sql
 
-正本: `backend/src/kotorelay/operations/identity/sql/organizations_fence.sql`
-
-### SQL種別
-
-UPDATE
-
-### SQLの概要
-
-組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | organizations | U |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| row | OrganizationsRow |
-
-
-### 戻り値
-
-型: `int`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
-
-```sql
-/* 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。 */
-UPDATE organizations SET revision = revision + 1
-WHERE
-  organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
-```
-
-## organizations_get.sql
-
-正本: `backend/src/kotorelay/operations/identity/sql/organizations_get.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織の組織名・改訂番号・利用停止状態を取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | organizations | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-| id | str |
-
-
-### 戻り値
-
-型: `list[OrganizationsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s AND id = %(id)s
-
-```sql
-/* 現在の組織の組織名・改訂番号・利用停止状態を取得する。 */
-SELECT
-  id,
-  organization_id,
-  name,
-  revision,
-  suspended
-FROM organizations
-WHERE
-  organization_id = %(organization_id)s AND id = %(id)s
-```
-
-## outbox_get.sql
-
-正本: `backend/src/kotorelay/operations/indexing/sql/outbox_get.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/outbox_get.sql`
 
 ### SQL種別
 
@@ -1021,9 +828,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## outbox_update.sql
+## indexing/shared/outbox_update.sql
 
-正本: `backend/src/kotorelay/operations/indexing/sql/outbox_update.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/outbox_update.sql`
 
 ### SQL種別
 
@@ -1062,61 +869,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## users_list.sql
+## indexing/shared/versions_get.sql
 
-正本: `backend/src/kotorelay/operations/identity/sql/users_list.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する利用者を識別子順に一覧取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | users | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-
-
-### 戻り値
-
-型: `list[UsersRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s
-
-ORDER BY id
-
-```sql
-/* 現在の組織に属する利用者を識別子順に一覧取得する。 */
-SELECT
-  id,
-  organization_id,
-  subject,
-  display_name,
-  active,
-  operator
-FROM users
-WHERE
-  organization_id = %(organization_id)s
-ORDER BY
-  id
-```
-
-## versions_get.sql
-
-正本: `backend/src/kotorelay/operations/documents/sql/versions_get.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/versions_get.sql`
 
 ### SQL種別
 
@@ -1168,9 +923,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## versions_list.sql
+## indexing/shared/versions_list.sql
 
-正本: `backend/src/kotorelay/operations/documents/sql/versions_list.sql`
+正本: `backend/src/kotorelay/operations/indexing/shared/sql/versions_list.sql`
 
 ### SQL種別
 
@@ -1219,6 +974,251 @@ SELECT
   created_by,
   created_at
 FROM versions
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+## system/authorization/departments_list.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/departments_list.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する部署を識別子順に一覧取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | departments | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+
+
+### 戻り値
+
+型: `list[DepartmentsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s
+
+ORDER BY id
+
+```sql
+/* 現在の組織に属する部署を識別子順に一覧取得する。 */
+SELECT
+  id,
+  organization_id,
+  name,
+  active
+FROM departments
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+## system/authorization/memberships_list.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/memberships_list.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する部署所属を識別子順に一覧取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | memberships | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+
+
+### 戻り値
+
+型: `list[MembershipsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s
+
+ORDER BY id
+
+```sql
+/* 現在の組織に属する部署所属を識別子順に一覧取得する。 */
+SELECT
+  id,
+  organization_id,
+  department_id,
+  user_id,
+  leader,
+  can_author,
+  can_review,
+  active
+FROM memberships
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+## system/authorization/organizations_fence.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/organizations_fence.sql`
+
+### SQL種別
+
+UPDATE
+
+### SQLの概要
+
+組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | organizations | U |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| row | OrganizationsRow |
+
+
+### 戻り値
+
+型: `int`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
+
+```sql
+/* 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。 */
+UPDATE organizations SET revision = revision + 1
+WHERE
+  organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s
+```
+
+## system/authorization/organizations_get.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/organizations_get.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織の組織名・改訂番号・利用停止状態を取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | organizations | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+| id | str |
+
+
+### 戻り値
+
+型: `list[OrganizationsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s AND id = %(id)s
+
+```sql
+/* 現在の組織の組織名・改訂番号・利用停止状態を取得する。 */
+SELECT
+  id,
+  organization_id,
+  name,
+  revision,
+  suspended
+FROM organizations
+WHERE
+  organization_id = %(organization_id)s AND id = %(id)s
+```
+
+## system/authorization/users_list.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/users_list.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する利用者を識別子順に一覧取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | users | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+
+
+### 戻り値
+
+型: `list[UsersRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s
+
+ORDER BY id
+
+```sql
+/* 現在の組織に属する利用者を識別子順に一覧取得する。 */
+SELECT
+  id,
+  organization_id,
+  subject,
+  display_name,
+  active,
+  operator
+FROM users
 WHERE
   organization_id = %(organization_id)s
 ORDER BY

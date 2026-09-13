@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 正本と索引の不一致を確認 — 詳細設計
 
@@ -35,12 +35,12 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:40 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:43 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/functions.py:218 | ctx.user.operator | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/indexing/functions.py:223 | any((c.version_id != doc.latest_version_id or doc.status != 'active' for c in current)) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/functions.py:225 | doc.status == 'active' and doc.latest_version_id and (not any((c.version_id == doc.latest_version_id and c.ready for c in current))) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:11 | ctx.user.operator | 'forbidden' | 403 |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:16 | any((c.version_id != doc.latest_version_id or doc.status != 'active' for c in current)) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:18 | doc.status == 'active' and doc.latest_version_id and (not any((c.version_id == doc.latest_version_id and c.ready for c in current))) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -51,12 +51,12 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | query | DB対象 | 処理 |
 | --- | --- | --- |
-| chunks_list | chunks | SELECT |
-| departments_list | departments | SELECT |
-| documents_list | documents | SELECT |
-| memberships_list | memberships | SELECT |
-| organizations_get | organizations | SELECT |
-| users_list | users | SELECT |
+| kotorelay.operations.indexing.reconcile_index.generated.queries.chunks_list | chunks | SELECT |
+| kotorelay.operations.indexing.reconcile_index.generated.queries.documents_list | documents | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.departments_list | departments | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.memberships_list | memberships | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.organizations_get | organizations | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.users_list | users | SELECT |
 
 異常時はDB transactionがrollbackします。内容ハッシュ実体は孤立し得るため、公開認可には使いません。配送失敗はoutboxへ記録します。
 
@@ -75,11 +75,12 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/generated/queries.py:623 | db.query('operations/indexing/sql/chunks_list.sql', {'organization_id': organization_id}, ChunksRow) |
-| backend/src/kotorelay/generated/queries.py:437 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/generated/queries.py:345 | db.query('operations/documents/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
-| backend/src/kotorelay/generated/queries.py:473 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/generated/queries.py:492 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/generated/queries.py:534 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
-| backend/src/kotorelay/operations/indexing/functions.py:231 | differences |
-| backend/src/kotorelay/operations/indexing/router.py:26 | f.reconcile(ctx) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/functions.py:24 | differences |
+| backend/src/kotorelay/operations/indexing/reconcile_index/generated/queries.py:11 | db.query('operations/indexing/reconcile_index/sql/chunks_list.sql', {'organization_id': organization_id}, ChunksRow) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/generated/queries.py:20 | db.query('operations/indexing/reconcile_index/sql/documents_list.sql', {'organization_id': organization_id}, DocumentsRow) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
+| backend/src/kotorelay/operations/indexing/reconcile_index/router.py:21 | build_response(f.reconcile(ctx)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |

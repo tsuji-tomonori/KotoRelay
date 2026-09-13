@@ -1,0 +1,15 @@
+-- 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+SELECT
+    id,
+    organization_id,
+    document_id,
+    number,
+    title,
+    body_key,
+    body_hash,
+    manifest,
+    manifest_hash,
+    created_by,
+    created_at
+FROM versions
+WHERE organization_id = %(organization_id)s AND id = %(id)s;

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 実閲覧を一意IDで記録 — 詳細設計
 
@@ -44,16 +44,16 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:40 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:43 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:82 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:89 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:53 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:83 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:90 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:54 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/metrics/functions.py:18 | previous | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/metrics/functions.py:14 | bool(doc.latest_version_id) | not_found | 404 |
-| backend/src/kotorelay/operations/metrics/functions.py:15 | ctx.member(data.department_id) | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/metrics/functions.py:19 | previous[0].document_id == doc.id and previous[0].department_id == data.department_id and (previous[0].kind == 'view') | 'idempotency_conflict' | 409 |
+| backend/src/kotorelay/operations/metrics/record_view/functions.py:18 | previous | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/metrics/record_view/functions.py:14 | bool(doc.latest_version_id) | not_found | 404 |
+| backend/src/kotorelay/operations/metrics/record_view/functions.py:15 | ctx.member(data.department_id) | 'forbidden' | 403 |
+| backend/src/kotorelay/operations/metrics/record_view/functions.py:19 | previous[0].document_id == doc.id and previous[0].department_id == data.department_id and (previous[0].kind == 'view') | 'idempotency_conflict' | 409 |
 
 
 ## 3. 正常系リソース変更
@@ -64,14 +64,14 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | query | DB対象 | 処理 |
 | --- | --- | --- |
-| departments_list | departments | SELECT |
-| documents_get | documents | SELECT |
-| events_get | events | SELECT |
-| events_insert | events | INSERT |
-| memberships_list | memberships | SELECT |
-| organizations_fence | organizations | UPDATE |
-| organizations_get | organizations | SELECT |
-| users_list | users | SELECT |
+| kotorelay.operations.metrics.record_view.generated.queries.events_get | events | SELECT |
+| kotorelay.operations.metrics.record_view.generated.queries.events_insert | events | INSERT |
+| kotorelay.operations.system.authorization.generated.queries.departments_list | departments | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.documents_get | documents | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.memberships_list | memberships | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.organizations_fence | organizations | UPDATE |
+| kotorelay.operations.system.authorization.generated.queries.organizations_get | organizations | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.users_list | users | SELECT |
 
 異常時はDB transactionがrollbackします。内容ハッシュ実体は孤立し得るため、公開認可には使いません。配送失敗はoutboxへ記録します。
 
@@ -103,18 +103,19 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:90 | doc |
-| backend/src/kotorelay/context.py:56 | any((m.department_id == department_id for m in self.memberships)) |
-| backend/src/kotorelay/context.py:18 | datetime.now(UTC) |
-| backend/src/kotorelay/context.py:26 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
-| backend/src/kotorelay/generated/queries.py:437 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/generated/queries.py:331 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/generated/queries.py:668 | db.query('operations/metrics/sql/events_get.sql', {'organization_id': organization_id, 'id': id}, EventsRow) |
-| backend/src/kotorelay/generated/queries.py:677 | db.execute('operations/metrics/sql/events_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:473 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/generated/queries.py:487 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:492 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/generated/queries.py:534 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
-| backend/src/kotorelay/operations/metrics/functions.py:42 | {'recorded': True} |
-| backend/src/kotorelay/operations/metrics/functions.py:26 | {'recorded': False} |
-| backend/src/kotorelay/operations/metrics/router.py:17 | f.view(ctx, str(document_id), data) |
+| backend/src/kotorelay/context.py:91 | doc |
+| backend/src/kotorelay/context.py:57 | any((m.department_id == department_id for m in self.memberships)) |
+| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
+| backend/src/kotorelay/context.py:27 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
+| backend/src/kotorelay/operations/metrics/record_view/functions.py:42 | {'recorded': True} |
+| backend/src/kotorelay/operations/metrics/record_view/functions.py:26 | {'recorded': False} |
+| backend/src/kotorelay/operations/metrics/record_view/generated/queries.py:11 | db.query('operations/metrics/record_view/sql/events_get.sql', {'organization_id': organization_id, 'id': id}, EventsRow) |
+| backend/src/kotorelay/operations/metrics/record_view/generated/queries.py:20 | db.execute('operations/metrics/record_view/sql/events_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/metrics/record_view/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
+| backend/src/kotorelay/operations/metrics/record_view/router.py:24 | build_response(f.view(ctx, str(document_id), data)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:34 | db.query('operations/system/authorization/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:68 | db.execute('operations/system/authorization/sql/organizations_fence.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |

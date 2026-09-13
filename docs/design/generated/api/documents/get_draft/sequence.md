@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 下書きを取得 — シーケンス
 
@@ -16,9 +16,9 @@ sequenceDiagram
     alt 認可条件が不成立
         A-->>U: 401または403または404
     else 許可
+        A->>D: 現在の組織に属する下書きを識別子順に一覧取得する。
         A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-        A->>D: 現在の組織に属する下書きを識別子順に一覧取得する。
         A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
         A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
         A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
@@ -35,8 +35,10 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.document | 90 | Return | doc |
+| kotorelay.context.Context.document | 91 | Return | doc |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.functions.draft | 144 | Return | {'document': doc, 'body': ctx.objects.get(row.body_key, row.body_hash).decode(), 'revision': row.revision, 'placements': json.loads(row.placements)} |
-| kotorelay.operations.documents.router.get_draft | 41 | Return | f.draft(ctx, str(document_id)) |
+| kotorelay.operations.documents.get_draft.functions.draft | 11 | Return | load_draft(ctx, document_id) |
+| kotorelay.operations.documents.get_draft.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
+| kotorelay.operations.documents.get_draft.router.get_draft | 23 | Return | build_response(f.draft(ctx, str(document_id))) |
+| kotorelay.operations.documents.shared.functions.draft | 14 | Return | {'document': doc, 'body': ctx.objects.get(row.body_key, row.body_hash).decode(), 'revision': row.revision, 'placements': json.loads(row.placements)} |

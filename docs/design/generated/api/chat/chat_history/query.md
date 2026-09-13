@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 現行認可で会話履歴を再表示 — クエリ
 
@@ -6,9 +6,9 @@
 
 DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更新し、競合は全体rollback→409。モデル呼出しはtransaction外、回答確定は別transactionで再認可。
 
-## answers_list.sql
+## chat/chat_history/answers_list.sql
 
-正本: `backend/src/kotorelay/operations/chat/sql/answers_list.sql`
+正本: `backend/src/kotorelay/operations/chat/chat_history/sql/answers_list.sql`
 
 ### SQL種別
 
@@ -63,9 +63,56 @@ ORDER BY
   id
 ```
 
-## assets_get.sql
+## chat/chat_history/conversations_get.sql
 
-正本: `backend/src/kotorelay/operations/images/sql/assets_get.sql`
+正本: `backend/src/kotorelay/operations/chat/chat_history/sql/conversations_get.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | conversations | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+| id | str |
+
+
+### 戻り値
+
+型: `list[ConversationsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s AND id = %(id)s
+
+```sql
+/* 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。 */
+SELECT
+  id,
+  organization_id,
+  user_id,
+  created_at
+FROM conversations
+WHERE
+  organization_id = %(organization_id)s AND id = %(id)s
+```
+
+## chat/shared/assets_get.sql
+
+正本: `backend/src/kotorelay/operations/chat/shared/sql/assets_get.sql`
 
 ### SQL種別
 
@@ -116,9 +163,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## chunks_get.sql
+## chat/shared/chunks_get.sql
 
-正本: `backend/src/kotorelay/operations/indexing/sql/chunks_get.sql`
+正本: `backend/src/kotorelay/operations/chat/shared/sql/chunks_get.sql`
 
 ### SQL種別
 
@@ -169,106 +216,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## conversations_get.sql
+## chat/shared/documents_get.sql
 
-正本: `backend/src/kotorelay/operations/chat/sql/conversations_get.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | conversations | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-| id | str |
-
-
-### 戻り値
-
-型: `list[ConversationsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s AND id = %(id)s
-
-```sql
-/* 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。 */
-SELECT
-  id,
-  organization_id,
-  user_id,
-  created_at
-FROM conversations
-WHERE
-  organization_id = %(organization_id)s AND id = %(id)s
-```
-
-## departments_list.sql
-
-正本: `backend/src/kotorelay/operations/groups/sql/departments_list.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する部署を識別子順に一覧取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | departments | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-
-
-### 戻り値
-
-型: `list[DepartmentsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s
-
-ORDER BY id
-
-```sql
-/* 現在の組織に属する部署を識別子順に一覧取得する。 */
-SELECT
-  id,
-  organization_id,
-  name,
-  active
-FROM departments
-WHERE
-  organization_id = %(organization_id)s
-ORDER BY
-  id
-```
-
-## documents_get.sql
-
-正本: `backend/src/kotorelay/operations/documents/sql/documents_get.sql`
+正本: `backend/src/kotorelay/operations/chat/shared/sql/documents_get.sql`
 
 ### SQL種別
 
@@ -321,9 +271,166 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## memberships_list.sql
+## chat/shared/ocr_runs_get.sql
 
-正本: `backend/src/kotorelay/operations/groups/sql/memberships_list.sql`
+正本: `backend/src/kotorelay/operations/chat/shared/sql/ocr_runs_get.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | ocr_runs | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+| id | str |
+
+
+### 戻り値
+
+型: `list[OcrRunsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s AND id = %(id)s
+
+```sql
+/* 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。 */
+SELECT
+  id,
+  organization_id,
+  document_id,
+  asset_id,
+  result_key,
+  result_hash,
+  engine,
+  status,
+  confirmed,
+  created_at
+FROM ocr_runs
+WHERE
+  organization_id = %(organization_id)s AND id = %(id)s
+```
+
+## chat/shared/versions_get.sql
+
+正本: `backend/src/kotorelay/operations/chat/shared/sql/versions_get.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | versions | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+| id | str |
+
+
+### 戻り値
+
+型: `list[VersionsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s AND id = %(id)s
+
+```sql
+/* 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。 */
+SELECT
+  id,
+  organization_id,
+  document_id,
+  number,
+  title,
+  body_key,
+  body_hash,
+  manifest,
+  manifest_hash,
+  created_by,
+  created_at
+FROM versions
+WHERE
+  organization_id = %(organization_id)s AND id = %(id)s
+```
+
+## system/authorization/departments_list.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/departments_list.sql`
+
+### SQL種別
+
+SELECT
+
+### SQLの概要
+
+現在の組織に属する部署を識別子順に一覧取得する。
+
+### 利用するテーブル
+
+| DB | テーブル | CRUD |
+| --- | --- | --- |
+| PostgreSQL / DSQL | departments | R |
+
+
+### 引数
+
+| 引数 | 型 |
+| --- | --- |
+| organization_id | str |
+
+
+### 戻り値
+
+型: `list[DepartmentsRow]`
+
+### 条件
+
+WHERE organization_id = %(organization_id)s
+
+ORDER BY id
+
+```sql
+/* 現在の組織に属する部署を識別子順に一覧取得する。 */
+SELECT
+  id,
+  organization_id,
+  name,
+  active
+FROM departments
+WHERE
+  organization_id = %(organization_id)s
+ORDER BY
+  id
+```
+
+## system/authorization/memberships_list.sql
+
+正本: `backend/src/kotorelay/operations/system/authorization/sql/memberships_list.sql`
 
 ### SQL種別
 
@@ -375,62 +482,9 @@ ORDER BY
   id
 ```
 
-## ocr_runs_get.sql
+## system/authorization/organizations_get.sql
 
-正本: `backend/src/kotorelay/operations/images/sql/ocr_runs_get.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | ocr_runs | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-| id | str |
-
-
-### 戻り値
-
-型: `list[OcrRunsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s AND id = %(id)s
-
-```sql
-/* 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。 */
-SELECT
-  id,
-  organization_id,
-  document_id,
-  asset_id,
-  result_key,
-  result_hash,
-  engine,
-  status,
-  confirmed,
-  created_at
-FROM ocr_runs
-WHERE
-  organization_id = %(organization_id)s AND id = %(id)s
-```
-
-## organizations_get.sql
-
-正本: `backend/src/kotorelay/operations/identity/sql/organizations_get.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/organizations_get.sql`
 
 ### SQL種別
 
@@ -476,9 +530,9 @@ WHERE
   organization_id = %(organization_id)s AND id = %(id)s
 ```
 
-## users_list.sql
+## system/authorization/users_list.sql
 
-正本: `backend/src/kotorelay/operations/identity/sql/users_list.sql`
+正本: `backend/src/kotorelay/operations/system/authorization/sql/users_list.sql`
 
 ### SQL種別
 
@@ -526,58 +580,4 @@ WHERE
   organization_id = %(organization_id)s
 ORDER BY
   id
-```
-
-## versions_get.sql
-
-正本: `backend/src/kotorelay/operations/documents/sql/versions_get.sql`
-
-### SQL種別
-
-SELECT
-
-### SQLの概要
-
-現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
-
-### 利用するテーブル
-
-| DB | テーブル | CRUD |
-| --- | --- | --- |
-| PostgreSQL / DSQL | versions | R |
-
-
-### 引数
-
-| 引数 | 型 |
-| --- | --- |
-| organization_id | str |
-| id | str |
-
-
-### 戻り値
-
-型: `list[VersionsRow]`
-
-### 条件
-
-WHERE organization_id = %(organization_id)s AND id = %(id)s
-
-```sql
-/* 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。 */
-SELECT
-  id,
-  organization_id,
-  document_id,
-  number,
-  title,
-  body_key,
-  body_hash,
-  manifest,
-  manifest_hash,
-  created_by,
-  created_at
-FROM versions
-WHERE
-  organization_id = %(organization_id)s AND id = %(id)s
 ```

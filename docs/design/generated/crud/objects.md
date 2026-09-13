@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # オブジェクト保存 CRUD対応表
 
@@ -41,8 +41,8 @@
 
 ```mermaid
 flowchart LR
-    A0["list_documents"] -->|R| R0["content_object"]
-    A1["create_document"] -->|CU| R0["content_object"]
+    A0["create_document"] -->|CU| R0["content_object"]
+    A1["list_documents"] -->|R| R0["content_object"]
     A2["get_draft"] -->|R| R0["content_object"]
     A3["save_draft"] -->|CRU| R0["content_object"]
     A4["submit_version"] -->|R| R0["content_object"]
@@ -60,8 +60,8 @@ flowchart LR
 flowchart LR
     A0["upload_image"] -->|CU| R0["content_object"]
     A1["get_image"] -->|R| R0["content_object"]
-    A2["correct_ocr"] -->|CU| R0["content_object"]
-    A3["get_ocr"] -->|R| R0["content_object"]
+    A2["get_ocr"] -->|R| R0["content_object"]
+    A3["correct_ocr"] -->|CU| R0["content_object"]
 ```
 
 ## APIグループ: groups
@@ -76,7 +76,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    A1["retry_job"] -->|CRUD| R0["content_object"]
+    A0["retry_job"] -->|CRUD| R0["content_object"]
 ```
 
 ## APIグループ: chat
@@ -91,42 +91,42 @@ flowchart LR
 
 | API | 保存先 | リソース | CRUD | SQL正本／呼出箇所 |
 | --- | --- | --- | --- | --- |
-| list_documents | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:128 |
-| create_document | objects | content_object | CU | backend/src/kotorelay/operations/documents/functions.py:40 |
-| get_draft | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:146 |
-| save_draft | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:146 |
-| save_draft | objects | content_object | CU | backend/src/kotorelay/operations/documents/functions.py:173 |
-| submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:215 |
-| submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:210 |
-| submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:211 |
-| read_document | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:275 |
-| version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:296 |
-| version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/functions.py:297 |
-| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/functions.py:81 |
-| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/functions.py:96 |
-| get_image | objects | content_object | R | backend/src/kotorelay/operations/images/functions.py:181 |
-| correct_ocr | objects | content_object | CU | backend/src/kotorelay/operations/images/functions.py:138 |
-| get_ocr | objects | content_object | R | backend/src/kotorelay/operations/images/functions.py:198 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/functions.py:63 |
-| retry_job | objects | content_object | CU | backend/src/kotorelay/operations/indexing/functions.py:73 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/functions.py:94 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/functions.py:56 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/functions.py:64 |
-| retry_job | objects | content_object | D | backend/src/kotorelay/operations/indexing/functions.py:143 |
-| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/functions.py:232 |
-| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/functions.py:233 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:181 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:143 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:81 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:281 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:282 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:55 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:56 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:67 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:68 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:281 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:282 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:55 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:56 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:67 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/functions.py:68 |
+| create_document | objects | content_object | CU | backend/src/kotorelay/operations/documents/create_document/functions.py:29 |
+| list_documents | objects | content_object | R | backend/src/kotorelay/operations/documents/list_documents/functions.py:80 |
+| get_draft | objects | content_object | R | backend/src/kotorelay/operations/documents/shared/functions.py:16 |
+| save_draft | objects | content_object | CU | backend/src/kotorelay/operations/documents/save_draft/functions.py:20 |
+| save_draft | objects | content_object | R | backend/src/kotorelay/operations/documents/shared/functions.py:16 |
+| submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/submit_version/functions.py:35 |
+| submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/submit_version/functions.py:30 |
+| submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/submit_version/functions.py:31 |
+| read_document | objects | content_object | R | backend/src/kotorelay/operations/documents/read_document/functions.py:22 |
+| version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/version_diff/functions.py:14 |
+| version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/version_diff/functions.py:15 |
+| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:27 |
+| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:42 |
+| get_image | objects | content_object | R | backend/src/kotorelay/operations/images/get_image/functions.py:11 |
+| get_ocr | objects | content_object | R | backend/src/kotorelay/operations/images/get_ocr/functions.py:26 |
+| correct_ocr | objects | content_object | CU | backend/src/kotorelay/operations/images/correct_ocr/functions.py:37 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:64 |
+| retry_job | objects | content_object | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:74 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:95 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:57 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:65 |
+| retry_job | objects | content_object | D | backend/src/kotorelay/operations/indexing/shared/functions.py:144 |
+| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:190 |
+| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:191 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:139 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:101 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:39 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:68 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:69 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:42 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:43 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:54 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:55 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:68 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:69 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:42 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:43 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:54 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:55 |

@@ -24,7 +24,9 @@ def test_collectorにある未実行ケースを成功としない():
 
 def test_API設計の呼出し追跡がSQLまで到達する():
     module = load("design")
-    reached = module.Inventory().reachable("kotorelay.operations.documents.router.save_draft")
+    reached = module.Inventory().reachable(
+        "kotorelay.operations.documents.save_draft.router.save_draft"
+    )
     assert any(".generated.queries.drafts_update" in name for name in reached)
     assert any(".context.Context.fence" in name for name in reached)
 

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # ベクトル索引 CRUD対応表
 
@@ -61,7 +61,7 @@
 
 ```mermaid
 flowchart LR
-    A1["retry_job"] -->|CRUD| R0["vector"]
+    A0["retry_job"] -->|CRUD| R0["vector"]
 ```
 
 ## APIグループ: chat
@@ -75,8 +75,8 @@ flowchart LR
 
 | API | 保存先 | リソース | CRUD | SQL正本／呼出箇所 |
 | --- | --- | --- | --- | --- |
-| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/functions.py:47 |
-| retry_job | vectors | vector | CU | backend/src/kotorelay/operations/indexing/functions.py:86 |
-| retry_job | vectors | vector | R | backend/src/kotorelay/operations/indexing/functions.py:92 |
-| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/functions.py:145 |
-| ask_question | vectors | vector | R | backend/src/kotorelay/operations/chat/functions.py:131 |
+| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/shared/functions.py:48 |
+| retry_job | vectors | vector | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:87 |
+| retry_job | vectors | vector | R | backend/src/kotorelay/operations/indexing/shared/functions.py:93 |
+| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/shared/functions.py:146 |
+| ask_question | vectors | vector | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:89 |

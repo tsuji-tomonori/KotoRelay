@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 版を確定して承認申請 — ログメッセージ
 
@@ -10,7 +10,7 @@
 | --- | --- |
 | operation | submit_version |
 | endpoint | POST /api/documents/{document_id}/submissions |
-| router | backend/src/kotorelay/operations/documents/router.py |
+| router | backend/src/kotorelay/operations/documents/submit_version/router.py |
 
 
 ## 生成・検証方針

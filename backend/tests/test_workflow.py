@@ -600,9 +600,9 @@ def test_画像を含む削除を保持期間後に完了する(client, db):
 
 
 def test_モデル実行中の権限変更で回答を保留する(client, monkeypatch):
-    from kotorelay.generated import queries as q
-    from kotorelay.operations.documents.functions import policy as update
-    from kotorelay.schemas import ChangePolicy
+    import query_helpers as q
+    from kotorelay.operations.documents.change_policy.functions import policy as update
+    from kotorelay.operations.documents.change_policy.schemas import ChangePolicy
 
     doc, _ = published(client)
     rt = client.app.state.runtime
@@ -719,8 +719,8 @@ def test_回答根拠の欠落と改変は閲覧時に非表示とする(client,
 
 
 def test_中断した質問は同じIDで再開し二重計上しない(client, db):
-    from kotorelay.operations.chat.functions import prepare
-    from kotorelay.schemas import Ask
+    from kotorelay.operations.chat.ask_question.functions import prepare
+    from kotorelay.operations.chat.ask_question.schemas import Ask
 
     published(client)
     rt = client.app.state.runtime
@@ -742,10 +742,10 @@ def test_外部検索は返されたID以外を根拠にしない(client, monkey
 
 
 def test_モデル入力直前に失効を検知した場合はモデルを呼ばない(client, monkeypatch):
-    from kotorelay.operations.chat import service
+    from kotorelay.operations.chat.ask_question import functions as service
 
     published(client)
-    original = service.f.validate_citation
+    original = service.validate_citation
     calls = 0
 
     def validate(ctx, citation):
@@ -753,7 +753,7 @@ def test_モデル入力直前に失効を検知した場合はモデルを呼�
         calls += 1
         return original(ctx, citation) if calls == 1 else False
 
-    monkeypatch.setattr(service.f, "validate_citation", validate)
+    monkeypatch.setattr(service, "validate_citation", validate)
     assert ask(client).json()["status"] == "held"
 
 

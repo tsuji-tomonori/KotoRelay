@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # 正本と索引の不一致を確認 — シーケンス
 
@@ -17,8 +17,8 @@ sequenceDiagram
         A-->>U: 401または403または404
     else 許可
         A->>D: 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
-        A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する文書を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
         A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
         A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
@@ -46,8 +46,9 @@ sequenceDiagram
 | --- | --- | --- | --- |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.indexing.functions.reconcile | 221 | For | For |
-| kotorelay.operations.indexing.functions.reconcile | 223 | If | any((c.version_id != doc.latest_version_id or doc.status != 'active' for c in current)) |
-| kotorelay.operations.indexing.functions.reconcile | 225 | If | doc.status == 'active' and doc.latest_version_id and (not any((c.version_id == doc.latest_version_id and c.ready for c in current))) |
-| kotorelay.operations.indexing.functions.reconcile | 231 | Return | differences |
-| kotorelay.operations.indexing.router.reconcile_index | 26 | Return | f.reconcile(ctx) |
+| kotorelay.operations.indexing.reconcile_index.functions.reconcile | 14 | For | For |
+| kotorelay.operations.indexing.reconcile_index.functions.reconcile | 16 | If | any((c.version_id != doc.latest_version_id or doc.status != 'active' for c in current)) |
+| kotorelay.operations.indexing.reconcile_index.functions.reconcile | 18 | If | doc.status == 'active' and doc.latest_version_id and (not any((c.version_id == doc.latest_version_id and c.ready for c in current))) |
+| kotorelay.operations.indexing.reconcile_index.functions.reconcile | 24 | Return | differences |
+| kotorelay.operations.indexing.reconcile_index.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
+| kotorelay.operations.indexing.reconcile_index.router.reconcile_index | 21 | Return | build_response(f.reconcile(ctx)) |

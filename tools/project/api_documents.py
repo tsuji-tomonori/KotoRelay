@@ -262,6 +262,13 @@ def interface(operation, schema):
                 + json.dumps(examples, ensure_ascii=False, indent=2)
                 + "\n```"
             )
+    for sample in operation.get("x-test-samples", []):
+        samples.append(
+            f"### {sample['name']}\n\n"
+            + "認証情報なしのHTTP要求と不変項目を実テストで確認します。\n\n```json\n"
+            + json.dumps(sample, ensure_ascii=False, indent=2)
+            + "\n```"
+        )
     sample_text = "\n\n".join(samples) or (
         "このAPIのOpenAPIにHTTP応答exampleは定義されていません。"
         "架空の成功応答は生成しません。入力形式は上記のData、"

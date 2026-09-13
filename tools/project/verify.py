@@ -83,6 +83,7 @@ def main() -> None:
                 ],
             ),
             ("型付きSQL生成差分", [PYTHON, "tools/project/queries.py", "--check"]),
+            ("API責務配置", [PYTHON, "tools/project/api_layout.py"]),
             ("ESLint", ["npm", "run", "lint"]),
             ("Prettier整形", ["npm", "run", "format:check"]),
             ("TypeScript型検査", ["npm", "run", "typecheck"]),

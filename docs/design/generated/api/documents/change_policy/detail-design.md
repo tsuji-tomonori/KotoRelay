@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # リーダーが公開範囲・公開停止・削除を管理 — 詳細設計
 
@@ -47,15 +47,15 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:40 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:43 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:82 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:89 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:53 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:41 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:44 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:83 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:90 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:54 | q.organizations_fence(self.db, self.organization) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/documents/functions.py:307 | doc.revision == data.revision | 'conflict' | 409 |
-| backend/src/kotorelay/operations/documents/functions.py:308 | data.status != 'deleted' or bool(data.reason.strip()) | 'reason_required' | 422 |
-| backend/src/kotorelay/operations/documents/functions.py:310 | set(data.shared_departments) <= departments | 'forbidden' | 422 |
+| backend/src/kotorelay/operations/documents/change_policy/functions.py:16 | doc.revision == data.revision | 'conflict' | 409 |
+| backend/src/kotorelay/operations/documents/change_policy/functions.py:17 | data.status != 'deleted' or bool(data.reason.strip()) | 'reason_required' | 422 |
+| backend/src/kotorelay/operations/documents/change_policy/functions.py:19 | set(data.shared_departments) <= departments | 'forbidden' | 422 |
 
 
 ## 3. 正常系リソース変更
@@ -66,15 +66,16 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | query | DB対象 | 処理 |
 | --- | --- | --- |
-| audit_insert | audit | INSERT |
-| departments_list | departments | SELECT |
-| documents_get | documents | SELECT |
-| documents_update | documents | UPDATE |
-| memberships_list | memberships | SELECT |
-| organizations_fence | organizations | UPDATE |
-| organizations_get | organizations | SELECT |
-| outbox_insert | outbox | INSERT |
-| users_list | users | SELECT |
+| kotorelay.operations.documents.change_policy.generated.queries.departments_list | departments | SELECT |
+| kotorelay.operations.documents.change_policy.generated.queries.documents_update | documents | UPDATE |
+| kotorelay.operations.documents.change_policy.generated.queries.outbox_insert | outbox | INSERT |
+| kotorelay.operations.system.authorization.generated.queries.audit_insert | audit | INSERT |
+| kotorelay.operations.system.authorization.generated.queries.departments_list | departments | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.documents_get | documents | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.memberships_list | memberships | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.organizations_fence | organizations | UPDATE |
+| kotorelay.operations.system.authorization.generated.queries.organizations_get | organizations | SELECT |
+| kotorelay.operations.system.authorization.generated.queries.users_list | users | SELECT |
 
 異常時はDB transactionがrollbackします。内容ハッシュ実体は孤立し得るため、公開認可には使いません。配送失敗はoutboxへ記録します。
 
@@ -119,17 +120,19 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:90 | doc |
-| backend/src/kotorelay/context.py:22 | str(uuid4()) |
-| backend/src/kotorelay/context.py:18 | datetime.now(UTC) |
-| backend/src/kotorelay/generated/queries.py:734 | db.execute('operations/system/sql/audit_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:437 | db.query('operations/groups/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
-| backend/src/kotorelay/generated/queries.py:331 | db.query('operations/documents/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
-| backend/src/kotorelay/generated/queries.py:354 | db.execute('operations/documents/sql/documents_update.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:473 | db.query('operations/groups/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
-| backend/src/kotorelay/generated/queries.py:487 | db.execute('operations/identity/sql/organizations_fence.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:492 | db.query('operations/identity/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
-| backend/src/kotorelay/generated/queries.py:651 | db.execute('operations/indexing/sql/outbox_insert.sql', row.model_dump()) |
-| backend/src/kotorelay/generated/queries.py:534 | db.query('operations/identity/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |
-| backend/src/kotorelay/operations/documents/functions.py:337 | updated |
-| backend/src/kotorelay/operations/documents/router.py:82 | f.policy(ctx, str(document_id), data) |
+| backend/src/kotorelay/context.py:91 | doc |
+| backend/src/kotorelay/context.py:23 | str(uuid4()) |
+| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
+| backend/src/kotorelay/operations/documents/change_policy/functions.py:46 | updated |
+| backend/src/kotorelay/operations/documents/change_policy/generated/queries.py:15 | db.query('operations/documents/change_policy/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/operations/documents/change_policy/generated/queries.py:24 | db.execute('operations/documents/change_policy/sql/documents_update.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/documents/change_policy/generated/queries.py:31 | db.execute('operations/documents/change_policy/sql/outbox_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/documents/change_policy/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
+| backend/src/kotorelay/operations/documents/change_policy/router.py:25 | build_response(f.policy(ctx, str(document_id), data)) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:20 | db.execute('operations/system/authorization/sql/audit_insert.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:25 | db.query('operations/system/authorization/sql/departments_list.sql', {'organization_id': organization_id}, DepartmentsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:34 | db.query('operations/system/authorization/sql/documents_get.sql', {'organization_id': organization_id, 'id': id}, DocumentsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:59 | db.query('operations/system/authorization/sql/memberships_list.sql', {'organization_id': organization_id}, MembershipsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:68 | db.execute('operations/system/authorization/sql/organizations_fence.sql', row.model_dump()) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:75 | db.query('operations/system/authorization/sql/organizations_get.sql', {'organization_id': organization_id, 'id': id}, OrganizationsRow) |
+| backend/src/kotorelay/operations/system/authorization/generated/queries.py:84 | db.query('operations/system/authorization/sql/users_list.sql', {'organization_id': organization_id}, UsersRow) |

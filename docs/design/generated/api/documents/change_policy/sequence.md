@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 31de213f242d3d7bf0d4f5957d4ef327aaacb2267a973d8e0adce1f1531ac7e1 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 987c18a693c5fa5c9f59f732c65771f1c047c0829e22a5d72b689276aae93c56 -->
 
 # リーダーが公開範囲・公開停止・削除を管理 — シーケンス
 
@@ -16,14 +16,15 @@ sequenceDiagram
     alt 認可条件が不成立
         A-->>U: 401または403または404
     else 許可
+        A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+        A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。
+        A->>D: 現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。
         A->>D: 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。
         A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
         A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-        A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。
         A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
         A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
         A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-        A->>D: 現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。
         A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
         A->>S: 内容ハッシュ実体を照合
         opt 実体欠落・ハッシュ不一致
@@ -38,10 +39,11 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.document | 90 | Return | doc |
-| kotorelay.context.new_id | 22 | Return | str(uuid4()) |
-| kotorelay.context.now | 18 | Return | datetime.now(UTC) |
+| kotorelay.context.Context.document | 91 | Return | doc |
+| kotorelay.context.new_id | 23 | Return | str(uuid4()) |
+| kotorelay.context.now | 19 | Return | datetime.now(UTC) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.functions.policy | 337 | Return | updated |
-| kotorelay.operations.documents.router.change_policy | 82 | Return | f.policy(ctx, str(document_id), data) |
+| kotorelay.operations.documents.change_policy.functions.policy | 46 | Return | updated |
+| kotorelay.operations.documents.change_policy.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
+| kotorelay.operations.documents.change_policy.router.change_policy | 25 | Return | build_response(f.policy(ctx, str(document_id), data)) |
