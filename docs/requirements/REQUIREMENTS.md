@@ -2,7 +2,7 @@
 # KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG 要件一覧
 
 - スキーマ版: 1
-- カタログ版: 9
+- カタログ版: 10
 - Product(JSON): <code>"KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG"</code>
 - 更新日(JSON): <code>"2026-09-12"</code>
 - 正本: `spec/requirements/requirements.qnt`
@@ -128,7 +128,7 @@
 | <code>"REQ-DESIGN-07"</code> | 2 | 有効 | 制約 | 開発プロジェクトは、routerがAPIの全体フローを所有するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 | <code>"REQ-DESIGN-08"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、SQLごとの引数と取得投影を型として生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 | <code>"REQ-DESIGN-09"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、routerの実行順序と制御構造からシーケンスを生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
-| <code>"REQ-DESIGN-10"</code> | 2 | 有効 | 制約 | 開発プロジェクトは、シーケンスに例外応答を具体的に表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
+| <code>"REQ-DESIGN-10"</code> | 3 | 有効 | 制約 | 開発プロジェクトは、シーケンスに例外応答を具体的に表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-11"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、型付き運用ログとHTTP応答を照合可能にするを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-12"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、ログ帳票を実装された例外と応答とログから生成するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-13"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、単体テストを日本語の検証単位で表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
@@ -3928,13 +3928,13 @@
 根拠: 利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。
 根拠(JSON): <code>"利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。"</code>
 
-項目版: 2 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"condition-diagram-2026-09-14"</code>
+項目版: 3 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"local-error-responses-2026-09-15"</code>
 分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
-- <code>"AC-DESIGN-10"</code> 前提: APIとテストと設計generatorが存在する。条件: 実行して設計と品質Pagesを生成する。期待結果: 実際に利用者へ返す例外応答を矢印で示し、そのラベルにはHTTPステータスと実メッセージだけを記す。内部で捕捉して継続する例外とHTTP終了を区別する。
-  - criterion(JSON Object): <code>{"given":"APIとテストと設計generatorが存在する","id":"AC-DESIGN-10","then":"実際に利用者へ返す例外応答を矢印で示し、そのラベルにはHTTPステータスと実メッセージだけを記す。内部で捕捉して継続する例外とHTTP終了を区別する","when":"実行して設計と品質Pagesを生成する"}</code>
+- <code>"AC-DESIGN-10"</code> 前提: APIとテストと設計generatorが存在する。条件: 実行して設計と品質Pagesを生成する。期待結果: 実際に利用者へ返す例外応答を発生箇所の矢印で示し、HTTPステータスと実メッセージだけを記す。共通例外経路や再送出一覧にまとめず、その場で終了を示す。内部で捕捉する場合は個別処理の終了と具体的な継続先を区別する。
+  - criterion(JSON Object): <code>{"given":"APIとテストと設計generatorが存在する","id":"AC-DESIGN-10","then":"実際に利用者へ返す例外応答を発生箇所の矢印で示し、HTTPステータスと実メッセージだけを記す。共通例外経路や再送出一覧にまとめず、その場で終了を示す。内部で捕捉する場合は個別処理の終了と具体的な継続先を区別する","when":"実行して設計と品質Pagesを生成する"}</code>
 
 要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
 検証方法: 実HTTP応答・ログ・生成の正例負例・Pages E2E
@@ -3942,8 +3942,8 @@
 検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"実HTTP応答・ログ・生成の正例負例・Pages E2E"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
-- 実装: <code>["tools/project/router_sequence.py","tools/project/error_design.py"]</code>
-- テスト: <code>["tools/project/tests/test_error_reporting.py","e2e/portal.spec.ts"]</code>
+- 実装: <code>["tools/project/router_sequence.py","tools/project/error_design.py","tools/project/exception_flow.py"]</code>
+- テスト: <code>["tools/project/tests/test_error_reporting.py","tools/project/tests/test_exception_flow.py","e2e/portal.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>

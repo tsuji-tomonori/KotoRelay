@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: ac3b8a89c10fb6f4c0a9456ea4fb59251414105722d4188a0beaca0d8b493f26 -->
 
 # 死活確認 — シーケンス
 
@@ -9,7 +9,6 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
-    participant E as HTTP例外ハンドラ
     participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体

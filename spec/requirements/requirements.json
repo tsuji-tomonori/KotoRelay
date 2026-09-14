@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 9,
+  "catalog_revision": 10,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -5800,18 +5800,18 @@
         {
           "given": "APIとテストと設計generatorが存在する",
           "id": "AC-DESIGN-10",
-          "then": "実際に利用者へ返す例外応答を矢印で示し、そのラベルにはHTTPステータスと実メッセージだけを記す。内部で捕捉して継続する例外とHTTP終了を区別する",
+          "then": "実際に利用者へ返す例外応答を発生箇所の矢印で示し、HTTPステータスと実メッセージだけを記す。共通例外経路や再送出一覧にまとめず、その場で終了を示す。内部で捕捉する場合は個別処理の終了と具体的な継続先を区別する",
           "when": "実行して設計と品質Pagesを生成する"
         }
       ],
       "action": "provide",
       "category": "nonfunctional",
       "id": "REQ-DESIGN-10",
-      "last_changed_by": "condition-diagram-2026-09-14",
+      "last_changed_by": "local-error-responses-2026-09-15",
       "object": "シーケンスに例外応答を具体的に表示する",
       "rationale": "利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。",
       "retirement_reason": "",
-      "revision": 2,
+      "revision": 3,
       "scope": "project",
       "source_refs": [
         "docs/planning/API-LAYOUT.md"
@@ -5826,13 +5826,15 @@
         ],
         "implementation": [
           "tools/project/router_sequence.py",
-          "tools/project/error_design.py"
+          "tools/project/error_design.py",
+          "tools/project/exception_flow.py"
         ],
         "standards": [
           "AGENTS.md"
         ],
         "tests": [
           "tools/project/tests/test_error_reporting.py",
+          "tools/project/tests/test_exception_flow.py",
           "e2e/portal.spec.ts"
         ]
       },

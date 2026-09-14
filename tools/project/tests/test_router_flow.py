@@ -146,4 +146,5 @@ def test_外部呼出しのない内包表記の空の枠を図へ出さない()
     body = "\n".join(sequence.render(inventory, key, "get", "/test", descriptions))
     assert "対象項目を一覧取得する。" in body
     assert "loop " not in body
-    assert "opt " not in body
+    assert "item.active" not in body
+    assert "条件参照" not in body

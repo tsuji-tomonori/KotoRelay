@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: ac3b8a89c10fb6f4c0a9456ea4fb59251414105722d4188a0beaca0d8b493f26 -->
 
 # リーダーが公開範囲・公開停止・削除を管理 — シーケンス
 
@@ -9,39 +9,119 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
-    participant E as HTTP例外ハンドラ
     participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体
     participant M as モデル・検索エンジン
     U->>A: PUT /api/documents/{document_id}/policy
-    Note over A,D: 依存注入でtransaction開始・組織と所属を確認
+    opt 認証に失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
+    end
+    end
+    opt リクエストの入力形式が不正な場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 入力形式を確認してください。
+    end
+    end
+    A->>D: 依存注入でtransaction開始・組織と所属を確認
+    opt DB接続で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt DB接続でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 文書を取得して要求された操作の権限を確認する。
     A->>F: 対象の文書が存在し、要求された操作を実行できることを確認する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：対象の文書が存在し、要求された操作を実行できることを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / 対象を利用できません。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     A->>F: 文書の閲覧権限を確認する操作である。
@@ -59,87 +139,132 @@ sequenceDiagram
     end
     end
     opt 検証不成立：対象の文書が存在し、要求された操作を実行できることを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / 対象を利用できません。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     A->>F: 文書が読み込み時点から変更されていないことを確認する。
     opt 検証不成立：文書が読み込み時点から変更されていないことを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 文書を削除するときに理由が入力されていることを確認する。
     opt 検証不成立：文書を削除するときに理由が入力されていることを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / 理由を入力してください。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 理由を入力してください。
     end
     end
     A->>F: 処理対象の識別子を重複なく取り出す。
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 共有先の全部署が現在の組織に存在することを確認する。
     opt 検証不成立：共有先の全部署が現在の組織に存在することを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / この操作は許可されていません。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / この操作は許可されていません。
     end
     end
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: now
     A->>F: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。
     A->>F: new_id
     A->>F: now
     A->>D: 現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 実行した変更の対象と結果を監査記録へ追加する。
     A->>F: audit
     A->>F: new_id
     A->>F: now
     A->>D: 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: 処理中に組織の状態が変更されていないことを確認する。
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：処理中に組織の状態が変更されていないことを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     break 応答を返して終了
-    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
+    A->>D: transactionをcommit
+    opt commitで競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt commitでDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A-->>U: HTTP 200 / models.DocumentsRow
-    end
-    Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
-    opt 入力検証の失敗（RequestValidationError）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / 入力形式を確認してください。
-    end
-    end
-    opt SQL実行またはcommitの競合（psycopg.Error）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 競合しました。再読込してください。
-    end
-    end
-    opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / 一時的に利用できません。
-    end
     end
 ```
 

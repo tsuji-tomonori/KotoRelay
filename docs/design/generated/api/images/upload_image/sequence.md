@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: ac3b8a89c10fb6f4c0a9456ea4fb59251414105722d4188a0beaca0d8b493f26 -->
 
 # 画像を添付して位置付きOCRを実行 — シーケンス
 
@@ -9,39 +9,119 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
-    participant E as HTTP例外ハンドラ
     participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体
     participant M as モデル・検索エンジン
     U->>A: POST /api/images/documents/{document_id}
-    Note over A,D: 依存注入でtransaction開始・組織と所属を確認
+    opt 認証に失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
+    end
+    end
+    opt リクエストの入力形式が不正な場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 入力形式を確認してください。
+    end
+    end
+    A->>D: 依存注入でtransaction開始・組織と所属を確認
+    opt DB接続で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt DB接続でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 文書を取得して要求された操作の権限を確認する。
     A->>F: 対象の文書が存在し、要求された操作を実行できることを確認する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：対象の文書が存在し、要求された操作を実行できることを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / 対象を利用できません。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     A->>F: 文書の閲覧権限を確認する操作である。
@@ -59,68 +139,139 @@ sequenceDiagram
     end
     end
     opt 検証不成立：対象の文書が存在し、要求された操作を実行できることを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / 対象を利用できません。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     A->>F: 用途と対象に一致するデータだけを取り出す。
     A->>D: 現在の組織に属する添付画像を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 文書へ追加できる画像枚数の上限を確認する。
     opt 検証不成立：文書へ追加できる画像枚数の上限を確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / 利用上限に達しました。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 利用上限に達しました。
     end
     end
     A->>F: 入力画像の形式と寸法を検証し、安全なPNGへ正規化する。
     opt 検証不成立：入力画像の形式と寸法を検証し、安全なPNGへ正規化する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / PNG/JPEGの許可サイズ内の画像を指定してください。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / PNG/JPEGの許可サイズ内の画像を指定してください。
     end
     end
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
-    opt 検証不成立：入力画像の形式と寸法を検証し、安全なPNGへ正規化する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / PNG/JPEGの許可サイズ内の画像を指定してください。
+    A->>F: 画像を読み取り・検証・変換する
+    opt 画像の読取・変換が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 画像を読み取れません。
     end
     end
     opt 検証不成立：入力画像の形式と寸法を検証し、安全なPNGへ正規化する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / PNG/JPEGの許可サイズ内の画像を指定してください。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / PNG/JPEGの許可サイズ内の画像を指定してください。
     end
     end
+    A->>F: 画像を読み取り・検証・変換する
+    opt 画像の読取・変換が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 画像を読み取れません。
     end
-    opt 例外発生：(UnidentifiedImageError, OSError, Image.DecompressionBombError)
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / 画像を読み取れません。
+    end
+    A->>F: 画像を読み取り・検証・変換する
+    opt 画像の読取・変換が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 画像を読み取れません。
+    end
+    end
+    A->>F: 画像を読み取り・検証・変換する
+    opt 画像の読取・変換が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 画像を読み取れません。
+    end
+    end
+    A->>F: 画像を読み取り・検証・変換する
+    opt 画像の読取・変換が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 画像を読み取れません。
+    end
+    end
+    opt 検証不成立：入力画像の形式と寸法を検証し、安全なPNGへ正規化する。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / PNG/JPEGの許可サイズ内の画像を指定してください。
+    end
     end
     end
     A->>F: 本文または画像の実体を保存して内容ハッシュのキーを取得する。
     A->>S: 実体を保存
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: new_id
     A->>F: now
     A->>F: 現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。
     A->>D: 現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: OCR providerを呼び出して領域とconfidenceを正規化する。
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
-    end
-    opt 例外発生：(OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError)
+    A->>M: OCRを実行する
+    opt OCRの起動・実行が失敗した場合
     A->>L: KR_OCR_FAILED / OCRエンジンの実行が失敗しました。
     Note over A,U: 後続の保存が成功すればHTTP 201、応答ocr.status=failed、ocr.regions=[]。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt OCRが時間切れの場合
+    A->>L: KR_OCR_FAILED / OCRエンジンの実行が失敗しました。
+    Note over A,U: 後続の保存が成功すればHTTP 201、応答ocr.status=failed、ocr.regions=[]。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt OCRが異常終了した場合
+    A->>L: KR_OCR_FAILED / OCRエンジンの実行が失敗しました。
+    Note over A,U: 後続の保存が成功すればHTTP 201、応答ocr.status=failed、ocr.regions=[]。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
     end
     loop csv.DictReader(io.StringIO(result.stdout.decode()), delimiter='\t')
     A->>F: OCRの行に空白以外の認識文字が含まれている。
@@ -130,48 +281,73 @@ sequenceDiagram
     end
     A->>F: 本文または画像の実体を保存して内容ハッシュのキーを取得する。
     A->>S: 実体を保存
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: new_id
     A->>F: now
     A->>F: 現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。
     A->>D: 現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: 処理中に組織の状態が変更されていないことを確認する。
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：処理中に組織の状態が変更されていないことを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     break 応答を返して終了
-    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
+    A->>D: transactionをcommit
+    opt commitで競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt commitでDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A-->>U: HTTP 201 / dict[str, object]
-    end
-    Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
-    opt 入力検証の失敗（RequestValidationError）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / 入力形式を確認してください。
-    end
-    end
-    opt SQL実行またはcommitの競合（psycopg.Error）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 競合しました。再読込してください。
-    end
-    end
-    opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / 一時的に利用できません。
-    end
     end
 ```
 

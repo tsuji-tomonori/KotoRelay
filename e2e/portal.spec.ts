@@ -313,6 +313,9 @@ test('例外応答と型付きログを日本語のテスト手順から照合�
   await expect(diagram).toContainText('HTTP 409');
   await expect(diagram).toContainText('他の操作で更新されました。');
   await expect(diagram).toContainText('KR_HTTP_REJECTED');
+  await expect(diagram).not.toContainText('共通例外経路');
+  await expect(diagram).not.toContainText('継続・再送出分岐');
+  await expect(diagram).toContainText('commitで競合が発生した場合');
   await expect(diagram).not.toContainText('例外を送出し通常経路を終了');
   await page
     .locator('.inventory button')

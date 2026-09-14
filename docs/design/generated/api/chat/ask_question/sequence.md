@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: ac3b8a89c10fb6f4c0a9456ea4fb59251414105722d4188a0beaca0d8b493f26 -->
 
 # 最新承認版の根拠で回答 — シーケンス
 
@@ -9,60 +9,532 @@ sequenceDiagram
     participant U as 利用者
     participant A as API router
     participant F as 個別処理 functions
-    participant E as HTTP例外ハンドラ
     participant L as 型付き運用ログ
     participant D as PostgreSQLまたはDSQL
     participant S as 内容ハッシュ実体
     participant M as モデル・検索エンジン
     U->>A: POST /api/chat
+    opt 認証に失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
+    end
+    end
+    opt リクエストの入力形式が不正な場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 422 / 入力形式を確認してください。
+    end
+    end
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     rect rgb(235, 245, 255)
-    Note over A,D: transaction開始・例外時rollback
+    A->>D: transaction開始
+    opt DB接続で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt DB接続でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
+    end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
+    end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 質問先部署への現在の所属を確認する。
     A->>F: 指定した部署に現在も所属している。
     opt 検証不成立：質問先部署への現在の所属を確認する。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 403 / この操作は許可されていません。
+    end
     end
     A->>F: stable_id
     A->>F: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
     A->>D: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 同じ操作IDの回答が保存されている。
     alt 同じ操作IDの回答が保存されている。
     A->>F: 同じ冪等キーの質問内容・部署・会話が一致することを確認する。
     opt 前条件が成立
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 保存内容の整合性を確認できません。
+    end
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     end
     opt 検証不成立：同じ冪等キーの質問内容・部署・会話が一致することを確認する。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 同じ操作IDが異なる内容で使用されています。
     end
-    Note over A: 保存済み回答を再取得・再認可する捕捉分岐へ進む
+    end
+    A->>D: 失敗したtransactionをrollback
+    rect rgb(235, 245, 255)
+    A->>D: transaction開始
+    opt DB接続で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt DB接続でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
+    end
+    end
+    A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
+    end
+    end
+    A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>F: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
+    A->>D: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>F: 現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
+    opt 検証不成立：現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 404 / 対象を利用できません。
+    end
+    end
+    loop evidence.citations
+    A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
+    A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
+    A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>F: digest
+    rect rgb(245, 247, 250)
+    Note over A: 例外を捕捉する処理範囲
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 保存データの形式が不正な場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    loop manifest.images
+    A->>F: 画像が引用した文書断片に含まれている。
+    alt 画像が引用した文書断片に含まれている。
+    A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    end
+    end
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 保存内容の整合性を確認できません。
+    end
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    alt 回答のすべての引用根拠が現在も有効である。
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 保存内容の整合性を確認できません。
+    end
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    else 条件不成立
+    end
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
+    break 応答を返して終了
+    A->>D: transactionをcommit
+    opt commitで競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt commitでDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A-->>U: HTTP 200 / AnswerView
+    end
+    end
     end
     A->>F: 要求内容の一致を確認して同じ冪等キーの記録済み結果を取得する。
     A->>F: 同じ冪等キーの処理内容が一致することを確認して保存済み応答を返す。
     A->>F: stable_id
     A->>D: 現在の組織に属する指定の再送判定の記録について、実行済み操作の入力ハッシュと応答を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 前条件が成立
     A->>F: digest
     end
     opt 検証不成立：同じ冪等キーの処理内容が一致することを確認して保存済み応答を返す。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 同じ操作IDが異なる内容で使用されています。
+    end
     end
     A->>F: 現在の組織に属する利用イベントを識別子順に一覧取得する。
     A->>D: 現在の組織に属する利用イベントを識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 再開要求を除いて利用者の当日質問数の上限を確認する。
     opt 検証不成立：再開要求を除いて利用者の当日質問数の上限を確認する。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 429 / 利用上限に達しました。
+    end
     end
     A->>F: 中断前に受付済みの会話がある。
     alt 中断前に受付済みの会話がある。
@@ -71,24 +543,80 @@ sequenceDiagram
     alt 継続する会話が指定されている。
     A->>F: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
     A->>D: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 会話が存在し現在の利用者が所有することを確認する。
     opt 検証不成立：会話が存在し現在の利用者が所有することを確認する。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 404 / 対象を利用できません。
+    end
     end
     A->>F: 会話内の回答が同じ部署に帰属することを確認する。
     A->>D: 現在の組織に属する回答履歴を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：会話内の回答が同じ部署に帰属することを確認する。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 利用部署を変更する場合は新しい会話を開始してください。
+    end
     end
     else 条件不成立
     A->>F: new_id
     A->>F: 現在の組織の会話を、所有者と開始日時を指定して登録する。
     A->>F: now
     A->>D: 現在の組織の会話を、所有者と開始日時を指定して登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     end
     end
     A->>F: 最新承認版を持ち現在閲覧できる文書を識別子別に取得する。
     A->>D: 現在の組織に属する文書を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     loop q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org))
     opt 前条件が成立
     A->>F: 現在の所属と公開範囲で文書を閲覧できる。
@@ -102,26 +630,62 @@ sequenceDiagram
     end
     A->>F: 閲覧可能な文書の範囲で質問に関連する断片を検索する。
     A->>M: search
+    opt モデル・検索サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt モデル・検索サービスが時間切れの場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
     A->>D: 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     loop f.chunks_list(ctx)
     A->>F: 閲覧可能な最新承認版の反映済み断片でないかを判定する。
     alt 閲覧可能な最新承認版の反映済み断片でないかを判定する。
-    Note over A: 次の反復へ
+    Note over A: この候補の処理を終了し、次の候補へ
     end
     A->>F: 検索エンジンの候補に含まれない断片かを判定する。
     alt 検索エンジンの候補に含まれない断片かを判定する。
-    Note over A: 次の反復へ
+    Note over A: この候補の処理を終了し、次の候補へ
     end
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     A->>F: 断片実体のハッシュを照合して本文を取得する。
     A->>S: 実体を取得・ハッシュ照合
-    end
-    opt 例外発生：Problem
+    opt 実体の欠落・ハッシュ不一致の場合
     A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
     Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
-    Note over A: 次の反復へ
+    Note over A: この候補の処理を終了し、次の候補へ
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     end
     A->>F: 検索順位があれば順位を使い、ローカル検索では質問と本文の共通語数を得点にする。
     A->>F: 検索エンジンの順位がなく、ローカルの共通語数で採点する。
@@ -141,9 +705,33 @@ sequenceDiagram
     loop f.rank_candidates(scored)
     A->>F: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 取得時点の文書・版・断片とハッシュを回答根拠の参照値にまとめる。
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 現在の所属と公開範囲で文書を閲覧できる。
     A->>F: 指定した部署に現在も所属している。
     opt 前条件が成立
@@ -152,40 +740,188 @@ sequenceDiagram
     end
     end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: digest
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 保存データの形式が不正な場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
     loop manifest.images
     A->>F: 画像が引用した文書断片に含まれている。
     alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
-    A->>S: 実体を取得・ハッシュ照合
-    end
-    end
-    end
-    opt 例外発生：(Problem, ValueError)
+    opt 実体の欠落・ハッシュ不一致の場合
     A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
     Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    end
+    end
     end
     alt 不成立：（閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。）
-    Note over A: 次の反復へ
+    Note over A: この候補の処理を終了し、次の候補へ
     end
     A->>F: 確定版に記録された本文と画像の構成を読み取る。
     A->>F: 検索断片に関連付けられた画像だけを取り出す。
     A->>F: 根拠画像を追加するとモデル入力の画像数上限を超えるかを判定する。
     alt 根拠画像を追加するとモデル入力の画像数上限を超えるかを判定する。
-    Note over A: 次の反復へ
+    Note over A: この候補の処理を終了し、次の候補へ
     end
     loop related
     A->>F: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 根拠画像のハッシュを照合してモデル入力用の実体を取得する。
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 保存内容の整合性を確認できません。
+    end
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     end
     A->>F: 回答に使用する根拠が五件に達したかを判定する。
     alt 回答に使用する根拠が五件に達したかを判定する。
@@ -197,170 +933,169 @@ sequenceDiagram
     A->>F: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
     A->>F: now
     A->>D: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 同じ要求を安全に再試行できるよう冪等キーと結果を記録する。
     A->>F: 冪等キーに処理内容と応答を保存する。
     A->>F: stable_id
     A->>F: digest
     A->>D: 現在の組織の操作の再送を判定するため、実行済み操作の入力ハッシュと応答を登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     end
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: 処理中に組織の状態が変更されていないことを確認する。
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：処理中に組織の状態が変更されていないことを確認する。
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
-    end
-    Note over A,D: 正常終了時commit・競合時rollback
-    end
-    end
-    opt 例外発生：Problem
-    A->>F: 既存回答の再表示以外の例外かを判定する。
-    alt 既存回答の再表示以外の例外かを判定する。
-    opt 捕捉した業務例外を再送出する場合
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / この操作は許可されていません。
+    A->>D: 失敗したtransactionをrollback
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
-    opt 捕捉した業務例外を再送出する場合
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / 対象を利用できません。
+    A->>D: transactionをcommit
+    opt commitで競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
     end
     end
-    opt 捕捉した業務例外を再送出する場合
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
+    opt commitでDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
     end
-    end
-    opt 捕捉した業務例外を再送出する場合
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 利用部署を変更する場合は新しい会話を開始してください。
-    end
-    end
-    opt 捕捉した業務例外を再送出する場合
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 同じ操作IDが異なる内容で使用されています。
-    end
-    end
-    opt 捕捉した業務例外を再送出する場合
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 429 / 利用上限に達しました。
-    end
-    end
-    end
-    rect rgb(235, 245, 255)
-    Note over A,D: transaction開始・例外時rollback
-    A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
-    end
-    end
-    A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
-    end
-    end
-    A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
-    A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
-    A->>F: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
-    A->>D: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
-    A->>F: 現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
-    opt 検証不成立：現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / 対象を利用できません。
-    end
-    end
-    loop evidence.citations
-    A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
-    A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
-    A->>F: 指定した部署に現在も所属している。
-    opt 前条件が成立
-    loop json.loads(doc.shared_departments)
-    A->>F: 指定した部署に現在も所属している。
-    end
-    end
-    A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
-    A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
-    A->>F: digest
-    rect rgb(245, 247, 250)
-    Note over A: 例外を捕捉する処理範囲
-    A->>S: 実体を取得・ハッシュ照合
-    A->>S: 実体を取得・ハッシュ照合
-    loop manifest.images
-    A->>F: 画像が引用した文書断片に含まれている。
-    alt 画像が引用した文書断片に含まれている。
-    A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
-    A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
-    A->>S: 実体を取得・ハッシュ照合
-    A->>S: 実体を取得・ハッシュ照合
-    end
-    end
-    end
-    opt 例外発生：(Problem, ValueError)
-    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
-    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
-    end
-    end
-    A->>S: 実体を取得・ハッシュ照合
-    A->>F: 回答のすべての引用根拠が現在も有効である。
-    alt 回答のすべての引用根拠が現在も有効である。
-    A->>S: 実体を取得・ハッシュ照合
-    else 条件不成立
-    end
-    A->>F: 回答のすべての引用根拠が現在も有効である。
-    A->>F: 回答のすべての引用根拠が現在も有効である。
-    A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    break 応答を返して終了
-    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
-    A-->>U: HTTP 200 / AnswerView
     end
     end
     end
     A->>F: 回答に使用する根拠候補がある。
     alt 回答に使用する根拠候補がある。
     rect rgb(235, 245, 255)
-    Note over A,D: transaction開始・例外時rollback
+    A->>D: transaction開始
+    opt DB接続で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt DB接続でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: すべての根拠の閲覧権限と公開版が現在も有効である。
     loop citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 現在の所属と公開範囲で文書を閲覧できる。
     A->>F: 指定した部署に現在も所属している。
     opt 前条件が成立
@@ -369,31 +1104,160 @@ sequenceDiagram
     end
     end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: digest
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 保存データの形式が不正な場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
     loop manifest.images
     A->>F: 画像が引用した文書断片に含まれている。
     alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
-    A->>S: 実体を取得・ハッシュ照合
-    end
-    end
-    end
-    opt 例外発生：(Problem, ValueError)
+    opt 実体の欠落・ハッシュ不一致の場合
     A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
     Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    end
+    end
     end
     end
     alt 不成立：（すべての根拠の閲覧権限と公開版が現在も有効である。）
     A->>F: 失効した根拠とその本文・画像をモデル入力から除く。
     end
-    Note over A,D: 正常終了時commit・競合時rollback
+    A->>D: transactionをcommit
+    opt commitで競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt commitでDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     end
     A->>F: 回答に使用する根拠候補がある。
     alt 回答に使用する根拠候補がある。
@@ -401,40 +1265,103 @@ sequenceDiagram
     Note over A: 例外を捕捉する処理範囲
     A->>F: 準備済みの本文と画像をモデルへ送り回答を取得する。
     A->>M: generate
-    end
-    opt 例外発生：(BotoCoreError, ClientError, TimeoutError)
+    opt モデル・検索サービスが失敗した場合
     A->>L: KR_MODEL_FAILED / 回答モデルの呼出しが失敗しました。
     Note over A,U: 後続の再認可と保存が成功すればHTTP 200、AnswerView.status=failed、answer=現在利用できる根拠が不足しているため、回答を保留しました。
+    Note over A: 失敗した処理の残りを省略し、「回答確定時点でも質問先部署への所属が有効であることを確認する。」から続ける。
+    end
+    opt モデル・検索サービスが時間切れの場合
+    A->>L: KR_MODEL_FAILED / 回答モデルの呼出しが失敗しました。
+    Note over A,U: 後続の再認可と保存が成功すればHTTP 200、AnswerView.status=failed、answer=現在利用できる根拠が不足しているため、回答を保留しました。
+    Note over A: 失敗した処理の残りを省略し、「回答確定時点でも質問先部署への所属が有効であることを確認する。」から続ける。
+    end
     end
     end
     end
     rect rgb(235, 245, 255)
-    Note over A,D: transaction開始・例外時rollback
+    A->>D: transaction開始
+    opt DB接続で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt DB接続でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / ログインが必要です。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 回答確定時点でも質問先部署への所属が有効であることを確認する。
     A->>F: 指定した部署に現在も所属している。
     opt 検証不成立：回答確定時点でも質問先部署への所属が有効であることを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / この操作は許可されていません。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 403 / この操作は許可されていません。
     end
     end
     A->>F: 回答に使用する根拠候補がある。
@@ -443,6 +1370,18 @@ sequenceDiagram
     loop citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 現在の所属と公開範囲で文書を閲覧できる。
     A->>F: 指定した部署に現在も所属している。
     opt 前条件が成立
@@ -451,72 +1390,283 @@ sequenceDiagram
     end
     end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: digest
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 保存データの形式が不正な場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
     loop manifest.images
     A->>F: 画像が引用した文書断片に含まれている。
     alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
-    A->>S: 実体を取得・ハッシュ照合
-    end
-    end
-    end
-    opt 例外発生：(Problem, ValueError)
+    opt 実体の欠落・ハッシュ不一致の場合
     A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
     Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    end
+    end
     end
     end
     end
     A->>F: 生成失敗と根拠の有効性から回答状態・公開する根拠・利用者向け本文を決める。
     A->>F: 回答状態に対応する質問・回答実体の保存先と根拠の行を組み立てる。
     A->>S: 実体を保存
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を保存
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: now
     A->>F: 現在の組織の回答履歴として、質問者・利用部署・質問と回答の保存先・根拠を登録する。
     A->>D: 現在の組織の回答履歴として、質問者・利用部署・質問と回答の保存先・根拠を登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
     A->>F: stable_id
     A->>F: now
     A->>D: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 回答根拠に寄与した文書の識別子を重複なく取り出す。
     loop f.collect_contributing_documents(citations)
     A->>F: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
     A->>F: stable_id
     A->>F: now
     A->>D: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     end
     A->>F: 実行した変更の対象と結果を監査記録へ追加する。
     A->>F: audit
     A->>F: new_id
     A->>F: now
     A->>D: 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
     A->>F: 処理中に組織の状態が変更されていないことを確認する。
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     opt 検証不成立：処理中に組織の状態が変更されていないことを確認する。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
     opt 検証不成立：現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / 対象を利用できません。
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     loop evidence.citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 現在の所属と公開範囲で文書を閲覧できる。
     A->>F: 指定した部署に現在も所属している。
     opt 前条件が成立
@@ -525,61 +1675,204 @@ sequenceDiagram
     end
     end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: digest
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 保存データの形式が不正な場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
     loop manifest.images
     A->>F: 画像が引用した文書断片に含まれている。
     alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
+    opt SQL実行で競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt SQL実行でDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>S: 実体を取得・ハッシュ照合
-    A->>S: 実体を取得・ハッシュ照合
-    end
-    end
-    end
-    opt 例外発生：(Problem, ValueError)
+    opt 実体の欠落・ハッシュ不一致の場合
     A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
     Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
     end
     end
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
+    Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
+    Note over F,A: 失敗結果を呼出し元へ返し、この個別処理を終了する
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    end
+    end
+    end
+    end
+    A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 保存内容の整合性を確認できません。
+    end
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A->>F: 回答のすべての引用根拠が現在も有効である。
     alt 回答のすべての引用根拠が現在も有効である。
     A->>S: 実体を取得・ハッシュ照合
+    opt 実体の欠落・ハッシュ不一致の場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 保存内容の整合性を確認できません。
+    end
+    end
+    opt 実体の入出力が失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
+    opt 実体サービスが失敗した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     else 条件不成立
     end
     A->>F: 回答のすべての引用根拠が現在も有効である。
     A->>F: 回答のすべての引用根拠が現在も有効である。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     break 応答を返して終了
-    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
+    A->>D: transactionをcommit
+    opt commitで競合が発生した場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_REJECTED
+    A-->>U: HTTP 409 / 競合しました。再読込してください。
+    end
+    end
+    opt commitでDBを利用できない場合
+    break エラー応答を返して終了
+    A->>L: KR_HTTP_FAILED
+    A-->>U: HTTP 503 / 一時的に利用できません。
+    end
+    end
     A-->>U: HTTP 200 / AnswerView
-    end
-    end
-    Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
-    opt 入力検証の失敗（RequestValidationError）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / 入力形式を確認してください。
-    end
-    end
-    opt SQL実行またはcommitの競合（psycopg.Error）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / 競合しました。再読込してください。
-    end
-    end
-    opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / 一時的に利用できません。
     end
     end
 ```
