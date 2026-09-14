@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # lazunex toolsの棚卸しと採用対応
 
@@ -30,7 +30,7 @@ routerは登録済みendpointだけを定義します。共有の索引配送は
 | [check_api_sequence_success_responses.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_api_sequence_success_responses.py) | 成功応答のシーケンス表示 | 既存 | tools/project/router_sequence.py | 実endpointのHTTP statusと応答型から生成、生成差分と単体テストを検査 |
 | [check_api_sql_ddl_usage.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_api_sql_ddl_usage.py) | SQLとDDLの表・列整合 | 既存 | tools/project/queries.py | PostgreSQL ASTとDDLで引数・投影・NULL・未知表列を検査 |
 | [check_api_status_samples.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_api_status_samples.py) | statusサンプルと契約の照合 | 適応 | backend/tests/test_api_layout.py | 現行サンプルはhealth成功・未認証拒否をHTTP検証。業務成功・異常はworkflow試験が担当し、全statusのサンプル化とは扱わない |
-| [check_bool_router_conditions.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_bool_router_conditions.py) | bool結果の制御条件への接続 | 追加 | tools/project/source_policy.py | bool結果の単独破棄を拒否。all、戻り値組立などKotoRelayで必要な値利用を許可しif専用制約は移植しない |
+| [check_bool_router_conditions.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_bool_router_conditions.py) | bool結果の制御条件への接続 | 追加 | tools/project/condition_labels.py | routerと共有workflowの条件をfunctionsの日本語説明付きbool関数に限定し、否定・短絡を保った日本語ラベルを生成。bool結果の単独破棄はsource_policy.pyで拒否 |
 | [check_constant_bool_returns.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_constant_bool_returns.py) | 固定boolによる無効な判定 | 追加 | tools/project/source_policy.py | 入れ子関数を除いた実returnを検査し、常に同じbool literalを返す関数を拒否 |
 | [check_e2e_case_evidences.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_e2e_case_evidences.py) | E2E実行証跡の欠落検査 | 既存 | tools/project/evidence.py | Playwrightの実結果・段階PNG・DB添付とcollectorを照合し、未実行を成功にしない |
 | [check_e2e_specs.py](https://github.com/tsuji-tomonori/lazunex/blob/096e1e580ab1c0670c57e4febad2bd9fdd4698ee/src/tools/check_e2e_specs.py) | E2Eシナリオとケースの整合 | 適応 | tools/project/evidence.py | 独立YAMLは追加せず、既存Playwright inventoryと結果の集合一致を検査 |

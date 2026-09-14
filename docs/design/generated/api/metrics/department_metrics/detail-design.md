@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 部署の利用数と文書貢献を集計 — 詳細設計
 
@@ -42,9 +42,9 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:79 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:84 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/metrics/department_metrics/functions.py:17 | ctx.permission(str(department_id), 'manage') | 'forbidden' | 403 |
 | backend/src/kotorelay/operations/metrics/department_metrics/functions.py:22 | start.tzinfo is not None and end.tzinfo is not None | 'invalid_period' | 422 |
@@ -96,9 +96,9 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:86 | False |
-| backend/src/kotorelay/context.py:80 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
-| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
+| backend/src/kotorelay/context.py:91 | False |
+| backend/src/kotorelay/context.py:85 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
+| backend/src/kotorelay/context.py:20 | datetime.now(UTC) |
 | backend/src/kotorelay/operations/metrics/department_metrics/functions.py:66 | {'department_id': str(department_id), 'timezone': 'Asia/Tokyo', 'generated_at': now().astimezone(ZoneInfo('Asia/Tokyo')), 'start': start, 'end': end, 'questions': sum((e.kind == 'question' for e in consumed)), 'views': sum((e.kind == 'view' for e in consumed)), 'unique_viewers': len({e.user_id for e in consumed if e.kind == 'view'}), 'outcomes': {status: sum((e.kind == 'outcome' and e.outcome == status for e in consumed)) for status in ['answered', 'held', 'failed', 'cancelled']}, 'documents': [{'id': d.id, 'title': d.title, 'views': sum((e.kind == 'view' and e.document_id == d.id for e in events)), 'contributions': len({e.answer_id for e in events if e.kind == 'contribution' and e.document_id == d.id})} for d in docs]} |
 | backend/src/kotorelay/operations/metrics/department_metrics/functions.py:17 | require(ctx.permission(str(department_id), 'manage'), 'forbidden', 403) |
 | backend/src/kotorelay/operations/metrics/department_metrics/functions.py:22 | require(start.tzinfo is not None and end.tzinfo is not None, 'invalid_period', 422) |

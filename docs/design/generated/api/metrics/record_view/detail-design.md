@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 実閲覧を一意IDで記録 — 詳細設計
 
@@ -44,16 +44,16 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:103 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:110 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:117 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:67 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:29 | ctx.member(data.department_id) | 'forbidden' | 403 |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:22 | bool(doc.latest_version_id) | not_found | 404 |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:41 | previous[0].document_id == doc.id and previous[0].department_id == data.department_id and (previous[0].kind == 'view') | 'idempotency_conflict' | 409 |
-| backend/src/kotorelay/operations/metrics/record_view/router.py:32 | previous | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/metrics/record_view/router.py:32 | f.has_previous_view(previous) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -103,16 +103,17 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:111 | doc |
-| backend/src/kotorelay/context.py:75 | any((m.department_id == department_id for m in self.memberships)) |
-| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
-| backend/src/kotorelay/context.py:27 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
+| backend/src/kotorelay/context.py:118 | doc |
+| backend/src/kotorelay/context.py:79 | any((m.department_id == department_id for m in self.memberships)) |
+| backend/src/kotorelay/context.py:20 | datetime.now(UTC) |
+| backend/src/kotorelay/context.py:28 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:52 | {'recorded': False} |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:85 | {'recorded': True} |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:80 | ctx.fence() |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:17 | ctx.document(str(document_id)) |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:34 | q.events_get(ctx.db, q.EventsGetParams(organization_id=ctx.org, id=event_id)) |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:62 | q.events_insert(ctx.db, q.EventsInsertParams(id=event_id, organization_id=ctx.org, user_id=ctx.user.id, department_id=data.department_id, document_id=doc.id, answer_id=None, kind='view', outcome='viewed', created_at=now())) |
+| backend/src/kotorelay/operations/metrics/record_view/functions.py:90 | bool(rows) |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:29 | require(ctx.member(data.department_id), 'forbidden', 403) |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:22 | require(bool(doc.latest_version_id)) |
 | backend/src/kotorelay/operations/metrics/record_view/functions.py:41 | require(previous[0].document_id == doc.id and previous[0].department_id == data.department_id and (previous[0].kind == 'view'), 'idempotency_conflict', 409) |
@@ -121,6 +122,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/metrics/record_view/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
 | backend/src/kotorelay/operations/metrics/record_view/router.py:37 | build_response(f.build_record_view_2()) |
 | backend/src/kotorelay/operations/metrics/record_view/router.py:34 | build_response(f.build_record_view()) |
+| backend/src/kotorelay/operations/system/authorization/functions.py:6 | operation == 'read' |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:98 | db.query('operations/system/authorization/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |

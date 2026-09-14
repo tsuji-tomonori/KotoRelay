@@ -24,7 +24,7 @@ def list_jobs(ctx: Ctx, details: bool = False) -> list[dict[str, object]]:
     """要求された詳細度に合わせて運用者向けジョブ一覧を取得する。"""
     f.require_operator(ctx)
     rows: list[models.OutboxRow] = list(f.outbox_list(ctx))
-    if details:
+    if f.requests_details(details):
         docs = f.map_docs(ctx)
         versions = f.map_versions(ctx)
         return build_response(f.select_job_details(rows, docs, versions))

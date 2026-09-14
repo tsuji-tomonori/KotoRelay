@@ -174,3 +174,13 @@ def build_manifest_image(placement: Placement, image_hash: str, ocr_hash: str) -
 def serialize_manifest(body_hash: str, images: list[ManifestImage]) -> str:
     """確定する本文と画像構成をmanifestのJSONへ変換する。"""
     return Manifest(body_hash=body_hash, images=images).model_dump_json()
+
+
+def has_previous_result(cached: str | None) -> bool:
+    """同じ操作IDの処理結果が保存されている。"""
+    return bool(cached)
+
+
+def is_document_draft(row: q.DraftsListRow, document_id: str) -> bool:
+    """下書きが申請対象の文書に属する。"""
+    return row.document_id == document_id

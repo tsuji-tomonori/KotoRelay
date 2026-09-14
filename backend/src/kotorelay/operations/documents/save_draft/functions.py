@@ -94,3 +94,8 @@ def documents_update(
 def check_concurrent_access(ctx: context_types.Context) -> None:
     """組織の更新競合を検出するための書込みフェンスを更新する。"""
     return ctx.fence()
+
+
+def is_document_draft(row: q.DraftsListRow, document_id: str) -> bool:
+    """下書きが保存対象の文書に属している。"""
+    return row.document_id == document_id

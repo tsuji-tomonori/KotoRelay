@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from botocore.exceptions import BotoCoreError, ClientError
 
 from kotorelay.context import Context
@@ -15,7 +17,7 @@ from kotorelay.operations.indexing.shared import functions as f
 def build_index(ctx: Context, job: models.OutboxRow, engine: Engine) -> str:
     """現行版の索引を分割更新し、外部実体の検証後に反映済みへ進める。"""
     doc = f.documents_get(ctx, job)[0]
-    if not job.version_id or f.is_obsolete_version(doc, job):
+    if f.is_obsolete_version(doc, job):
         return "obsolete"
     stale = f.select_stale(ctx, doc, job)
     f.delete_build_index(engine, stale)
@@ -25,7 +27,7 @@ def build_index(ctx: Context, job: models.OutboxRow, engine: Engine) -> str:
         return "pending"
     if f.is_inactive_document(doc):
         return "done"
-    version = f.versions_get(ctx, job.version_id)[0]
+    version = f.versions_get(ctx, cast(str, job.version_id))[0]
     manifest = f.build_manifest(version)
     body = f.decode_body(version, ctx)
     parts: list[tuple[str, str, str]] = f.select_parts(body)

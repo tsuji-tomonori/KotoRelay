@@ -27,7 +27,9 @@ def read_document(ctx: Ctx, document_id: UUID, version_id: UUID | None = None) -
     doc = rows[0]
     f.require_retained_document(doc)
     f.require_read_permission(doc, ctx)
-    chosen = (str(version_id) if version_id else None) or doc.latest_version_id
+    chosen = (
+        str(version_id) if f.has_requested_version(version_id) else None
+    ) or doc.latest_version_id
     f.require_selected_version(chosen)
     version = f.version_version(doc, ctx, chosen)
     return build_response(f.build_read_document(version, doc, ctx))

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 文書を作成 — 詳細設計
 
@@ -41,10 +41,10 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
-| backend/src/kotorelay/context.py:79 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:67 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:84 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/documents/create_document/functions.py:17 | ctx.permission(data.department_id, 'author') | 'forbidden' | 403 |
 
@@ -109,10 +109,10 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:86 | False |
-| backend/src/kotorelay/context.py:80 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
-| backend/src/kotorelay/context.py:23 | str(uuid4()) |
-| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
+| backend/src/kotorelay/context.py:91 | False |
+| backend/src/kotorelay/context.py:85 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
+| backend/src/kotorelay/context.py:24 | str(uuid4()) |
+| backend/src/kotorelay/context.py:20 | datetime.now(UTC) |
 | backend/src/kotorelay/operations/documents/create_document/functions.py:76 | ctx.fence() |
 | backend/src/kotorelay/operations/documents/create_document/functions.py:42 | q.documents_insert(ctx.db, q.DocumentsInsertParams.model_validate(doc, from_attributes=True)) |
 | backend/src/kotorelay/operations/documents/create_document/functions.py:54 | q.drafts_insert(ctx.db, q.DraftsInsertParams(id=new_id(), organization_id=ctx.org, document_id=doc.id, body_key=key, body_hash=key, placements='[]', revision=1, updated_by=ctx.user.id)) |

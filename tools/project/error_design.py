@@ -29,10 +29,8 @@ def problem_call(node: ast.Call, *, require: bool = False) -> ErrorOutcome:
 
 
 def response_label(outcome: ErrorOutcome) -> str:
-    return (
-        f'HTTP {outcome.status} / {{code: "{outcome.code}", '
-        f'message: "{outcome.message}", request_id: 相関ID}}'
-    )
+    """利用者への応答線にはHTTP statusと実メッセージだけを表示する。"""
+    return f"HTTP {outcome.status} / {outcome.message}"
 
 
 def contracts(inventory, reached: list[str], *, authenticated: bool) -> list[ErrorOutcome]:

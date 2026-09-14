@@ -17,7 +17,7 @@ def test_シーケンスはSQL名の辞書順ではなく呼出しと条件の�
     source = """
 def execute(enabled):
     f.last_named_step()
-    if enabled:
+    if f.is_enabled(enabled):
         f.first_named_step()
     else:
         return None
@@ -28,13 +28,16 @@ def execute(enabled):
         inventory.nodes["example.functions." + name] = ast.parse(
             f"def {name}():\n    return q.{query}()"
         ).body[0]
+    inventory.nodes["example.functions.is_enabled"] = ast.parse(
+        'def is_enabled(enabled) -> bool:\n    """受付後の取得が有効である。"""\n    return enabled'
+    ).body[0]
     descriptions = {
         "example.generated.queries.z_write": "受付記録を保存する。",
         "example.generated.queries.a_read": "受付後の記録を取得する。",
     }
     body = "\n".join(sequence.render(inventory, key, "post", "/test", descriptions))
-    assert body.index("受付記録を保存する。") < body.index("alt enabled")
-    assert body.index("alt enabled") < body.index("受付後の記録を取得する。")
+    assert body.index("受付記録を保存する。") < body.index("alt 受付後の取得が有効である。")
+    assert body.index("alt 受付後の取得が有効である。") < body.index("受付後の記録を取得する。")
     assert body.index("受付後の記録を取得する。") < body.index("else 条件不成立")
     assert "正常終了時commit" not in body
 

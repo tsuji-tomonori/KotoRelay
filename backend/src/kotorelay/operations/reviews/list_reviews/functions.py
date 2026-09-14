@@ -56,5 +56,12 @@ def select_list_reviews(
             "can_review": ctx.permission(documents[s.document_id].department_id, "review"),
         }
         for s in q.submissions_list(ctx.db, q.SubmissionsListParams(organization_id=ctx.org))
-        if s.document_id in documents
+        if has_reviewable_document(s, documents)
     ]
+
+
+def has_reviewable_document(
+    submission: q.SubmissionsListRow, documents: dict[str, q.DocumentsListRow]
+) -> bool:
+    """申請の文書を現在の利用者が承認または管理できる。"""
+    return submission.document_id in documents

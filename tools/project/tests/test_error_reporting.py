@@ -27,16 +27,16 @@ def test_シーケンスに例外のstatusと本文と型付きログを表示�
     text = "\n".join(render(inventory, key, "put", "/api/documents/{id}/draft", {}))
     for expected in [
         "HTTP 409",
-        "code：",
-        "conflict",
         "他の操作で更新されました。",
-        "request_id",
         "KR_HTTP_REJECTED",
         "HTTP 422",
         "HTTP 503",
         "後続の正常処理は実行しない",
     ]:
         assert expected in text
+    assert "E-->>U: HTTP 409 / 他の操作で更新されました。" in text
+    responses = [line for line in text.splitlines() if "-->>U:" in line]
+    assert all("code" not in line and "request_id" not in line for line in responses)
     assert "例外を送出し通常経路を終了" not in text
 
 
@@ -44,10 +44,12 @@ def test_捕捉して継続する例外に誤ったHTTPエラーを割り当て�
     inventory = Inventory()
     key = "kotorelay.operations.chat.ask_question.router.ask_question"
     text = "\n".join(render(inventory, key, "post", "/api/chat", {}))
-    assert "HTTP 409は送らない" in text and "HTTP 200 / AnswerView" in text
+    assert "保存済み回答を再取得・再認可する捕捉分岐へ進む" in text
+    assert "A-->>U: HTTP 200 / AnswerView" in text
+    assert "E-->>U: HTTP 409 / already_answered" not in text
     assert "KR_MODEL_FAILED" in text and "AnswerView.status=failed" in text
-    assert "は未送信。catchの継続・再送出分岐へ進む" in text
-    assert "再送出されたProblem" in text and "HTTP 429" in text
+    assert "で捕捉し、継続・再送出分岐へ進む" in text
+    assert "捕捉した業務例外を再送出する場合" in text and "HTTP 429" in text
 
 
 def test_ログ帳票を実catalogと呼出し位置と応答契約から生成する():

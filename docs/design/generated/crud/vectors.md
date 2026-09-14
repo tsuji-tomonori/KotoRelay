@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # ベクトル索引 CRUD対応表
 
@@ -79,4 +79,4 @@ flowchart LR
 | retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/shared/functions.py:311 |
 | retry_job | vectors | vector | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:190 |
 | retry_job | vectors | vector | R | backend/src/kotorelay/operations/indexing/shared/functions.py:222 |
-| ask_question | vectors | vector | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:151 |
+| ask_question | vectors | vector | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:153 |

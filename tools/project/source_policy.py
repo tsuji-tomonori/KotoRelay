@@ -185,4 +185,7 @@ def inspect(app: Path, inventory) -> int:
         if "generated" not in path.parts:
             check_source(path, ast.parse(path.read_text(), filename=str(path)))
     check_calls(inventory)
+    from tools.project.condition_labels import inspect as inspect_conditions
+
+    inspect_conditions(inventory)
     return len(paths)

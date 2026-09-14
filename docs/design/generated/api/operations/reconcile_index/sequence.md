@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 正本と索引の不一致を確認 — シーケンス
 
@@ -17,29 +17,29 @@ sequenceDiagram
     U->>A: GET /api/operations/reconcile
     Note over A,D: 依存注入でtransaction開始・組織と所属を確認
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: 索引整合を確認できる運用権限を確認する。
-    opt 検証不成立：ctx.user.operator
+    opt 検証不成立：索引整合を確認できる運用権限を確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    E-->>U: HTTP 403 / この操作は許可されていません。
     end
     end
     A->>F: 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
@@ -49,38 +49,39 @@ sequenceDiagram
     loop f.documents_list(ctx)
     A->>F: 用途と対象に一致するデータだけを取り出す。
     A->>F: 公開版が変わったか文書が失効したため不要になった断片があるかを判定する。
-    alt f.has_outdated_chunks(current, doc)
+    alt 公開版が変わったか文書が失効したため不要になった断片があるかを判定する。
     A->>F: 後続処理に渡すデータを組み立てる。
     end
     A->>F: 有効な公開版に反映済みの断片が存在しないかを判定する。
-    alt f.needs_index_repair(doc, current)
+    alt 有効な公開版に反映済みの断片が存在しないかを判定する。
     A->>F: 後続処理に渡すデータを組み立てる。
     end
     end
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
-    Note over A,D: 成功応答前に依存transactionをcommit・失敗時rollback
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
     A-->>U: HTTP 200 / list[dict[str, str]]
+    end
     Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
     opt 入力検証の失敗（RequestValidationError）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 422 / 入力形式を確認してください。
     end
     end
     opt SQL実行またはcommitの競合（psycopg.Error）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 競合しました。再読込してください。
     end
     end
     opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 503 / 一時的に利用できません。
     end
     end
 ```

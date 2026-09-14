@@ -65,7 +65,7 @@ def run_ocr(data: bytes, width: int, height: int, command: str) -> OcrResult:
         regions: list[Region] = []
         for line in csv.DictReader(io.StringIO(result.stdout.decode()), delimiter="\t"):
             text = line.get("text", "").strip()
-            if text:
+            if has_recognized_text(text):
                 regions.append(
                     Region(
                         region_id=new_id(),
@@ -177,3 +177,8 @@ def build_upload_image(
 ) -> dict[str, object]:
     """後続処理に渡すデータを組み立てる。"""
     return {"asset": asset, "ocr_run": run, "ocr": result}
+
+
+def has_recognized_text(text: str) -> bool:
+    """OCRの行に空白以外の認識文字が含まれている。"""
+    return bool(text)

@@ -61,7 +61,9 @@ def build_row(
 ) -> models.MembershipsRow:
     """後続処理に渡すデータを組み立てる。"""
     return models.MembershipsRow(
-        id=rows[0].id if rows else new_id(), organization_id=ctx.org, **data.model_dump()
+        id=rows[0].id if has_existing_membership(rows) else new_id(),
+        organization_id=ctx.org,
+        **data.model_dump(),
     )
 
 
@@ -91,3 +93,8 @@ def record_change_membership_audit(
 def check_concurrent_access(ctx: context_types.Context) -> None:
     """組織の更新競合を検出するための書込みフェンスを更新する。"""
     return ctx.fence()
+
+
+def has_existing_membership(rows: list[q.MembershipsListRow]) -> bool:
+    """対象利用者の部署所属が既に登録されている。"""
+    return bool(rows)

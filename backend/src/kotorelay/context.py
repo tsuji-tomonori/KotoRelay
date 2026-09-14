@@ -11,6 +11,7 @@ from kotorelay.db import Database
 from kotorelay.errors import require
 from kotorelay.generated import models
 from kotorelay.objects import Objects, digest
+from kotorelay.operations.system.authorization.functions import is_read_operation
 from kotorelay.operations.system.authorization.generated import queries as q
 from kotorelay.schemas import Manifest
 
@@ -33,6 +34,7 @@ def serialized(value: object) -> str:
 
 class Context:
     def __init__(self, db: Database, settings: Settings, objects: Objects, subject: str):
+        """有効な組織と利用者を確認し、最新の所属を読み込む。"""
         self.db = db
         self.settings = settings
         self.objects = objects
@@ -61,6 +63,7 @@ class Context:
         ]
 
     def fence(self) -> None:
+        """処理中に組織の状態が変更されていないことを確認する。"""
         require(
             q.organizations_fence(
                 self.db,
@@ -72,9 +75,11 @@ class Context:
         )
 
     def member(self, department_id: str) -> bool:
+        """指定した部署に現在も所属している。"""
         return any(m.department_id == department_id for m in self.memberships)
 
     def permission(self, department_id: str, operation: str) -> bool:
+        """指定した部署で要求された操作を実行できる。"""
         for m in self.memberships:
             if m.department_id == department_id:
                 return {
@@ -86,6 +91,7 @@ class Context:
         return False
 
     def can_read(self, doc: models.DocumentsRow) -> bool:
+        """現在の所属と公開範囲で文書を閲覧できる。"""
         if doc.status != "active" or not self.memberships:
             return False
         if doc.visibility == "organization":
@@ -97,6 +103,7 @@ class Context:
         )
 
     def document(self, document_id: str, operation: str = "read") -> models.DocumentsRow:
+        """対象の文書が存在し、要求された操作を実行できることを確認する。"""
         rows = q.documents_get(
             self.db, q.DocumentsGetParams(organization_id=self.org, id=document_id)
         )
@@ -104,13 +111,14 @@ class Context:
         doc = rows[0]
         allowed = (
             self.can_read(doc)
-            if operation == "read"
+            if is_read_operation(operation)
             else doc.status != "deleted" and self.permission(doc.department_id, operation)
         )
         require(allowed)
         return doc
 
     def version(self, doc: models.DocumentsRow, version_id: str) -> models.VersionsRow:
+        """文書の版が存在し、閲覧権限と実体の整合性が有効なことを確認する。"""
         rows = q.versions_get(self.db, q.VersionsGetParams(organization_id=self.org, id=version_id))
         require(bool(rows) and rows[0].document_id == doc.id)
         version = rows[0]
@@ -146,6 +154,7 @@ class Context:
         )
 
     def idempotent_result(self, key: str, operation: str, request: str) -> str | None:
+        """同じ冪等キーの処理内容が一致することを確認して保存済み応答を返す。"""
         rows = q.idempotency_get(
             self.db,
             q.IdempotencyGetParams(organization_id=self.org, id=stable_id(self.user.id + key)),
@@ -161,6 +170,7 @@ class Context:
         return record.response
 
     def remember(self, key: str, operation: str, request: str, response: str) -> None:
+        """冪等キーに処理内容と応答を保存する。"""
         q.idempotency_insert(
             self.db,
             q.IdempotencyInsertParams(

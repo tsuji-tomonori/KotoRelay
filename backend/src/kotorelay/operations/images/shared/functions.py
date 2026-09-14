@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from kotorelay.context import Context
 from kotorelay.errors import require
 from kotorelay.generated import models
@@ -14,7 +16,7 @@ def authorize_asset(ctx: Context, asset_id: str, version_id: str | None) -> mode
     assets = q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=asset_id))
     require(bool(assets))
     asset = assets[0]
-    if version_id is None:
+    if has_no_requested_version(version_id):
         ctx.document(asset.document_id, "draft")
     else:
         docs = q.documents_get(
@@ -23,7 +25,7 @@ def authorize_asset(ctx: Context, asset_id: str, version_id: str | None) -> mode
         require(bool(docs) and docs[0].status != "deleted")
         doc = docs[0]
         require(ctx.can_read(doc) or ctx.permission(doc.department_id, "draft"))
-        version = ctx.version(doc, version_id)
+        version = ctx.version(doc, cast(str, version_id))
         manifest = Manifest.model_validate_json(version.manifest)
         require(
             any(
@@ -32,3 +34,8 @@ def authorize_asset(ctx: Context, asset_id: str, version_id: str | None) -> mode
             )
         )
     return asset
+
+
+def has_no_requested_version(version_id: str | None) -> bool:
+    """版の指定がなく、下書きの画像として権限を確認する。"""
+    return version_id is None

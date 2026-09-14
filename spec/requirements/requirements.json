@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 8,
+  "catalog_revision": 9,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -5800,18 +5800,18 @@
         {
           "given": "APIとテストと設計generatorが存在する",
           "id": "AC-DESIGN-10",
-          "then": "例外のHTTP status・code・messageと内部捕捉後の継続または再送出を区別し、解決不能な応答を汎用文で隠さず検出する",
+          "then": "実際に利用者へ返す例外応答を矢印で示し、そのラベルにはHTTPステータスと実メッセージだけを記す。内部で捕捉して継続する例外とHTTP終了を区別する",
           "when": "実行して設計と品質Pagesを生成する"
         }
       ],
       "action": "provide",
       "category": "nonfunctional",
       "id": "REQ-DESIGN-10",
-      "last_changed_by": "error-reporting-2026-09-13",
+      "last_changed_by": "condition-diagram-2026-09-14",
       "object": "シーケンスに例外応答を具体的に表示する",
       "rationale": "利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。",
       "retirement_reason": "",
-      "revision": 1,
+      "revision": 2,
       "scope": "project",
       "source_refs": [
         "docs/planning/API-LAYOUT.md"
@@ -6211,6 +6211,100 @@
         ],
         "tests": [
           "tools/project/tests/test_source_policy.py",
+          "backend/tests/test_workflow.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質portalとローカル検証結果",
+        "method": "構文・型・依存の正例負例と実HTTP回帰試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIと検査adapterが存在する",
+          "id": "AC-DESIGN-19",
+          "then": "routerと共有workflowの条件式はfunctions側の日本語説明付きbool関数で判定し、直接の比較や真偽値評価を検査で拒否する",
+          "when": "APIの実装と検査を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-19",
+      "last_changed_by": "condition-diagram-2026-09-14",
+      "object": "APIフローの条件を説明付きbool関数へ分離する",
+      "rationale": "利用者がbool関数とその日本語コメントを条件分岐と図の正本にするよう明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "APIフローの条件を説明付きbool関数へ分離する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/condition_labels.py",
+          "tools/project/router_sequence.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_condition_labels.py",
+          "backend/tests/test_workflow.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質portalとローカル検証結果",
+        "method": "構文・型・依存の正例負例と実HTTP回帰試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIと検査adapterが存在する",
+          "id": "AC-DESIGN-20",
+          "then": "シーケンスの条件ラベルを判定関数の日本語コメントから生成し、否定と短絡の意味を保つ。未解決の条件を実装式で代用しない",
+          "when": "APIの実装と検査を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-20",
+      "last_changed_by": "condition-diagram-2026-09-14",
+      "object": "シーケンスの条件を関数の日本語説明から生成する",
+      "rationale": "利用者がbool関数とその日本語コメントを条件分岐と図の正本にするよう明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "シーケンスの条件を関数の日本語説明から生成する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/condition_labels.py",
+          "tools/project/router_sequence.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_condition_labels.py",
           "backend/tests/test_workflow.py"
         ]
       },

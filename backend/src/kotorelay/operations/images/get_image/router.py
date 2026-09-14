@@ -25,5 +25,7 @@ router = APIRouter(prefix="/api/images", tags=["画像・OCR"])
     openapi_extra=CONTRACT.openapi_extra(SAMPLES),
 )
 def get_image(ctx: Ctx, asset_id: UUID, version_id: UUID | None = None) -> Response:
-    asset = authorize_asset(ctx, str(asset_id), str(version_id) if version_id else None)
+    asset = authorize_asset(
+        ctx, str(asset_id), str(version_id) if f.has_requested_version(version_id) else None
+    )
     return build_response(f.get_get_image(asset, ctx))

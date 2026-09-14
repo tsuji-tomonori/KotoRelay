@@ -72,6 +72,7 @@ def sources() -> list[Path]:
                 ROOT / "tools/project/source_policy.py",
                 ROOT / "tools/project/tool_adoption.json",
                 ROOT / "tools/project/router_sequence.py",
+                ROOT / "tools/project/condition_labels.py",
                 ROOT / "tools/project/error_design.py",
                 ROOT / "tools/project/test_narrative.py",
             ]

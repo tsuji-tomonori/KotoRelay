@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # オブジェクト保存 CRUD対応表
 
@@ -113,11 +113,11 @@ flowchart LR
 | retry_job | objects | content_object | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:155 |
 | retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:228 |
 | retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:127 |
-| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:287 |
-| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:288 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:175 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:224 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:59 |
+| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:289 |
+| ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:290 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:177 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:226 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:61 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:84 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:85 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:48 |

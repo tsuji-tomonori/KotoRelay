@@ -10,7 +10,7 @@ from kotorelay.generated import models
 from kotorelay.objects import digest
 from kotorelay.operational_logging import MessageId, continuation_context, ops_logger
 from kotorelay.operations.chat.shared.generated import queries as q
-from kotorelay.schemas import AnswerView, Citation, Evidence, Manifest
+from kotorelay.schemas import AnswerView, Citation, Evidence, Manifest, ManifestImage
 
 
 def validate_citation(ctx: Context, citation: Citation) -> bool:
@@ -52,7 +52,7 @@ def validate_citation(ctx: Context, citation: Citation) -> bool:
         if placements - {image.placement.id for image in manifest.images}:
             return False
         for image in manifest.images:
-            if image.placement.id in json.loads(chunk.placements):
+            if is_cited_image(image, chunk):
                 assets = q.assets_get(
                     ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=image.placement.asset_id)
                 )
@@ -83,10 +83,20 @@ def present(ctx: Context, answer: models.AnswersRow) -> AnswerView:
         conversation_id=answer.conversation_id,
         question=ctx.objects.get(answer.question_key).decode(),
         answer=ctx.objects.get(answer.answer_key).decode()
-        if valid
+        if has_valid_evidence(valid)
         else "権限または公開版が変更されたため、この回答は表示できません。",
-        status=answer.status if valid else "hidden",
-        citations=evidence.citations if valid else [],
+        status=answer.status if has_valid_evidence(valid) else "hidden",
+        citations=evidence.citations if has_valid_evidence(valid) else [],
         model=answer.model,
         created_at=answer.created_at,
     )
+
+
+def is_cited_image(image: ManifestImage, chunk: q.ChunksGetRow) -> bool:
+    """画像が引用した文書断片に含まれている。"""
+    return image.placement.id in json.loads(chunk.placements)
+
+
+def has_valid_evidence(valid: bool) -> bool:
+    """回答のすべての引用根拠が現在も有効である。"""
+    return valid

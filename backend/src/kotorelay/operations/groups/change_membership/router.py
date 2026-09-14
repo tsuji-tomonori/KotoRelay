@@ -27,7 +27,7 @@ def change_membership(ctx: Ctx, data: ChangeMembership) -> models.MembershipsRow
     f.require_target_department(ctx, data)
     rows = f.select_rows(ctx, data)
     row = f.build_row(rows, ctx, data)
-    if rows:
+    if f.has_existing_membership(rows):
         f.memberships_update(ctx, row)
     else:
         f.memberships_insert(ctx, row)

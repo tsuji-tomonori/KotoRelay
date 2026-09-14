@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 競合を検出して下書きを保存 — 詳細設計
 
@@ -53,11 +53,11 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:103 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:110 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:117 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:67 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:50 | row.revision == data.revision | 'conflict' | 409 |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:19 | len({p.id for p in data.placements}) == len(data.placements) | 'invalid_placement' | 422 |
@@ -116,13 +116,14 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:111 | doc |
-| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
+| backend/src/kotorelay/context.py:118 | doc |
+| backend/src/kotorelay/context.py:20 | datetime.now(UTC) |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:96 | ctx.fence() |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:40 | ctx.document(str(document_id), 'author') |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:83 | q.documents_update(ctx.db, q.DocumentsUpdateParams.model_validate(doc.model_copy(update={'title': data.title, 'revision': doc.revision + 1, 'updated_at': now()}), from_attributes=True)) |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:45 | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:62 | q.drafts_update(ctx.db, q.DraftsUpdateParams.model_validate(row.model_copy(update={'body_key': key, 'body_hash': key, 'revision': row.revision + 1, 'updated_by': ctx.user.id, 'placements': json.dumps([p.model_dump() for p in data.placements])}), from_attributes=True)) |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:101 | row.document_id == document_id |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:55 | ctx.objects.put(data.body.encode(), 'text/markdown') |
 | backend/src/kotorelay/operations/documents/save_draft/functions.py:50 | require(row.revision == data.revision, 'conflict', 409) |
 | backend/src/kotorelay/operations/documents/save_draft/generated/queries.py:43 | db.query('operations/documents/save_draft/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
@@ -137,6 +138,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/documents/shared/functions.py:26 | ctx.objects.get(row.body_key, row.body_hash).decode() |
 | backend/src/kotorelay/operations/documents/shared/functions.py:17 | next((row for row in q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) if row.document_id == document_id)) |
 | backend/src/kotorelay/operations/documents/shared/generated/queries.py:36 | db.query('operations/documents/shared/sql/001_drafts_list.sql', params.model_dump(), DraftsListRow) |
+| backend/src/kotorelay/operations/system/authorization/functions.py:6 | operation == 'read' |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:98 | db.query('operations/system/authorization/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |

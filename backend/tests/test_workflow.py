@@ -901,7 +901,7 @@ def test_モデル入力直前に失効を検知した場合はモデルを呼�
     When: モデル入力直前の再検証で根拠を失効させる。
     Then: 回答を保留し、失効した根拠を利用しない。
     """
-    from kotorelay.operations.chat.ask_question import router as service
+    from kotorelay.operations.chat.shared import functions as service
 
     published(client)
     original = service.validate_citation

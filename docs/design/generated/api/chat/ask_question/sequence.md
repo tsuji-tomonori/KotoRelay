@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 最新承認版の根拠で回答 — シーケンス
 
@@ -20,62 +20,65 @@ sequenceDiagram
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: 質問先部署への現在の所属を確認する。
-    A->>F: member
-    opt 検証不成立：ctx.member(data.department_id)
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    A->>F: 指定した部署に現在も所属している。
+    opt 検証不成立：質問先部署への現在の所属を確認する。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
     A->>F: stable_id
     A->>F: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
     A->>D: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
-    alt prior
+    A->>F: 同じ操作IDの回答が保存されている。
+    alt 同じ操作IDの回答が保存されている。
     A->>F: 同じ冪等キーの質問内容・部署・会話が一致することを確認する。
     opt 前条件が成立
     A->>S: 実体を取得・ハッシュ照合
     end
-    opt 検証不成立：prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id)
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 409 / {code： "idempotency_conflict", message： "同じ操作IDが異なる内容で使用されています。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：同じ冪等キーの質問内容・部署・会話が一致することを確認する。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
-    Note over A: already_answeredは内部制御例外。catchで既存回答を再取得・再認可し、HTTP 200 / AnswerView（id・answer・status・citations等）を返す。HTTP 409は送らない。
+    Note over A: 保存済み回答を再取得・再認可する捕捉分岐へ進む
     end
     A->>F: 要求内容の一致を確認して同じ冪等キーの記録済み結果を取得する。
-    A->>F: idempotent_result
+    A->>F: 同じ冪等キーの処理内容が一致することを確認して保存済み応答を返す。
     A->>F: stable_id
     A->>D: 現在の組織に属する指定の再送判定の記録について、実行済み操作の入力ハッシュと応答を取得する。
     opt 前条件が成立
     A->>F: digest
     end
-    opt 検証不成立：record.operation == operation and record.request_hash == digest(request.encode())
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 409 / {code： "idempotency_conflict", message： "同じ操作IDが異なる内容で使用されています。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：同じ冪等キーの処理内容が一致することを確認して保存済み応答を返す。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
     A->>F: 現在の組織に属する利用イベントを識別子順に一覧取得する。
     A->>D: 現在の組織に属する利用イベントを識別子順に一覧取得する。
     A->>F: 再開要求を除いて利用者の当日質問数の上限を確認する。
-    opt 検証不成立：resumed is not None or sum((1 for e in events if e.user_id == ctx.user.id and e.kind == 'question' and (e.created_at.date() == today))) < ctx.settings.max_questions_per_day
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 429 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：再開要求を除いて利用者の当日質問数の上限を確認する。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
-    alt resumed is not None
+    A->>F: 中断前に受付済みの会話がある。
+    alt 中断前に受付済みの会話がある。
     else 条件不成立
-    alt data.conversation_id
+    A->>F: 継続する会話が指定されている。
+    alt 継続する会話が指定されている。
     A->>F: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
     A->>D: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
     A->>F: 会話が存在し現在の利用者が所有することを確認する。
-    opt 検証不成立：bool(conversations) and conversations[0].user_id == ctx.user.id
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：会話が存在し現在の利用者が所有することを確認する。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
     A->>F: 会話内の回答が同じ部署に帰属することを確認する。
     A->>D: 現在の組織に属する回答履歴を識別子順に一覧取得する。
-    opt 検証不成立：all((a.department_id == data.department_id for a in q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) if a.conversation_id == conversation_id))
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 409 / {code： "conversation_department", message： "利用部署を変更する場合は新しい会話を開始してください。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：会話内の回答が同じ部署に帰属することを確認する。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
     else 条件不成立
     A->>F: new_id
@@ -88,7 +91,13 @@ sequenceDiagram
     A->>D: 現在の組織に属する文書を識別子順に一覧取得する。
     loop q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org))
     opt 前条件が成立
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     end
     end
     A->>F: 閲覧可能な文書の範囲で質問に関連する断片を検索する。
@@ -97,11 +106,11 @@ sequenceDiagram
     A->>D: 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
     loop f.chunks_list(ctx)
     A->>F: 閲覧可能な最新承認版の反映済み断片でないかを判定する。
-    alt f.is_unavailable_chunk(docs, chunk)
+    alt 閲覧可能な最新承認版の反映済み断片でないかを判定する。
     Note over A: 次の反復へ
     end
     A->>F: 検索エンジンの候補に含まれない断片かを判定する。
-    alt f.is_outside_search_results(vector_keys, chunk)
+    alt 検索エンジンの候補に含まれない断片かを判定する。
     Note over A: 次の反復へ
     end
     rect rgb(245, 247, 250)
@@ -115,7 +124,8 @@ sequenceDiagram
     Note over A: 次の反復へ
     end
     A->>F: 検索順位があれば順位を使い、ローカル検索では質問と本文の共通語数を得点にする。
-    alt vector_keys is None
+    A->>F: 検索エンジンの順位がなく、ローカルの共通語数で採点する。
+    alt 検索エンジンの順位がなく、ローカルの共通語数で採点する。
     A->>F: terms
     A->>F: terms
     else 条件不成立
@@ -134,7 +144,13 @@ sequenceDiagram
     A->>F: 取得時点の文書・版・断片とハッシュを回答根拠の参照値にまとめる。
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
     A->>F: digest
@@ -143,7 +159,8 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     A->>S: 実体を取得・ハッシュ照合
     loop manifest.images
-    alt image.placement.id in json.loads(chunk.placements)
+    A->>F: 画像が引用した文書断片に含まれている。
+    alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
     A->>S: 実体を取得・ハッシュ照合
@@ -155,13 +172,13 @@ sequenceDiagram
     A->>L: KR_EVIDENCE_REJECTED / 整合性を確認できない回答根拠を除外しました。
     Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
     end
-    alt not validate_citation(ctx, citation)
+    alt 不成立：（閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。）
     Note over A: 次の反復へ
     end
     A->>F: 確定版に記録された本文と画像の構成を読み取る。
     A->>F: 検索断片に関連付けられた画像だけを取り出す。
     A->>F: 根拠画像を追加するとモデル入力の画像数上限を超えるかを判定する。
-    alt f.exceeds_image_limit(images, related, ctx)
+    alt 根拠画像を追加するとモデル入力の画像数上限を超えるかを判定する。
     Note over A: 次の反復へ
     end
     loop related
@@ -171,92 +188,92 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     end
     A->>F: 回答に使用する根拠が五件に達したかを判定する。
-    alt f.has_enough_citations(citations)
+    alt 回答に使用する根拠が五件に達したかを判定する。
     Note over A: 反復を終了
     end
     end
     A->>F: 既存の受付記録を再開する要求ではないかを判定する。
-    alt f.is_new_question(resumed)
+    alt 既存の受付記録を再開する要求ではないかを判定する。
     A->>F: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
     A->>F: now
     A->>D: 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。
     A->>F: 同じ要求を安全に再試行できるよう冪等キーと結果を記録する。
-    A->>F: remember
+    A->>F: 冪等キーに処理内容と応答を保存する。
     A->>F: stable_id
     A->>F: digest
     A->>D: 現在の組織の操作の再送を判定するため、実行済み操作の入力ハッシュと応答を登録する。
     end
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
-    A->>F: fence
+    A->>F: 処理中に組織の状態が変更されていないことを確認する。
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-    opt 検証不成立：q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1
-    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：111 で捕捉 / HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    opt 検証不成立：処理中に組織の状態が変更されていないことを確認する。
+    Note over A: Problemを kotorelay.operations.chat.ask_question.router.ask_question：113 で捕捉し、継続・再送出分岐へ進む。
     end
     Note over A,D: 正常終了時commit・競合時rollback
     end
     end
     opt 例外発生：Problem
     A->>F: 既存回答の再表示以外の例外かを判定する。
-    alt f.is_unhandled_problem(exc)
-    opt 再送出されたProblem：forbidden
+    alt 既存回答の再表示以外の例外かを判定する。
+    opt 捕捉した業務例外を再送出する場合
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    E-->>U: HTTP 403 / この操作は許可されていません。
     end
     end
-    opt 再送出されたProblem：not_found
+    opt 捕捉した業務例外を再送出する場合
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
-    opt 再送出されたProblem：conflict
+    opt 捕捉した業務例外を再送出する場合
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
-    opt 再送出されたProblem：conversation_department
+    opt 捕捉した業務例外を再送出する場合
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conversation_department", message： "利用部署を変更する場合は新しい会話を開始してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 利用部署を変更する場合は新しい会話を開始してください。
     end
     end
-    opt 再送出されたProblem：idempotency_conflict
+    opt 捕捉した業務例外を再送出する場合
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "idempotency_conflict", message： "同じ操作IDが異なる内容で使用されています。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 同じ操作IDが異なる内容で使用されています。
     end
     end
-    opt 再送出されたProblem：limit
+    opt 捕捉した業務例外を再送出する場合
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 429 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID}
+    E-->>U: HTTP 429 / 利用上限に達しました。
     end
     end
     end
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
@@ -264,17 +281,23 @@ sequenceDiagram
     A->>F: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
     A->>D: 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。
     A->>F: 現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
-    opt 検証不成立：answer.user_id == ctx.user.id
+    opt 検証不成立：現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     loop evidence.citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
     A->>F: digest
@@ -283,7 +306,8 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     A->>S: 実体を取得・ハッシュ照合
     loop manifest.images
-    alt image.placement.id in json.loads(chunk.placements)
+    A->>F: 画像が引用した文書断片に含まれている。
+    alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
     A->>S: 実体を取得・ハッシュ照合
@@ -297,40 +321,53 @@ sequenceDiagram
     end
     end
     A->>S: 実体を取得・ハッシュ照合
-    alt valid
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    alt 回答のすべての引用根拠が現在も有効である。
     A->>S: 実体を取得・ハッシュ照合
     else 条件不成立
     end
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    A->>F: 回答のすべての引用根拠が現在も有効である。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
-    Note over A,D: 正常終了時commit・競合時rollback
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
+    A-->>U: HTTP 200 / AnswerView
     end
     end
-    alt prepared.citations
+    end
+    A->>F: 回答に使用する根拠候補がある。
+    alt 回答に使用する根拠候補がある。
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
-    loop prepared.citations
+    A->>F: すべての根拠の閲覧権限と公開版が現在も有効である。
+    loop citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
     A->>F: digest
@@ -339,7 +376,8 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     A->>S: 実体を取得・ハッシュ照合
     loop manifest.images
-    alt image.placement.id in json.loads(chunk.placements)
+    A->>F: 画像が引用した文書断片に含まれている。
+    alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
     A->>S: 実体を取得・ハッシュ照合
@@ -352,12 +390,13 @@ sequenceDiagram
     Note over A,U: HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。
     end
     end
-    alt not all((validate_citation(ctx, c) for c in prepared.citations))
+    alt 不成立：（すべての根拠の閲覧権限と公開版が現在も有効である。）
     A->>F: 失効した根拠とその本文・画像をモデル入力から除く。
     end
     Note over A,D: 正常終了時commit・競合時rollback
     end
-    alt prepared.citations
+    A->>F: 回答に使用する根拠候補がある。
+    alt 回答に使用する根拠候補がある。
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     A->>F: 準備済みの本文と画像をモデルへ送り回答を取得する。
@@ -372,37 +411,45 @@ sequenceDiagram
     rect rgb(235, 245, 255)
     Note over A,D: transaction開始・例外時rollback
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
     A->>F: 回答確定時点でも質問先部署への所属が有効であることを確認する。
-    A->>F: member
-    opt 検証不成立：ctx.member(prepared.department_id)
+    A->>F: 指定した部署に現在も所属している。
+    opt 検証不成立：回答確定時点でも質問先部署への所属が有効であることを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    E-->>U: HTTP 403 / この操作は許可されていません。
     end
     end
+    A->>F: 回答に使用する根拠候補がある。
     opt 前条件が成立
-    loop prepared.citations
+    A->>F: すべての根拠の閲覧権限と公開版が現在も有効である。
+    loop citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
     A->>F: digest
@@ -411,7 +458,8 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     A->>S: 実体を取得・ハッシュ照合
     loop manifest.images
-    alt image.placement.id in json.loads(chunk.placements)
+    A->>F: 画像が引用した文書断片に含まれている。
+    alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
     A->>S: 実体を取得・ハッシュ照合
@@ -449,27 +497,33 @@ sequenceDiagram
     A->>F: now
     A->>D: 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
-    A->>F: fence
+    A->>F: 処理中に組織の状態が変更されていないことを確認する。
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-    opt 検証不成立：q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1
+    opt 検証不成立：処理中に組織の状態が変更されていないことを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
-    opt 検証不成立：answer.user_id == ctx.user.id
+    opt 検証不成立：現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     loop evidence.citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
     A->>F: digest
@@ -478,7 +532,8 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     A->>S: 実体を取得・ハッシュ照合
     loop manifest.images
-    alt image.placement.id in json.loads(chunk.placements)
+    A->>F: 画像が引用した文書断片に含まれている。
+    alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
     A->>S: 実体を取得・ハッシュ照合
@@ -492,35 +547,39 @@ sequenceDiagram
     end
     end
     A->>S: 実体を取得・ハッシュ照合
-    alt valid
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    alt 回答のすべての引用根拠が現在も有効である。
     A->>S: 実体を取得・ハッシュ照合
     else 条件不成立
     end
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    A->>F: 回答のすべての引用根拠が現在も有効である。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
-    Note over A,D: 正常終了時commit・競合時rollback
-    end
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
     A-->>U: HTTP 200 / AnswerView
+    end
+    end
     Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
     opt 入力検証の失敗（RequestValidationError）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 422 / 入力形式を確認してください。
     end
     end
     opt SQL実行またはcommitの競合（psycopg.Error）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 競合しました。再読込してください。
     end
     end
     opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 503 / 一時的に利用できません。
     end
     end
 ```
@@ -545,98 +604,106 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.can_read | 89 | If | doc.status != 'active' or not self.memberships |
-| kotorelay.context.Context.can_read | 90 | Return | False |
-| kotorelay.context.Context.can_read | 91 | If | doc.visibility == 'organization' |
-| kotorelay.context.Context.can_read | 92 | Return | True |
-| kotorelay.context.Context.can_read | 93 | If | self.member(doc.department_id) |
-| kotorelay.context.Context.can_read | 94 | Return | True |
-| kotorelay.context.Context.can_read | 95 | Return | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
-| kotorelay.context.Context.idempotent_result | 153 | If | not rows |
-| kotorelay.context.Context.idempotent_result | 154 | Return | None |
-| kotorelay.context.Context.idempotent_result | 161 | Return | record.response |
-| kotorelay.context.Context.member | 75 | Return | any((m.department_id == department_id for m in self.memberships)) |
-| kotorelay.context.new_id | 23 | Return | str(uuid4()) |
-| kotorelay.context.now | 19 | Return | datetime.now(UTC) |
-| kotorelay.context.stable_id | 27 | Return | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
+| kotorelay.context.Context.can_read | 95 | If | doc.status != 'active' or not self.memberships |
+| kotorelay.context.Context.can_read | 96 | Return | False |
+| kotorelay.context.Context.can_read | 97 | If | doc.visibility == 'organization' |
+| kotorelay.context.Context.can_read | 98 | Return | True |
+| kotorelay.context.Context.can_read | 99 | If | self.member(doc.department_id) |
+| kotorelay.context.Context.can_read | 100 | Return | True |
+| kotorelay.context.Context.can_read | 101 | Return | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
+| kotorelay.context.Context.idempotent_result | 162 | If | not rows |
+| kotorelay.context.Context.idempotent_result | 163 | Return | None |
+| kotorelay.context.Context.idempotent_result | 170 | Return | record.response |
+| kotorelay.context.Context.member | 79 | Return | any((m.department_id == department_id for m in self.memberships)) |
+| kotorelay.context.new_id | 24 | Return | str(uuid4()) |
+| kotorelay.context.now | 20 | Return | datetime.now(UTC) |
+| kotorelay.context.stable_id | 28 | Return | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | kotorelay.engines.terms | 30 | Return | {value[i:i + 2] for i in range(max(0, len(value) - 1))} &#124; set(re.findall('[a-z0-9]+', value)) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
 | kotorelay.operational_logging.continuation_context | 150 | Return | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
-| kotorelay.operations.chat.ask_question.functions.answers_get | 30 | Return | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=exc.message)) |
-| kotorelay.operations.chat.ask_question.functions.answers_get_2 | 50 | Return | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=answer_id)) |
-| kotorelay.operations.chat.ask_question.functions.answers_insert | 298 | Return | q.answers_insert(ctx.db, q.AnswersInsertParams.model_validate(row, from_attributes=True)) |
-| kotorelay.operations.chat.ask_question.functions.assets_get | 215 | Return | q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=image.placement.asset_id)) |
-| kotorelay.operations.chat.ask_question.functions.build_answer_record | 281 | Return | models.AnswersRow(id=prepared.answer_id, organization_id=ctx.org, conversation_id=prepared.conversation_id, user_id=ctx.user.id, department_id=prepared.department_id, question_key=ctx.objects.put(prepared.question.encode()), answer_key=ctx.objects.put(text.encode()), evidence=Evidence(citations=citations).model_dump_json(), status=status, model=engine.name, created_at=now()) |
-| kotorelay.operations.chat.ask_question.functions.build_citation | 368 | Return | shared_schemas.Citation(document_id=doc.id, version_id=version.id, version_number=version.number, has_images=bool(json.loads(chunk.placements)), chunk_id=chunk.id, title=version.title, heading=chunk.heading, manifest_hash=version.manifest_hash, chunk_hash=chunk.sha256, document_revision=doc.revision) |
-| kotorelay.operations.chat.ask_question.functions.check_concurrent_access | 264 | Return | ctx.fence() |
-| kotorelay.operations.chat.ask_question.functions.chunks_list | 156 | Return | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
-| kotorelay.operations.chat.ask_question.functions.collect_contributing_documents | 323 | Return | {c.document_id for c in citations} |
-| kotorelay.operations.chat.ask_question.functions.conversations_get | 101 | Return | q.conversations_get(ctx.db, q.ConversationsGetParams(organization_id=ctx.org, id=conversation_id)) |
-| kotorelay.operations.chat.ask_question.functions.conversations_insert | 130 | Return | q.conversations_insert(ctx.db, q.ConversationsInsertParams(id=conversation_id, organization_id=ctx.org, user_id=ctx.user.id, created_at=now())) |
-| kotorelay.operations.chat.ask_question.functions.discard_invalid_evidence | 35 | Return | prepared.model_copy(update={'citations': [], 'texts': [], 'images': []}) |
-| kotorelay.operations.chat.ask_question.functions.enforce_daily_question_limit | 84 | Return | require(resumed is not None or sum((1 for e in events if e.user_id == ctx.user.id and e.kind == 'question' and (e.created_at.date() == today))) < ctx.settings.max_questions_per_day, 'limit', 429) |
-| kotorelay.operations.chat.ask_question.functions.events_insert | 239 | Return | q.events_insert(ctx.db, q.EventsInsertParams(id=answer_id, organization_id=ctx.org, user_id=ctx.user.id, department_id=data.department_id, document_id=None, answer_id=None, kind='question', outcome='accepted', created_at=now())) |
-| kotorelay.operations.chat.ask_question.functions.events_insert_2 | 305 | Return | q.events_insert(ctx.db, q.EventsInsertParams(id=stable_id(row.id + 'outcome'), organization_id=ctx.org, user_id=ctx.user.id, department_id=prepared.department_id, document_id=None, answer_id=row.id, kind='outcome', outcome=status, created_at=now())) |
-| kotorelay.operations.chat.ask_question.functions.events_insert_3 | 334 | Return | q.events_insert(ctx.db, q.EventsInsertParams(id=stable_id(row.id + document_id), organization_id=ctx.org, user_id=ctx.user.id, department_id=prepared.department_id, document_id=document_id, answer_id=row.id, kind='contribution', outcome=status, created_at=now())) |
-| kotorelay.operations.chat.ask_question.functions.events_list | 74 | Return | q.events_list(ctx.db, q.EventsListParams(organization_id=ctx.org)) |
-| kotorelay.operations.chat.ask_question.functions.exceeds_image_limit | 208 | Return | bool(len(images) + len(related) > ctx.settings.max_model_images) |
-| kotorelay.operations.chat.ask_question.functions.find_previous_result | 69 | Return | ctx.idempotent_result(key, 'ask', request) |
-| kotorelay.operations.chat.ask_question.functions.generate_answer | 40 | Return | rt.engine.generate(prepared.question, prepared.texts, prepared.images) |
-| kotorelay.operations.chat.ask_question.functions.has_enough_citations | 229 | Return | bool(len(citations) >= 5) |
-| kotorelay.operations.chat.ask_question.functions.has_sufficient_relevance | 182 | Return | bool(score > 0 and (vector_keys is not None or score >= max(1, len(terms(data.question)) * 0.3))) |
-| kotorelay.operations.chat.ask_question.functions.is_new_question | 234 | Return | bool(resumed is None) |
-| kotorelay.operations.chat.ask_question.functions.is_outside_search_results | 170 | Return | bool(vector_keys is not None and chunk.id not in vector_keys) |
-| kotorelay.operations.chat.ask_question.functions.is_unavailable_chunk | 161 | Return | bool(chunk.document_id not in docs or chunk.version_id != docs[chunk.document_id].latest_version_id or (not chunk.ready)) |
-| kotorelay.operations.chat.ask_question.functions.is_unhandled_problem | 25 | Return | bool(exc.code != 'already_answered') |
-| kotorelay.operations.chat.ask_question.functions.load_chunk_text | 175 | Return | ctx.objects.get(chunk.body_key, chunk.sha256).decode() |
-| kotorelay.operations.chat.ask_question.functions.load_citation_image | 224 | Return | ctx.objects.get(asset.object_key, image.image_hash) |
-| kotorelay.operations.chat.ask_question.functions.load_readable_documents | 140 | Return | {d.id: d for d in q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) if d.latest_version_id and ctx.can_read(d)} |
-| kotorelay.operations.chat.ask_question.functions.parse_manifest | 194 | Return | Manifest.model_validate_json(version.manifest) |
-| kotorelay.operations.chat.ask_question.functions.rank_candidates | 386 | Return | sorted(scored, key=lambda item: (-item[0], item[1].id))[:10] |
-| kotorelay.operations.chat.ask_question.functions.record_finalize_audit | 352 | Return | ctx.audit('answer', after=status) |
-| kotorelay.operations.chat.ask_question.functions.remember_prepare_result | 259 | Return | ctx.remember(key, 'ask', request, conversation_id) |
-| kotorelay.operations.chat.ask_question.functions.require_conversation_owner | 110 | Return | require(bool(conversations) and conversations[0].user_id == ctx.user.id) |
-| kotorelay.operations.chat.ask_question.functions.require_current_membership | 269 | Return | require(ctx.member(prepared.department_id), 'forbidden', 403) |
-| kotorelay.operations.chat.ask_question.functions.require_question_membership | 45 | Return | require(ctx.member(data.department_id), 'forbidden', 403) |
-| kotorelay.operations.chat.ask_question.functions.require_same_department | 117 | Return | require(all((a.department_id == data.department_id for a in q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) if a.conversation_id == conversation_id)), 'conversation_department', 409) |
-| kotorelay.operations.chat.ask_question.functions.resolve_answer_outcome | 394 | Return | (status, evidence if status == 'answered' else [], answer if status == 'answered' else '現在利用できる根拠が不足しているため、回答を保留しました。') |
-| kotorelay.operations.chat.ask_question.functions.score_chunk | 357 | Return | float(len(terms(question) & terms(text))) if vector_keys is None else float(len(vector_keys) - vector_keys.index(chunk_id)) |
-| kotorelay.operations.chat.ask_question.functions.search_vector_keys | 151 | Return | engine.search(data.question, list(docs)) |
-| kotorelay.operations.chat.ask_question.functions.select_citation_images | 201 | Return | [i for i in manifest.images if i.placement.id in json.loads(chunk.placements)] |
-| kotorelay.operations.chat.ask_question.functions.validate_repeated_question | 57 | Return | require(prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id), 'idempotency_conflict', 409) |
-| kotorelay.operations.chat.ask_question.functions.versions_get | 189 | Return | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=chunk.version_id)) |
+| kotorelay.operations.chat.ask_question.functions.answers_get | 32 | Return | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=exc.message)) |
+| kotorelay.operations.chat.ask_question.functions.answers_get_2 | 52 | Return | q.answers_get(ctx.db, q.AnswersGetParams(organization_id=ctx.org, id=answer_id)) |
+| kotorelay.operations.chat.ask_question.functions.answers_insert | 300 | Return | q.answers_insert(ctx.db, q.AnswersInsertParams.model_validate(row, from_attributes=True)) |
+| kotorelay.operations.chat.ask_question.functions.assets_get | 217 | Return | q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=image.placement.asset_id)) |
+| kotorelay.operations.chat.ask_question.functions.build_answer_record | 283 | Return | models.AnswersRow(id=prepared.answer_id, organization_id=ctx.org, conversation_id=prepared.conversation_id, user_id=ctx.user.id, department_id=prepared.department_id, question_key=ctx.objects.put(prepared.question.encode()), answer_key=ctx.objects.put(text.encode()), evidence=Evidence(citations=citations).model_dump_json(), status=status, model=engine.name, created_at=now()) |
+| kotorelay.operations.chat.ask_question.functions.build_citation | 373 | Return | shared_schemas.Citation(document_id=doc.id, version_id=version.id, version_number=version.number, has_images=bool(json.loads(chunk.placements)), chunk_id=chunk.id, title=version.title, heading=chunk.heading, manifest_hash=version.manifest_hash, chunk_hash=chunk.sha256, document_revision=doc.revision) |
+| kotorelay.operations.chat.ask_question.functions.check_concurrent_access | 266 | Return | ctx.fence() |
+| kotorelay.operations.chat.ask_question.functions.chunks_list | 158 | Return | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
+| kotorelay.operations.chat.ask_question.functions.collect_contributing_documents | 325 | Return | {c.document_id for c in citations} |
+| kotorelay.operations.chat.ask_question.functions.conversations_get | 103 | Return | q.conversations_get(ctx.db, q.ConversationsGetParams(organization_id=ctx.org, id=conversation_id)) |
+| kotorelay.operations.chat.ask_question.functions.conversations_insert | 132 | Return | q.conversations_insert(ctx.db, q.ConversationsInsertParams(id=conversation_id, organization_id=ctx.org, user_id=ctx.user.id, created_at=now())) |
+| kotorelay.operations.chat.ask_question.functions.discard_invalid_evidence | 37 | Return | prepared.model_copy(update={'citations': [], 'texts': [], 'images': []}) |
+| kotorelay.operations.chat.ask_question.functions.enforce_daily_question_limit | 86 | Return | require(resumed is not None or sum((1 for e in events if e.user_id == ctx.user.id and e.kind == 'question' and (e.created_at.date() == today))) < ctx.settings.max_questions_per_day, 'limit', 429) |
+| kotorelay.operations.chat.ask_question.functions.events_insert | 241 | Return | q.events_insert(ctx.db, q.EventsInsertParams(id=answer_id, organization_id=ctx.org, user_id=ctx.user.id, department_id=data.department_id, document_id=None, answer_id=None, kind='question', outcome='accepted', created_at=now())) |
+| kotorelay.operations.chat.ask_question.functions.events_insert_2 | 307 | Return | q.events_insert(ctx.db, q.EventsInsertParams(id=stable_id(row.id + 'outcome'), organization_id=ctx.org, user_id=ctx.user.id, department_id=prepared.department_id, document_id=None, answer_id=row.id, kind='outcome', outcome=status, created_at=now())) |
+| kotorelay.operations.chat.ask_question.functions.events_insert_3 | 336 | Return | q.events_insert(ctx.db, q.EventsInsertParams(id=stable_id(row.id + document_id), organization_id=ctx.org, user_id=ctx.user.id, department_id=prepared.department_id, document_id=document_id, answer_id=row.id, kind='contribution', outcome=status, created_at=now())) |
+| kotorelay.operations.chat.ask_question.functions.events_list | 76 | Return | q.events_list(ctx.db, q.EventsListParams(organization_id=ctx.org)) |
+| kotorelay.operations.chat.ask_question.functions.exceeds_image_limit | 210 | Return | bool(len(images) + len(related) > ctx.settings.max_model_images) |
+| kotorelay.operations.chat.ask_question.functions.find_previous_result | 71 | Return | ctx.idempotent_result(key, 'ask', request) |
+| kotorelay.operations.chat.ask_question.functions.generate_answer | 42 | Return | rt.engine.generate(prepared.question, prepared.texts, prepared.images) |
+| kotorelay.operations.chat.ask_question.functions.has_answer_evidence | 425 | Return | bool(prepared.citations) |
+| kotorelay.operations.chat.ask_question.functions.has_enough_citations | 231 | Return | bool(len(citations) >= 5) |
+| kotorelay.operations.chat.ask_question.functions.has_prepared_conversation | 415 | Return | conversation_id is not None |
+| kotorelay.operations.chat.ask_question.functions.has_previous_answer | 410 | Return | bool(rows) |
+| kotorelay.operations.chat.ask_question.functions.has_requested_conversation | 420 | Return | bool(data.conversation_id) |
+| kotorelay.operations.chat.ask_question.functions.has_sufficient_relevance | 184 | Return | bool(score > 0 and (vector_keys is not None or score >= max(1, len(terms(data.question)) * 0.3))) |
+| kotorelay.operations.chat.ask_question.functions.has_valid_evidence | 432 | Return | all((evidence_functions.validate_citation(ctx, citation) for citation in citations)) |
+| kotorelay.operations.chat.ask_question.functions.is_new_question | 236 | Return | bool(resumed is None) |
+| kotorelay.operations.chat.ask_question.functions.is_outside_search_results | 172 | Return | bool(vector_keys is not None and chunk.id not in vector_keys) |
+| kotorelay.operations.chat.ask_question.functions.is_unavailable_chunk | 163 | Return | bool(chunk.document_id not in docs or chunk.version_id != docs[chunk.document_id].latest_version_id or (not chunk.ready)) |
+| kotorelay.operations.chat.ask_question.functions.is_unhandled_problem | 27 | Return | bool(exc.code != 'already_answered') |
+| kotorelay.operations.chat.ask_question.functions.load_chunk_text | 177 | Return | ctx.objects.get(chunk.body_key, chunk.sha256).decode() |
+| kotorelay.operations.chat.ask_question.functions.load_citation_image | 226 | Return | ctx.objects.get(asset.object_key, image.image_hash) |
+| kotorelay.operations.chat.ask_question.functions.load_readable_documents | 142 | Return | {d.id: d for d in q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) if d.latest_version_id and ctx.can_read(d)} |
+| kotorelay.operations.chat.ask_question.functions.parse_manifest | 196 | Return | Manifest.model_validate_json(version.manifest) |
+| kotorelay.operations.chat.ask_question.functions.rank_candidates | 391 | Return | sorted(scored, key=lambda item: (-item[0], item[1].id))[:10] |
+| kotorelay.operations.chat.ask_question.functions.record_finalize_audit | 354 | Return | ctx.audit('answer', after=status) |
+| kotorelay.operations.chat.ask_question.functions.remember_prepare_result | 261 | Return | ctx.remember(key, 'ask', request, conversation_id) |
+| kotorelay.operations.chat.ask_question.functions.require_conversation_owner | 112 | Return | require(bool(conversations) and conversations[0].user_id == ctx.user.id) |
+| kotorelay.operations.chat.ask_question.functions.require_current_membership | 271 | Return | require(ctx.member(prepared.department_id), 'forbidden', 403) |
+| kotorelay.operations.chat.ask_question.functions.require_question_membership | 47 | Return | require(ctx.member(data.department_id), 'forbidden', 403) |
+| kotorelay.operations.chat.ask_question.functions.require_same_department | 119 | Return | require(all((a.department_id == data.department_id for a in q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) if a.conversation_id == conversation_id)), 'conversation_department', 409) |
+| kotorelay.operations.chat.ask_question.functions.resolve_answer_outcome | 399 | Return | (status, evidence if status == 'answered' else [], answer if status == 'answered' else '現在利用できる根拠が不足しているため、回答を保留しました。') |
+| kotorelay.operations.chat.ask_question.functions.score_chunk | 359 | Return | float(len(terms(question) & terms(text))) if uses_local_scoring(vector_keys) else float(len(typing.cast(list[str], vector_keys)) - typing.cast(list[str], vector_keys).index(chunk_id)) |
+| kotorelay.operations.chat.ask_question.functions.search_vector_keys | 153 | Return | engine.search(data.question, list(docs)) |
+| kotorelay.operations.chat.ask_question.functions.select_citation_images | 203 | Return | [i for i in manifest.images if i.placement.id in json.loads(chunk.placements)] |
+| kotorelay.operations.chat.ask_question.functions.uses_local_scoring | 437 | Return | vector_keys is None |
+| kotorelay.operations.chat.ask_question.functions.validate_repeated_question | 59 | Return | require(prior[0].user_id == ctx.user.id and ctx.objects.get(prior[0].question_key).decode() == data.question and (prior[0].department_id == data.department_id) and (data.conversation_id is None or data.conversation_id == prior[0].conversation_id), 'idempotency_conflict', 409) |
+| kotorelay.operations.chat.ask_question.functions.versions_get | 191 | Return | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=chunk.version_id)) |
 | kotorelay.operations.chat.ask_question.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 35 | Try | Try |
-| kotorelay.operations.chat.ask_question.router.ask_question | 40 | If | prior |
-| kotorelay.operations.chat.ask_question.router.ask_question | 42 | Raise | Raise |
-| kotorelay.operations.chat.ask_question.router.ask_question | 48 | If | resumed is not None |
-| kotorelay.operations.chat.ask_question.router.ask_question | 50 | If | data.conversation_id |
-| kotorelay.operations.chat.ask_question.router.ask_question | 62 | For | For |
-| kotorelay.operations.chat.ask_question.router.ask_question | 63 | If | f.is_unavailable_chunk(docs, chunk) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 65 | If | f.is_outside_search_results(vector_keys, chunk) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 67 | Try | Try |
-| kotorelay.operations.chat.ask_question.router.ask_question | 69 | ExceptHandler | Problem |
-| kotorelay.operations.chat.ask_question.router.ask_question | 76 | If | f.has_sufficient_relevance(score, vector_keys, data) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 81 | For | For |
-| kotorelay.operations.chat.ask_question.router.ask_question | 85 | If | not validate_citation(ctx, citation) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 89 | If | f.exceeds_image_limit(images, related, ctx) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 91 | For | For |
-| kotorelay.operations.chat.ask_question.router.ask_question | 96 | If | f.has_enough_citations(citations) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 98 | If | f.is_new_question(resumed) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 111 | ExceptHandler | Problem |
-| kotorelay.operations.chat.ask_question.router.ask_question | 112 | If | f.is_unhandled_problem(exc) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 113 | Raise | Raise |
-| kotorelay.operations.chat.ask_question.router.ask_question | 115 | Return | build_response(present(ctx, f.answers_get(ctx, exc)[0])) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 118 | If | prepared.citations |
-| kotorelay.operations.chat.ask_question.router.ask_question | 120 | If | not all((validate_citation(ctx, c) for c in prepared.citations)) |
-| kotorelay.operations.chat.ask_question.router.ask_question | 122 | If | prepared.citations |
-| kotorelay.operations.chat.ask_question.router.ask_question | 123 | Try | Try |
-| kotorelay.operations.chat.ask_question.router.ask_question | 125 | ExceptHandler | (BotoCoreError, ClientError, TimeoutError) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 37 | Try | Try |
+| kotorelay.operations.chat.ask_question.router.ask_question | 42 | If | f.has_previous_answer(prior) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 44 | Raise | Raise |
+| kotorelay.operations.chat.ask_question.router.ask_question | 50 | If | f.has_prepared_conversation(resumed) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 52 | If | f.has_requested_conversation(data) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 64 | For | For |
+| kotorelay.operations.chat.ask_question.router.ask_question | 65 | If | f.is_unavailable_chunk(docs, chunk) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 67 | If | f.is_outside_search_results(vector_keys, chunk) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 69 | Try | Try |
+| kotorelay.operations.chat.ask_question.router.ask_question | 71 | ExceptHandler | Problem |
+| kotorelay.operations.chat.ask_question.router.ask_question | 78 | If | f.has_sufficient_relevance(score, vector_keys, data) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 83 | For | For |
+| kotorelay.operations.chat.ask_question.router.ask_question | 87 | If | not evidence_functions.validate_citation(ctx, citation) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 91 | If | f.exceeds_image_limit(images, related, ctx) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 93 | For | For |
+| kotorelay.operations.chat.ask_question.router.ask_question | 98 | If | f.has_enough_citations(citations) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 100 | If | f.is_new_question(resumed) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 113 | ExceptHandler | Problem |
+| kotorelay.operations.chat.ask_question.router.ask_question | 114 | If | f.is_unhandled_problem(exc) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 115 | Raise | Raise |
+| kotorelay.operations.chat.ask_question.router.ask_question | 117 | Return | build_response(present(ctx, f.answers_get(ctx, exc)[0])) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 120 | If | f.has_answer_evidence(prepared) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 122 | If | not f.has_valid_evidence(ctx, prepared.citations) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 124 | If | f.has_answer_evidence(prepared) |
+| kotorelay.operations.chat.ask_question.router.ask_question | 125 | Try | Try |
+| kotorelay.operations.chat.ask_question.router.ask_question | 127 | ExceptHandler | (BotoCoreError, ClientError, TimeoutError) |
 | kotorelay.operations.chat.ask_question.router.ask_question | 142 | For | For |
 | kotorelay.operations.chat.ask_question.router.ask_question | 146 | Return | build_response(present(ctx, row)) |
-| kotorelay.operations.chat.shared.functions.present | 81 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| kotorelay.operations.chat.shared.functions.has_valid_evidence | 102 | Return | valid |
+| kotorelay.operations.chat.shared.functions.is_cited_image | 97 | Return | image.placement.id in json.loads(chunk.placements) |
+| kotorelay.operations.chat.shared.functions.present | 81 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if has_valid_evidence(valid) else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if has_valid_evidence(valid) else 'hidden', citations=evidence.citations if has_valid_evidence(valid) else [], model=answer.model, created_at=answer.created_at) |
 | kotorelay.operations.chat.shared.functions.validate_citation | 21 | If | not docs |
 | kotorelay.operations.chat.shared.functions.validate_citation | 22 | Return | False |
 | kotorelay.operations.chat.shared.functions.validate_citation | 24 | If | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision |
@@ -649,7 +716,7 @@ sequenceDiagram
 | kotorelay.operations.chat.shared.functions.validate_citation | 52 | If | placements - {image.placement.id for image in manifest.images} |
 | kotorelay.operations.chat.shared.functions.validate_citation | 53 | Return | False |
 | kotorelay.operations.chat.shared.functions.validate_citation | 54 | For | For |
-| kotorelay.operations.chat.shared.functions.validate_citation | 55 | If | image.placement.id in json.loads(chunk.placements) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 55 | If | is_cited_image(image, chunk) |
 | kotorelay.operations.chat.shared.functions.validate_citation | 63 | If | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') |
 | kotorelay.operations.chat.shared.functions.validate_citation | 64 | Return | False |
 | kotorelay.operations.chat.shared.functions.validate_citation | 67 | Return | True |

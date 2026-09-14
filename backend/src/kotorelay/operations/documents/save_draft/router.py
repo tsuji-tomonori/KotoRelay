@@ -25,7 +25,7 @@ router = APIRouter(prefix="/api/documents", tags=["文書"])
 )
 def save_draft(ctx: Ctx, document_id: UUID, data: SaveDraft) -> dict[str, object]:
     doc = f.document_doc(ctx, document_id)
-    row = next(d for d in f.drafts_list(ctx) if d.document_id == doc.id)
+    row = next(d for d in f.drafts_list(ctx) if f.is_document_draft(d, doc.id))
     f.validate_draft_revision(row, data)
     f.validate_placements(ctx, doc, data)
     key = f.put_key(ctx, data)

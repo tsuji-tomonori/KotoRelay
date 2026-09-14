@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 反映ジョブを再処理 — 詳細設計
 
@@ -38,9 +38,9 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:67 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/shared/functions.py:474 | row.document_id == document_id | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/shared/functions.py:476 | row.document_id in live | then / else の実装分岐 | 制御フロー参照 |
@@ -54,17 +54,17 @@
 | backend/src/kotorelay/operations/indexing/shared/functions.py:29 | line.startswith('#') | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/shared/functions.py:33 | len(buffer) + len(part) > 1200 and buffer.strip() | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/shared/functions.py:221 | len(actual) == len(parts) and engine.verify([c.id for c in actual]) | 'integrity' | 503 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:18 | not job.version_id or f.is_obsolete_version(doc, job) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:24 | f.has_more_stale_chunks(stale) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:26 | f.is_inactive_document(doc) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:44 | f.is_existing_chunk(previous, chunk) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:102 | f.is_finished_job(job) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:59 | f.is_restored_document(doc) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:61 | f.is_within_retention(ctx, job) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:79 | f.has_more_target_chunks(target_chunks) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:84 | f.has_more_target_ocr(target_runs) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:87 | f.is_target_asset(asset, doc) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:90 | f.is_target_draft(draft, doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:20 | f.is_obsolete_version(doc, job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:26 | f.has_more_stale_chunks(stale) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:28 | f.is_inactive_document(doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:46 | f.is_existing_chunk(previous, chunk) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:104 | f.is_finished_job(job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:61 | f.is_restored_document(doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:63 | f.is_within_retention(ctx, job) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:81 | f.has_more_target_chunks(target_chunks) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:86 | f.has_more_target_ocr(target_runs) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:89 | f.is_target_asset(asset, doc) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:92 | f.is_target_draft(draft, doc) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -140,8 +140,8 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
-| backend/src/kotorelay/context.py:27 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
+| backend/src/kotorelay/context.py:20 | datetime.now(UTC) |
+| backend/src/kotorelay/context.py:28 | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | backend/src/kotorelay/operational_logging.py:150 | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
 | backend/src/kotorelay/operations/indexing/retry_job/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
 | backend/src/kotorelay/operations/indexing/retry_job/router.py:27 | build_response(process(ctx, rt.engine, str(job_id))) |
@@ -225,17 +225,17 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/indexing/shared/generated/queries.py:441 | db.execute('operations/indexing/shared/sql/017_outbox_update.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/indexing/shared/generated/queries.py:471 | db.query('operations/indexing/shared/sql/018_versions_get.sql', params.model_dump(), VersionsGetRow) |
 | backend/src/kotorelay/operations/indexing/shared/generated/queries.py:502 | db.query('operations/indexing/shared/sql/019_versions_list.sql', params.model_dump(), VersionsListRow) |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:53 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:19 | 'obsolete' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:25 | 'pending' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:27 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:119 | updated |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:103 | job |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:92 | 'done' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:60 | 'obsolete' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:62 | 'retained' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:80 | 'pending' |
-| backend/src/kotorelay/operations/indexing/shared/workflow.py:85 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:55 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:21 | 'obsolete' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:27 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:29 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:121 | updated |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:105 | job |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:94 | 'done' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:62 | 'obsolete' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:64 | 'retained' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:82 | 'pending' |
+| backend/src/kotorelay/operations/indexing/shared/workflow.py:87 | 'pending' |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:194 | db.execute('operations/system/authorization/sql/007_organizations_fence.sql', params.model_dump()) |

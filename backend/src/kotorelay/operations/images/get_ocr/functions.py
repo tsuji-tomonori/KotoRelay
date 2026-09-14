@@ -65,3 +65,8 @@ def build_get_ocr(
             ],
         }
     )
+
+
+def has_requested_version(version_id: object | None) -> bool:
+    """表示する版が指定されている。"""
+    return bool(version_id)

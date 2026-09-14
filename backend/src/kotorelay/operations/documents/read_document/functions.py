@@ -57,3 +57,8 @@ def build_read_document(
             for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org))
         ),
     }
+
+
+def has_requested_version(version_id: object | None) -> bool:
+    """表示する版が指定されている。"""
+    return bool(version_id)

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # manifestを確認して承認・却下 — シーケンス
 
@@ -17,19 +17,19 @@ sequenceDiagram
     U->>A: POST /api/reviews/{submission_id}/decision
     Note over A,D: 依存注入でtransaction開始・組織と所属を確認
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
@@ -37,106 +37,132 @@ sequenceDiagram
     A->>F: 現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を取得する。
     A->>D: 現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を取得する。
     A->>F: 対象の承認申請が存在することを確認する。
-    opt 検証不成立：bool(rows)
+    opt 検証不成立：対象の承認申請が存在することを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     A->>F: 文書を取得して要求された操作の権限を確認する。
-    A->>F: document
+    A->>F: 対象の文書が存在し、要求された操作を実行できることを確認する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    opt 検証不成立：bool(rows)
+    opt 検証不成立：対象の文書が存在し、要求された操作を実行できることを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
-    opt 検証不成立：allowed
+    A->>F: 文書の閲覧権限を確認する操作である。
+    alt 文書の閲覧権限を確認する操作である。
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
+    else 条件不成立
+    opt 前条件が成立
+    A->>F: 指定した部署で要求された操作を実行できる。
+    end
+    end
+    opt 検証不成立：対象の文書が存在し、要求された操作を実行できることを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     A->>F: 要求内容の一致を確認して同じ冪等キーの記録済み結果を取得する。
-    A->>F: idempotent_result
+    A->>F: 同じ冪等キーの処理内容が一致することを確認して保存済み応答を返す。
     A->>F: stable_id
     A->>D: 現在の組織に属する指定の再送判定の記録について、実行済み操作の入力ハッシュと応答を取得する。
     opt 前条件が成立
     A->>F: digest
     end
-    opt 検証不成立：record.operation == operation and record.request_hash == digest(request.encode())
+    opt 検証不成立：同じ冪等キーの処理内容が一致することを確認して保存済み応答を返す。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "idempotency_conflict", message： "同じ操作IDが異なる内容で使用されています。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 同じ操作IDが異なる内容で使用されています。
     end
     end
-    alt cached
+    A->>F: 同じ操作IDの処理結果が保存されている。
+    alt 同じ操作IDの処理結果が保存されている。
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
+    A-->>U: HTTP 200 / models.SubmissionsRow
+    end
     end
     A->>F: 未決裁の申請であることを確認する。
-    opt 検証不成立：submission.status == 'pending'
+    opt 検証不成立：未決裁の申請であることを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 対象文書に属する確定版を取得する。
-    A->>F: version
+    A->>F: 文書の版が存在し、閲覧権限と実体の整合性が有効なことを確認する。
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
-    opt 検証不成立：bool(rows) and rows[0].document_id == doc.id
+    opt 検証不成立：文書の版が存在し、閲覧権限と実体の整合性が有効なことを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
-    alt not self.permission(doc.department_id, 'draft')
-    opt 検証不成立：self.can_read(doc) and doc.latest_version_id == version.id
+    A->>F: 指定した部署で要求された操作を実行できる。
+    alt 不成立：（指定した部署で要求された操作を実行できる。）
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
+    opt 検証不成立：文書の版が存在し、閲覧権限と実体の整合性が有効なことを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     end
     A->>F: digest
-    opt 検証不成立：digest(version.manifest.encode()) == version.manifest_hash
+    opt 検証不成立：文書の版が存在し、閲覧権限と実体の整合性が有効なことを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / {code： "integrity", message： "保存内容の整合性を確認できません。", request_id： 相関ID}
+    E-->>U: HTTP 503 / 保存内容の整合性を確認できません。
     end
     end
     A->>F: 版の作成者による自己承認を拒否する。
-    opt 検証不成立：version.created_by != ctx.user.id
+    opt 検証不成立：版の作成者による自己承認を拒否する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / {code： "self_approval", message： "自分が作成した版は承認できません。", request_id： 相関ID}
+    E-->>U: HTTP 403 / 自分が作成した版は承認できません。
     end
     end
     A->>F: 申請・確認画面・確定版のmanifestハッシュが一致することを確認する。
-    opt 検証不成立：submission.manifest_hash == data.manifest_hash == version.manifest_hash
+    opt 検証不成立：申請・確認画面・確定版のmanifestハッシュが一致することを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 却下するときに理由が入力されていることを確認する。
-    opt 検証不成立：data.decision != 'rejected' or bool(data.reason.strip())
+    opt 検証不成立：却下するときに理由が入力されていることを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / {code： "reason_required", message： "理由を入力してください。", request_id： 相関ID}
+    E-->>U: HTTP 422 / 理由を入力してください。
     end
     end
     A->>F: 後続処理に渡すデータを組み立てる。
@@ -144,14 +170,15 @@ sequenceDiagram
     A->>F: 現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を更新する。
     A->>D: 現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を更新する。
     A->>F: 申請を承認する決裁かを判定する。
-    alt f.is_approved(data)
-    alt doc.latest_version_id
+    alt 申請を承認する決裁かを判定する。
+    A->>F: 文書に公開済みの版がある。
+    alt 文書に公開済みの版がある。
     A->>F: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     else 条件不成立
     end
     A->>F: 今回の版が公開中の版より新しいかを判定する。
-    alt f.is_newer_publication(previous, version)
+    alt 今回の版が公開中の版より新しいかを判定する。
     A->>F: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。
     A->>F: now
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。
@@ -167,44 +194,45 @@ sequenceDiagram
     A->>F: now
     A->>D: 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。
     A->>F: 同じ要求を安全に再試行できるよう冪等キーと結果を記録する。
-    A->>F: remember
+    A->>F: 冪等キーに処理内容と応答を保存する。
     A->>F: stable_id
     A->>F: digest
     A->>D: 現在の組織の操作の再送を判定するため、実行済み操作の入力ハッシュと応答を登録する。
     A->>F: 組織の更新競合を検出するための書込みフェンスを更新する。
-    A->>F: fence
+    A->>F: 処理中に組織の状態が変更されていないことを確認する。
     A->>D: 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。
-    opt 検証不成立：q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1
+    opt 検証不成立：処理中に組織の状態が変更されていないことを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 他の操作で更新されました。最新の状態を確認してください。
     end
     end
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
-    Note over A,D: 成功応答前に依存transactionをcommit・失敗時rollback
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
     A-->>U: HTTP 200 / models.SubmissionsRow
+    end
     Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
     opt 入力検証の失敗（RequestValidationError）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 422 / 入力形式を確認してください。
     end
     end
     opt SQL実行またはcommitの競合（psycopg.Error）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 競合しました。再読込してください。
     end
     end
     opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 503 / 一時的に利用できません。
     end
     end
 ```
@@ -229,15 +257,15 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.document | 111 | Return | doc |
-| kotorelay.context.Context.idempotent_result | 153 | If | not rows |
-| kotorelay.context.Context.idempotent_result | 154 | Return | None |
-| kotorelay.context.Context.idempotent_result | 161 | Return | record.response |
-| kotorelay.context.Context.version | 117 | If | not self.permission(doc.department_id, 'draft') |
-| kotorelay.context.Context.version | 121 | Return | version |
-| kotorelay.context.new_id | 23 | Return | str(uuid4()) |
-| kotorelay.context.now | 19 | Return | datetime.now(UTC) |
-| kotorelay.context.stable_id | 27 | Return | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
+| kotorelay.context.Context.document | 118 | Return | doc |
+| kotorelay.context.Context.idempotent_result | 162 | If | not rows |
+| kotorelay.context.Context.idempotent_result | 163 | Return | None |
+| kotorelay.context.Context.idempotent_result | 170 | Return | record.response |
+| kotorelay.context.Context.version | 125 | If | not self.permission(doc.department_id, 'draft') |
+| kotorelay.context.Context.version | 129 | Return | version |
+| kotorelay.context.new_id | 24 | Return | str(uuid4()) |
+| kotorelay.context.now | 20 | Return | datetime.now(UTC) |
+| kotorelay.context.stable_id | 28 | Return | str(uuid5(NAMESPACE_URL, 'kotorelay:' + value)) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
@@ -247,6 +275,8 @@ sequenceDiagram
 | kotorelay.operations.reviews.decide_review.functions.document_doc | 33 | Return | ctx.document(submission.document_id, 'review') |
 | kotorelay.operations.reviews.decide_review.functions.documents_update | 117 | Return | q.documents_update(ctx.db, q.DocumentsUpdateParams.model_validate(doc.model_copy(update={'latest_version_id': version.id, 'revision': doc.revision + 1, 'updated_at': now()}), from_attributes=True)) |
 | kotorelay.operations.reviews.decide_review.functions.find_previous_result | 38 | Return | ctx.idempotent_result(str(key), 'decide', request) |
+| kotorelay.operations.reviews.decide_review.functions.has_previous_result | 178 | Return | bool(cached) |
+| kotorelay.operations.reviews.decide_review.functions.has_published_version | 183 | Return | bool(doc.latest_version_id) |
 | kotorelay.operations.reviews.decide_review.functions.is_approved | 100 | Return | bool(data.decision == 'approved') |
 | kotorelay.operations.reviews.decide_review.functions.is_newer_publication | 110 | Return | bool(not previous or previous[0].number < version.number) |
 | kotorelay.operations.reviews.decide_review.functions.outbox_insert | 136 | Return | q.outbox_insert(ctx.db, q.OutboxInsertParams(id=new_id(), organization_id=ctx.org, document_id=doc.id, version_id=version.id, kind='index', status='pending', attempts=0, error_code='', created_at=now())) |
@@ -262,8 +292,9 @@ sequenceDiagram
 | kotorelay.operations.reviews.decide_review.functions.version_version | 55 | Return | ctx.version(doc, submission.version_id) |
 | kotorelay.operations.reviews.decide_review.functions.versions_get | 105 | Return | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=version_id)) |
 | kotorelay.operations.reviews.decide_review.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
-| kotorelay.operations.reviews.decide_review.router.decide_review | 34 | If | cached |
-| kotorelay.operations.reviews.decide_review.router.decide_review | 35 | Return | build_response(f.build_decide_review(cached)) |
-| kotorelay.operations.reviews.decide_review.router.decide_review | 43 | If | f.is_approved(data) |
-| kotorelay.operations.reviews.decide_review.router.decide_review | 45 | If | f.is_newer_publication(previous, version) |
-| kotorelay.operations.reviews.decide_review.router.decide_review | 51 | Return | build_response(updated) |
+| kotorelay.operations.reviews.decide_review.router.decide_review | 35 | If | f.has_previous_result(cached) |
+| kotorelay.operations.reviews.decide_review.router.decide_review | 36 | Return | build_response(f.build_decide_review(cast(str, cached))) |
+| kotorelay.operations.reviews.decide_review.router.decide_review | 44 | If | f.is_approved(data) |
+| kotorelay.operations.reviews.decide_review.router.decide_review | 50 | If | f.is_newer_publication(previous, version) |
+| kotorelay.operations.reviews.decide_review.router.decide_review | 56 | Return | build_response(updated) |
+| kotorelay.operations.system.authorization.functions.is_read_operation | 6 | Return | operation == 'read' |

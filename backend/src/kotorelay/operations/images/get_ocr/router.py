@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import cast
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -27,10 +28,12 @@ def get_ocr(ctx: Ctx, run_id: UUID, version_id: UUID | None = None) -> OcrResult
     rows = f.ocr_runs_get(ctx, run_id)
     f.require_ocr_run(rows)
     run = rows[0]
-    asset = authorize_asset(ctx, run.asset_id, str(version_id) if version_id else None)
-    if version_id:
+    asset = authorize_asset(
+        ctx, run.asset_id, str(version_id) if f.has_requested_version(version_id) else None
+    )
+    if f.has_requested_version(version_id):
         doc = f.documents_get(ctx, asset)[0]
-        version = f.version_version(doc, ctx, version_id)
+        version = f.version_version(doc, ctx, cast(UUID, version_id))
         f.validate_version_ocr(run, version)
     result = f.build_result(run, ctx)
     return build_response(f.build_get_ocr(result, run))

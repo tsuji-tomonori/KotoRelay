@@ -2,7 +2,7 @@
 # KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG 要件一覧
 
 - スキーマ版: 1
-- カタログ版: 8
+- カタログ版: 9
 - Product(JSON): <code>"KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG"</code>
 - 更新日(JSON): <code>"2026-09-12"</code>
 - 正本: `spec/requirements/requirements.qnt`
@@ -128,7 +128,7 @@
 | <code>"REQ-DESIGN-07"</code> | 2 | 有効 | 制約 | 開発プロジェクトは、routerがAPIの全体フローを所有するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 | <code>"REQ-DESIGN-08"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、SQLごとの引数と取得投影を型として生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 | <code>"REQ-DESIGN-09"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、routerの実行順序と制御構造からシーケンスを生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
-| <code>"REQ-DESIGN-10"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、シーケンスに例外応答を具体的に表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
+| <code>"REQ-DESIGN-10"</code> | 2 | 有効 | 制約 | 開発プロジェクトは、シーケンスに例外応答を具体的に表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-11"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、型付き運用ログとHTTP応答を照合可能にするを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-12"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、ログ帳票を実装された例外と応答とログから生成するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-13"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、単体テストを日本語の検証単位で表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
@@ -137,6 +137,8 @@
 | <code>"REQ-DESIGN-16"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、APIフローで例外の分類を保持するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
 | <code>"REQ-DESIGN-17"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、固定boolによる形だけの業務判定を拒否するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
 | <code>"REQ-DESIGN-18"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、業務例外のHTTP変換を共通境界に集約するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
+| <code>"REQ-DESIGN-19"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、APIフローの条件を説明付きbool関数へ分離するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
+| <code>"REQ-DESIGN-20"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、シーケンスの条件を関数の日本語説明から生成するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
 
 ## REQ-DOC-01: ブラウザでMarkdownを編集する
 
@@ -3926,13 +3928,13 @@
 根拠: 利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。
 根拠(JSON): <code>"利用者が例外応答・lazunex方式の型付きログ・日本語の検証単位を明示指定したため。"</code>
 
-項目版: 1 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"error-reporting-2026-09-13"</code>
+項目版: 2 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"condition-diagram-2026-09-14"</code>
 分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
-- <code>"AC-DESIGN-10"</code> 前提: APIとテストと設計generatorが存在する。条件: 実行して設計と品質Pagesを生成する。期待結果: 例外のHTTP status・code・messageと内部捕捉後の継続または再送出を区別し、解決不能な応答を汎用文で隠さず検出する。
-  - criterion(JSON Object): <code>{"given":"APIとテストと設計generatorが存在する","id":"AC-DESIGN-10","then":"例外のHTTP status・code・messageと内部捕捉後の継続または再送出を区別し、解決不能な応答を汎用文で隠さず検出する","when":"実行して設計と品質Pagesを生成する"}</code>
+- <code>"AC-DESIGN-10"</code> 前提: APIとテストと設計generatorが存在する。条件: 実行して設計と品質Pagesを生成する。期待結果: 実際に利用者へ返す例外応答を矢印で示し、そのラベルにはHTTPステータスと実メッセージだけを記す。内部で捕捉して継続する例外とHTTP終了を区別する。
+  - criterion(JSON Object): <code>{"given":"APIとテストと設計generatorが存在する","id":"AC-DESIGN-10","then":"実際に利用者へ返す例外応答を矢印で示し、そのラベルにはHTTPステータスと実メッセージだけを記す。内部で捕捉して継続する例外とHTTP終了を区別する","when":"実行して設計と品質Pagesを生成する"}</code>
 
 要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
 検証方法: 実HTTP応答・ログ・生成の正例負例・Pages E2E
@@ -4198,6 +4200,70 @@
 - 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
 - 実装: <code>["tools/project/source_policy.py","tools/project/api_layout.py"]</code>
 - テスト: <code>["tools/project/tests/test_source_policy.py","backend/tests/test_workflow.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-19: APIフローの条件を説明付きbool関数へ分離する
+
+要件ID(JSON): <code>"REQ-DESIGN-19"</code>
+タイトル(JSON): <code>"APIフローの条件を説明付きbool関数へ分離する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"APIフローの条件を説明付きbool関数へ分離する"</code>
+開発プロジェクトは、APIフローの条件を説明付きbool関数へ分離するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がbool関数とその日本語コメントを条件分岐と図の正本にするよう明示指定したため。
+根拠(JSON): <code>"利用者がbool関数とその日本語コメントを条件分岐と図の正本にするよう明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"condition-diagram-2026-09-14"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-19"</code> 前提: APIと検査adapterが存在する。条件: APIの実装と検査を行う。期待結果: routerと共有workflowの条件式はfunctions側の日本語説明付きbool関数で判定し、直接の比較や真偽値評価を検査で拒否する。
+  - criterion(JSON Object): <code>{"given":"APIと検査adapterが存在する","id":"AC-DESIGN-19","then":"routerと共有workflowの条件式はfunctions側の日本語説明付きbool関数で判定し、直接の比較や真偽値評価を検査で拒否する","when":"APIの実装と検査を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 構文・型・依存の正例負例と実HTTP回帰試験
+検証証跡: 品質portalとローカル検証結果
+検証(JSON Object): <code>{"evidence":"品質portalとローカル検証結果","method":"構文・型・依存の正例負例と実HTTP回帰試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/condition_labels.py","tools/project/router_sequence.py"]</code>
+- テスト: <code>["tools/project/tests/test_condition_labels.py","backend/tests/test_workflow.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-20: シーケンスの条件を関数の日本語説明から生成する
+
+要件ID(JSON): <code>"REQ-DESIGN-20"</code>
+タイトル(JSON): <code>"シーケンスの条件を関数の日本語説明から生成する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"シーケンスの条件を関数の日本語説明から生成する"</code>
+開発プロジェクトは、シーケンスの条件を関数の日本語説明から生成するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がbool関数とその日本語コメントを条件分岐と図の正本にするよう明示指定したため。
+根拠(JSON): <code>"利用者がbool関数とその日本語コメントを条件分岐と図の正本にするよう明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"condition-diagram-2026-09-14"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-20"</code> 前提: APIと検査adapterが存在する。条件: APIの実装と検査を行う。期待結果: シーケンスの条件ラベルを判定関数の日本語コメントから生成し、否定と短絡の意味を保つ。未解決の条件を実装式で代用しない。
+  - criterion(JSON Object): <code>{"given":"APIと検査adapterが存在する","id":"AC-DESIGN-20","then":"シーケンスの条件ラベルを判定関数の日本語コメントから生成し、否定と短絡の意味を保つ。未解決の条件を実装式で代用しない","when":"APIの実装と検査を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 構文・型・依存の正例負例と実HTTP回帰試験
+検証証跡: 品質portalとローカル検証結果
+検証(JSON Object): <code>{"evidence":"品質portalとローカル検証結果","method":"構文・型・依存の正例負例と実HTTP回帰試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/condition_labels.py","tools/project/router_sequence.py"]</code>
+- テスト: <code>["tools/project/tests/test_condition_labels.py","backend/tests/test_workflow.py"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>

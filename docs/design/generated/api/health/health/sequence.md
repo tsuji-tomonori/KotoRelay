@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 死活確認 — シーケンス
 
@@ -17,8 +17,9 @@ sequenceDiagram
     U->>A: GET /api/health
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
+    break 応答を返して終了
     A-->>U: HTTP 200 / dict[str, str]
+    end
 ```
 
 **例外応答一覧（HTTP境界へ到達した場合）**

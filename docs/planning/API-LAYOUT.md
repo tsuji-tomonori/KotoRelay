@@ -43,7 +43,7 @@ lazunexの`list_apis/functions.py`と`core/logging.py`を確認し、運用ロ�
 
 HTTP境界ではProblem、入力検証、DB競合・停止、外部サービス例外を安全なstatus/code/messageへ変換し、応答とログのrequest_idを一致させる。モデル失敗、OCR失敗、索引失敗、根拠の除外は内部で捕捉して継続する。途中のログに未確定のHTTP statusを確定値として記録せず、後続の再認可・保存が成功した場合の応答をcatalogに明記する。workerの索引処理にはHTTP応答がない。
 
-シーケンスは実際のrequire/Problemの引数・既定値、try/catch、応答契約を読んで例外のstatus・code・message・ログを表示する。already_answeredは内部制御例外であり、既存回答を再取得して200を返す。catch内の再送出とHTTP終了を区別する。静的に解決できないProblemを汎用の説明で埋めず生成失敗とする。
+シーケンスは実際のrequire/Problemの引数・既定値、try/catch、応答契約を読んで例外応答とログを表示し、利用者への応答矢印にはHTTPステータスと実メッセージだけを記す。already_answeredは内部制御例外であり、既存回答を再取得して200を返す。catch内の再送出とHTTP終了を区別する。静的に解決できないProblemを汎用の説明で埋めず生成失敗とする。
 
 単体テストのdocstringに、実際の試験を説明する日本語のGiven/When/Thenを記述する。API帳票の要因とケース詳細、pytestの実行一覧はこの説明を参照し、fixture名やassert式を説明の代用にしない。説明の欠落・重複は検査で拒否する。条件式の技術的な追跡は詳細設計とシーケンスの補助表を使う。
 
@@ -65,3 +65,9 @@ Pythonの型の絞り込み、allによる根拠検証、共有workflow、同期
 標準側の改善提案は[dev-standard issue #72](https://github.com/tsuji-tomonori/dev-standard/issues/72)に起票した。
 
 標準の汎用source-conventionsのSQL配置検査は、全SQL所有先にrouter.pyとfunctions.pyを要求するため、既存のshared・認可・初期投入・worker配送の43 SQLを拒否する。本構成ではこれらはHTTP endpointではない。日本語説明は標準検査で確認し、SQL配置・所有先・型付き生成・呼出境界は既存project adapterのqueries.pyとapi_layout.py、実DB試験で確認する。汎用検査への共有責務profileの不足もIssue #72へ報告する。
+
+## 条件の日本語説明と応答矢印（2026年9月14日追補）
+
+routerと共有workflowのif・三項式・while・内包表記の条件は、functions.pyに置いたbool関数を呼ぶ。日本語docstringの先頭文を判定内容として記し、条件ラベルはその文から生成する。否定とand/orは日本語の不成立・かつ・またはで意味を保持する。コメントの欠落、非bool、直接の条件式をcondition_labels.pyで拒否する。型の絞り込みが必要な箇所は型検査付きのcastで補い、根拠の再認可などの実行回数とタイミングを維持する。
+
+共通処理に展開される条件も、図に出すものは日本語説明のあるbool関数から生成する。純粋な値計算など呼出しも応答もない空の制御枠は省く。実装式と位置は補助表に残す。例外を内部で捕捉する段階では利用者への応答線を出さず、再送出またはreturnによって実際にHTTP応答になる箇所へ線を引く。保存済み回答の再取得はcatch内からHTTP 200を返し、そのreturnを図に示す。エラー応答線のラベルはHTTPステータスと実メッセージだけにし、codeとrequest_idは応答契約とログ帳票で扱う。

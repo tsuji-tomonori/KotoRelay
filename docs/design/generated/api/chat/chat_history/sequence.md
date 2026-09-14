@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 現行認可で会話履歴を再表示 — シーケンス
 
@@ -17,19 +17,19 @@ sequenceDiagram
     U->>A: GET /api/chat/{conversation_id}
     Note over A,D: 依存注入でtransaction開始・組織と所属を確認
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
@@ -37,29 +37,36 @@ sequenceDiagram
     A->>F: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
     A->>D: 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。
     A->>F: 取得対象の会話を現在の利用者が所有していることを確認する。
-    opt 検証不成立：bool(conversations) and conversations[0].user_id == ctx.user.id
+    opt 検証不成立：取得対象の会話を現在の利用者が所有していることを確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     A->>F: 用途と対象に一致するデータだけを取り出す。
     A->>D: 現在の組織に属する回答履歴を識別子順に一覧取得する。
     loop sorted(q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)), key=lambda a： a.created_at)
-    opt a.conversation_id == str(conversation_id)
+    A->>F: 回答が表示対象の会話に属している。
+    opt 回答が表示対象の会話に属している。
     A->>F: 現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
-    opt 検証不成立：answer.user_id == ctx.user.id
+    opt 検証不成立：現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 404 / {code： "not_found", message： "対象を利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 404 / 対象を利用できません。
     end
     end
     loop evidence.citations
     A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。
     A->>F: digest
@@ -68,7 +75,8 @@ sequenceDiagram
     A->>S: 実体を取得・ハッシュ照合
     A->>S: 実体を取得・ハッシュ照合
     loop manifest.images
-    alt image.placement.id in json.loads(chunk.placements)
+    A->>F: 画像が引用した文書断片に含まれている。
+    alt 画像が引用した文書断片に含まれている。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。
     A->>S: 実体を取得・ハッシュ照合
@@ -82,36 +90,40 @@ sequenceDiagram
     end
     end
     A->>S: 実体を取得・ハッシュ照合
-    alt valid
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    alt 回答のすべての引用根拠が現在も有効である。
     A->>S: 実体を取得・ハッシュ照合
     else 条件不成立
     end
+    A->>F: 回答のすべての引用根拠が現在も有効である。
+    A->>F: 回答のすべての引用根拠が現在も有効である。
     end
     end
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
-    Note over A,D: 成功応答前に依存transactionをcommit・失敗時rollback
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
     A-->>U: HTTP 200 / list[AnswerView]
+    end
     Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
     opt 入力検証の失敗（RequestValidationError）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 422 / 入力形式を確認してください。
     end
     end
     opt SQL実行またはcommitの競合（psycopg.Error）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 競合しました。再読込してください。
     end
     end
     opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 503 / 一時的に利用できません。
     end
     end
 ```
@@ -131,23 +143,26 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.can_read | 89 | If | doc.status != 'active' or not self.memberships |
-| kotorelay.context.Context.can_read | 90 | Return | False |
-| kotorelay.context.Context.can_read | 91 | If | doc.visibility == 'organization' |
-| kotorelay.context.Context.can_read | 92 | Return | True |
-| kotorelay.context.Context.can_read | 93 | If | self.member(doc.department_id) |
-| kotorelay.context.Context.can_read | 94 | Return | True |
-| kotorelay.context.Context.can_read | 95 | Return | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
+| kotorelay.context.Context.can_read | 95 | If | doc.status != 'active' or not self.memberships |
+| kotorelay.context.Context.can_read | 96 | Return | False |
+| kotorelay.context.Context.can_read | 97 | If | doc.visibility == 'organization' |
+| kotorelay.context.Context.can_read | 98 | Return | True |
+| kotorelay.context.Context.can_read | 99 | If | self.member(doc.department_id) |
+| kotorelay.context.Context.can_read | 100 | Return | True |
+| kotorelay.context.Context.can_read | 101 | Return | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.objects.digest | 17 | Return | hashlib.sha256(data).hexdigest() |
 | kotorelay.operational_logging.continuation_context | 150 | Return | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
+| kotorelay.operations.chat.chat_history.functions.belongs_to_conversation | 46 | Return | answer.conversation_id == str(conversation_id) |
 | kotorelay.operations.chat.chat_history.functions.conversations_get | 18 | Return | q.conversations_get(ctx.db, q.ConversationsGetParams(organization_id=ctx.org, id=str(conversation_id))) |
 | kotorelay.operations.chat.chat_history.functions.require_conversation_owner | 27 | Return | require(bool(conversations) and conversations[0].user_id == ctx.user.id) |
-| kotorelay.operations.chat.chat_history.functions.select_chat_history | 34 | Return | [present(ctx, a) for a in sorted(q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)), key=lambda a: a.created_at) if a.conversation_id == str(conversation_id)] |
+| kotorelay.operations.chat.chat_history.functions.select_chat_history | 34 | Return | [present(ctx, a) for a in sorted(q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)), key=lambda a: a.created_at) if belongs_to_conversation(a, conversation_id)] |
 | kotorelay.operations.chat.chat_history.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
 | kotorelay.operations.chat.chat_history.router.chat_history | 28 | Return | build_response(f.select_chat_history(ctx, conversation_id)) |
-| kotorelay.operations.chat.shared.functions.present | 81 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| kotorelay.operations.chat.shared.functions.has_valid_evidence | 102 | Return | valid |
+| kotorelay.operations.chat.shared.functions.is_cited_image | 97 | Return | image.placement.id in json.loads(chunk.placements) |
+| kotorelay.operations.chat.shared.functions.present | 81 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if has_valid_evidence(valid) else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if has_valid_evidence(valid) else 'hidden', citations=evidence.citations if has_valid_evidence(valid) else [], model=answer.model, created_at=answer.created_at) |
 | kotorelay.operations.chat.shared.functions.validate_citation | 21 | If | not docs |
 | kotorelay.operations.chat.shared.functions.validate_citation | 22 | Return | False |
 | kotorelay.operations.chat.shared.functions.validate_citation | 24 | If | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision |
@@ -160,7 +175,7 @@ sequenceDiagram
 | kotorelay.operations.chat.shared.functions.validate_citation | 52 | If | placements - {image.placement.id for image in manifest.images} |
 | kotorelay.operations.chat.shared.functions.validate_citation | 53 | Return | False |
 | kotorelay.operations.chat.shared.functions.validate_citation | 54 | For | For |
-| kotorelay.operations.chat.shared.functions.validate_citation | 55 | If | image.placement.id in json.loads(chunk.placements) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 55 | If | is_cited_image(image, chunk) |
 | kotorelay.operations.chat.shared.functions.validate_citation | 63 | If | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') |
 | kotorelay.operations.chat.shared.functions.validate_citation | 64 | Return | False |
 | kotorelay.operations.chat.shared.functions.validate_citation | 67 | Return | True |

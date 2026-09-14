@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 本人と現在の所属権限を取得 — 詳細設計
 
@@ -35,8 +35,8 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 
 
@@ -71,7 +71,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:75 | any((m.department_id == department_id for m in self.memberships)) |
+| backend/src/kotorelay/context.py:79 | any((m.department_id == department_id for m in self.memberships)) |
 | backend/src/kotorelay/operations/groups/get_identity/functions.py:11 | {'user': ctx.user, 'memberships': ctx.memberships, 'departments': [d for d in q.departments_list(ctx.db, q.DepartmentsListParams(organization_id=ctx.org)) if ctx.member(d.id)], 'directory': [d for d in q.departments_list(ctx.db, q.DepartmentsListParams(organization_id=ctx.org)) if d.active], 'mode': ctx.settings.mode} |
 | backend/src/kotorelay/operations/groups/get_identity/generated/queries.py:32 | db.query('operations/groups/get_identity/sql/001_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/groups/get_identity/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import cast
 
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter
@@ -17,7 +18,8 @@ from kotorelay.operations.chat.ask_question.contract import CONTRACT
 from kotorelay.operations.chat.ask_question.response_builders import build_response
 from kotorelay.operations.chat.ask_question.samples import SAMPLES
 from kotorelay.operations.chat.ask_question.schemas import Ask, Prepared
-from kotorelay.operations.chat.shared.functions import present, validate_citation
+from kotorelay.operations.chat.shared import functions as evidence_functions
+from kotorelay.operations.chat.shared.functions import present
 from kotorelay.runtime import Rt, Subject
 from kotorelay.schemas import AnswerView, Citation
 
@@ -37,7 +39,7 @@ def ask_question(rt: Rt, subject: Subject, data: Ask, key: Key) -> AnswerView:
             f.require_question_membership(ctx, data)
             answer_id = stable_id(ctx.user.id + str(key))
             prior = f.answers_get_2(ctx, answer_id)
-            if prior:
+            if f.has_previous_answer(prior):
                 f.validate_repeated_question(data, prior, ctx)
                 raise Problem(409, "already_answered", answer_id)
             request = data.model_dump_json()
@@ -45,10 +47,10 @@ def ask_question(rt: Rt, subject: Subject, data: Ask, key: Key) -> AnswerView:
             events = f.events_list(ctx)
             today = datetime.now(UTC).date()
             f.enforce_daily_question_limit(resumed, ctx, events, today)
-            if resumed is not None:
-                conversation_id = resumed
-            elif data.conversation_id:
-                conversations = f.conversations_get(ctx, data.conversation_id)
+            if f.has_prepared_conversation(resumed):
+                conversation_id = cast(str, resumed)
+            elif f.has_requested_conversation(data):
+                conversations = f.conversations_get(ctx, cast(str, data.conversation_id))
                 f.require_conversation_owner(conversations, ctx)
                 conversation_id = conversations[0].id
                 f.require_same_department(data, conversation_id, ctx)
@@ -82,7 +84,7 @@ def ask_question(rt: Rt, subject: Subject, data: Ask, key: Key) -> AnswerView:
                 doc = docs[chunk.document_id]
                 version = f.versions_get(ctx, chunk)[0]
                 citation = f.build_citation(doc, version, chunk)
-                if not validate_citation(ctx, citation):
+                if not evidence_functions.validate_citation(ctx, citation):
                     continue
                 manifest = f.parse_manifest(version)
                 related = f.select_citation_images(manifest, chunk)
@@ -115,11 +117,11 @@ def ask_question(rt: Rt, subject: Subject, data: Ask, key: Key) -> AnswerView:
             return build_response(present(ctx, f.answers_get(ctx, exc)[0]))
     failed = False
     answer = ""
-    if prepared.citations:
+    if f.has_answer_evidence(prepared):
         with rt.context(subject) as ctx:
-            if not all(validate_citation(ctx, c) for c in prepared.citations):
+            if not f.has_valid_evidence(ctx, prepared.citations):
                 prepared = f.discard_invalid_evidence(prepared)
-        if prepared.citations:
+        if f.has_answer_evidence(prepared):
             try:
                 answer = f.generate_answer(prepared, rt)
             except (BotoCoreError, ClientError, TimeoutError) as exc:
@@ -130,9 +132,7 @@ def ask_question(rt: Rt, subject: Subject, data: Ask, key: Key) -> AnswerView:
                 failed = True
     with rt.context(subject) as ctx:
         f.require_current_membership(ctx, prepared)
-        valid = bool(prepared.citations) and all(
-            validate_citation(ctx, c) for c in prepared.citations
-        )
+        valid = f.has_answer_evidence(prepared) and f.has_valid_evidence(ctx, prepared.citations)
         status, citations, text = f.resolve_answer_outcome(
             valid, failed, answer, prepared.citations
         )

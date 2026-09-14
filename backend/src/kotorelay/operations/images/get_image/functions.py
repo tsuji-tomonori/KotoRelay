@@ -9,3 +9,8 @@ import kotorelay.generated.models as models
 def get_get_image(asset: models.AssetsRow, ctx: context_types.Context) -> bytes:
     """記録された保存先から実体を取得してハッシュを照合する。"""
     return ctx.objects.get(asset.object_key, asset.sha256)
+
+
+def has_requested_version(version_id: object | None) -> bool:
+    """表示する版が指定されている。"""
+    return bool(version_id)

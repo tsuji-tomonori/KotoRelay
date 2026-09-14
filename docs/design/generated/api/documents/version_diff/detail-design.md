@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 版IDを指定して本文差分を比較 — 詳細設計
 
@@ -42,14 +42,14 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:103 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:117 | not self.permission(doc.department_id, 'draft') | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/context.py:115 | bool(rows) and rows[0].document_id == doc.id | not_found | 404 |
-| backend/src/kotorelay/context.py:119 | digest(version.manifest.encode()) == version.manifest_hash | 'integrity' | 503 |
-| backend/src/kotorelay/context.py:118 | self.can_read(doc) and doc.latest_version_id == version.id | not_found | 404 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:110 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:117 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:125 | not self.permission(doc.department_id, 'draft') | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:123 | bool(rows) and rows[0].document_id == doc.id | not_found | 404 |
+| backend/src/kotorelay/context.py:127 | digest(version.manifest.encode()) == version.manifest_hash | 'integrity' | 503 |
+| backend/src/kotorelay/context.py:126 | self.can_read(doc) and doc.latest_version_id == version.id | not_found | 404 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 
 
@@ -98,8 +98,8 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:111 | doc |
-| backend/src/kotorelay/context.py:121 | version |
+| backend/src/kotorelay/context.py:118 | doc |
+| backend/src/kotorelay/context.py:129 | version |
 | backend/src/kotorelay/objects.py:17 | hashlib.sha256(data).hexdigest() |
 | backend/src/kotorelay/operations/documents/version_diff/functions.py:43 | {'left': str(left), 'right': str(right), 'diff': '\n'.join(lines)} |
 | backend/src/kotorelay/operations/documents/version_diff/functions.py:50 | list(difflib.unified_diff(left_lines, right_lines, fromfile=left, tofile=right, lineterm='')) |
@@ -110,6 +110,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/documents/version_diff/functions.py:28 | ctx.version(doc, str(right)) |
 | backend/src/kotorelay/operations/documents/version_diff/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
 | backend/src/kotorelay/operations/documents/version_diff/router.py:33 | build_response(f.build_version_diff(left, right, lines)) |
+| backend/src/kotorelay/operations/system/authorization/functions.py:6 | operation == 'read' |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:98 | db.query('operations/system/authorization/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |

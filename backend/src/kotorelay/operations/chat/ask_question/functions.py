@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as datetime_module
 import json
+import typing
 
 import kotorelay.context as context_types
 import kotorelay.engines as engine_types
@@ -17,6 +18,7 @@ from kotorelay.context import now, stable_id
 from kotorelay.engines import terms
 from kotorelay.errors import require
 from kotorelay.operations.chat.ask_question.schemas import Prepared
+from kotorelay.operations.chat.shared import functions as evidence_functions
 from kotorelay.schemas import Evidence, Manifest
 
 
@@ -356,8 +358,11 @@ def score_chunk(question: str, text: str, vector_keys: list[str] | None, chunk_i
     """検索順位があれば順位を使い、ローカル検索では質問と本文の共通語数を得点にする。"""
     return (
         float(len(terms(question) & terms(text)))
-        if vector_keys is None
-        else float(len(vector_keys) - vector_keys.index(chunk_id))
+        if uses_local_scoring(vector_keys)
+        else float(
+            len(typing.cast(list[str], vector_keys))
+            - typing.cast(list[str], vector_keys).index(chunk_id)
+        )
     )
 
 
@@ -398,3 +403,35 @@ def resolve_answer_outcome(
         if status == "answered"
         else "現在利用できる根拠が不足しているため、回答を保留しました。",
     )
+
+
+def has_previous_answer(rows: list[q.AnswersGetRow]) -> bool:
+    """同じ操作IDの回答が保存されている。"""
+    return bool(rows)
+
+
+def has_prepared_conversation(conversation_id: str | None) -> bool:
+    """中断前に受付済みの会話がある。"""
+    return conversation_id is not None
+
+
+def has_requested_conversation(data: request_schemas.Ask) -> bool:
+    """継続する会話が指定されている。"""
+    return bool(data.conversation_id)
+
+
+def has_answer_evidence(prepared: Prepared) -> bool:
+    """回答に使用する根拠候補がある。"""
+    return bool(prepared.citations)
+
+
+def has_valid_evidence(
+    ctx: context_types.Context, citations: list[shared_schemas.Citation]
+) -> bool:
+    """すべての根拠の閲覧権限と公開版が現在も有効である。"""
+    return all(evidence_functions.validate_citation(ctx, citation) for citation in citations)
+
+
+def uses_local_scoring(vector_keys: list[str] | None) -> bool:
+    """検索エンジンの順位がなく、ローカルの共通語数で採点する。"""
+    return vector_keys is None

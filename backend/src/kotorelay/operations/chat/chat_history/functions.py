@@ -37,5 +37,10 @@ def select_chat_history(
             q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)),
             key=lambda a: a.created_at,
         )
-        if a.conversation_id == str(conversation_id)
+        if belongs_to_conversation(a, conversation_id)
     ]
+
+
+def belongs_to_conversation(answer: q.AnswersListRow, conversation_id: uuid.UUID) -> bool:
+    """回答が表示対象の会話に属している。"""
+    return answer.conversation_id == str(conversation_id)

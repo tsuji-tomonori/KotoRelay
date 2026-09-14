@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # リーダーが公開範囲・公開停止・削除を管理 — 詳細設計
 
@@ -47,11 +47,11 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:103 | bool(rows) | not_found | 404 |
-| backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
-| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:110 | bool(rows) | not_found | 404 |
+| backend/src/kotorelay/context.py:117 | allowed | not_found | 404 |
+| backend/src/kotorelay/context.py:67 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/documents/change_policy/functions.py:30 | data.status != 'deleted' or bool(data.reason.strip()) | 'reason_required' | 422 |
 | backend/src/kotorelay/operations/documents/change_policy/functions.py:25 | doc.revision == data.revision | 'conflict' | 409 |
@@ -120,9 +120,9 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:111 | doc |
-| backend/src/kotorelay/context.py:23 | str(uuid4()) |
-| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
+| backend/src/kotorelay/context.py:118 | doc |
+| backend/src/kotorelay/context.py:24 | str(uuid4()) |
+| backend/src/kotorelay/context.py:20 | datetime.now(UTC) |
 | backend/src/kotorelay/operations/documents/change_policy/functions.py:51 | doc.model_copy(update={'visibility': data.visibility, 'shared_departments': json.dumps(data.shared_departments), 'status': data.status, 'revision': doc.revision + 1, 'updated_at': now()}) |
 | backend/src/kotorelay/operations/documents/change_policy/functions.py:98 | ctx.fence() |
 | backend/src/kotorelay/operations/documents/change_policy/functions.py:35 | {d.id for d in q.departments_list(ctx.db, q.DepartmentsListParams(organization_id=ctx.org)) if d.active} |
@@ -138,6 +138,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/documents/change_policy/generated/queries.py:83 | db.execute('operations/documents/change_policy/sql/003_outbox_insert.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/documents/change_policy/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
 | backend/src/kotorelay/operations/documents/change_policy/router.py:37 | build_response(updated) |
+| backend/src/kotorelay/operations/system/authorization/functions.py:6 | operation == 'read' |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:39 | db.execute('operations/system/authorization/sql/001_audit_insert.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:98 | db.query('operations/system/authorization/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |

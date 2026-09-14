@@ -134,8 +134,11 @@ def build_document_page(
         "index_ready": bool(
             version and any(c.version_id == version.id and c.ready for c in chunks)
         ),
-        "summary": ctx.objects.get(version.body_key, version.body_hash).decode()[:180]
-        if version and scope == "read"
+        "summary": ctx.objects.get(
+            typing.cast(q.VersionsListRow, version).body_key,
+            typing.cast(q.VersionsListRow, version).body_hash,
+        ).decode()[:180]
+        if has_readable_summary(version, scope)
         else "",
         "review_status": latest.status if latest and scope != "read" else None,
         "review_number": versions[latest.version_id].number if latest and scope != "read" else None,
@@ -172,3 +175,18 @@ def paginate_documents(
 ) -> list[models.DocumentsRow]:
     """更新日時の降順で並べた文書から指定範囲を切り出す。"""
     return sorted(docs, key=lambda doc: doc.updated_at, reverse=True)[offset : offset + limit]
+
+
+def has_department_filter(department_id: object | None) -> bool:
+    """一覧を絞り込む部署が指定されている。"""
+    return bool(department_id)
+
+
+def requests_page(page: bool) -> bool:
+    """一覧の件数と次ページ情報が要求されている。"""
+    return page
+
+
+def has_readable_summary(version: q.VersionsListRow | None, scope: str) -> bool:
+    """公開版が存在し、閲覧用一覧に本文の要約を表示する。"""
+    return version is not None and scope == "read"

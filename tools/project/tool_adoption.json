@@ -132,8 +132,8 @@
       "path": "check_bool_router_conditions.py",
       "purpose": "bool結果の制御条件への接続",
       "decision": "追加",
-      "adapter": "tools/project/source_policy.py",
-      "scope": "bool結果の単独破棄を拒否。all、戻り値組立などKotoRelayで必要な値利用を許可しif専用制約は移植しない"
+      "adapter": "tools/project/condition_labels.py",
+      "scope": "routerと共有workflowの条件をfunctionsの日本語説明付きbool関数に限定し、否定・短絡を保った日本語ラベルを生成。bool結果の単独破棄はsource_policy.pyで拒否"
     },
     {
       "path": "check_constant_bool_returns.py",

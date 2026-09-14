@@ -171,3 +171,13 @@ def remember_decide_review_result(
 def check_concurrent_access(ctx: context_types.Context) -> None:
     """組織の更新競合を検出するための書込みフェンスを更新する。"""
     return ctx.fence()
+
+
+def has_previous_result(cached: str | None) -> bool:
+    """同じ操作IDの処理結果が保存されている。"""
+    return bool(cached)
+
+
+def has_published_version(doc: models.DocumentsRow) -> bool:
+    """文書に公開済みの版がある。"""
+    return bool(doc.latest_version_id)

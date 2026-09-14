@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import cast
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -31,8 +32,8 @@ def decide_review(ctx: Ctx, submission_id: UUID, data: Decide, key: Key) -> mode
     doc = f.document_doc(ctx, submission)
     request = str(submission_id) + data.model_dump_json()
     cached = f.find_previous_result(request, ctx, key)
-    if cached:
-        return build_response(f.build_decide_review(cached))
+    if f.has_previous_result(cached):
+        return build_response(f.build_decide_review(cast(str, cached)))
     f.require_pending_submission(submission)
     version = f.version_version(doc, ctx, submission)
     f.prevent_self_approval(version, ctx)
@@ -41,7 +42,11 @@ def decide_review(ctx: Ctx, submission_id: UUID, data: Decide, key: Key) -> mode
     updated = f.build_updated(submission, data, ctx)
     f.submissions_update(ctx, updated)
     if f.is_approved(data):
-        previous = f.versions_get(ctx, doc.latest_version_id) if doc.latest_version_id else []
+        previous = (
+            f.versions_get(ctx, cast(str, doc.latest_version_id))
+            if f.has_published_version(doc)
+            else []
+        )
         if f.is_newer_publication(previous, version):
             f.documents_update(ctx, doc, version)
             f.outbox_insert(ctx, doc, version)

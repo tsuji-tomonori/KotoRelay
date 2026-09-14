@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 反映ジョブを再処理 — ログメッセージ
 
@@ -61,7 +61,7 @@ lazunexのops_loggerと同じく、独自型のcontext、ログID、例外型、
 | メッセージ | 索引または削除ジョブの実行が失敗しました。 |
 | 例外・出力条件 | ジョブ実行中にProblem / OSError / BotoCoreError / ClientErrorを捕捉した場合。 |
 | 返すレスポンス | 後続の保存が成功すれば再試行APIはHTTP 200、OutboxRow.status=failed、error_code=context.code。Problemはその業務code、それ以外はexternal_failure。workerはHTTP応答なし。 |
-| 呼出し位置 | backend/src/kotorelay/operations/indexing/shared/workflow.py:108, backend/src/kotorelay/operations/indexing/shared/workflow.py:113 |
+| 呼出し位置 | backend/src/kotorelay/operations/indexing/shared/workflow.py:110, backend/src/kotorelay/operations/indexing/shared/workflow.py:115 |
 | 確認手順 | 例外型とジョブのerror_codeから実体整合性・外部索引を確認する。 |
 | 復旧手順 | 失敗原因を解消し、同じジョブを再試行する。 |
 

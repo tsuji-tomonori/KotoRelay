@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 反映ジョブと失敗理由を確認 — 詳細設計
 
@@ -38,11 +38,11 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:18 | ctx.user.operator | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/indexing/list_jobs/router.py:27 | details | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:27 | f.requests_details(details) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -94,6 +94,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:28 | {d.id: d for d in q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org))} |
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:35 | {v.id: v for v in q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org))} |
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:23 | q.outbox_list(ctx.db, q.OutboxListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/indexing/list_jobs/functions.py:56 | details |
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:18 | require(ctx.user.operator, 'forbidden', 403) |
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:44 | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:13 | [row.model_dump() for row in rows] |

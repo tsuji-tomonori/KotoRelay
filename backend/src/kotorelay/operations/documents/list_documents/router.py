@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, cast
 from uuid import UUID
 
 from fastapi import APIRouter, Query
@@ -34,11 +34,13 @@ def list_documents(
     page: bool = False,
 ) -> list[models.DocumentsRow] | dict[str, object]:
     """閲覧権限で文書を絞り込み、要求時だけページ用の付加情報を返す。"""
-    department = str(department_id) if department_id else None
-    if department and f.requires_department_permission(department, scope):
-        f.require_department_permission(department, ctx, scope)
+    department = str(department_id) if f.has_department_filter(department_id) else None
+    if f.requires_department_permission(department, scope):
+        f.require_department_permission(cast(str, department), ctx, scope)
     docs: list[models.DocumentsRow] = list(
-        f.documents_by_department(ctx, department) if department else f.documents_list(ctx)
+        f.documents_by_department(ctx, cast(str, department))
+        if f.has_department_filter(department)
+        else f.documents_list(ctx)
     )
     if f.is_management_scope(scope):
         docs = f.select_docs(docs, ctx)
@@ -49,8 +51,8 @@ def list_documents(
         versions = f.map_versions(ctx)
         docs = f.select_docs_4(docs, versions)
     docs = f.select_docs_5(docs, status, search)
-    docs = f.paginate_documents(docs, offset, limit + 1 if page else limit)
-    if not page:
+    docs = f.paginate_documents(docs, offset, limit + 1 if f.requests_page(page) else limit)
+    if not f.requests_page(page):
         return build_response(docs)
     versions = f.map_versions_2(ctx)
     submissions = f.submissions_list(ctx)

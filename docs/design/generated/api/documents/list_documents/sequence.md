@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 閲覧可能な文書を検索 — シーケンス
 
@@ -17,38 +17,38 @@ sequenceDiagram
     U->>A: GET /api/documents
     Note over A,D: 依存注入でtransaction開始・組織と所属を確認
     A->>D: 現在の組織の組織名・改訂番号・利用停止状態を取得する。
-    opt 検証不成立：bool(organizations) and (not organizations[0].suspended)
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する利用者を識別子順に一覧取得する。
-    opt 検証不成立：len(users) == 1
+    opt 検証不成立：有効な組織と利用者を確認し、最新の所属を読み込む。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 401 / {code： "unauthenticated", message： "ログインが必要です。", request_id： 相関ID}
+    E-->>U: HTTP 401 / ログインが必要です。
     end
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
-    opt 前条件が成立
+    A->>F: 一覧を絞り込む部署が指定されている。
     A->>F: 部署指定の管理用または執筆用の一覧かを判定する。
-    end
-    alt department and f.requires_department_permission(department, scope)
+    alt 部署指定の管理用または執筆用の一覧かを判定する。
     A->>F: 指定した一覧の用途に対応する部署権限を確認する。
-    A->>F: permission
-    opt 検証不成立：ctx.permission(department_id, 'manage' if scope == 'manage' else 'draft')
+    A->>F: 指定した部署で要求された操作を実行できる。
+    opt 検証不成立：指定した一覧の用途に対応する部署権限を確認する。
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
+    E-->>U: HTTP 403 / この操作は許可されていません。
     end
     end
     end
-    alt department
+    A->>F: 一覧を絞り込む部署が指定されている。
+    alt 一覧を絞り込む部署が指定されている。
     A->>F: 現在の組織に属する文書を指定した所有部署で絞り込み、一覧の対象を取得する。
     A->>D: 現在の組織に属する文書を指定した所有部署で絞り込み、一覧の対象を取得する。
     else 条件不成立
@@ -56,25 +56,31 @@ sequenceDiagram
     A->>D: 現在の組織に属する文書を識別子順に一覧取得する。
     end
     A->>F: 管理用の文書一覧を要求しているかを判定する。
-    alt f.is_management_scope(scope)
+    alt 管理用の文書一覧を要求しているかを判定する。
     A->>F: 用途と対象に一致するデータだけを取り出す。
     loop docs
-    A->>F: permission
+    A->>F: 指定した部署で要求された操作を実行できる。
     end
     else 条件不成立
     A->>F: 執筆用の文書一覧を要求しているかを判定する。
-    alt f.is_authoring_scope(scope)
+    alt 執筆用の文書一覧を要求しているかを判定する。
     A->>F: 用途と対象に一致するデータだけを取り出す。
     loop docs
     opt 前条件が成立
-    A->>F: permission
+    A->>F: 指定した部署で要求された操作を実行できる。
     end
     end
     else 条件不成立
     A->>F: 用途と対象に一致するデータだけを取り出す。
     loop docs
     opt 前条件が成立
-    A->>F: can_read
+    A->>F: 現在の所属と公開範囲で文書を閲覧できる。
+    A->>F: 指定した部署に現在も所属している。
+    opt 前条件が成立
+    loop json.loads(doc.shared_departments)
+    A->>F: 指定した部署に現在も所属している。
+    end
+    end
     end
     end
     A->>F: 取得したデータを識別子別に参照できる辞書へ変換する。
@@ -83,10 +89,15 @@ sequenceDiagram
     end
     end
     A->>F: 用途と対象に一致するデータだけを取り出す。
+    A->>F: 一覧の件数と次ページ情報が要求されている。
     A->>F: 更新日時の降順で並べた文書から指定範囲を切り出す。
-    alt not page
+    A->>F: 一覧の件数と次ページ情報が要求されている。
+    alt 不成立：（一覧の件数と次ページ情報が要求されている。）
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
+    A-->>U: HTTP 200 / list[models.DocumentsRow] | dict[str, object]
+    end
     end
     A->>F: 取得したデータを識別子別に参照できる辞書へ変換する。
     A->>D: 現在の組織に属する文書版を識別子順に一覧取得する。
@@ -98,36 +109,38 @@ sequenceDiagram
     A->>F: 公開版・承認状態・索引状態・本文要約を一覧の一行へ組み立てる。
     A->>F: 用途と対象に一致するデータだけを取り出す。
     A->>F: 後続処理に渡すデータを組み立てる。
-    alt version and scope == 'read'
+    A->>F: 公開版が存在し、閲覧用一覧に本文の要約を表示する。
+    alt 公開版が存在し、閲覧用一覧に本文の要約を表示する。
     A->>S: 実体を取得・ハッシュ照合
     else 条件不成立
     end
     end
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
-    Note over A: この処理からreturn
-    Note over A,D: 成功応答前に依存transactionをcommit・失敗時rollback
+    break 応答を返して終了
+    Note over A,D: 成功応答前にtransactionをcommit・競合時rollback
     A-->>U: HTTP 200 / list[models.DocumentsRow] | dict[str, object]
+    end
     Note over A,U: 共通例外経路（成功後に実行する追加処理ではない）
     opt 入力検証の失敗（RequestValidationError）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 422 / {code： "invalid_input", message： "入力形式を確認してください。", request_id： 相関ID}
+    E-->>U: HTTP 422 / 入力形式を確認してください。
     end
     end
     opt SQL実行またはcommitの競合（psycopg.Error）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 409 / {code： "conflict", message： "競合しました。再読込してください。", request_id： 相関ID}
+    E-->>U: HTTP 409 / 競合しました。再読込してください。
     end
     end
     opt DB接続・外部サービスの失敗（捕捉して継続する場合を除く）
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
     E->>L: KR_HTTP_FAILED / 処理を完了できずエラー応答を返しました。
-    E-->>U: HTTP 503 / {code： "unavailable", message： "一時的に利用できません。", request_id： 相関ID}
+    E-->>U: HTTP 503 / 一時的に利用できません。
     end
     end
 ```
@@ -147,30 +160,33 @@ sequenceDiagram
 
 | 関数 | 行 | 要素 | 条件・早期終了・例外 |
 | --- | --- | --- | --- |
-| kotorelay.context.Context.can_read | 89 | If | doc.status != 'active' or not self.memberships |
-| kotorelay.context.Context.can_read | 90 | Return | False |
-| kotorelay.context.Context.can_read | 91 | If | doc.visibility == 'organization' |
-| kotorelay.context.Context.can_read | 92 | Return | True |
-| kotorelay.context.Context.can_read | 93 | If | self.member(doc.department_id) |
-| kotorelay.context.Context.can_read | 94 | Return | True |
-| kotorelay.context.Context.can_read | 95 | Return | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
-| kotorelay.context.Context.permission | 78 | For | For |
-| kotorelay.context.Context.permission | 79 | If | m.department_id == department_id |
-| kotorelay.context.Context.permission | 80 | Return | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
-| kotorelay.context.Context.permission | 86 | Return | False |
+| kotorelay.context.Context.can_read | 95 | If | doc.status != 'active' or not self.memberships |
+| kotorelay.context.Context.can_read | 96 | Return | False |
+| kotorelay.context.Context.can_read | 97 | If | doc.visibility == 'organization' |
+| kotorelay.context.Context.can_read | 98 | Return | True |
+| kotorelay.context.Context.can_read | 99 | If | self.member(doc.department_id) |
+| kotorelay.context.Context.can_read | 100 | Return | True |
+| kotorelay.context.Context.can_read | 101 | Return | doc.visibility == 'selected' and any((self.member(department) for department in json.loads(doc.shared_departments))) |
+| kotorelay.context.Context.permission | 83 | For | For |
+| kotorelay.context.Context.permission | 84 | If | m.department_id == department_id |
+| kotorelay.context.Context.permission | 85 | Return | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
+| kotorelay.context.Context.permission | 91 | Return | False |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.list_documents.functions.build_document_item | 167 | Return | item |
-| kotorelay.operations.documents.list_documents.functions.build_document_page | 131 | Return | {'published_number': version.number if version else None, 'approved_at': approval.decided_at if approval else None, 'index_ready': bool(version and any((c.version_id == version.id and c.ready for c in chunks))), 'summary': ctx.objects.get(version.body_key, version.body_hash).decode()[:180] if version and scope == 'read' else '', 'review_status': latest.status if latest and scope != 'read' else None, 'review_number': versions[latest.version_id].number if latest and scope != 'read' else None} |
-| kotorelay.operations.documents.list_documents.functions.build_document_page_2 | 149 | Return | {'items': items, 'has_next': len(docs) > limit} |
+| kotorelay.operations.documents.list_documents.functions.build_document_item | 170 | Return | item |
+| kotorelay.operations.documents.list_documents.functions.build_document_page | 131 | Return | {'published_number': version.number if version else None, 'approved_at': approval.decided_at if approval else None, 'index_ready': bool(version and any((c.version_id == version.id and c.ready for c in chunks))), 'summary': ctx.objects.get(typing.cast(q.VersionsListRow, version).body_key, typing.cast(q.VersionsListRow, version).body_hash).decode()[:180] if has_readable_summary(version, scope) else '', 'review_status': latest.status if latest and scope != 'read' else None, 'review_number': versions[latest.version_id].number if latest and scope != 'read' else None} |
+| kotorelay.operations.documents.list_documents.functions.build_document_page_2 | 152 | Return | {'items': items, 'has_next': len(docs) > limit} |
 | kotorelay.operations.documents.list_documents.functions.chunks_list | 111 | Return | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
 | kotorelay.operations.documents.list_documents.functions.documents_by_department | 31 | Return | q.documents_by_department(ctx.db, q.DocumentsByDepartmentParams(organization_id=ctx.org, department_id=department_id)) |
 | kotorelay.operations.documents.list_documents.functions.documents_list | 38 | Return | q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) |
+| kotorelay.operations.documents.list_documents.functions.has_department_filter | 182 | Return | bool(department_id) |
+| kotorelay.operations.documents.list_documents.functions.has_readable_summary | 192 | Return | version is not None and scope == 'read' |
 | kotorelay.operations.documents.list_documents.functions.is_authoring_scope | 55 | Return | bool(scope == 'work') |
 | kotorelay.operations.documents.list_documents.functions.is_management_scope | 43 | Return | bool(scope == 'manage') |
 | kotorelay.operations.documents.list_documents.functions.map_versions | 74 | Return | {v.id: v for v in q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org))} |
 | kotorelay.operations.documents.list_documents.functions.map_versions_2 | 101 | Return | {v.id: v for v in q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org))} |
-| kotorelay.operations.documents.list_documents.functions.paginate_documents | 174 | Return | sorted(docs, key=lambda doc: doc.updated_at, reverse=True)[offset:offset + limit] |
+| kotorelay.operations.documents.list_documents.functions.paginate_documents | 177 | Return | sorted(docs, key=lambda doc: doc.updated_at, reverse=True)[offset:offset + limit] |
+| kotorelay.operations.documents.list_documents.functions.requests_page | 187 | Return | page |
 | kotorelay.operations.documents.list_documents.functions.require_department_permission | 22 | Return | require(ctx.permission(department_id, 'manage' if scope == 'manage' else 'draft'), 'forbidden', 403) |
 | kotorelay.operations.documents.list_documents.functions.requires_department_permission | 15 | Return | bool(department_id and scope in {'manage', 'work'}) |
 | kotorelay.operations.documents.list_documents.functions.select_docs | 50 | Return | [d for d in docs if ctx.permission(d.department_id, 'manage')] |
@@ -181,10 +197,10 @@ sequenceDiagram
 | kotorelay.operations.documents.list_documents.functions.select_history | 118 | Return | [s for s in submissions if s.document_id == doc.id] |
 | kotorelay.operations.documents.list_documents.functions.submissions_list | 106 | Return | q.submissions_list(ctx.db, q.SubmissionsListParams(organization_id=ctx.org)) |
 | kotorelay.operations.documents.list_documents.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
-| kotorelay.operations.documents.list_documents.router.list_documents | 38 | If | department and f.requires_department_permission(department, scope) |
-| kotorelay.operations.documents.list_documents.router.list_documents | 43 | If | f.is_management_scope(scope) |
-| kotorelay.operations.documents.list_documents.router.list_documents | 45 | If | f.is_authoring_scope(scope) |
-| kotorelay.operations.documents.list_documents.router.list_documents | 53 | If | not page |
-| kotorelay.operations.documents.list_documents.router.list_documents | 54 | Return | build_response(docs) |
-| kotorelay.operations.documents.list_documents.router.list_documents | 59 | For | For |
-| kotorelay.operations.documents.list_documents.router.list_documents | 61 | Return | build_response(f.build_document_page_2(items, limit, docs)) |
+| kotorelay.operations.documents.list_documents.router.list_documents | 38 | If | f.requires_department_permission(department, scope) |
+| kotorelay.operations.documents.list_documents.router.list_documents | 45 | If | f.is_management_scope(scope) |
+| kotorelay.operations.documents.list_documents.router.list_documents | 47 | If | f.is_authoring_scope(scope) |
+| kotorelay.operations.documents.list_documents.router.list_documents | 55 | If | not f.requests_page(page) |
+| kotorelay.operations.documents.list_documents.router.list_documents | 56 | Return | build_response(docs) |
+| kotorelay.operations.documents.list_documents.router.list_documents | 61 | For | For |
+| kotorelay.operations.documents.list_documents.router.list_documents | 63 | Return | build_response(f.build_document_page_2(items, limit, docs)) |

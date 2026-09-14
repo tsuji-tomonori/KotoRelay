@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 最新承認版の根拠で回答 — ログメッセージ
 
@@ -36,7 +36,7 @@ lazunexのops_loggerと同じく、独自型のcontext、ログID、例外型、
 | メッセージ | 整合性を確認できない回答根拠を除外しました。 |
 | 例外・出力条件 | 根拠の読込み・検証でProblemまたはValueErrorを捕捉した場合。 |
 | 返すレスポンス | HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。 |
-| 呼出し位置 | backend/src/kotorelay/operations/chat/ask_question/router.py:70, backend/src/kotorelay/operations/chat/shared/functions.py:69 |
+| 呼出し位置 | backend/src/kotorelay/operations/chat/ask_question/router.py:72, backend/src/kotorelay/operations/chat/shared/functions.py:69 |
 | 確認手順 | request_idと例外型から版・権限・実体の整合性を確認する。 |
 | 復旧手順 | 公開版と索引を照合し、必要なら再索引する。 |
 
@@ -75,7 +75,7 @@ lazunexのops_loggerと同じく、独自型のcontext、ログID、例外型、
 | メッセージ | 回答モデルの呼出しが失敗しました。 |
 | 例外・出力条件 | 回答生成中にBotoCoreError / ClientError / TimeoutErrorを捕捉した場合。 |
 | 返すレスポンス | 後続の再認可と保存が成功すればHTTP 200、AnswerView.status=failed、answer=現在利用できる根拠が不足しているため、回答を保留しました。 |
-| 呼出し位置 | backend/src/kotorelay/operations/chat/ask_question/router.py:126 |
+| 呼出し位置 | backend/src/kotorelay/operations/chat/ask_question/router.py:128 |
 | 確認手順 | request_idと例外型からモデルの稼働と呼出し権限を確認する。 |
 | 復旧手順 | 依存先の復旧後に新しい質問として再実行する。 |
 

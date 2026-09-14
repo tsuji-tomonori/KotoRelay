@@ -49,3 +49,8 @@ def select_job_details(
         )
         for row in rows
     ]
+
+
+def requests_details(details: bool) -> bool:
+    """ジョブに文書名と版番号を含めるよう要求されている。"""
+    return details

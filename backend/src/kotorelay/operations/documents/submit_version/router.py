@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import cast
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -30,9 +31,9 @@ def submit_version(ctx: Ctx, document_id: UUID, data: Submit, key: Key) -> model
     doc = f.document_doc(ctx, document_id)
     request = str(document_id) + data.model_dump_json()
     cached = f.find_previous_result(request, ctx, key)
-    if cached:
-        return build_response(f.build_submit_version(cached))
-    row = next(d for d in f.drafts_list(ctx) if d.document_id == doc.id)
+    if f.has_previous_result(cached):
+        return build_response(f.build_submit_version(cast(str, cached)))
+    row = next(d for d in f.drafts_list(ctx) if f.is_document_draft(d, doc.id))
     f.validate_draft_revision(row, data)
     images: list[ManifestImage] = []
     for placement in f.read_placements(row):

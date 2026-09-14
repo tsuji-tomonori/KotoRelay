@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: dc958b6e6841a9f29856eb932e8271e37a6d4416a3266624301c411c89949f81 -->
 
 # 部署の所属権限を変更 — 詳細設計
 
@@ -45,15 +45,15 @@
 
 | 実装箇所 | 検査条件 | 不成立時／分岐 | HTTP |
 | --- | --- | --- | --- |
-| backend/src/kotorelay/context.py:43 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
-| backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
-| backend/src/kotorelay/context.py:79 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/context.py:45 | bool(organizations) and (not organizations[0].suspended) | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:52 | len(users) == 1 | 'unauthenticated' | 401 |
+| backend/src/kotorelay/context.py:67 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
+| backend/src/kotorelay/context.py:84 | m.department_id == department_id | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/groups/change_membership/functions.py:17 | ctx.permission(data.department_id, 'manage') or ctx.user.operator | 'forbidden' | 403 |
 | backend/src/kotorelay/operations/groups/change_membership/functions.py:35 | bool(q.departments_get(ctx.db, q.DepartmentsGetParams(organization_id=ctx.org, id=data.department_id))) | 'not_found' | 404 |
 | backend/src/kotorelay/operations/groups/change_membership/functions.py:24 | bool(q.users_get(ctx.db, q.UsersGetParams(organization_id=ctx.org, id=data.user_id))) | 'not_found' | 404 |
-| backend/src/kotorelay/operations/groups/change_membership/router.py:30 | rows | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/groups/change_membership/router.py:30 | f.has_existing_membership(rows) | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -115,15 +115,16 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 
 | 実装箇所 | 返却式（DB行・変換結果・固定値） |
 | --- | --- |
-| backend/src/kotorelay/context.py:86 | False |
-| backend/src/kotorelay/context.py:80 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
-| backend/src/kotorelay/context.py:23 | str(uuid4()) |
-| backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
-| backend/src/kotorelay/operations/groups/change_membership/functions.py:63 | models.MembershipsRow(id=rows[0].id if rows else new_id(), organization_id=ctx.org, **data.model_dump()) |
-| backend/src/kotorelay/operations/groups/change_membership/functions.py:93 | ctx.fence() |
-| backend/src/kotorelay/operations/groups/change_membership/functions.py:77 | q.memberships_insert(ctx.db, q.MembershipsInsertParams.model_validate(row, from_attributes=True)) |
-| backend/src/kotorelay/operations/groups/change_membership/functions.py:70 | q.memberships_update(ctx.db, q.MembershipsUpdateParams.model_validate(row, from_attributes=True)) |
-| backend/src/kotorelay/operations/groups/change_membership/functions.py:86 | ctx.audit('membership', before=str(rows[0].active) if rows else '', after=str(row.active)) |
+| backend/src/kotorelay/context.py:91 | False |
+| backend/src/kotorelay/context.py:85 | {'author': m.can_author, 'review': m.can_review, 'manage': m.leader, 'draft': m.can_author or m.can_review}.get(operation, False) |
+| backend/src/kotorelay/context.py:24 | str(uuid4()) |
+| backend/src/kotorelay/context.py:20 | datetime.now(UTC) |
+| backend/src/kotorelay/operations/groups/change_membership/functions.py:63 | models.MembershipsRow(id=rows[0].id if has_existing_membership(rows) else new_id(), organization_id=ctx.org, **data.model_dump()) |
+| backend/src/kotorelay/operations/groups/change_membership/functions.py:95 | ctx.fence() |
+| backend/src/kotorelay/operations/groups/change_membership/functions.py:100 | bool(rows) |
+| backend/src/kotorelay/operations/groups/change_membership/functions.py:79 | q.memberships_insert(ctx.db, q.MembershipsInsertParams.model_validate(row, from_attributes=True)) |
+| backend/src/kotorelay/operations/groups/change_membership/functions.py:72 | q.memberships_update(ctx.db, q.MembershipsUpdateParams.model_validate(row, from_attributes=True)) |
+| backend/src/kotorelay/operations/groups/change_membership/functions.py:88 | ctx.audit('membership', before=str(rows[0].active) if rows else '', after=str(row.active)) |
 | backend/src/kotorelay/operations/groups/change_membership/functions.py:17 | require(ctx.permission(data.department_id, 'manage') or ctx.user.operator, 'forbidden', 403) |
 | backend/src/kotorelay/operations/groups/change_membership/functions.py:35 | require(bool(q.departments_get(ctx.db, q.DepartmentsGetParams(organization_id=ctx.org, id=data.department_id))), 'not_found', 404) |
 | backend/src/kotorelay/operations/groups/change_membership/functions.py:24 | require(bool(q.users_get(ctx.db, q.UsersGetParams(organization_id=ctx.org, id=data.user_id))), 'not_found', 404) |

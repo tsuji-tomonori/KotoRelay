@@ -22,6 +22,8 @@ def resolve(inventory: Inventory, key: str, call: ast.Call) -> str:
         module = module.rsplit(".", 1)[0]
     name = ast.unparse(call.func)
     prefix, _, rest = name.partition(".")
+    if prefix == "self" and ".Context." in key and rest:
+        return "kotorelay.context.Context." + rest
     if prefix == "ctx" and rest:
         return "kotorelay.context.Context." + rest
     if prefix in {"rt", "runtime"} and rest == "context":
@@ -58,8 +60,22 @@ def render(
     from kotorelay.error_responses import DB_CONFLICT, INVALID_INPUT, UNAVAILABLE
     from kotorelay.operational_logging import CATALOG, MessageId
 
+    from tools.project.condition_labels import describe
     from tools.project.error_design import problem_call, response_label
+    from tools.project.source_policy import terminates
 
+    status = 200
+    for decorator in inventory.nodes[key].decorator_list:
+        if isinstance(decorator, ast.Call):
+            for keyword in decorator.keywords:
+                if keyword.arg == "status_code":
+                    status = ast.literal_eval(keyword.value)
+    annotation = inventory.nodes[key].returns
+    success_label = f"HTTP {status} / " + label(
+        ast.unparse(annotation) if annotation else "成功応答"
+    )
+    active_transactions = 0
+    deferred_conditions: dict[str, tuple[str, ast.AST]] = {}
     catches: list[tuple[str, str]] = []
     lines = [
         "sequenceDiagram",
@@ -77,6 +93,18 @@ def render(
     def add(text: str) -> None:
         lines.append("    " + text)
 
+    def condition_text(node: ast.AST, current: str) -> str:
+        token = f"条件参照{len(deferred_conditions)}番"
+        deferred_conditions[token] = (current, node)
+        return token
+
+    def success() -> None:
+        add("break 応答を返して終了")
+        if uses_context or active_transactions:
+            add("Note over A,D: 成功応答前にtransactionをcommit・競合時rollback")
+        add("A-->>U: " + success_label)
+        add("end")
+
     def response(outcome) -> None:
         add("break エラー応答を返して終了（後続の正常処理は実行しない）")
         add("A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback")
@@ -88,13 +116,7 @@ def render(
     def raised(outcome) -> None:
         handler = next((place for types, place in reversed(catches) if "Problem" in types), None)
         if handler:
-            add(
-                "Note over A: Problemを "
-                + label(handler)
-                + " で捕捉 / "
-                + label(response_label(outcome))
-                + " は未送信。catchの継続・再送出分岐へ進む。"
-            )
+            add("Note over A: Problemを " + label(handler) + " で捕捉し、継続・再送出分岐へ進む。")
         else:
             response(outcome)
 
@@ -107,7 +129,7 @@ def render(
             return
         if isinstance(node, ast.IfExp):
             expression(node.test, current, stack)
-            add("alt " + label(ast.unparse(node.test)))
+            add("alt " + condition_text(node.test, current))
             expression(node.body, current, stack)
             add("else 条件不成立")
             expression(node.orelse, current, stack)
@@ -128,7 +150,7 @@ def render(
                 add("loop " + label(ast.unparse(generator.iter)))
                 for condition in generator.ifs:
                     expression(condition, current, stack)
-                    add("opt " + label(ast.unparse(condition)))
+                    add("opt " + condition_text(condition, current))
                 iteration(index + 1)
                 for _ in generator.ifs:
                     add("end")
@@ -156,12 +178,7 @@ def render(
                     current,
                     stack,
                 )
-                condition = (
-                    node.args[0]
-                    if node.args
-                    else next(k.value for k in node.keywords if k.arg == "condition")
-                )
-                add("opt 検証不成立：" + label(ast.unparse(condition)))
+                add("opt 検証不成立：" + purpose(current))
                 raised(problem_call(node, require=True))
                 add("end")
                 return
@@ -201,10 +218,11 @@ def render(
                 add("A->>M: " + name.rsplit(".", 1)[-1])
 
     def statements(nodes: list[ast.stmt], current: str, stack: tuple[str, ...]) -> None:
+        nonlocal active_transactions
         for node in nodes:
             if isinstance(node, ast.If):
                 expression(node.test, current, stack)
-                add("alt " + label(ast.unparse(node.test)))
+                add("alt " + condition_text(node.test, current))
                 statements(node.body, current, stack)
                 if node.orelse:
                     add("else 条件不成立")
@@ -213,7 +231,14 @@ def render(
             elif isinstance(node, (ast.For, ast.While)):
                 condition = node.iter if isinstance(node, ast.For) else node.test
                 expression(condition, current, stack)
-                add("loop " + label(ast.unparse(condition)))
+                add(
+                    "loop "
+                    + (
+                        label(ast.unparse(condition))
+                        if isinstance(node, ast.For)
+                        else condition_text(condition, current)
+                    )
+                )
                 statements(node.body, current, stack)
                 add("end")
                 statements(node.orelse, current, stack)
@@ -251,6 +276,7 @@ def render(
                     for item in node.items
                 )
                 if transaction:
+                    active_transactions += 1
                     add("rect rgb(235, 245, 255)")
                     add("Note over A,D: transaction開始・例外時rollback")
                     authentication = "kotorelay.context.Context.__init__"
@@ -264,12 +290,16 @@ def render(
                         expression(item.context_expr, current, stack)
                 statements(node.body, current, stack)
                 if transaction:
-                    add("Note over A,D: 正常終了時commit・競合時rollback")
+                    active_transactions -= 1
+                    if not terminates(node.body):
+                        add("Note over A,D: 正常終了時commit・競合時rollback")
                     add("end")
             elif isinstance(node, ast.Return):
                 expression(node.value, current, stack)
-                if any(part in current for part in (".router.", ".workflow.")):
-                    add("Note over A: この処理からreturn")
+                if current == key:
+                    success()
+                elif ".workflow." in current:
+                    add("Note over A: 共有処理から呼出し元へ戻る")
             elif isinstance(node, ast.Raise):
                 if (
                     isinstance(node.exc, ast.Call)
@@ -279,12 +309,7 @@ def render(
                         len(node.exc.args) > 1
                         and ast.literal_eval(node.exc.args[1]) == "already_answered"
                     ):
-                        add(
-                            "Note over A: already_answeredは内部制御例外。"
-                            "catchで既存回答を再取得・再認可し、"
-                            "HTTP 200 / AnswerView（id・answer・status・citations等）を返す。"
-                            "HTTP 409は送らない。"
-                        )
+                        add("Note over A: 保存済み回答を再取得・再認可する捕捉分岐へ進む")
                     else:
                         raised(problem_call(node.exc))
                 elif node.exc is None:
@@ -293,7 +318,7 @@ def render(
                     for outcome in contracts(
                         inventory, inventory.reachable(current), authenticated=False
                     ):
-                        add("opt 再送出されたProblem：" + outcome.code)
+                        add("opt 捕捉した業務例外を再送出する場合")
                         response(outcome)
                         add("end")
 
@@ -324,16 +349,6 @@ def render(
         authentication = "kotorelay.context.Context.__init__"
         statements(inventory.nodes[authentication].body, authentication, (key, authentication))
     statements(inventory.nodes[key].body, key, (key,))
-    if uses_context:
-        add("Note over A,D: 成功応答前に依存transactionをcommit・失敗時rollback")
-    status = 200
-    for decorator in inventory.nodes[key].decorator_list:
-        if isinstance(decorator, ast.Call):
-            for keyword in decorator.keywords:
-                if keyword.arg == "status_code":
-                    status = ast.literal_eval(keyword.value)
-    annotation = inventory.nodes[key].returns
-    add(f"A-->>U: HTTP {status} / " + label(ast.unparse(annotation) if annotation else "成功応答"))
     if uses_context or any(
         a.annotation and ast.unparse(a.annotation) == "Rt" for a in inventory.nodes[key].args.args
     ):
@@ -346,4 +361,9 @@ def render(
             add("opt " + title)
             response(outcome)
             add("end")
-    return remove_empty_blocks(lines)
+    rendered = remove_empty_blocks(lines)
+    for token, (current, node) in deferred_conditions.items():
+        if any(token in line for line in rendered):
+            text = label(describe(inventory, current, node))
+            rendered = [line.replace(token, text) for line in rendered]
+    return rendered

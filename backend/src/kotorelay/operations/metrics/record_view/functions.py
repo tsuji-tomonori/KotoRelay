@@ -83,3 +83,8 @@ def check_concurrent_access(ctx: context_types.Context) -> None:
 def build_record_view_2() -> dict[str, bool]:
     """後続処理に渡すデータを組み立てる。"""
     return {"recorded": True}
+
+
+def has_previous_view(rows: list[q.EventsGetRow]) -> bool:
+    """同じ閲覧イベントが既に記録されている。"""
+    return bool(rows)

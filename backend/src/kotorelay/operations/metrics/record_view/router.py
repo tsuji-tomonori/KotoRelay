@@ -29,7 +29,7 @@ def record_view(ctx: Ctx, document_id: UUID, data: ViewEvent) -> dict[str, bool]
     f.require_consuming_membership(ctx, data)
     event_id = stable_id(ctx.user.id + data.id)
     previous = f.events_get(ctx, event_id)
-    if previous:
+    if f.has_previous_view(previous):
         f.validate_repeated_view(doc, data, previous)
         return build_response(f.build_record_view())
     f.events_insert(ctx, event_id, data, doc)
