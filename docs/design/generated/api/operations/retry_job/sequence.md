@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 反映ジョブを再処理 — シーケンス
 
@@ -164,7 +164,7 @@ sequenceDiagram
     A->>F: 保存された実体をテキストへ復元する。
     A->>S: 実体を取得・ハッシュ照合
     A->>F: 用途と対象に一致するデータだけを取り出す。
-    A->>F: split_chunks
+    A->>F: 見出しと本文を検索用の長さに分割する。
     loop manifest.images
     A->>F: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
@@ -175,11 +175,11 @@ sequenceDiagram
     A->>F: 後続処理に渡すデータを組み立てる。
     A->>S: 実体を取得・ハッシュ照合
     A->>F: OCRの領域順に本文を復元し、画像配置を付けた検索断片へ分割する。
-    A->>F: split_chunks
+    A->>F: 見出しと本文を検索用の長さに分割する。
     end
     A->>F: 生成する検索断片の件数上限を確認する。
     opt 検証不成立：len(parts) <= 300
-    Note over A: Problemを kotorelay.operations.indexing.shared.router.process：104 で捕捉 / HTTP 422 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    Note over A: Problemを kotorelay.operations.indexing.shared.workflow.process：107 で捕捉 / HTTP 422 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     A->>F: 取得したデータを識別子別に参照できる辞書へ変換する。
     A->>D: 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。
@@ -206,7 +206,7 @@ sequenceDiagram
     A->>M: verify
     end
     opt 検証不成立：len(actual) == len(parts) and engine.verify([c.id for c in actual])
-    Note over A: Problemを kotorelay.operations.indexing.shared.router.process：104 で捕捉 / HTTP 503 / {code： "integrity", message： "保存内容の整合性を確認できません。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
+    Note over A: Problemを kotorelay.operations.indexing.shared.workflow.process：107 で捕捉 / HTTP 503 / {code： "integrity", message： "保存内容の整合性を確認できません。", request_id： 相関ID} は未送信。catchの継続・再送出分岐へ進む。
     end
     loop actual
     A->>F: 記録された保存先から実体を取得してハッシュを照合する。
@@ -296,112 +296,110 @@ sequenceDiagram
 | kotorelay.operational_logging.continuation_context | 150 | Return | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
 | kotorelay.operations.indexing.retry_job.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
 | kotorelay.operations.indexing.retry_job.router.retry_job | 27 | Return | build_response(process(ctx, rt.engine, str(job_id))) |
-| kotorelay.operations.indexing.shared.functions.answers_list | 284 | Return | q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) |
-| kotorelay.operations.indexing.shared.functions.assets_delete | 347 | Return | q.assets_delete(ctx.db, q.AssetsDeleteParams(organization_id=ctx.org, id=asset.id)) |
-| kotorelay.operations.indexing.shared.functions.assets_get | 108 | Return | q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=image.placement.asset_id)) |
-| kotorelay.operations.indexing.shared.functions.assets_list | 264 | Return | q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) |
-| kotorelay.operations.indexing.shared.functions.build_chunk | 167 | Return | models.ChunksRow(id=stable_id(version.id + str(number)), organization_id=ctx.org, document_id=doc.id, version_id=version.id, body_key=key, sha256=key, heading=heading, placements=placements, manifest_hash=version.manifest_hash, ready=False) |
-| kotorelay.operations.indexing.shared.functions.build_manifest | 91 | Return | Manifest.model_validate_json(version.manifest) |
-| kotorelay.operations.indexing.shared.functions.build_result | 133 | Return | OcrResult.model_validate_json(ctx.objects.get(run.result_key, image.ocr_hash)) |
-| kotorelay.operations.indexing.shared.functions.build_updated | 387 | Return | job.model_copy(update={'status': status, 'attempts': job.attempts if status in {'retained', 'pending'} else job.attempts + 1, 'error_code': ''}) |
-| kotorelay.operations.indexing.shared.functions.build_updated_2 | 398 | Return | job.model_copy(update={'status': 'failed', 'attempts': job.attempts + 1, 'error_code': exc.code}) |
-| kotorelay.operations.indexing.shared.functions.build_updated_3 | 405 | Return | job.model_copy(update={'status': 'failed', 'attempts': job.attempts + 1, 'error_code': 'external_failure'}) |
-| kotorelay.operations.indexing.shared.functions.check_concurrent_access | 419 | Return | ctx.fence() |
-| kotorelay.operations.indexing.shared.functions.chunks_delete | 71 | Return | q.chunks_delete(ctx.db, q.ChunksDeleteParams(organization_id=ctx.org, id=stale_chunk.id)) |
-| kotorelay.operations.indexing.shared.functions.chunks_delete_2 | 315 | Return | q.chunks_delete(ctx.db, q.ChunksDeleteParams(organization_id=ctx.org, id=chunk.id)) |
-| kotorelay.operations.indexing.shared.functions.chunks_insert | 204 | Return | q.chunks_insert(ctx.db, q.ChunksInsertParams.model_validate(chunk, from_attributes=True)) |
-| kotorelay.operations.indexing.shared.functions.chunks_list | 259 | Return | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
-| kotorelay.operations.indexing.shared.functions.chunks_update | 199 | Return | q.chunks_update(ctx.db, q.ChunksUpdateParams.model_validate(chunk, from_attributes=True)) |
-| kotorelay.operations.indexing.shared.functions.chunks_update_2 | 232 | Return | q.chunks_update(ctx.db, q.ChunksUpdateParams.model_validate(current.model_copy(update={'ready': True}), from_attributes=True)) |
-| kotorelay.operations.indexing.shared.functions.collect_live | 289 | Return | {d.id for d in q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) if d.status != 'deleted'} |
-| kotorelay.operations.indexing.shared.functions.collect_object_keys | 471 | For | For |
+| kotorelay.operations.indexing.shared.functions.answers_list | 285 | Return | q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)) |
+| kotorelay.operations.indexing.shared.functions.assets_delete | 348 | Return | q.assets_delete(ctx.db, q.AssetsDeleteParams(organization_id=ctx.org, id=asset.id)) |
+| kotorelay.operations.indexing.shared.functions.assets_get | 109 | Return | q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=image.placement.asset_id)) |
+| kotorelay.operations.indexing.shared.functions.assets_list | 265 | Return | q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) |
+| kotorelay.operations.indexing.shared.functions.build_chunk | 168 | Return | models.ChunksRow(id=stable_id(version.id + str(number)), organization_id=ctx.org, document_id=doc.id, version_id=version.id, body_key=key, sha256=key, heading=heading, placements=placements, manifest_hash=version.manifest_hash, ready=False) |
+| kotorelay.operations.indexing.shared.functions.build_manifest | 92 | Return | Manifest.model_validate_json(version.manifest) |
+| kotorelay.operations.indexing.shared.functions.build_result | 134 | Return | OcrResult.model_validate_json(ctx.objects.get(run.result_key, image.ocr_hash)) |
+| kotorelay.operations.indexing.shared.functions.build_updated | 388 | Return | job.model_copy(update={'status': status, 'attempts': job.attempts if status in {'retained', 'pending'} else job.attempts + 1, 'error_code': ''}) |
+| kotorelay.operations.indexing.shared.functions.build_updated_2 | 399 | Return | job.model_copy(update={'status': 'failed', 'attempts': job.attempts + 1, 'error_code': exc.code}) |
+| kotorelay.operations.indexing.shared.functions.build_updated_3 | 406 | Return | job.model_copy(update={'status': 'failed', 'attempts': job.attempts + 1, 'error_code': 'external_failure'}) |
+| kotorelay.operations.indexing.shared.functions.check_concurrent_access | 420 | Return | ctx.fence() |
+| kotorelay.operations.indexing.shared.functions.chunks_delete | 72 | Return | q.chunks_delete(ctx.db, q.ChunksDeleteParams(organization_id=ctx.org, id=stale_chunk.id)) |
+| kotorelay.operations.indexing.shared.functions.chunks_delete_2 | 316 | Return | q.chunks_delete(ctx.db, q.ChunksDeleteParams(organization_id=ctx.org, id=chunk.id)) |
+| kotorelay.operations.indexing.shared.functions.chunks_insert | 205 | Return | q.chunks_insert(ctx.db, q.ChunksInsertParams.model_validate(chunk, from_attributes=True)) |
+| kotorelay.operations.indexing.shared.functions.chunks_list | 260 | Return | q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) |
+| kotorelay.operations.indexing.shared.functions.chunks_update | 200 | Return | q.chunks_update(ctx.db, q.ChunksUpdateParams.model_validate(chunk, from_attributes=True)) |
+| kotorelay.operations.indexing.shared.functions.chunks_update_2 | 233 | Return | q.chunks_update(ctx.db, q.ChunksUpdateParams.model_validate(current.model_copy(update={'ready': True}), from_attributes=True)) |
+| kotorelay.operations.indexing.shared.functions.collect_live | 290 | Return | {d.id for d in q.documents_list(ctx.db, q.DocumentsListParams(organization_id=ctx.org)) if d.status != 'deleted'} |
 | kotorelay.operations.indexing.shared.functions.collect_object_keys | 472 | For | For |
-| kotorelay.operations.indexing.shared.functions.collect_object_keys | 473 | If | row.document_id == document_id |
-| kotorelay.operations.indexing.shared.functions.collect_object_keys | 475 | If | row.document_id in live |
-| kotorelay.operations.indexing.shared.functions.collect_object_keys | 477 | For | For |
-| kotorelay.operations.indexing.shared.functions.collect_object_keys | 484 | Return | (keys, protected) |
-| kotorelay.operations.indexing.shared.functions.decode_body | 96 | Return | ctx.objects.get(version.body_key, version.body_hash).decode() |
-| kotorelay.operations.indexing.shared.functions.delete_build_index | 66 | Return | engine.delete([c.id for c in stale[:100]]) |
-| kotorelay.operations.indexing.shared.functions.delete_purge | 298 | Return | ctx.objects.delete(key) |
-| kotorelay.operations.indexing.shared.functions.delete_purge_2 | 310 | Return | engine.delete([c.id for c in target_chunks]) |
-| kotorelay.operations.indexing.shared.functions.documents_get | 43 | Return | q.documents_get(ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=job.document_id)) |
-| kotorelay.operations.indexing.shared.functions.documents_get_2 | 242 | Return | q.documents_get(ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=job.document_id)) |
-| kotorelay.operations.indexing.shared.functions.drafts_delete | 357 | Return | q.drafts_delete(ctx.db, q.DraftsDeleteParams(organization_id=ctx.org, id=draft.id)) |
-| kotorelay.operations.indexing.shared.functions.drafts_list | 274 | Return | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
-| kotorelay.operations.indexing.shared.functions.enforce_chunk_limit | 138 | Return | require(len(parts) <= 300, 'limit', 422) |
-| kotorelay.operations.indexing.shared.functions.enforce_retry_limit | 377 | Return | require(job.attempts < 5, 'limit', 429) |
-| kotorelay.operations.indexing.shared.functions.get_build_index | 126 | Return | ctx.objects.get(asset.object_key, image.image_hash) |
-| kotorelay.operations.indexing.shared.functions.get_build_index_2 | 227 | Return | ctx.objects.get(current.body_key, current.sha256) |
-| kotorelay.operations.indexing.shared.functions.has_more_stale_chunks | 76 | Return | bool(len(stale) > 100) |
-| kotorelay.operations.indexing.shared.functions.has_more_target_chunks | 320 | Return | bool(len(target_chunks) > 100) |
-| kotorelay.operations.indexing.shared.functions.has_more_target_ocr | 337 | Return | bool(len(target_runs) > 100) |
-| kotorelay.operations.indexing.shared.functions.image_chunks | 429 | Return | [(image.placement.heading or heading, text, json.dumps([image.placement.id])) for heading, text in split_chunks(text or '添付画像')] |
-| kotorelay.operations.indexing.shared.functions.index_build_index | 189 | Return | engine.index(chunk.id, text, doc.id, version.id) |
-| kotorelay.operations.indexing.shared.functions.is_existing_chunk | 194 | Return | bool(chunk.id in previous) |
-| kotorelay.operations.indexing.shared.functions.is_finished_job | 382 | Return | bool(job.status in {'done', 'obsolete'}) |
-| kotorelay.operations.indexing.shared.functions.is_inactive_document | 81 | Return | bool(doc.status != 'active') |
-| kotorelay.operations.indexing.shared.functions.is_obsolete_version | 50 | Return | bool(doc.latest_version_id != job.version_id or not job.version_id) |
-| kotorelay.operations.indexing.shared.functions.is_purge_job | 437 | Return | job.kind == 'purge' |
-| kotorelay.operations.indexing.shared.functions.is_restored_document | 249 | Return | bool(doc.status != 'deleted') |
-| kotorelay.operations.indexing.shared.functions.is_target_asset | 342 | Return | bool(asset.document_id == doc.id) |
-| kotorelay.operations.indexing.shared.functions.is_target_draft | 352 | Return | bool(draft.document_id == doc.id) |
-| kotorelay.operations.indexing.shared.functions.is_within_retention | 254 | Return | bool((now() - job.created_at).total_seconds() < ctx.settings.retention_days * 86400) |
-| kotorelay.operations.indexing.shared.functions.map_previous | 145 | Return | {c.id: c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.version_id == version.id} |
-| kotorelay.operations.indexing.shared.functions.ocr_runs_delete | 332 | Return | q.ocr_runs_delete(ctx.db, q.OcrRunsDeleteParams(organization_id=ctx.org, id=run.id)) |
-| kotorelay.operations.indexing.shared.functions.ocr_runs_get | 117 | Return | q.ocr_runs_get(ctx.db, q.OcrRunsGetParams(organization_id=ctx.org, id=image.placement.ocr_run_id)) |
-| kotorelay.operations.indexing.shared.functions.ocr_runs_list | 269 | Return | q.ocr_runs_list(ctx.db, q.OcrRunsListParams(organization_id=ctx.org)) |
-| kotorelay.operations.indexing.shared.functions.outbox_get | 367 | Return | q.outbox_get(ctx.db, q.OutboxGetParams(organization_id=ctx.org, id=job_id)) |
-| kotorelay.operations.indexing.shared.functions.outbox_update | 412 | Return | q.outbox_update(ctx.db, q.OutboxUpdateParams.model_validate(updated, from_attributes=True)) |
-| kotorelay.operations.indexing.shared.functions.put_key | 154 | Return | ctx.objects.put(text.encode(), 'text/plain') |
-| kotorelay.operations.indexing.shared.functions.require_job | 372 | Return | require(bool(rows)) |
-| kotorelay.operations.indexing.shared.functions.require_operator | 362 | Return | require(ctx.user.operator, 'forbidden', 403) |
-| kotorelay.operations.indexing.shared.functions.select_actual | 209 | Return | [c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.version_id == version.id] |
-| kotorelay.operations.indexing.shared.functions.select_parts | 101 | Return | [(heading, text, '[]') for heading, text in split_chunks(body)] |
-| kotorelay.operations.indexing.shared.functions.select_stale | 57 | Return | [c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.document_id == doc.id and (doc.status != 'active' or c.version_id != job.version_id)] |
-| kotorelay.operations.indexing.shared.functions.select_target_chunks | 305 | Return | [c for c in chunks if c.document_id == doc.id] |
-| kotorelay.operations.indexing.shared.functions.select_target_runs | 327 | Return | [r for r in runs if r.document_id == doc.id] |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 23 | For | For |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 24 | If | line.startswith('#') or len(buffer) + len(line) > 1200 |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 25 | If | buffer.strip() |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 28 | If | line.startswith('#') |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 30 | For | For |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 32 | If | len(buffer) + len(part) > 1200 and buffer.strip() |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 36 | If | buffer.strip() |
-| kotorelay.operations.indexing.shared.functions.split_chunks | 38 | Return | chunks |
-| kotorelay.operations.indexing.shared.functions.verify_index_completion | 220 | Return | require(len(actual) == len(parts) and engine.verify([c.id for c in actual]), 'integrity', 503) |
-| kotorelay.operations.indexing.shared.functions.versions_get | 86 | Return | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=version_id)) |
-| kotorelay.operations.indexing.shared.functions.versions_list | 279 | Return | q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org)) |
-| kotorelay.operations.indexing.shared.router.build_index | 17 | If | not job.version_id or f.is_obsolete_version(doc, job) |
-| kotorelay.operations.indexing.shared.router.build_index | 18 | Return | 'obsolete' |
-| kotorelay.operations.indexing.shared.router.build_index | 21 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 23 | If | f.has_more_stale_chunks(stale) |
-| kotorelay.operations.indexing.shared.router.build_index | 24 | Return | 'pending' |
-| kotorelay.operations.indexing.shared.router.build_index | 25 | If | f.is_inactive_document(doc) |
-| kotorelay.operations.indexing.shared.router.build_index | 26 | Return | 'done' |
-| kotorelay.operations.indexing.shared.router.build_index | 31 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 39 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 43 | If | f.is_existing_chunk(previous, chunk) |
-| kotorelay.operations.indexing.shared.router.build_index | 49 | For | For |
-| kotorelay.operations.indexing.shared.router.build_index | 52 | Return | 'done' |
-| kotorelay.operations.indexing.shared.router.process | 99 | If | f.is_finished_job(job) |
-| kotorelay.operations.indexing.shared.router.process | 100 | Return | job |
-| kotorelay.operations.indexing.shared.router.process | 101 | Try | Try |
-| kotorelay.operations.indexing.shared.router.process | 104 | ExceptHandler | Problem |
-| kotorelay.operations.indexing.shared.router.process | 109 | ExceptHandler | (OSError, BotoCoreError, ClientError) |
-| kotorelay.operations.indexing.shared.router.process | 116 | Return | updated |
-| kotorelay.operations.indexing.shared.router.purge | 57 | If | f.is_restored_document(doc) |
-| kotorelay.operations.indexing.shared.router.purge | 58 | Return | 'obsolete' |
-| kotorelay.operations.indexing.shared.router.purge | 59 | If | f.is_within_retention(ctx, job) |
-| kotorelay.operations.indexing.shared.router.purge | 60 | Return | 'retained' |
-| kotorelay.operations.indexing.shared.router.purge | 71 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 75 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 77 | If | f.has_more_target_chunks(target_chunks) |
-| kotorelay.operations.indexing.shared.router.purge | 78 | Return | 'pending' |
-| kotorelay.operations.indexing.shared.router.purge | 80 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 82 | If | f.has_more_target_ocr(target_runs) |
-| kotorelay.operations.indexing.shared.router.purge | 83 | Return | 'pending' |
-| kotorelay.operations.indexing.shared.router.purge | 84 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 85 | If | f.is_target_asset(asset, doc) |
-| kotorelay.operations.indexing.shared.router.purge | 87 | For | For |
-| kotorelay.operations.indexing.shared.router.purge | 88 | If | f.is_target_draft(draft, doc) |
-| kotorelay.operations.indexing.shared.router.purge | 90 | Return | 'done' |
+| kotorelay.operations.indexing.shared.functions.collect_object_keys | 473 | For | For |
+| kotorelay.operations.indexing.shared.functions.collect_object_keys | 474 | If | row.document_id == document_id |
+| kotorelay.operations.indexing.shared.functions.collect_object_keys | 476 | If | row.document_id in live |
+| kotorelay.operations.indexing.shared.functions.collect_object_keys | 478 | For | For |
+| kotorelay.operations.indexing.shared.functions.collect_object_keys | 485 | Return | (keys, protected) |
+| kotorelay.operations.indexing.shared.functions.decode_body | 97 | Return | ctx.objects.get(version.body_key, version.body_hash).decode() |
+| kotorelay.operations.indexing.shared.functions.delete_build_index | 67 | Return | engine.delete([c.id for c in stale[:100]]) |
+| kotorelay.operations.indexing.shared.functions.delete_purge | 299 | Return | ctx.objects.delete(key) |
+| kotorelay.operations.indexing.shared.functions.delete_purge_2 | 311 | Return | engine.delete([c.id for c in target_chunks]) |
+| kotorelay.operations.indexing.shared.functions.documents_get | 44 | Return | q.documents_get(ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=job.document_id)) |
+| kotorelay.operations.indexing.shared.functions.documents_get_2 | 243 | Return | q.documents_get(ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=job.document_id)) |
+| kotorelay.operations.indexing.shared.functions.drafts_delete | 358 | Return | q.drafts_delete(ctx.db, q.DraftsDeleteParams(organization_id=ctx.org, id=draft.id)) |
+| kotorelay.operations.indexing.shared.functions.drafts_list | 275 | Return | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
+| kotorelay.operations.indexing.shared.functions.enforce_chunk_limit | 139 | Return | require(len(parts) <= 300, 'limit', 422) |
+| kotorelay.operations.indexing.shared.functions.enforce_retry_limit | 378 | Return | require(job.attempts < 5, 'limit', 429) |
+| kotorelay.operations.indexing.shared.functions.has_more_stale_chunks | 77 | Return | bool(len(stale) > 100) |
+| kotorelay.operations.indexing.shared.functions.has_more_target_chunks | 321 | Return | bool(len(target_chunks) > 100) |
+| kotorelay.operations.indexing.shared.functions.has_more_target_ocr | 338 | Return | bool(len(target_runs) > 100) |
+| kotorelay.operations.indexing.shared.functions.image_chunks | 430 | Return | [(image.placement.heading or heading, text, json.dumps([image.placement.id])) for heading, text in split_chunks(text or '添付画像')] |
+| kotorelay.operations.indexing.shared.functions.index_build_index | 190 | Return | engine.index(chunk.id, text, doc.id, version.id) |
+| kotorelay.operations.indexing.shared.functions.is_existing_chunk | 195 | Return | bool(chunk.id in previous) |
+| kotorelay.operations.indexing.shared.functions.is_finished_job | 383 | Return | bool(job.status in {'done', 'obsolete'}) |
+| kotorelay.operations.indexing.shared.functions.is_inactive_document | 82 | Return | bool(doc.status != 'active') |
+| kotorelay.operations.indexing.shared.functions.is_obsolete_version | 51 | Return | bool(doc.latest_version_id != job.version_id or not job.version_id) |
+| kotorelay.operations.indexing.shared.functions.is_purge_job | 438 | Return | job.kind == 'purge' |
+| kotorelay.operations.indexing.shared.functions.is_restored_document | 250 | Return | bool(doc.status != 'deleted') |
+| kotorelay.operations.indexing.shared.functions.is_target_asset | 343 | Return | bool(asset.document_id == doc.id) |
+| kotorelay.operations.indexing.shared.functions.is_target_draft | 353 | Return | bool(draft.document_id == doc.id) |
+| kotorelay.operations.indexing.shared.functions.is_within_retention | 255 | Return | bool((now() - job.created_at).total_seconds() < ctx.settings.retention_days * 86400) |
+| kotorelay.operations.indexing.shared.functions.map_previous | 146 | Return | {c.id: c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.version_id == version.id} |
+| kotorelay.operations.indexing.shared.functions.ocr_runs_delete | 333 | Return | q.ocr_runs_delete(ctx.db, q.OcrRunsDeleteParams(organization_id=ctx.org, id=run.id)) |
+| kotorelay.operations.indexing.shared.functions.ocr_runs_get | 118 | Return | q.ocr_runs_get(ctx.db, q.OcrRunsGetParams(organization_id=ctx.org, id=image.placement.ocr_run_id)) |
+| kotorelay.operations.indexing.shared.functions.ocr_runs_list | 270 | Return | q.ocr_runs_list(ctx.db, q.OcrRunsListParams(organization_id=ctx.org)) |
+| kotorelay.operations.indexing.shared.functions.outbox_get | 368 | Return | q.outbox_get(ctx.db, q.OutboxGetParams(organization_id=ctx.org, id=job_id)) |
+| kotorelay.operations.indexing.shared.functions.outbox_update | 413 | Return | q.outbox_update(ctx.db, q.OutboxUpdateParams.model_validate(updated, from_attributes=True)) |
+| kotorelay.operations.indexing.shared.functions.put_key | 155 | Return | ctx.objects.put(text.encode(), 'text/plain') |
+| kotorelay.operations.indexing.shared.functions.require_job | 373 | Return | require(bool(rows)) |
+| kotorelay.operations.indexing.shared.functions.require_operator | 363 | Return | require(ctx.user.operator, 'forbidden', 403) |
+| kotorelay.operations.indexing.shared.functions.select_actual | 210 | Return | [c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.version_id == version.id] |
+| kotorelay.operations.indexing.shared.functions.select_parts | 102 | Return | [(heading, text, '[]') for heading, text in split_chunks(body)] |
+| kotorelay.operations.indexing.shared.functions.select_stale | 58 | Return | [c for c in q.chunks_list(ctx.db, q.ChunksListParams(organization_id=ctx.org)) if c.document_id == doc.id and (doc.status != 'active' or c.version_id != job.version_id)] |
+| kotorelay.operations.indexing.shared.functions.select_target_chunks | 306 | Return | [c for c in chunks if c.document_id == doc.id] |
+| kotorelay.operations.indexing.shared.functions.select_target_runs | 328 | Return | [r for r in runs if r.document_id == doc.id] |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 24 | For | For |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 25 | If | line.startswith('#') or len(buffer) + len(line) > 1200 |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 26 | If | buffer.strip() |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 29 | If | line.startswith('#') |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 31 | For | For |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 33 | If | len(buffer) + len(part) > 1200 and buffer.strip() |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 37 | If | buffer.strip() |
+| kotorelay.operations.indexing.shared.functions.split_chunks | 39 | Return | chunks |
+| kotorelay.operations.indexing.shared.functions.verify_index_completion | 221 | Return | require(len(actual) == len(parts) and engine.verify([c.id for c in actual]), 'integrity', 503) |
+| kotorelay.operations.indexing.shared.functions.versions_get | 87 | Return | q.versions_get(ctx.db, q.VersionsGetParams(organization_id=ctx.org, id=version_id)) |
+| kotorelay.operations.indexing.shared.functions.versions_list | 280 | Return | q.versions_list(ctx.db, q.VersionsListParams(organization_id=ctx.org)) |
+| kotorelay.operations.indexing.shared.workflow.build_index | 18 | If | not job.version_id or f.is_obsolete_version(doc, job) |
+| kotorelay.operations.indexing.shared.workflow.build_index | 19 | Return | 'obsolete' |
+| kotorelay.operations.indexing.shared.workflow.build_index | 22 | For | For |
+| kotorelay.operations.indexing.shared.workflow.build_index | 24 | If | f.has_more_stale_chunks(stale) |
+| kotorelay.operations.indexing.shared.workflow.build_index | 25 | Return | 'pending' |
+| kotorelay.operations.indexing.shared.workflow.build_index | 26 | If | f.is_inactive_document(doc) |
+| kotorelay.operations.indexing.shared.workflow.build_index | 27 | Return | 'done' |
+| kotorelay.operations.indexing.shared.workflow.build_index | 32 | For | For |
+| kotorelay.operations.indexing.shared.workflow.build_index | 40 | For | For |
+| kotorelay.operations.indexing.shared.workflow.build_index | 44 | If | f.is_existing_chunk(previous, chunk) |
+| kotorelay.operations.indexing.shared.workflow.build_index | 50 | For | For |
+| kotorelay.operations.indexing.shared.workflow.build_index | 53 | Return | 'done' |
+| kotorelay.operations.indexing.shared.workflow.process | 102 | If | f.is_finished_job(job) |
+| kotorelay.operations.indexing.shared.workflow.process | 103 | Return | job |
+| kotorelay.operations.indexing.shared.workflow.process | 104 | Try | Try |
+| kotorelay.operations.indexing.shared.workflow.process | 107 | ExceptHandler | Problem |
+| kotorelay.operations.indexing.shared.workflow.process | 112 | ExceptHandler | (OSError, BotoCoreError, ClientError) |
+| kotorelay.operations.indexing.shared.workflow.process | 119 | Return | updated |
+| kotorelay.operations.indexing.shared.workflow.purge | 59 | If | f.is_restored_document(doc) |
+| kotorelay.operations.indexing.shared.workflow.purge | 60 | Return | 'obsolete' |
+| kotorelay.operations.indexing.shared.workflow.purge | 61 | If | f.is_within_retention(ctx, job) |
+| kotorelay.operations.indexing.shared.workflow.purge | 62 | Return | 'retained' |
+| kotorelay.operations.indexing.shared.workflow.purge | 73 | For | For |
+| kotorelay.operations.indexing.shared.workflow.purge | 77 | For | For |
+| kotorelay.operations.indexing.shared.workflow.purge | 79 | If | f.has_more_target_chunks(target_chunks) |
+| kotorelay.operations.indexing.shared.workflow.purge | 80 | Return | 'pending' |
+| kotorelay.operations.indexing.shared.workflow.purge | 82 | For | For |
+| kotorelay.operations.indexing.shared.workflow.purge | 84 | If | f.has_more_target_ocr(target_runs) |
+| kotorelay.operations.indexing.shared.workflow.purge | 85 | Return | 'pending' |
+| kotorelay.operations.indexing.shared.workflow.purge | 86 | For | For |
+| kotorelay.operations.indexing.shared.workflow.purge | 87 | If | f.is_target_asset(asset, doc) |
+| kotorelay.operations.indexing.shared.workflow.purge | 89 | For | For |
+| kotorelay.operations.indexing.shared.workflow.purge | 90 | If | f.is_target_draft(draft, doc) |
+| kotorelay.operations.indexing.shared.workflow.purge | 92 | Return | 'done' |

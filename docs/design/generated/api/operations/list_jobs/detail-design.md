@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 反映ジョブと失敗理由を確認 — 詳細設計
 
@@ -42,7 +42,7 @@
 | backend/src/kotorelay/context.py:50 | len(users) == 1 | 'unauthenticated' | 401 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/indexing/list_jobs/functions.py:18 | ctx.user.operator | 'forbidden' | 403 |
-| backend/src/kotorelay/operations/indexing/list_jobs/router.py:26 | details | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:27 | details | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -101,10 +101,8 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:75 | db.query('operations/indexing/list_jobs/sql/002_outbox_list.sql', params.model_dump(), OutboxListRow) |
 | backend/src/kotorelay/operations/indexing/list_jobs/generated/queries.py:106 | db.query('operations/indexing/list_jobs/sql/003_versions_list.sql', params.model_dump(), VersionsListRow) |
 | backend/src/kotorelay/operations/indexing/list_jobs/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
-| backend/src/kotorelay/operations/indexing/list_jobs/router.py:40 | f.select_job_details(rows, docs, versions) |
-| backend/src/kotorelay/operations/indexing/list_jobs/router.py:33 | list(f.outbox_list(ctx)) |
-| backend/src/kotorelay/operations/indexing/list_jobs/router.py:28 | build_response(f.select_list_jobs(jobs(ctx))) |
-| backend/src/kotorelay/operations/indexing/list_jobs/router.py:27 | build_response(job_details(ctx)) |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:31 | build_response(f.select_list_jobs(rows)) |
+| backend/src/kotorelay/operations/indexing/list_jobs/router.py:30 | build_response(f.select_job_details(rows, docs, versions)) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:176 | db.query('operations/system/authorization/sql/006_memberships_list.sql', params.model_dump(), MembershipsListRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:220 | db.query('operations/system/authorization/sql/008_organizations_get.sql', params.model_dump(), OrganizationsGetRow) |

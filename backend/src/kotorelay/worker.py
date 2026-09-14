@@ -6,7 +6,7 @@ import time
 from typing import TYPE_CHECKING
 
 from kotorelay.config import Settings
-from kotorelay.operations.indexing.shared.router import process
+from kotorelay.operations.indexing.shared.workflow import process
 from kotorelay.operations.system.dispatch.generated import queries as q
 from kotorelay.runtime import Runtime
 

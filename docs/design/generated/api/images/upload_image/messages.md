@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 画像を添付して位置付きOCRを実行 — ログメッセージ
 
@@ -61,7 +61,7 @@ lazunexのops_loggerと同じく、独自型のcontext、ログID、例外型、
 | メッセージ | OCRエンジンの実行が失敗しました。 |
 | 例外・出力条件 | OCR中にOSError / TimeoutExpired / CalledProcessErrorを捕捉した場合。 |
 | 返すレスポンス | 後続の保存が成功すればHTTP 201、応答ocr.status=failed、ocr.regions=[]。 |
-| 呼出し位置 | backend/src/kotorelay/operations/images/upload_image/functions.py:59 |
+| 呼出し位置 | backend/src/kotorelay/operations/images/upload_image/functions.py:61 |
 | 確認手順 | request_idと例外型からOCRコマンドと日本語辞書の配置を確認する。 |
 | 復旧手順 | OCR実行環境を復旧して画像を再登録する。 |
 

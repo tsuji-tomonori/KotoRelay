@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # オブジェクト保存 CRUD対応表
 
@@ -94,7 +94,7 @@ flowchart LR
 | create_document | objects | content_object | CU | backend/src/kotorelay/operations/documents/create_document/functions.py:49 |
 | list_documents | objects | content_object | R | backend/src/kotorelay/operations/documents/list_documents/functions.py:137 |
 | get_draft | objects | content_object | R | backend/src/kotorelay/operations/documents/shared/functions.py:26 |
-| save_draft | objects | content_object | CU | backend/src/kotorelay/operations/documents/save_draft/functions.py:54 |
+| save_draft | objects | content_object | CU | backend/src/kotorelay/operations/documents/save_draft/functions.py:55 |
 | save_draft | objects | content_object | R | backend/src/kotorelay/operations/documents/shared/functions.py:26 |
 | submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/submit_version/functions.py:77 |
 | submit_version | objects | content_object | R | backend/src/kotorelay/operations/documents/submit_version/functions.py:67 |
@@ -102,31 +102,31 @@ flowchart LR
 | read_document | objects | content_object | R | backend/src/kotorelay/operations/documents/read_document/functions.py:54 |
 | version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/version_diff/functions.py:33 |
 | version_diff | objects | content_object | R | backend/src/kotorelay/operations/documents/version_diff/functions.py:38 |
-| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:103 |
-| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:136 |
+| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:105 |
+| upload_image | objects | content_object | CU | backend/src/kotorelay/operations/images/upload_image/functions.py:138 |
 | get_image | objects | content_object | R | backend/src/kotorelay/operations/images/get_image/functions.py:11 |
 | get_ocr | objects | content_object | R | backend/src/kotorelay/operations/images/get_ocr/functions.py:52 |
 | correct_ocr | objects | content_object | CU | backend/src/kotorelay/operations/images/correct_ocr/functions.py:62 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:133 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:96 |
-| retry_job | objects | content_object | D | backend/src/kotorelay/operations/indexing/shared/functions.py:298 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:126 |
-| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:227 |
-| retry_job | objects | content_object | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:154 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:134 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:97 |
+| retry_job | objects | content_object | D | backend/src/kotorelay/operations/indexing/shared/functions.py:299 |
+| retry_job | objects | content_object | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:155 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:228 |
+| retry_job | objects | content_object | R | backend/src/kotorelay/operations/indexing/shared/functions.py:127 |
 | ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:287 |
 | ask_question | objects | content_object | CU | backend/src/kotorelay/operations/chat/ask_question/functions.py:288 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:175 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:224 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:59 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:82 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:83 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:47 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:84 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:85 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:48 |
-| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:64 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:49 |
 | ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:65 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:82 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:83 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:47 |
+| ask_question | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:66 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:84 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:85 |
 | chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:48 |
-| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:64 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:49 |
 | chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:65 |
+| chat_history | objects | content_object | R | backend/src/kotorelay/operations/chat/shared/functions.py:66 |

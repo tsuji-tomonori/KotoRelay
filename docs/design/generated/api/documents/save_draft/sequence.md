@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 競合を検出して下書きを保存 — シーケンス
 
@@ -61,7 +61,7 @@ sequenceDiagram
     E-->>U: HTTP 409 / {code： "conflict", message： "他の操作で更新されました。最新の状態を確認してください。", request_id： 相関ID}
     end
     end
-    A->>F: validate_placements
+    A->>F: 本文内の画像配置と添付画像・OCRの所有先と有効性を照合する。
     opt 検証不成立：len({p.id for p in data.placements}) == len(data.placements)
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
@@ -175,14 +175,14 @@ sequenceDiagram
 | kotorelay.context.now | 19 | Return | datetime.now(UTC) |
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
-| kotorelay.operations.documents.save_draft.functions.check_concurrent_access | 95 | Return | ctx.fence() |
-| kotorelay.operations.documents.save_draft.functions.document_doc | 39 | Return | ctx.document(str(document_id), 'author') |
-| kotorelay.operations.documents.save_draft.functions.documents_update | 82 | Return | q.documents_update(ctx.db, q.DocumentsUpdateParams.model_validate(doc.model_copy(update={'title': data.title, 'revision': doc.revision + 1, 'updated_at': now()}), from_attributes=True)) |
-| kotorelay.operations.documents.save_draft.functions.drafts_list | 44 | Return | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
-| kotorelay.operations.documents.save_draft.functions.drafts_update | 61 | Return | q.drafts_update(ctx.db, q.DraftsUpdateParams.model_validate(row.model_copy(update={'body_key': key, 'body_hash': key, 'revision': row.revision + 1, 'updated_by': ctx.user.id, 'placements': json.dumps([p.model_dump() for p in data.placements])}), from_attributes=True)) |
-| kotorelay.operations.documents.save_draft.functions.put_key | 54 | Return | ctx.objects.put(data.body.encode(), 'text/markdown') |
-| kotorelay.operations.documents.save_draft.functions.validate_draft_revision | 49 | Return | require(row.revision == data.revision, 'conflict', 409) |
-| kotorelay.operations.documents.save_draft.functions.validate_placements | 19 | For | For |
+| kotorelay.operations.documents.save_draft.functions.check_concurrent_access | 96 | Return | ctx.fence() |
+| kotorelay.operations.documents.save_draft.functions.document_doc | 40 | Return | ctx.document(str(document_id), 'author') |
+| kotorelay.operations.documents.save_draft.functions.documents_update | 83 | Return | q.documents_update(ctx.db, q.DocumentsUpdateParams.model_validate(doc.model_copy(update={'title': data.title, 'revision': doc.revision + 1, 'updated_at': now()}), from_attributes=True)) |
+| kotorelay.operations.documents.save_draft.functions.drafts_list | 45 | Return | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
+| kotorelay.operations.documents.save_draft.functions.drafts_update | 62 | Return | q.drafts_update(ctx.db, q.DraftsUpdateParams.model_validate(row.model_copy(update={'body_key': key, 'body_hash': key, 'revision': row.revision + 1, 'updated_by': ctx.user.id, 'placements': json.dumps([p.model_dump() for p in data.placements])}), from_attributes=True)) |
+| kotorelay.operations.documents.save_draft.functions.put_key | 55 | Return | ctx.objects.put(data.body.encode(), 'text/markdown') |
+| kotorelay.operations.documents.save_draft.functions.validate_draft_revision | 50 | Return | require(row.revision == data.revision, 'conflict', 409) |
+| kotorelay.operations.documents.save_draft.functions.validate_placements | 20 | For | For |
 | kotorelay.operations.documents.save_draft.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
 | kotorelay.operations.documents.save_draft.router.save_draft | 38 | Return | build_response(draft_functions.build_draft_data(current_document, current_draft, body)) |
 | kotorelay.operations.documents.shared.functions.authorize_draft | 12 | Return | ctx.document(document_id, 'draft') |

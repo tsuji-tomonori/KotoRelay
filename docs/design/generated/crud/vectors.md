@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # ベクトル索引 CRUD対応表
 
@@ -75,8 +75,8 @@ flowchart LR
 
 | API | 保存先 | リソース | CRUD | SQL正本／呼出箇所 |
 | --- | --- | --- | --- | --- |
-| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/shared/functions.py:66 |
-| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/shared/functions.py:310 |
-| retry_job | vectors | vector | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:189 |
-| retry_job | vectors | vector | R | backend/src/kotorelay/operations/indexing/shared/functions.py:221 |
+| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/shared/functions.py:67 |
+| retry_job | vectors | vector | D | backend/src/kotorelay/operations/indexing/shared/functions.py:311 |
+| retry_job | vectors | vector | CU | backend/src/kotorelay/operations/indexing/shared/functions.py:190 |
+| retry_job | vectors | vector | R | backend/src/kotorelay/operations/indexing/shared/functions.py:222 |
 | ask_question | vectors | vector | R | backend/src/kotorelay/operations/chat/ask_question/functions.py:151 |

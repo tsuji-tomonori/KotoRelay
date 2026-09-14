@@ -1666,7 +1666,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py"
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1715,7 +1715,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py"
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1764,7 +1764,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py"
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1813,7 +1813,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py"
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -1862,7 +1862,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py"
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -3447,7 +3447,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py",
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py",
           "backend/src/kotorelay/operations/chat/ask_question/functions.py",
           "backend/src/kotorelay/operations/chat/ask_question/router.py"
         ],
@@ -3989,7 +3989,7 @@
         "implementation": [
           "frontend/src/components/App.tsx",
           "backend/src/kotorelay/operations/indexing/shared/functions.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py"
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -5656,18 +5656,18 @@
         {
           "given": "APIとSQLと設計generatorが存在する",
           "id": "AC-DESIGN-07",
-          "then": "routerに処理順・分岐・例外・transactionを記述し、functionsは個別処理だけを持ち、複数更新段階の委譲と直接DB・provider実行を拒否する",
+          "then": "routerのendpointに処理順・分岐・例外・transactionを記述する。APIとworkerが共有する索引配送は専用workflowに置き、functionsは個別処理だけを持ち、全体フローへの逆依存と直接DB・provider実行を拒否する",
           "when": "実装と設計を生成し検査する"
         }
       ],
       "action": "provide",
       "category": "nonfunctional",
       "id": "REQ-DESIGN-07",
-      "last_changed_by": "router-flow-2026-09-13",
+      "last_changed_by": "router-policy-2026-09-14",
       "object": "routerがAPIの全体フローを所有する",
       "rationale": "利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。",
       "retirement_reason": "",
-      "revision": 1,
+      "revision": 2,
       "scope": "project",
       "source_refs": [
         "docs/planning/API-LAYOUT.md"
@@ -5683,7 +5683,7 @@
         "implementation": [
           "tools/project/api_layout.py",
           "backend/src/kotorelay/operations/chat/ask_question/router.py",
-          "backend/src/kotorelay/operations/indexing/shared/router.py"
+          "backend/src/kotorelay/operations/indexing/shared/workflow.py"
         ],
         "standards": [
           "AGENTS.md"
@@ -5983,6 +5983,241 @@
       "verification": {
         "evidence": "同一コミットの品質Pages",
         "method": "実HTTP応答・ログ・生成の正例負例・Pages E2E"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIと検査adapterが存在する",
+          "id": "AC-DESIGN-14",
+          "then": "全router.pyを走査し、登録されたAPI endpoint以外の同期関数・非同期関数・入れ子関数・メソッド・lambdaを拒否する。グループのrouterは登録だけを担当し、未登録の宣言も拒否する",
+          "when": "APIの実装と検査を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-14",
+      "last_changed_by": "router-policy-2026-09-14",
+      "object": "routerにAPI endpoint以外の関数を定義しない",
+      "rationale": "利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "routerにAPI endpoint以外の関数を定義しない",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/source_policy.py",
+          "tools/project/api_layout.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_source_policy.py",
+          "backend/tests/test_workflow.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質portalとローカル検証結果",
+        "method": "構文・型・依存の正例負例と実HTTP回帰試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIと検査adapterが存在する",
+          "id": "AC-DESIGN-15",
+          "then": "同期・非同期の呼出し先と型を解決して読取結果・判定値の単独破棄を拒否する。検証専用処理はNoneを返す",
+          "when": "APIの実装と検査を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-15",
+      "last_changed_by": "router-policy-2026-09-14",
+      "object": "業務関数の意味のある戻り値を破棄しない",
+      "rationale": "利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "業務関数の意味のある戻り値を破棄しない",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/source_policy.py",
+          "tools/project/api_layout.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_source_policy.py",
+          "backend/tests/test_workflow.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質portalとローカル検証結果",
+        "method": "構文・型・依存の正例負例と実HTTP回帰試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIと検査adapterが存在する",
+          "id": "AC-DESIGN-16",
+          "then": "routerと共有workflowの裸のexcept・Exception・BaseException捕捉を拒否する",
+          "when": "APIの実装と検査を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-16",
+      "last_changed_by": "router-policy-2026-09-14",
+      "object": "APIフローで例外の分類を保持する",
+      "rationale": "利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "APIフローで例外の分類を保持する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/source_policy.py",
+          "tools/project/api_layout.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_source_policy.py",
+          "backend/tests/test_workflow.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質portalとローカル検証結果",
+        "method": "構文・型・依存の正例負例と実HTTP回帰試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIと検査adapterが存在する",
+          "id": "AC-DESIGN-17",
+          "then": "bool戻り型を持つ業務関数が常に同じbool literalを返す場合に検査を失敗させる",
+          "when": "APIの実装と検査を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-17",
+      "last_changed_by": "router-policy-2026-09-14",
+      "object": "固定boolによる形だけの業務判定を拒否する",
+      "rationale": "利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "固定boolによる形だけの業務判定を拒否する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/source_policy.py",
+          "tools/project/api_layout.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_source_policy.py",
+          "backend/tests/test_workflow.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質portalとローカル検証結果",
+        "method": "構文・型・依存の正例負例と実HTTP回帰試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "APIと検査adapterが存在する",
+          "id": "AC-DESIGN-18",
+          "then": "業務関数からのHTTPExceptionを拒否し、Problemを共通HTTP変換境界へ接続する",
+          "when": "APIの実装と検査を行う"
+        }
+      ],
+      "action": "provide",
+      "category": "nonfunctional",
+      "id": "REQ-DESIGN-18",
+      "last_changed_by": "router-policy-2026-09-14",
+      "object": "業務例外のHTTP変換を共通境界に集約する",
+      "rationale": "利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/API-LAYOUT.md"
+      ],
+      "status": "active",
+      "subject": "開発プロジェクト",
+      "superseded_by": "",
+      "title": "業務例外のHTTP変換を共通境界に集約する",
+      "traces": {
+        "design": [
+          "docs/planning/API-LAYOUT.md"
+        ],
+        "implementation": [
+          "tools/project/source_policy.py",
+          "tools/project/api_layout.py"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_source_policy.py",
+          "backend/tests/test_workflow.py"
+        ]
+      },
+      "type": "constraint",
+      "verification": {
+        "evidence": "品質portalとローカル検証結果",
+        "method": "構文・型・依存の正例負例と実HTTP回帰試験"
       }
     }
   ],

@@ -165,3 +165,10 @@ def build_document_item(
     item = doc.model_dump()
     item.update(build_document_page(version, approval, latest, scope, versions, chunks, ctx))
     return item
+
+
+def paginate_documents(
+    docs: list[models.DocumentsRow], offset: int, limit: int
+) -> list[models.DocumentsRow]:
+    """更新日時の降順で並べた文書から指定範囲を切り出す。"""
+    return sorted(docs, key=lambda doc: doc.updated_at, reverse=True)[offset : offset + limit]

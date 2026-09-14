@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 認可されたOCR領域を取得 — 詳細設計
 
@@ -57,11 +57,11 @@
 | backend/src/kotorelay/operations/images/get_ocr/functions.py:23 | bool(rows) | not_found | 404 |
 | backend/src/kotorelay/operations/images/get_ocr/functions.py:42 | any((i.placement.ocr_run_id == run.id and i.ocr_hash == run.result_hash for i in Manifest.model_validate_json(version.manifest).images)) | not_found | 404 |
 | backend/src/kotorelay/operations/images/get_ocr/router.py:31 | version_id | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/shared/functions.py:16 | version_id is None | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/shared/functions.py:14 | bool(assets) | not_found | 404 |
-| backend/src/kotorelay/operations/images/shared/functions.py:22 | bool(docs) and docs[0].status != 'deleted' | not_found | 404 |
-| backend/src/kotorelay/operations/images/shared/functions.py:24 | ctx.can_read(doc) or ctx.permission(doc.department_id, 'draft') | not_found | 404 |
-| backend/src/kotorelay/operations/images/shared/functions.py:27 | any((i.placement.asset_id == asset.id and i.image_hash == asset.sha256 for i in manifest.images)) | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:17 | version_id is None | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/images/shared/functions.py:15 | bool(assets) | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:23 | bool(docs) and docs[0].status != 'deleted' | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:25 | ctx.can_read(doc) or ctx.permission(doc.department_id, 'draft') | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:28 | any((i.placement.asset_id == asset.id and i.image_hash == asset.sha256 for i in manifest.images)) | not_found | 404 |
 
 
 ## 3. 正常系リソース変更
@@ -148,7 +148,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/images/get_ocr/generated/queries.py:75 | db.query('operations/images/get_ocr/sql/002_ocr_runs_get.sql', params.model_dump(), OcrRunsGetRow) |
 | backend/src/kotorelay/operations/images/get_ocr/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
 | backend/src/kotorelay/operations/images/get_ocr/router.py:36 | build_response(f.build_get_ocr(result, run)) |
-| backend/src/kotorelay/operations/images/shared/functions.py:33 | asset |
+| backend/src/kotorelay/operations/images/shared/functions.py:34 | asset |
 | backend/src/kotorelay/operations/images/shared/generated/queries.py:42 | db.query('operations/images/shared/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
 | backend/src/kotorelay/operations/images/shared/generated/queries.py:75 | db.query('operations/images/shared/sql/002_documents_get.sql', params.model_dump(), DocumentsGetRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |

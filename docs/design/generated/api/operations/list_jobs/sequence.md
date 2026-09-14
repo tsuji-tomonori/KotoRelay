@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 反映ジョブと失敗理由を確認 — シーケンス
 
@@ -34,7 +34,6 @@ sequenceDiagram
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
-    alt details
     A->>F: 索引ジョブを閲覧できる運用権限を確認する。
     opt 検証不成立：ctx.user.operator
     break エラー応答を返して終了（後続の正常処理は実行しない）
@@ -45,27 +44,15 @@ sequenceDiagram
     end
     A->>F: 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。
     A->>D: 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。
-    Note over A: この処理からreturn
+    alt details
     A->>F: 取得したデータを識別子別に参照できる辞書へ変換する。
     A->>D: 現在の組織に属する文書を識別子順に一覧取得する。
     A->>F: 取得したデータを識別子別に参照できる辞書へ変換する。
     A->>D: 現在の組織に属する文書版を識別子順に一覧取得する。
     A->>F: 用途と対象に一致するデータだけを取り出す。
-    Note over A: この処理からreturn
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     Note over A: この処理からreturn
     end
-    A->>F: 索引ジョブを閲覧できる運用権限を確認する。
-    opt 検証不成立：ctx.user.operator
-    break エラー応答を返して終了（後続の正常処理は実行しない）
-    A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
-    E->>L: KR_HTTP_REJECTED / 業務条件または入力検証によりリクエストを拒否しました。
-    E-->>U: HTTP 403 / {code： "forbidden", message： "この操作は許可されていません。", request_id： 相関ID}
-    end
-    end
-    A->>F: 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。
-    A->>D: 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。
-    Note over A: この処理からreturn
     A->>F: 用途と対象に一致するデータだけを取り出す。
     A->>F: 公開する応答型で業務結果を検証し、レスポンスの境界を保証する。
     Note over A: この処理からreturn
@@ -119,8 +106,6 @@ sequenceDiagram
 | kotorelay.operations.indexing.list_jobs.functions.select_job_details | 44 | Return | [dict(row.model_dump(), title=docs[row.document_id].title, version_number=versions[row.version_id].number if row.version_id else None) for row in rows] |
 | kotorelay.operations.indexing.list_jobs.functions.select_list_jobs | 13 | Return | [row.model_dump() for row in rows] |
 | kotorelay.operations.indexing.list_jobs.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
-| kotorelay.operations.indexing.list_jobs.router.job_details | 40 | Return | f.select_job_details(rows, docs, versions) |
-| kotorelay.operations.indexing.list_jobs.router.jobs | 33 | Return | list(f.outbox_list(ctx)) |
-| kotorelay.operations.indexing.list_jobs.router.list_jobs | 26 | If | details |
-| kotorelay.operations.indexing.list_jobs.router.list_jobs | 27 | Return | build_response(job_details(ctx)) |
-| kotorelay.operations.indexing.list_jobs.router.list_jobs | 28 | Return | build_response(f.select_list_jobs(jobs(ctx))) |
+| kotorelay.operations.indexing.list_jobs.router.list_jobs | 27 | If | details |
+| kotorelay.operations.indexing.list_jobs.router.list_jobs | 30 | Return | build_response(f.select_job_details(rows, docs, versions)) |
+| kotorelay.operations.indexing.list_jobs.router.list_jobs | 31 | Return | build_response(f.select_list_jobs(rows)) |

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # OCRを訂正し新しいrunを保存 — 詳細設計
 
@@ -119,7 +119,6 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/images/correct_ocr/functions.py:108 | {'ocr_run': run, 'ocr': result} |
 | backend/src/kotorelay/operations/images/correct_ocr/functions.py:73 | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=asset.document_id, asset_id=asset.id, result_key=key, result_hash=key, engine=result.engine, status='ready', confirmed=data.confirmed, created_at=now()) |
 | backend/src/kotorelay/operations/images/correct_ocr/functions.py:101 | ctx.fence() |
-| backend/src/kotorelay/operations/images/correct_ocr/functions.py:28 | ctx.document(asset.document_id, 'author') |
 | backend/src/kotorelay/operations/images/correct_ocr/functions.py:89 | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
 | backend/src/kotorelay/operations/images/correct_ocr/functions.py:62 | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
 | backend/src/kotorelay/operations/images/correct_ocr/functions.py:96 | ctx.audit('ocr_correction', asset.document_id) |

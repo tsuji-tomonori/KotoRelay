@@ -858,23 +858,30 @@ def test_回答根拠の欠落と改変は閲覧時に非表示とする(client,
     assert result[0]["status"] == "hidden" and result[0]["citations"] == []
 
 
-def test_中断した質問は同じIDで再開し二重計上しない(client, db):
+def test_中断した質問は同じIDで再開し二重計上しない(client, db, monkeypatch):
     """Given: 質問受付だけを保存し、回答確定前に中断している。
     When: 同じ操作IDで質問を再送する。
     Then: 同じ会話で200を返し、質問イベントは1件のままになる。
     """
-    from kotorelay.operations.chat.ask_question.router import prepare
-    from kotorelay.operations.chat.ask_question.schemas import Ask
+    from kotorelay.operations.chat.ask_question import functions
 
     published(client)
-    rt = client.app.state.runtime
     key = str(uuid4())
-    data = Ask(question="開発フロー", department_id=DEPT)
-    with rt.context("demo-reader") as ctx:
-        first = prepare(ctx, data, key, rt.engine)
-    result = client.post("/api/chat", headers=headers("reader", key), json=data.model_dump())
+    data = {"question": "開発フロー", "department_id": DEPT}
+    # 受付commit後のモデル呼出しで中断し、実HTTPから再開を検証する。
+    with monkeypatch.context() as patch:
+
+        def interrupt(prepared, rt):
+            raise RuntimeError("試験用の中断")
+
+        patch.setattr(functions, "generate_answer", interrupt)
+        with pytest.raises(RuntimeError, match="試験用の中断"):
+            client.post("/api/chat", headers=headers("reader", key), json=data)
+    first = next(iter(db.tables["conversations"].values()))
+    assert not db.tables.get("answers")
+    result = client.post("/api/chat", headers=headers("reader", key), json=data)
     assert result.status_code == 200, result.text
-    assert result.json()["conversation_id"] == first.conversation_id
+    assert result.json()["conversation_id"] == first["id"]
     assert len([e for e in db.tables["events"].values() if e["kind"] == "question"]) == 1
 
 

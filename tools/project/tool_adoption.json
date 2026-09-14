@@ -1,0 +1,370 @@
+{
+  "repository": "https://github.com/tsuji-tomonori/lazunex",
+  "revision": "096e1e580ab1c0670c57e4febad2bd9fdd4698ee",
+  "entries": [
+    {
+      "path": "__init__.py",
+      "purpose": "tool packageの初期化",
+      "decision": "非採用",
+      "adapter": "tools/project/api_layout.py",
+      "scope": "package固有の初期化であり移植対象の検査を持たない"
+    },
+    {
+      "path": "check_api_contracts.py",
+      "purpose": "operation契約と実routerの照合",
+      "decision": "既存",
+      "adapter": "tools/project/api_layout.py",
+      "scope": "26操作のcontract・OpenAPI・所有先を照合"
+    },
+    {
+      "path": "check_api_descriptions.py",
+      "purpose": "APIの日本語説明",
+      "decision": "追加",
+      "adapter": "tools/project/source_policy.py",
+      "scope": "業務関数の日本語docstringを検査。schemaの説明はOpenAPIから生成し、全fieldの説明必須化は行わない"
+    },
+    {
+      "path": "check_api_exception_summaries.py",
+      "purpose": "例外の自然言語説明",
+      "decision": "既存",
+      "adapter": "tools/project/error_design.py",
+      "scope": "Problem catalogと安全な日本語応答を解決不能時に拒否"
+    },
+    {
+      "path": "check_api_function_exception_policy.py",
+      "purpose": "業務関数の例外境界",
+      "decision": "追加",
+      "adapter": "tools/project/source_policy.py",
+      "scope": "HTTPExceptionを業務層から排除し、Problemと共通HTTP境界へ統一"
+    },
+    {
+      "path": "check_api_function_names.py",
+      "purpose": "関数名の許可語彙",
+      "decision": "非採用",
+      "adapter": "tools/project/api_layout.py",
+      "scope": "lazunex専用の動詞・名詞辞書は移植しない。型・責務・実call graphで検査し、個別名は業務目的に合わせる"
+    },
+    {
+      "path": "check_api_function_resource_usage.py",
+      "purpose": "関数とDB・外部portの関係",
+      "decision": "既存",
+      "adapter": "tools/project/api_layout.py",
+      "scope": "routerの直接実行とfunctionsの全体フローを拒否。全処理へのI/O必須化は純粋な分割・正規化・判定に適さない"
+    },
+    {
+      "path": "check_api_function_tests.py",
+      "purpose": "関数ごとのテスト参照",
+      "decision": "適応",
+      "adapter": "pyproject.toml",
+      "scope": "既存pytest-covの実行行・分岐coverageで検証。関数名のテスト参照だけでは実行を保証できないため同方式は使わない"
+    },
+    {
+      "path": "check_api_managed_literals.py",
+      "purpose": "管理文字列の定数化",
+      "decision": "適応",
+      "adapter": "tools/project/error_design.py",
+      "scope": "既存MessageId・例外catalogへの登録と使用を検査。hub-admin等のlazunex固有定数は対象外"
+    },
+    {
+      "path": "check_api_mermaid_sequences.py",
+      "purpose": "Mermaidシーケンス整合",
+      "decision": "既存",
+      "adapter": "tools/project/router_sequence.py",
+      "scope": "ASTから生成し未対応構文を拒否、生成driftと実ブラウザ描画を検証"
+    },
+    {
+      "path": "check_api_router_ignored_returns.py",
+      "purpose": "結果の破棄と副作用の混在",
+      "decision": "追加",
+      "adapter": "tools/project/source_policy.py",
+      "scope": "同期・非同期・import別名を実call graphで解決。読取・判定値の破棄を拒否し検証専用関数をNoneへ修正。既存SQL更新件数は許可"
+    },
+    {
+      "path": "check_api_router_logging_tests.py",
+      "purpose": "HTTP試験とログの照合",
+      "decision": "既存",
+      "adapter": "backend/tests/test_operational_logging.py",
+      "scope": "実HTTPのstatus・request_id・MessageId・機密非出力を検証"
+    },
+    {
+      "path": "check_api_router_test_asserts.py",
+      "purpose": "HTTP応答とDB副作用のassert",
+      "decision": "適応",
+      "adapter": "backend/tests/test_postgres.py",
+      "scope": "実DBの保存・rollback・競合を検証。静的なassert名や参照先専用CRUD fixtureは移植しない"
+    },
+    {
+      "path": "check_api_router_tests.py",
+      "purpose": "全routerのHTTP試験",
+      "decision": "既存",
+      "adapter": "backend/tests/test_api_layout.py",
+      "scope": "実operation package集合でparametrizeして各サンプルを実HTTP検証"
+    },
+    {
+      "path": "check_api_router_unit_test_factors.py",
+      "purpose": "要因テストの直接API呼出し",
+      "decision": "適応",
+      "adapter": "tools/project/design.py",
+      "scope": "実装分岐と実在HTTPテストを生成。直積ケースのID実行方式は使わず、全分岐とテストの1対1対応は主張しない"
+    },
+    {
+      "path": "check_api_sequence_success_responses.py",
+      "purpose": "成功応答のシーケンス表示",
+      "decision": "既存",
+      "adapter": "tools/project/router_sequence.py",
+      "scope": "実endpointのHTTP statusと応答型から生成、生成差分と単体テストを検査"
+    },
+    {
+      "path": "check_api_sql_ddl_usage.py",
+      "purpose": "SQLとDDLの表・列整合",
+      "decision": "既存",
+      "adapter": "tools/project/queries.py",
+      "scope": "PostgreSQL ASTとDDLで引数・投影・NULL・未知表列を検査"
+    },
+    {
+      "path": "check_api_status_samples.py",
+      "purpose": "statusサンプルと契約の照合",
+      "decision": "適応",
+      "adapter": "backend/tests/test_api_layout.py",
+      "scope": "現行サンプルはhealth成功・未認証拒否をHTTP検証。業務成功・異常はworkflow試験が担当し、全statusのサンプル化とは扱わない"
+    },
+    {
+      "path": "check_bool_router_conditions.py",
+      "purpose": "bool結果の制御条件への接続",
+      "decision": "追加",
+      "adapter": "tools/project/source_policy.py",
+      "scope": "bool結果の単独破棄を拒否。all、戻り値組立などKotoRelayで必要な値利用を許可しif専用制約は移植しない"
+    },
+    {
+      "path": "check_constant_bool_returns.py",
+      "purpose": "固定boolによる無効な判定",
+      "decision": "追加",
+      "adapter": "tools/project/source_policy.py",
+      "scope": "入れ子関数を除いた実returnを検査し、常に同じbool literalを返す関数を拒否"
+    },
+    {
+      "path": "check_e2e_case_evidences.py",
+      "purpose": "E2E実行証跡の欠落検査",
+      "decision": "既存",
+      "adapter": "tools/project/evidence.py",
+      "scope": "Playwrightの実結果・段階PNG・DB添付とcollectorを照合し、未実行を成功にしない"
+    },
+    {
+      "path": "check_e2e_specs.py",
+      "purpose": "E2Eシナリオとケースの整合",
+      "decision": "適応",
+      "adapter": "tools/project/evidence.py",
+      "scope": "独立YAMLは追加せず、既存Playwright inventoryと結果の集合一致を検査"
+    },
+    {
+      "path": "check_exception_router_handlers.py",
+      "purpose": "例外を扱うHTTP境界",
+      "decision": "追加",
+      "adapter": "tools/project/source_policy.py",
+      "scope": "routerと共有workflowの包括捕捉を拒否。共通middlewareで分類される例外を各endpointで重複catchしない"
+    },
+    {
+      "path": "check_operational_logging.py",
+      "purpose": "運用ログの型・catalog使用",
+      "decision": "既存",
+      "adapter": "tools/project/error_design.py",
+      "scope": "既存ops_loggerの登録ID・level・context_modelの使用を検査"
+    },
+    {
+      "path": "check_router_error_response_returns.py",
+      "purpose": "error応答の直接返却",
+      "decision": "追加",
+      "adapter": "tools/project/source_policy.py",
+      "scope": "endpointの直接build_response返却を検査。エラーは共通middlewareとProblem catalogを既存HTTP試験で照合"
+    },
+    {
+      "path": "e2e_models.py",
+      "purpose": "E2E計画・証跡のデータモデル",
+      "decision": "適応",
+      "adapter": "tools/project/evidence.py",
+      "scope": "既存Playwright JSONを入力とし、別のYAML正本を増やさない"
+    },
+    {
+      "path": "generate_api_detail_design.py",
+      "purpose": "API詳細設計",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "実装分岐とSQL・HTTP契約からAPI別に生成"
+    },
+    {
+      "path": "generate_api_list.py",
+      "purpose": "OpenAPIからAPI一覧",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "実FastAPIアプリからoperation一覧を生成"
+    },
+    {
+      "path": "generate_api_message_catalog.py",
+      "purpose": "API別ログ帳票",
+      "decision": "既存",
+      "adapter": "tools/project/error_design.py",
+      "scope": "実catalogとログ呼出しから出力条件・応答・復旧手順を生成"
+    },
+    {
+      "path": "generate_api_pytest_cases.py",
+      "purpose": "テストケースコード生成",
+      "decision": "非採用",
+      "adapter": "backend/tests/test_workflow.py",
+      "scope": "実HTTPとDBの既存テストを維持し、実装をなぞる自動assertや未実行stubを追加しない"
+    },
+    {
+      "path": "generate_api_sequences.py",
+      "purpose": "APIシーケンス生成",
+      "decision": "拡張",
+      "adapter": "tools/project/router_sequence.py",
+      "scope": "endpointと共有workflowのcall graphからSQL・条件・例外・transaction順を追跡"
+    },
+    {
+      "path": "generate_api_unit_test_factors.py",
+      "purpose": "ASTからテスト要因帳票",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "実装の判定要因と日本語Given/When/Thenの実在テストを生成。全直積の自動実行は対象外"
+    },
+    {
+      "path": "generate_db_crud.py",
+      "purpose": "API×DB CRUD表",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "実SQL ASTと呼出し先からMarkdownとCSVを生成"
+    },
+    {
+      "path": "generate_db_er_diagram.py",
+      "purpose": "DDLからER図",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "適用済みDDLの参照制約からMermaidを生成"
+    },
+    {
+      "path": "generate_db_table_specs.py",
+      "purpose": "DDLから表定義",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "表・列・型・制約を生成"
+    },
+    {
+      "path": "generate_e2e_case_list.py",
+      "purpose": "E2Eケース一覧",
+      "decision": "適応",
+      "adapter": "tools/project/evidence.py",
+      "scope": "実Playwright collectorから品質portalの検索可能な一覧を生成"
+    },
+    {
+      "path": "generate_e2e_scenarios.py",
+      "purpose": "E2Eシナリオ帳票",
+      "decision": "適応",
+      "adapter": "tools/project/evidence.py",
+      "scope": "実specの日本語ケース・GWT段階と画像を既存portalへ表示"
+    },
+    {
+      "path": "generate_external_crud.py",
+      "purpose": "外部リソースCRUD表",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "ObjectStoreとvector portの実呼出しから表・CSVを生成"
+    },
+    {
+      "path": "generate_openapi_if_specs.py",
+      "purpose": "OpenAPIインターフェース帳票",
+      "decision": "既存",
+      "adapter": "tools/project/api_documents.py",
+      "scope": "実OpenAPIからparameter・schema・response・sampleを生成"
+    },
+    {
+      "path": "generate_queries.py",
+      "purpose": "型付きquery生成",
+      "decision": "既存",
+      "adapter": "tools/project/queries.py",
+      "scope": "psycopgの束縛とDDLから専用Params/Rowを生成、欠落・手編集・driftを拒否"
+    },
+    {
+      "path": "generate_query_specs.py",
+      "purpose": "SQL別のquery仕様",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "SQL日本語コメント・表・引数・取得投影・条件を生成"
+    },
+    {
+      "path": "generation_io.py",
+      "purpose": "生成出力の安全な書込み",
+      "decision": "既存",
+      "adapter": "tools/project/design.py",
+      "scope": "出力先所有・symlink拒否・drift検査を既存generatorが担当"
+    },
+    {
+      "path": "rulecheck/__init__.py",
+      "purpose": "rulecheck公開API",
+      "decision": "非採用",
+      "adapter": "tools/project/api_layout.py",
+      "scope": "汎用rule DSLではなく既存project adapterを入口にする"
+    },
+    {
+      "path": "rulecheck/__main__.py",
+      "purpose": "rulecheck CLI入口",
+      "decision": "非採用",
+      "adapter": "tools/project/verify.py",
+      "scope": "既存検査commandを維持し別CLIを増やさない"
+    },
+    {
+      "path": "rulecheck/builtin_checks.py",
+      "purpose": "責務・依存・品質の組込み検査",
+      "decision": "拡張",
+      "adapter": "tools/project/api_layout.py",
+      "scope": "router内の補助関数禁止・未登録検出・相対import依存検査を追加。参照先専用の数量閾値は移植しない"
+    },
+    {
+      "path": "rulecheck/checklist.py",
+      "purpose": "規則Markdownのチェックリスト化",
+      "decision": "非採用",
+      "adapter": "tools/quintflow.py",
+      "scope": "規則の正本は既存Quint。二重正本を作らない"
+    },
+    {
+      "path": "rulecheck/cli.py",
+      "purpose": "規則評価の実行CLI",
+      "decision": "非採用",
+      "adapter": "tools/project/verify.py",
+      "scope": "既存verifyからAPI責務配置を実行し品質portalに結果を記録"
+    },
+    {
+      "path": "rulecheck/config.py",
+      "purpose": "規則・対象path・閾値の設定",
+      "decision": "適応",
+      "adapter": "pyproject.toml",
+      "scope": "既存Ruff・mypy・coverage設定を使用し、lazunex専用pathや一律120行等は移植しない"
+    },
+    {
+      "path": "rulecheck/evaluator.py",
+      "purpose": "規則の評価・集約",
+      "decision": "適応",
+      "adapter": "tools/project/verify.py",
+      "scope": "既存command registryが失敗を保持したまま実行結果を集約"
+    },
+    {
+      "path": "rulecheck/models.py",
+      "purpose": "規則と結果のモデル",
+      "decision": "適応",
+      "adapter": "tools/project/evidence.py",
+      "scope": "既存portalの実行結果形式へ接続"
+    },
+    {
+      "path": "rulecheck/report.py",
+      "purpose": "評価結果の出力",
+      "decision": "既存",
+      "adapter": "tools/project/evidence.py",
+      "scope": "既存品質portalへ実行結果と生成設計を表示"
+    },
+    {
+      "path": "rulecheck/rule_parser.py",
+      "purpose": "規則Markdownの解析",
+      "decision": "非採用",
+      "adapter": "tools/quintflow.py",
+      "scope": "Quint正本からJSON・Markdownを生成する既存方式を維持"
+    }
+  ]
+}

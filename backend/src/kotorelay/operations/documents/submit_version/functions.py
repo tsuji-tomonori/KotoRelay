@@ -62,19 +62,19 @@ def require_confirmed_ocr(ocr: q.OcrRunsGetRow) -> None:
     return require(ocr.confirmed and ocr.status == "ready", "ocr_unconfirmed", 409)
 
 
-def verify_image(asset: q.AssetsGetRow, ctx: context_types.Context) -> bytes:
+def verify_image(asset: q.AssetsGetRow, ctx: context_types.Context) -> None:
     """添付画像の実体と記録済みハッシュを照合する。"""
-    return ctx.objects.get(asset.object_key, asset.sha256)
+    ctx.objects.get(asset.object_key, asset.sha256)
 
 
-def verify_ocr(ocr: q.OcrRunsGetRow, ctx: context_types.Context) -> bytes:
+def verify_ocr(ocr: q.OcrRunsGetRow, ctx: context_types.Context) -> None:
     """確認済みOCRの実体と記録済みハッシュを照合する。"""
-    return ctx.objects.get(ocr.result_key, ocr.result_hash)
+    ctx.objects.get(ocr.result_key, ocr.result_hash)
 
 
-def verify_body(row: q.DraftsListRow, ctx: context_types.Context) -> bytes:
+def verify_body(row: q.DraftsListRow, ctx: context_types.Context) -> None:
     """申請する本文の実体と記録済みハッシュを照合する。"""
-    return ctx.objects.get(row.body_key, row.body_hash)
+    ctx.objects.get(row.body_key, row.body_hash)
 
 
 def build_version(

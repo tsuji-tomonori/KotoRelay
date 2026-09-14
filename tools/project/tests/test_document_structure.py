@@ -179,3 +179,16 @@ def test_OpenAPIの参照型と配列と認証を人向けの章へ展開する(
         "Samples",
     ]
     assert "架空の成功応答は生成しません" in rendered
+
+
+def test_参照toolsの全件に採用判断と実在する接続先を表示する(generated):
+    adoption = json.loads(Path("tools/project/tool_adoption.json").read_text())
+    entries = adoption["entries"]
+    assert len(entries) == len({entry["path"] for entry in entries}) == 52
+    body = generated["TOOLING.md"]
+    for entry in entries:
+        assert f"[{entry['path']}]" in body
+        assert entry["decision"] in body and entry["scope"] in body
+        assert Path(entry["adapter"]).is_file()
+    assert adoption["revision"] in body
+    assert "全分岐の網羅を表しません" in body

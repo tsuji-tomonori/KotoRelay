@@ -14,6 +14,7 @@ from kotorelay.schemas import AnswerView, Citation, Evidence, Manifest
 
 
 def validate_citation(ctx: Context, citation: Citation) -> bool:
+    """閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。"""
     docs = q.documents_get(
         ctx.db, q.DocumentsGetParams(organization_id=ctx.org, id=citation.document_id)
     )
@@ -73,6 +74,7 @@ def validate_citation(ctx: Context, citation: Citation) -> bool:
 
 
 def present(ctx: Context, answer: models.AnswersRow) -> AnswerView:
+    """現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。"""
     require(answer.user_id == ctx.user.id)
     evidence = Evidence.model_validate_json(answer.evidence)
     valid = all(validate_citation(ctx, c) for c in evidence.citations)

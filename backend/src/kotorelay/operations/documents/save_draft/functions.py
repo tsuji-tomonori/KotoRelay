@@ -15,6 +15,7 @@ from kotorelay.operations.documents.save_draft.schemas import SaveDraft
 
 
 def validate_placements(ctx: Context, doc: models.DocumentsRow, data: SaveDraft) -> None:
+    """本文内の画像配置と添付画像・OCRの所有先と有効性を照合する。"""
     require(len({p.id for p in data.placements}) == len(data.placements), "invalid_placement", 422)
     for placement in data.placements:
         assets = q.assets_get(

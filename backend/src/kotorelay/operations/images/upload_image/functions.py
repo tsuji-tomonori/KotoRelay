@@ -22,6 +22,7 @@ from kotorelay.schemas import OcrResult, Region
 
 
 def normalize_image(data: bytes, max_bytes: int, max_pixels: int) -> tuple[bytes, int, int]:
+    """入力画像の形式と寸法を検証し、安全なPNGへ正規化する。"""
     require(0 < len(data) <= max_bytes, "invalid_image", 422)
     try:
         with Image.open(io.BytesIO(data)) as source:
@@ -45,6 +46,7 @@ def normalize_image(data: bytes, max_bytes: int, max_pixels: int) -> tuple[bytes
 
 
 def run_ocr(data: bytes, width: int, height: int, command: str) -> OcrResult:
+    """OCR providerを呼び出して領域とconfidenceを正規化する。"""
     with tempfile.TemporaryDirectory(prefix="kotorelay-ocr-") as folder:
         path = Path(folder) / "image.png"
         path.write_bytes(data)

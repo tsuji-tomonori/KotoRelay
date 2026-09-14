@@ -27,7 +27,7 @@ def correct_ocr(ctx: Ctx, asset_id: UUID, data: OcrCorrection) -> dict[str, obje
     assets = f.assets_get(ctx, asset_id)
     f.require_asset(assets)
     asset = assets[0]
-    f.document_correct_ocr(ctx, asset)
+    f.require_document_author(ctx, asset)
     ids = f.select_ids(data)
     f.validate_region_ids(ids)
     for region in data.regions:

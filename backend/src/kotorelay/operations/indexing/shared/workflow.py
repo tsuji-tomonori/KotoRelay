@@ -1,4 +1,4 @@
-"""indexingのsharedの業務判定と処理を実行する。"""
+"""APIとworkerが共有する索引配送の順序・分岐・例外を管理する。"""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from kotorelay.operations.indexing.shared import functions as f
 
 
 def build_index(ctx: Context, job: models.OutboxRow, engine: Engine) -> str:
+    """現行版の索引を分割更新し、外部実体の検証後に反映済みへ進める。"""
     doc = f.documents_get(ctx, job)[0]
     if not job.version_id or f.is_obsolete_version(doc, job):
         return "obsolete"
@@ -31,7 +32,7 @@ def build_index(ctx: Context, job: models.OutboxRow, engine: Engine) -> str:
     for image in manifest.images:
         asset = f.assets_get(ctx, image)[0]
         run = f.ocr_runs_get(ctx, image)[0]
-        f.get_build_index(asset, image, ctx)
+        f.verify_image_object(asset, image, ctx)
         result = f.build_result(run, image, ctx)
         parts.extend(f.image_chunks(result, image))
     f.enforce_chunk_limit(parts)
@@ -47,12 +48,13 @@ def build_index(ctx: Context, job: models.OutboxRow, engine: Engine) -> str:
     actual = f.select_actual(ctx, version)
     f.verify_index_completion(actual, parts, engine)
     for current in actual:
-        f.get_build_index_2(current, ctx)
+        f.verify_chunk_object(current, ctx)
         f.chunks_update_2(ctx, current)
     return "done"
 
 
 def purge(ctx: Context, job: models.OutboxRow, engine: Engine) -> str:
+    """保持期間と共有実体を確認し、削除対象の索引と画像を段階的に除去する。"""
     doc = f.documents_get_2(ctx, job)[0]
     if f.is_restored_document(doc):
         return "obsolete"
@@ -91,6 +93,7 @@ def purge(ctx: Context, job: models.OutboxRow, engine: Engine) -> str:
 
 
 def process(ctx: Context, engine: Engine, job_id: str) -> models.OutboxRow:
+    """権限と再試行上限を確認して配送し、成功・失敗状態を記録する。"""
     f.require_operator(ctx)
     rows = f.outbox_get(ctx, job_id)
     f.require_job(rows)

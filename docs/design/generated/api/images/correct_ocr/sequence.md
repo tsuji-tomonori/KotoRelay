@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # OCRを訂正し新しいrunを保存 — シーケンス
 
@@ -163,7 +163,6 @@ sequenceDiagram
 | kotorelay.operations.images.correct_ocr.functions.build_correct_ocr | 108 | Return | {'ocr_run': run, 'ocr': result} |
 | kotorelay.operations.images.correct_ocr.functions.build_run | 73 | Return | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=asset.document_id, asset_id=asset.id, result_key=key, result_hash=key, engine=result.engine, status='ready', confirmed=data.confirmed, created_at=now()) |
 | kotorelay.operations.images.correct_ocr.functions.check_concurrent_access | 101 | Return | ctx.fence() |
-| kotorelay.operations.images.correct_ocr.functions.document_correct_ocr | 28 | Return | ctx.document(asset.document_id, 'author') |
 | kotorelay.operations.images.correct_ocr.functions.ocr_runs_insert | 89 | Return | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
 | kotorelay.operations.images.correct_ocr.functions.put_key | 62 | Return | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
 | kotorelay.operations.images.correct_ocr.functions.record_correct_ocr_audit | 96 | Return | ctx.audit('ocr_correction', asset.document_id) |

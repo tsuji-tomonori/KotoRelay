@@ -23,9 +23,9 @@ def require_asset(assets: list[q.AssetsGetRow]) -> None:
     return require(bool(assets))
 
 
-def document_correct_ocr(ctx: context_types.Context, asset: q.AssetsGetRow) -> models.DocumentsRow:
+def require_document_author(ctx: context_types.Context, asset: q.AssetsGetRow) -> None:
     """文書を取得して要求された操作の権限を確認する。"""
-    return ctx.document(asset.document_id, "author")
+    ctx.document(asset.document_id, "author")
 
 
 def select_ids(data: request_schemas.OcrCorrection) -> list[str]:

@@ -23,14 +23,41 @@ FILES = {
 def check_source(path: Path, source: str) -> None:
     """ルーターへのSQL・provider実行とfunctionsへの全体フローの逆流を拒否する。"""
     tree = ast.parse(source)
+    from tools.project.source_policy import check_source as check_policy
+
+    check_policy(path, tree)
     relative = path.relative_to(APP)
     is_api = len(relative.parts) == 4 and relative.parts[0] == "operations"
     for node in ast.walk(tree):
+        if is_api and isinstance(node, (ast.Import, ast.ImportFrom)):
+            package = ["kotorelay", *relative.parts[:-1]]
+            if isinstance(node, ast.Import):
+                modules = [alias.name for alias in node.names]
+            else:
+                base = node.module or ""
+                if node.level:
+                    base = ".".join(
+                        package[: len(package) - node.level + 1] + ([base] if base else [])
+                    )
+                modules = [base + "." + alias.name for alias in node.names]
+            for module in modules:
+                parts = module.split(".")
+                if (
+                    parts[:2] == ["kotorelay", "operations"]
+                    and len(parts) >= 4
+                    and parts[2:4] != list(relative.parts[1:3])
+                    and parts[3] != "shared"
+                ):
+                    raise ValueError(f"API間の直接依存: {relative} -> {module}")
+                if path.name == "functions.py" and any(
+                    part in {"router", "workflow"} for part in parts[4:]
+                ):
+                    raise ValueError(f"functionsから全体フローへの逆依存: {relative}")
         if isinstance(node, ast.Import):
             for alias in node.names:
                 if path.name == "router.py" and ".generated.queries" in alias.name:
                     raise ValueError(f"ルーターがSQL境界へ直接依存しています: {relative}")
-                if path.name == "functions.py" and alias.name.endswith(".router"):
+                if path.name == "functions.py" and alias.name.endswith((".router", ".workflow")):
                     raise ValueError(f"functionsから全体フローへの逆依存: {relative}")
         if isinstance(node, ast.ImportFrom) and node.module:
             parts = node.module.split(".")
@@ -57,7 +84,11 @@ def check_source(path: Path, source: str) -> None:
                 raise ValueError(f"ルーターがSQL境界へ直接依存しています: {relative}")
 
         if path.name == "functions.py":
-            if isinstance(node, ast.ImportFrom) and node.module and node.module.endswith(".router"):
+            if (
+                isinstance(node, ast.ImportFrom)
+                and node.module
+                and node.module.endswith((".router", ".workflow"))
+            ):
                 raise ValueError(f"functionsから全体フローへの逆依存: {relative}")
             if isinstance(node, ast.Call) and ast.unparse(node.func) in {
                 "rt.context",
@@ -113,6 +144,10 @@ def inspect() -> list[dict[str, object]]:
     from fastapi.routing import APIRoute
     from kotorelay.main import app
 
+    from tools.project.design import Inventory
+    from tools.project.source_policy import inspect as inspect_policy
+
+    inspect_policy(APP, Inventory())
     check_workflow_ownership()
     result = []
     owners = set()
@@ -177,6 +212,21 @@ def inspect() -> list[dict[str, object]]:
     }
     if {item["operation"] for item in result} != expected or not expected:
         raise ValueError("API配置とOpenAPIのoperation集合が一致しません")
+    # 未登録のoperationも走査し、動的に登録された実endpointとの不一致を拒否する。
+    from tools.project.source_policy import router_endpoints
+
+    declared = set()
+    for path in (APP / "operations").rglob("router.py"):
+        names = router_endpoints(path, ast.parse(path.read_text()))
+        module = "kotorelay." + ".".join(path.relative_to(APP).with_suffix("").parts)
+        declared.update(module + "." + name for name in names)
+    registered = {
+        route.endpoint.__module__ + "." + route.endpoint.__name__
+        for route in routes
+        if isinstance(route, APIRoute)
+    }
+    if declared != registered:
+        raise ValueError(f"routerの宣言と登録が一致しません: {sorted(declared ^ registered)}")
     return result
 
 

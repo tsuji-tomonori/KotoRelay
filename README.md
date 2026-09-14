@@ -38,3 +38,5 @@ UIは提供デザインに沿った文字・配色・メニューと、OCR領域
 AWSへの実デプロイと実DSQL/Bedrockの疎通は未実行です。常設サーバー等の待機計算固定費を避けた構成ですが、AWSの利用量・保存量による料金は発生します。構築・認証・バックアップ・復旧・cdk-nag除外理由は運用手順を参照してください。
 
 設計書の章構成・API階層・CRUD図は[生成設計の構成方針](docs/planning/DOCUMENT-STRUCTURE.md)に従います。
+
+[lazunex tools全52ファイルの採用一覧](docs/design/generated/TOOLING.md)。routerの宣言と責務は `.venv/bin/python tools/project/api_layout.py` で検査します。

@@ -478,6 +478,24 @@
         "infra/src"
       ],
       "status": "required"
+    },
+    "tooling": {
+      "check": [
+        ".venv/bin/python",
+        "tools/project/design.py",
+        "--check"
+      ],
+      "generate": [
+        ".venv/bin/python",
+        "tools/project/design.py"
+      ],
+      "markdown": [
+        "docs/design/generated/TOOLING.md"
+      ],
+      "sources": [
+        "tools/project"
+      ],
+      "status": "required"
     }
   }
 }

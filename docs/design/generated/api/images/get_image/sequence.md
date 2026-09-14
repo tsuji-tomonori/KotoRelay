@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 現在の認可で画像を配信 — シーケンス
 
@@ -34,7 +34,7 @@ sequenceDiagram
     end
     A->>D: 現在の組織に属する部署を識別子順に一覧取得する。
     A->>D: 現在の組織に属する部署所属を識別子順に一覧取得する。
-    A->>F: authorize_asset
+    A->>F: 画像の所有文書と指定版の閲覧権限を確認して実体情報を返す。
     A->>D: 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。
     opt 検証不成立：bool(assets)
     break エラー応答を返して終了（後続の正常処理は実行しない）
@@ -180,5 +180,5 @@ sequenceDiagram
 | kotorelay.operations.images.get_image.functions.get_get_image | 11 | Return | ctx.objects.get(asset.object_key, asset.sha256) |
 | kotorelay.operations.images.get_image.response_builders.build_response | 10 | Return | Response(value, media_type='image/png') |
 | kotorelay.operations.images.get_image.router.get_image | 29 | Return | build_response(f.get_get_image(asset, ctx)) |
-| kotorelay.operations.images.shared.functions.authorize_asset | 16 | If | version_id is None |
-| kotorelay.operations.images.shared.functions.authorize_asset | 33 | Return | asset |
+| kotorelay.operations.images.shared.functions.authorize_asset | 17 | If | version_id is None |
+| kotorelay.operations.images.shared.functions.authorize_asset | 34 | Return | asset |

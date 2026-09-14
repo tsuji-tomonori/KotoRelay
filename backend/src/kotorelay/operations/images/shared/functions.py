@@ -10,6 +10,7 @@ from kotorelay.schemas import Manifest
 
 
 def authorize_asset(ctx: Context, asset_id: str, version_id: str | None) -> models.AssetsRow:
+    """画像の所有文書と指定版の閲覧権限を確認して実体情報を返す。"""
     assets = q.assets_get(ctx.db, q.AssetsGetParams(organization_id=ctx.org, id=asset_id))
     require(bool(assets))
     asset = assets[0]

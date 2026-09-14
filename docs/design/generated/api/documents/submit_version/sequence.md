@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 版を確定して承認申請 — シーケンス
 
@@ -209,9 +209,6 @@ sequenceDiagram
 | kotorelay.operations.documents.submit_version.functions.serialize_manifest | 176 | Return | Manifest(body_hash=body_hash, images=images).model_dump_json() |
 | kotorelay.operations.documents.submit_version.functions.submissions_insert | 110 | Return | q.submissions_insert(ctx.db, q.SubmissionsInsertParams(id=new_id(), organization_id=ctx.org, document_id=doc.id, version_id=version.id, requested_by=ctx.user.id, status='pending', manifest_hash=version.manifest_hash, decided_by=None, reason='', created_at=now(), decided_at=None)) |
 | kotorelay.operations.documents.submit_version.functions.validate_draft_revision | 41 | Return | require(row.revision == data.revision, 'conflict', 409) |
-| kotorelay.operations.documents.submit_version.functions.verify_body | 77 | Return | ctx.objects.get(row.body_key, row.body_hash) |
-| kotorelay.operations.documents.submit_version.functions.verify_image | 67 | Return | ctx.objects.get(asset.object_key, asset.sha256) |
-| kotorelay.operations.documents.submit_version.functions.verify_ocr | 72 | Return | ctx.objects.get(ocr.result_key, ocr.result_hash) |
 | kotorelay.operations.documents.submit_version.functions.versions_insert | 101 | Return | q.versions_insert(ctx.db, q.VersionsInsertParams.model_validate(version, from_attributes=True)) |
 | kotorelay.operations.documents.submit_version.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
 | kotorelay.operations.documents.submit_version.router.submit_version | 33 | If | cached |

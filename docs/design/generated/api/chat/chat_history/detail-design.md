@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 現行認可で会話履歴を再表示 — 詳細設計
 
@@ -45,14 +45,14 @@
 | backend/src/kotorelay/context.py:93 | self.member(doc.department_id) | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
 | backend/src/kotorelay/operations/chat/chat_history/functions.py:27 | bool(conversations) and conversations[0].user_id == ctx.user.id | not_found | 404 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:76 | answer.user_id == ctx.user.id | not_found | 404 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:20 | not docs | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:23 | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:33 | not versions or not chunks | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:36 | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:51 | placements - {image.placement.id for image in manifest.images} | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:54 | image.placement.id in json.loads(chunk.placements) | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/chat/shared/functions.py:62 | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:78 | answer.user_id == ctx.user.id | not_found | 404 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:21 | not docs | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:24 | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:34 | not versions or not chunks | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:37 | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:52 | placements - {image.placement.id for image in manifest.images} | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:55 | image.placement.id in json.loads(chunk.placements) | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/chat/shared/functions.py:63 | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') | then / else の実装分岐 | 制御フロー参照 |
 
 
 ## 3. 正常系リソース変更
@@ -137,15 +137,15 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/chat/chat_history/generated/queries.py:67 | db.query('operations/chat/chat_history/sql/002_conversations_get.sql', params.model_dump(), ConversationsGetRow) |
 | backend/src/kotorelay/operations/chat/chat_history/response_builders.py:10 | TypeAdapter(ResponseData).validate_python(value) |
 | backend/src/kotorelay/operations/chat/chat_history/router.py:28 | build_response(f.select_chat_history(ctx, conversation_id)) |
-| backend/src/kotorelay/operations/chat/shared/functions.py:79 | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
-| backend/src/kotorelay/operations/chat/shared/functions.py:21 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:28 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:34 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:45 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:66 | True |
-| backend/src/kotorelay/operations/chat/shared/functions.py:52 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:72 | False |
-| backend/src/kotorelay/operations/chat/shared/functions.py:63 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:81 | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| backend/src/kotorelay/operations/chat/shared/functions.py:22 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:29 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:35 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:46 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:67 | True |
+| backend/src/kotorelay/operations/chat/shared/functions.py:53 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:73 | False |
+| backend/src/kotorelay/operations/chat/shared/functions.py:64 | False |
 | backend/src/kotorelay/operations/chat/shared/generated/queries.py:45 | db.query('operations/chat/shared/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
 | backend/src/kotorelay/operations/chat/shared/generated/queries.py:76 | db.query('operations/chat/shared/sql/002_chunks_get.sql', params.model_dump(), ChunksGetRow) |
 | backend/src/kotorelay/operations/chat/shared/generated/queries.py:109 | db.query('operations/chat/shared/sql/003_documents_get.sql', params.model_dump(), DocumentsGetRow) |

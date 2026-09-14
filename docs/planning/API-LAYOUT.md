@@ -29,7 +29,7 @@ FastAPI、psycopg、同期DB port、DSQL/PostgreSQL、既存のHTTP契約は維�
 
 ## routerのフローとSQLモデルの責務（2026年9月13日追補）
 
-利用者の追加指定により、認可・冪等性・個別処理・更新・監査・結果返却の全体フローをrouterに置く。functionsへ全体フローを委譲しない。routerには分岐、例外処理、手順に必要な反復とtransactionの範囲を記述し、SQL実行、外部portの実行、値の変換や集計の詳細は名前を持つ個別関数へ分ける。索引APIとworkerが共有するフローは`indexing/shared/router.py`が所有し、`shared/functions.py`はその個別処理を提供する。既存のFastAPI依存transactionは成功応答前に確定する。チャットのモデル呼出しはtransactionの外で行い、入力直前・回答確定時の再認可を維持する。
+利用者の追加指定により、認可・冪等性・個別処理・更新・監査・結果返却の全体フローをrouterに置く。functionsへ全体フローを委譲しない。routerには分岐、例外処理、手順に必要な反復とtransactionの範囲を記述し、SQL実行、外部portの実行、値の変換や集計の詳細は名前を持つ個別関数へ分ける。索引APIとworkerが共有するフローは`indexing/shared/workflow.py`が所有し、`shared/functions.py`はその個別処理を提供する。既存のFastAPI依存transactionは成功応答前に確定する。チャットのモデル呼出しはtransactionの外で行い、入力直前・回答確定時の再認可を維持する。
 
 SQL正本は`sql/NNN_name.sql`、生成境界は各責務の`generated/queries.py`とする。SQLに実際に束縛する引数だけを厳格なPydantic Paramsにし、DDLとSQL ASTの束縛位置から型を決める。SELECTには列を列挙し、その投影と別名とNULL制約から専用Rowを生成する。全列を取得するときだけ共通の業務行型と代入互換にし、部分投影には未取得列を持たせない。DBの戻り値を単一の全体行型で代用しない。MySQLやSQLAlchemyの構文は移植せず、PostgreSQL/DSQLとpsycopgのparameter bindingを使う。
 
@@ -48,3 +48,20 @@ HTTP境界ではProblem、入力検証、DB競合・停止、外部サービス�
 単体テストのdocstringに、実際の試験を説明する日本語のGiven/When/Thenを記述する。API帳票の要因とケース詳細、pytestの実行一覧はこの説明を参照し、fixture名やassert式を説明の代用にしない。説明の欠落・重複は検査で拒否する。条件式の技術的な追跡は詳細設計とシーケンスの補助表を使う。
 
 前回は呼出し順や章の一致を検査した一方、HTTP応答への変換と型付きログを適用範囲から落とし、テストのASTを説明として代用していた。原因・改善案は[dev-standard issue #70](https://github.com/tsuji-tomonori/dev-standard/issues/70)へ報告した。
+
+
+## router専用宣言とtoolsの採用（2026年9月14日追補）
+
+router.pyに定義できる関数はFastAPIへ登録したendpointだけとする。補助関数、入れ子関数、メソッド、クラス、lambdaを置かない。グループ直下は登録だけとし、実アプリへ未登録のendpointや未使用のrouterも検査する。チャット受付と確定、文書一覧、ジョブ一覧の全体フローは各endpointに展開する。並べ替えなど個別の変換はfunctionsへ置く。
+
+索引配送はHTTP APIとworkerが同じ処理を実行するため、shared/workflow.pyに置く。ここはHTTP endpointを定義しない。functionsからrouter・workflowへの逆依存を拒否し、シーケンスgeneratorはworkflow内の分岐・例外・SQL呼出しも追跡する。チャットは受付commit、transaction外のモデル呼出し、確定時の再認可という順序を維持する。
+
+lazunexのmain（096e1e580ab1c0670c57e4febad2bd9fdd4698ee）にあるsrc/tools全52ファイルを[採用一覧](../design/generated/TOOLING.md)へ記載する。正本はtools/project/tool_adoption.jsonと接続先の実装で、設計generatorが一覧と参照先を検査して生成する。参照先の規約05はendpointと処理順の責務を定めるが、補助関数を一律拒否する検査は確認できなかったため、本プロジェクトの明示制約として追加する。
+
+source_policy.pyはrouterの宣言、応答builderの直接返却、業務関数の結果の単独破棄、定数bool、説明docstring、包括的な例外捕捉、業務層のHTTPExceptionを検査する。既存api_layout.pyから呼び出し、verifyのAPI責務配置結果と品質portalへ接続する。DB更新wrapperの既存int件数は破棄を許可するが、読取結果やboolは許可しない。検証のみの関数はNoneにする。値を変数に代入した後の全経路での使用証明まではこの検査の対象としない。
+
+Pythonの型の絞り込み、allによる根拠検証、共有workflow、同期psycopgを維持する。lazunex固有のSQLAlchemy例外、命名辞書、hub-admin等の定数、固定の行数・複雑度上限は取り込まない。テストは実HTTP・実DB・実測coverageを使い、独立YAMLや生成された空テストを追加しない。既存CI・Pages公開・branch規則は維持する。
+
+標準側の改善提案は[dev-standard issue #72](https://github.com/tsuji-tomonori/dev-standard/issues/72)に起票した。
+
+標準の汎用source-conventionsのSQL配置検査は、全SQL所有先にrouter.pyとfunctions.pyを要求するため、既存のshared・認可・初期投入・worker配送の43 SQLを拒否する。本構成ではこれらはHTTP endpointではない。日本語説明は標準検査で確認し、SQL配置・所有先・型付き生成・呼出境界は既存project adapterのqueries.pyとapi_layout.py、実DB試験で確認する。汎用検査への共有責務profileの不足もIssue #72へ報告する。

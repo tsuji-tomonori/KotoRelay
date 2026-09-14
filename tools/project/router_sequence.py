@@ -182,7 +182,7 @@ def render(
         elif target in inventory.nodes and target not in stack:
             if target == "kotorelay.runtime.Runtime.context":
                 return
-            if ".router." not in target:
+            if not any(part in target for part in (".router.", ".workflow.")):
                 add("A->>F: " + purpose(target))
             statements(inventory.nodes[target].body, target, (*stack, target))
         else:
@@ -268,7 +268,7 @@ def render(
                     add("end")
             elif isinstance(node, ast.Return):
                 expression(node.value, current, stack)
-                if ".router." in current:
+                if any(part in current for part in (".router.", ".workflow.")):
                     add("Note over A: この処理からreturn")
             elif isinstance(node, ast.Raise):
                 if (

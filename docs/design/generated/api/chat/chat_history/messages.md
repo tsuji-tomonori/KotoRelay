@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 現行認可で会話履歴を再表示 — ログメッセージ
 
@@ -35,7 +35,7 @@ lazunexのops_loggerと同じく、独自型のcontext、ログID、例外型、
 | メッセージ | 整合性を確認できない回答根拠を除外しました。 |
 | 例外・出力条件 | 根拠の読込み・検証でProblemまたはValueErrorを捕捉した場合。 |
 | 返すレスポンス | HTTPエラーを直ちに返さず根拠を除外して継続。残る有効根拠により回答を返すかstatus=held、履歴はstatus=hidden。 |
-| 呼出し位置 | backend/src/kotorelay/operations/chat/shared/functions.py:68 |
+| 呼出し位置 | backend/src/kotorelay/operations/chat/shared/functions.py:69 |
 | 確認手順 | request_idと例外型から版・権限・実体の整合性を確認する。 |
 | 復旧手順 | 公開版と索引を照合し、必要なら再索引する。 |
 

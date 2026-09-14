@@ -17,6 +17,7 @@ from kotorelay.schemas import Manifest, OcrResult
 
 
 def split_chunks(body: str) -> list[tuple[str, str]]:
+    """見出しと本文を検索用の長さに分割する。"""
     chunks: list[tuple[str, str]] = []
     heading = "本文"
     buffer = ""
@@ -119,11 +120,11 @@ def ocr_runs_get(
     )
 
 
-def get_build_index(
+def verify_image_object(
     asset: q.AssetsGetRow, image: shared_schemas.ManifestImage, ctx: context_types.Context
-) -> bytes:
+) -> None:
     """記録された保存先から実体を取得してハッシュを照合する。"""
-    return ctx.objects.get(asset.object_key, image.image_hash)
+    ctx.objects.get(asset.object_key, image.image_hash)
 
 
 def build_result(
@@ -222,9 +223,9 @@ def verify_index_completion(
     )
 
 
-def get_build_index_2(current: q.ChunksListRow, ctx: context_types.Context) -> bytes:
+def verify_chunk_object(current: q.ChunksListRow, ctx: context_types.Context) -> None:
     """記録された保存先から実体を取得してハッシュを照合する。"""
-    return ctx.objects.get(current.body_key, current.sha256)
+    ctx.objects.get(current.body_key, current.sha256)
 
 
 def chunks_update_2(ctx: context_types.Context, current: q.ChunksListRow) -> int:

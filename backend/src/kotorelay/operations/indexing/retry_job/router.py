@@ -10,7 +10,7 @@ from kotorelay.generated import models
 from kotorelay.operations.indexing.retry_job.contract import CONTRACT
 from kotorelay.operations.indexing.retry_job.response_builders import build_response
 from kotorelay.operations.indexing.retry_job.samples import SAMPLES
-from kotorelay.operations.indexing.shared.router import process
+from kotorelay.operations.indexing.shared.workflow import process
 from kotorelay.runtime import Ctx, Rt
 
 router = APIRouter(prefix="/api/operations", tags=["運用"])

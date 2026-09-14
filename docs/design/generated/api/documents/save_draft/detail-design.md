@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 競合を検出して下書きを保存 — 詳細設計
 
@@ -59,10 +59,10 @@
 | backend/src/kotorelay/context.py:110 | allowed | not_found | 404 |
 | backend/src/kotorelay/context.py:64 | q.organizations_fence(self.db, q.OrganizationsFenceParams.model_validate(self.organization, from_attributes=True)) == 1 | 'conflict' | 409 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:49 | row.revision == data.revision | 'conflict' | 409 |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:18 | len({p.id for p in data.placements}) == len(data.placements) | 'invalid_placement' | 422 |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:26 | bool(assets) and bool(runs) | 'invalid_placement' | 422 |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:27 | assets[0].document_id == doc.id and runs[0].asset_id == assets[0].id and (runs[0].document_id == doc.id) and (placement.offset <= len(data.body)) | 'invalid_placement' | 422 |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:50 | row.revision == data.revision | 'conflict' | 409 |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:19 | len({p.id for p in data.placements}) == len(data.placements) | 'invalid_placement' | 422 |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:27 | bool(assets) and bool(runs) | 'invalid_placement' | 422 |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:28 | assets[0].document_id == doc.id and runs[0].asset_id == assets[0].id and (runs[0].document_id == doc.id) and (placement.offset <= len(data.body)) | 'invalid_placement' | 422 |
 
 
 ## 3. 正常系リソース変更
@@ -118,13 +118,13 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | --- | --- |
 | backend/src/kotorelay/context.py:111 | doc |
 | backend/src/kotorelay/context.py:19 | datetime.now(UTC) |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:95 | ctx.fence() |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:39 | ctx.document(str(document_id), 'author') |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:82 | q.documents_update(ctx.db, q.DocumentsUpdateParams.model_validate(doc.model_copy(update={'title': data.title, 'revision': doc.revision + 1, 'updated_at': now()}), from_attributes=True)) |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:44 | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:61 | q.drafts_update(ctx.db, q.DraftsUpdateParams.model_validate(row.model_copy(update={'body_key': key, 'body_hash': key, 'revision': row.revision + 1, 'updated_by': ctx.user.id, 'placements': json.dumps([p.model_dump() for p in data.placements])}), from_attributes=True)) |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:54 | ctx.objects.put(data.body.encode(), 'text/markdown') |
-| backend/src/kotorelay/operations/documents/save_draft/functions.py:49 | require(row.revision == data.revision, 'conflict', 409) |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:96 | ctx.fence() |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:40 | ctx.document(str(document_id), 'author') |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:83 | q.documents_update(ctx.db, q.DocumentsUpdateParams.model_validate(doc.model_copy(update={'title': data.title, 'revision': doc.revision + 1, 'updated_at': now()}), from_attributes=True)) |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:45 | q.drafts_list(ctx.db, q.DraftsListParams(organization_id=ctx.org)) |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:62 | q.drafts_update(ctx.db, q.DraftsUpdateParams.model_validate(row.model_copy(update={'body_key': key, 'body_hash': key, 'revision': row.revision + 1, 'updated_by': ctx.user.id, 'placements': json.dumps([p.model_dump() for p in data.placements])}), from_attributes=True)) |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:55 | ctx.objects.put(data.body.encode(), 'text/markdown') |
+| backend/src/kotorelay/operations/documents/save_draft/functions.py:50 | require(row.revision == data.revision, 'conflict', 409) |
 | backend/src/kotorelay/operations/documents/save_draft/generated/queries.py:43 | db.query('operations/documents/save_draft/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
 | backend/src/kotorelay/operations/documents/save_draft/generated/queries.py:68 | db.execute('operations/documents/save_draft/sql/002_documents_update.sql', params.model_dump()) |
 | backend/src/kotorelay/operations/documents/save_draft/generated/queries.py:96 | db.query('operations/documents/save_draft/sql/003_drafts_list.sql', params.model_dump(), DraftsListRow) |

@@ -59,6 +59,8 @@ def sources() -> list[Path]:
         ("e2e", ".ts"),
     ]:
         paths.extend((ROOT / folder).rglob("*" + suffix))
+    adoption = json.loads((ROOT / "tools/project/tool_adoption.json").read_text())
+    paths.extend(ROOT / entry["adapter"] for entry in adoption["entries"])
     return sorted(
         set(
             paths
@@ -67,6 +69,8 @@ def sources() -> list[Path]:
                 Path(__file__),
                 ROOT / "tools/project/api_documents.py",
                 ROOT / "tools/project/api_layout.py",
+                ROOT / "tools/project/source_policy.py",
+                ROOT / "tools/project/tool_adoption.json",
                 ROOT / "tools/project/router_sequence.py",
                 ROOT / "tools/project/error_design.py",
                 ROOT / "tools/project/test_narrative.py",
@@ -768,6 +772,42 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         "版と画像は認可付きAPIから読み込みます。未保存確認はWorkspaceで共有し、"
         "引用版の変更と非許可状態を区別して表示します。詳細は上記の実装イベントに対応します。"
     )
+    adoption = json.loads((ROOT / "tools/project/tool_adoption.json").read_text())
+    entries = adoption["entries"]
+    if len({entry["path"] for entry in entries}) != len(entries):
+        raise ValueError("参照tool一覧のpathが重複しています")
+    for entry in entries:
+        adapter = ROOT / entry["adapter"]
+        if not adapter.is_file() or not adapter.resolve().is_relative_to(ROOT):
+            raise ValueError(f"参照toolの導入先が存在しません: {entry['adapter']}")
+    reference = adoption["repository"] + "/blob/" + adoption["revision"] + "/src/tools/"
+    output["TOOLING.md"] = (
+        header
+        + "# lazunex toolsの棚卸しと採用対応\n\n"
+        + f"参照revision: `{adoption['revision']}`。`src/tools`配下の全{len(entries)}ファイル。\n\n"
+        + "既存・追加・拡張は接続済みの機能、適応は目的に応じた別方式、"
+        + "非採用は移植しない理由を示します。"
+        + "一覧は採用構成を示し、検査の成功や全分岐の網羅を表しません。"
+        + "実行結果は品質portalを参照します。\n\n"
+        + "実行入口: `.venv/bin/python tools/project/api_layout.py`、"
+        + "`.venv/bin/python tools/project/design.py --check`、"
+        + "`.venv/bin/python tools/project/queries.py --check`。既存verifyから実行します。\n\n"
+        + "routerは登録済みendpointだけを定義します。共有の索引配送はAPIとworkerが使用する"
+        + "`indexing/shared/workflow.py`に置き、functionsからの逆依存を拒否します。\n\n"
+        + table(
+            ["参照ファイル", "用途", "採用判断", "導入先", "適用範囲・理由"],
+            [
+                [
+                    f"[{entry['path']}]({reference}{entry['path']})",
+                    entry["purpose"],
+                    entry["decision"],
+                    entry["adapter"],
+                    entry["scope"],
+                ]
+                for entry in entries
+            ],
+        )
+    )
     output["manifest.json"] = dump(
         {
             "source_sha256": hashes,
@@ -789,6 +829,13 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     contract = {
         "schema_version": 1,
         "surfaces": {
+            "tooling": {
+                "status": "required",
+                "sources": ["tools/project"],
+                "markdown": ["docs/design/generated/TOOLING.md"],
+                "generate": command,
+                "check": command + ["--check"],
+            },
             "api": {
                 "status": "required",
                 "sources": ["backend/src"],

@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 現在の認可で画像を配信 — 詳細設計
 
@@ -54,11 +54,11 @@
 | backend/src/kotorelay/context.py:119 | digest(version.manifest.encode()) == version.manifest_hash | 'integrity' | 503 |
 | backend/src/kotorelay/context.py:118 | self.can_read(doc) and doc.latest_version_id == version.id | not_found | 404 |
 | backend/src/kotorelay/errors.py:13 | not condition | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/shared/functions.py:16 | version_id is None | then / else の実装分岐 | 制御フロー参照 |
-| backend/src/kotorelay/operations/images/shared/functions.py:14 | bool(assets) | not_found | 404 |
-| backend/src/kotorelay/operations/images/shared/functions.py:22 | bool(docs) and docs[0].status != 'deleted' | not_found | 404 |
-| backend/src/kotorelay/operations/images/shared/functions.py:24 | ctx.can_read(doc) or ctx.permission(doc.department_id, 'draft') | not_found | 404 |
-| backend/src/kotorelay/operations/images/shared/functions.py:27 | any((i.placement.asset_id == asset.id and i.image_hash == asset.sha256 for i in manifest.images)) | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:17 | version_id is None | then / else の実装分岐 | 制御フロー参照 |
+| backend/src/kotorelay/operations/images/shared/functions.py:15 | bool(assets) | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:23 | bool(docs) and docs[0].status != 'deleted' | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:25 | ctx.can_read(doc) or ctx.permission(doc.department_id, 'draft') | not_found | 404 |
+| backend/src/kotorelay/operations/images/shared/functions.py:28 | any((i.placement.asset_id == asset.id and i.image_hash == asset.sha256 for i in manifest.images)) | not_found | 404 |
 
 
 ## 3. 正常系リソース変更
@@ -119,7 +119,7 @@ DBはrepeatable-read相当のtransaction。変更時に組織revisionをCAS更�
 | backend/src/kotorelay/operations/images/get_image/functions.py:11 | ctx.objects.get(asset.object_key, asset.sha256) |
 | backend/src/kotorelay/operations/images/get_image/response_builders.py:10 | Response(value, media_type='image/png') |
 | backend/src/kotorelay/operations/images/get_image/router.py:29 | build_response(f.get_get_image(asset, ctx)) |
-| backend/src/kotorelay/operations/images/shared/functions.py:33 | asset |
+| backend/src/kotorelay/operations/images/shared/functions.py:34 | asset |
 | backend/src/kotorelay/operations/images/shared/generated/queries.py:42 | db.query('operations/images/shared/sql/001_assets_get.sql', params.model_dump(), AssetsGetRow) |
 | backend/src/kotorelay/operations/images/shared/generated/queries.py:75 | db.query('operations/images/shared/sql/002_documents_get.sql', params.model_dump(), DocumentsGetRow) |
 | backend/src/kotorelay/operations/system/authorization/generated/queries.py:63 | db.query('operations/system/authorization/sql/002_departments_list.sql', params.model_dump(), DepartmentsListRow) |

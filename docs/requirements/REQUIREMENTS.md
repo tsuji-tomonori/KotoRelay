@@ -125,13 +125,18 @@
 | <code>"REQ-DESIGN-04"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、品質Pagesで設計の階層を維持するを**提供する**（<code>"provide"</code>） | 生成差分、構成の回帰検査、品質SPAのE2E |
 | <code>"REQ-DESIGN-05"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、SQLの役割を日本語一文で説明し図へ反映するを**提供する**（<code>"provide"</code>） | 生成差分、SQLコメントの検査、品質SPAのE2E |
 | <code>"REQ-DESIGN-06"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、API操作ごとにファイルと責務を分離するを**提供する**（<code>"provide"</code>） | 配置と依存の検査、実HTTPサンプル、生成差分、業務と実DBとCompose E2E |
-| <code>"REQ-DESIGN-07"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、routerがAPIの全体フローを所有するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
+| <code>"REQ-DESIGN-07"</code> | 2 | 有効 | 制約 | 開発プロジェクトは、routerがAPIの全体フローを所有するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 | <code>"REQ-DESIGN-08"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、SQLごとの引数と取得投影を型として生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 | <code>"REQ-DESIGN-09"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、routerの実行順序と制御構造からシーケンスを生成するを**提供する**（<code>"provide"</code>） | 配置と型の負例、生成差分、既存業務と実DBとCompose E2E |
 | <code>"REQ-DESIGN-10"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、シーケンスに例外応答を具体的に表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-11"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、型付き運用ログとHTTP応答を照合可能にするを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-12"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、ログ帳票を実装された例外と応答とログから生成するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
 | <code>"REQ-DESIGN-13"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、単体テストを日本語の検証単位で表示するを**提供する**（<code>"provide"</code>） | 実HTTP応答・ログ・生成の正例負例・Pages E2E |
+| <code>"REQ-DESIGN-14"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、routerにAPI endpoint以外の関数を定義しないを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
+| <code>"REQ-DESIGN-15"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、業務関数の意味のある戻り値を破棄しないを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
+| <code>"REQ-DESIGN-16"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、APIフローで例外の分類を保持するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
+| <code>"REQ-DESIGN-17"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、固定boolによる形だけの業務判定を拒否するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
+| <code>"REQ-DESIGN-18"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、業務例外のHTTP変換を共通境界に集約するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
 
 ## REQ-DOC-01: ブラウザでMarkdownを編集する
 
@@ -1215,7 +1220,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/workflow.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1247,7 +1252,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/workflow.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1279,7 +1284,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/workflow.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1311,7 +1316,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/workflow.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -1343,7 +1348,7 @@
 検証(JSON Object): <code>{"evidence":"この受入条件の入力・期待結果・実測結果を照合する。実装時に対応する試験と証跡の参照を登録する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/workflow.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2367,7 +2372,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/workflow.py","backend/src/kotorelay/operations/chat/ask_question/functions.py","backend/src/kotorelay/operations/chat/ask_question/router.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -2719,7 +2724,7 @@
 検証(JSON Object): <code>{"evidence":"受入条件の入力・期待結果・実測結果を照合する。DSQL制約、モデルへ実際に送った画像の識別子、現行認可、利用イベントを必要に応じて確認する。","method":"設計レビュー・単体試験・PostgreSQL結合試験・Compose E2E（AWS実機は未検証）"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/design/generated/API.md","docs/design/generated/FRONTEND.md"]</code>
-- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- 実装: <code>["frontend/src/components/App.tsx","backend/src/kotorelay/operations/indexing/shared/functions.py","backend/src/kotorelay/operations/indexing/shared/workflow.py"]</code>
 - テスト: <code>["backend/tests/test_workflow.py","frontend/tests/app.test.tsx"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -3825,13 +3830,13 @@
 根拠: 利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。
 根拠(JSON): <code>"利用者がlazunex全体との責務比較とrouterの全体フロー・SQLモデルの修正を指定したため。"</code>
 
-項目版: 1 / 状態: `active` / 種別: `constraint`
-変更識別子: <code>"router-flow-2026-09-13"</code>
+項目版: 2 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-policy-2026-09-14"</code>
 分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
 
 受入条件:
-- <code>"AC-DESIGN-07"</code> 前提: APIとSQLと設計generatorが存在する。条件: 実装と設計を生成し検査する。期待結果: routerに処理順・分岐・例外・transactionを記述し、functionsは個別処理だけを持ち、複数更新段階の委譲と直接DB・provider実行を拒否する。
-  - criterion(JSON Object): <code>{"given":"APIとSQLと設計generatorが存在する","id":"AC-DESIGN-07","then":"routerに処理順・分岐・例外・transactionを記述し、functionsは個別処理だけを持ち、複数更新段階の委譲と直接DB・provider実行を拒否する","when":"実装と設計を生成し検査する"}</code>
+- <code>"AC-DESIGN-07"</code> 前提: APIとSQLと設計generatorが存在する。条件: 実装と設計を生成し検査する。期待結果: routerのendpointに処理順・分岐・例外・transactionを記述する。APIとworkerが共有する索引配送は専用workflowに置き、functionsは個別処理だけを持ち、全体フローへの逆依存と直接DB・provider実行を拒否する。
+  - criterion(JSON Object): <code>{"given":"APIとSQLと設計generatorが存在する","id":"AC-DESIGN-07","then":"routerのendpointに処理順・分岐・例外・transactionを記述する。APIとworkerが共有する索引配送は専用workflowに置き、functionsは個別処理だけを持ち、全体フローへの逆依存と直接DB・provider実行を拒否する","when":"実装と設計を生成し検査する"}</code>
 
 要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
 検証方法: 配置と型の負例、生成差分、既存業務と実DBとCompose E2E
@@ -3839,7 +3844,7 @@
 検証(JSON Object): <code>{"evidence":"同一コミットの品質Pages","method":"配置と型の負例、生成差分、既存業務と実DBとCompose E2E"}</code>
 トレース(JSON List、順序保持):
 - 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
-- 実装: <code>["tools/project/api_layout.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/indexing/shared/router.py"]</code>
+- 実装: <code>["tools/project/api_layout.py","backend/src/kotorelay/operations/chat/ask_question/router.py","backend/src/kotorelay/operations/indexing/shared/workflow.py"]</code>
 - テスト: <code>["tools/project/tests/test_router_flow.py","backend/tests/test_workflow.py","backend/tests/test_postgres.py"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
@@ -4033,6 +4038,166 @@
 - 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
 - 実装: <code>["tools/project/test_narrative.py","tools/project/collector.py","tools/project/design.py","frontend/portal/App.tsx"]</code>
 - テスト: <code>["tools/project/tests/test_error_reporting.py","e2e/portal.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-14: routerにAPI endpoint以外の関数を定義しない
+
+要件ID(JSON): <code>"REQ-DESIGN-14"</code>
+タイトル(JSON): <code>"routerにAPI endpoint以外の関数を定義しない"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"routerにAPI endpoint以外の関数を定義しない"</code>
+開発プロジェクトは、routerにAPI endpoint以外の関数を定義しないを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。
+根拠(JSON): <code>"利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-policy-2026-09-14"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-14"</code> 前提: APIと検査adapterが存在する。条件: APIの実装と検査を行う。期待結果: 全router.pyを走査し、登録されたAPI endpoint以外の同期関数・非同期関数・入れ子関数・メソッド・lambdaを拒否する。グループのrouterは登録だけを担当し、未登録の宣言も拒否する。
+  - criterion(JSON Object): <code>{"given":"APIと検査adapterが存在する","id":"AC-DESIGN-14","then":"全router.pyを走査し、登録されたAPI endpoint以外の同期関数・非同期関数・入れ子関数・メソッド・lambdaを拒否する。グループのrouterは登録だけを担当し、未登録の宣言も拒否する","when":"APIの実装と検査を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 構文・型・依存の正例負例と実HTTP回帰試験
+検証証跡: 品質portalとローカル検証結果
+検証(JSON Object): <code>{"evidence":"品質portalとローカル検証結果","method":"構文・型・依存の正例負例と実HTTP回帰試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/source_policy.py","tools/project/api_layout.py"]</code>
+- テスト: <code>["tools/project/tests/test_source_policy.py","backend/tests/test_workflow.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-15: 業務関数の意味のある戻り値を破棄しない
+
+要件ID(JSON): <code>"REQ-DESIGN-15"</code>
+タイトル(JSON): <code>"業務関数の意味のある戻り値を破棄しない"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"業務関数の意味のある戻り値を破棄しない"</code>
+開発プロジェクトは、業務関数の意味のある戻り値を破棄しないを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。
+根拠(JSON): <code>"利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-policy-2026-09-14"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-15"</code> 前提: APIと検査adapterが存在する。条件: APIの実装と検査を行う。期待結果: 同期・非同期の呼出し先と型を解決して読取結果・判定値の単独破棄を拒否する。検証専用処理はNoneを返す。
+  - criterion(JSON Object): <code>{"given":"APIと検査adapterが存在する","id":"AC-DESIGN-15","then":"同期・非同期の呼出し先と型を解決して読取結果・判定値の単独破棄を拒否する。検証専用処理はNoneを返す","when":"APIの実装と検査を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 構文・型・依存の正例負例と実HTTP回帰試験
+検証証跡: 品質portalとローカル検証結果
+検証(JSON Object): <code>{"evidence":"品質portalとローカル検証結果","method":"構文・型・依存の正例負例と実HTTP回帰試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/source_policy.py","tools/project/api_layout.py"]</code>
+- テスト: <code>["tools/project/tests/test_source_policy.py","backend/tests/test_workflow.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-16: APIフローで例外の分類を保持する
+
+要件ID(JSON): <code>"REQ-DESIGN-16"</code>
+タイトル(JSON): <code>"APIフローで例外の分類を保持する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"APIフローで例外の分類を保持する"</code>
+開発プロジェクトは、APIフローで例外の分類を保持するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。
+根拠(JSON): <code>"利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-policy-2026-09-14"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-16"</code> 前提: APIと検査adapterが存在する。条件: APIの実装と検査を行う。期待結果: routerと共有workflowの裸のexcept・Exception・BaseException捕捉を拒否する。
+  - criterion(JSON Object): <code>{"given":"APIと検査adapterが存在する","id":"AC-DESIGN-16","then":"routerと共有workflowの裸のexcept・Exception・BaseException捕捉を拒否する","when":"APIの実装と検査を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 構文・型・依存の正例負例と実HTTP回帰試験
+検証証跡: 品質portalとローカル検証結果
+検証(JSON Object): <code>{"evidence":"品質portalとローカル検証結果","method":"構文・型・依存の正例負例と実HTTP回帰試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/source_policy.py","tools/project/api_layout.py"]</code>
+- テスト: <code>["tools/project/tests/test_source_policy.py","backend/tests/test_workflow.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-17: 固定boolによる形だけの業務判定を拒否する
+
+要件ID(JSON): <code>"REQ-DESIGN-17"</code>
+タイトル(JSON): <code>"固定boolによる形だけの業務判定を拒否する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"固定boolによる形だけの業務判定を拒否する"</code>
+開発プロジェクトは、固定boolによる形だけの業務判定を拒否するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。
+根拠(JSON): <code>"利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-policy-2026-09-14"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-17"</code> 前提: APIと検査adapterが存在する。条件: APIの実装と検査を行う。期待結果: bool戻り型を持つ業務関数が常に同じbool literalを返す場合に検査を失敗させる。
+  - criterion(JSON Object): <code>{"given":"APIと検査adapterが存在する","id":"AC-DESIGN-17","then":"bool戻り型を持つ業務関数が常に同じbool literalを返す場合に検査を失敗させる","when":"APIの実装と検査を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 構文・型・依存の正例負例と実HTTP回帰試験
+検証証跡: 品質portalとローカル検証結果
+検証(JSON Object): <code>{"evidence":"品質portalとローカル検証結果","method":"構文・型・依存の正例負例と実HTTP回帰試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/source_policy.py","tools/project/api_layout.py"]</code>
+- テスト: <code>["tools/project/tests/test_source_policy.py","backend/tests/test_workflow.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-18: 業務例外のHTTP変換を共通境界に集約する
+
+要件ID(JSON): <code>"REQ-DESIGN-18"</code>
+タイトル(JSON): <code>"業務例外のHTTP変換を共通境界に集約する"</code>
+主体(JSON): <code>"開発プロジェクト"</code>
+対象(JSON): <code>"業務例外のHTTP変換を共通境界に集約する"</code>
+開発プロジェクトは、業務例外のHTTP変換を共通境界に集約するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: 利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。
+根拠(JSON): <code>"利用者がrouterの関数制約とlazunex toolsの適用を明示指定したため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `constraint`
+変更識別子: <code>"router-policy-2026-09-14"</code>
+分類: scope=<code>"project"</code> / category=<code>"nonfunctional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-18"</code> 前提: APIと検査adapterが存在する。条件: APIの実装と検査を行う。期待結果: 業務関数からのHTTPExceptionを拒否し、Problemを共通HTTP変換境界へ接続する。
+  - criterion(JSON Object): <code>{"given":"APIと検査adapterが存在する","id":"AC-DESIGN-18","then":"業務関数からのHTTPExceptionを拒否し、Problemを共通HTTP変換境界へ接続する","when":"APIの実装と検査を行う"}</code>
+
+要求源(JSON List): <code>["docs/planning/API-LAYOUT.md"]</code>
+検証方法: 構文・型・依存の正例負例と実HTTP回帰試験
+検証証跡: 品質portalとローカル検証結果
+検証(JSON Object): <code>{"evidence":"品質portalとローカル検証結果","method":"構文・型・依存の正例負例と実HTTP回帰試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
+- 実装: <code>["tools/project/source_policy.py","tools/project/api_layout.py"]</code>
+- テスト: <code>["tools/project/tests/test_source_policy.py","backend/tests/test_workflow.py"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>

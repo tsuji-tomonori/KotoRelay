@@ -978,6 +978,7 @@
   "paths": {
     "/api/chat": {
       "post": {
+        "description": "受付を確定し、transaction外で生成して再認可後に回答を保存する。",
         "operationId": "ask_question",
         "parameters": [
           {
@@ -1114,6 +1115,7 @@
     },
     "/api/documents": {
       "get": {
+        "description": "閲覧権限で文書を絞り込み、要求時だけページ用の付加情報を返す。",
         "operationId": "list_documents",
         "parameters": [
           {

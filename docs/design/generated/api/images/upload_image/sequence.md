@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 画像を添付して位置付きOCRを実行 — シーケンス
 
@@ -61,7 +61,7 @@ sequenceDiagram
     E-->>U: HTTP 422 / {code： "limit", message： "利用上限に達しました。", request_id： 相関ID}
     end
     end
-    A->>F: normalize_image
+    A->>F: 入力画像の形式と寸法を検証し、安全なPNGへ正規化する。
     opt 検証不成立：0 < len(data) <= max_bytes
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
@@ -100,7 +100,7 @@ sequenceDiagram
     A->>F: now
     A->>F: 現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。
     A->>D: 現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。
-    A->>F: run_ocr
+    A->>F: OCR providerを呼び出して領域とconfidenceを正規化する。
     rect rgb(245, 247, 250)
     Note over A: 例外を捕捉する処理範囲
     end
@@ -184,26 +184,26 @@ sequenceDiagram
 | kotorelay.errors.require | 13 | If | not condition |
 | kotorelay.errors.require | 14 | Raise | Raise |
 | kotorelay.operational_logging.continuation_context | 150 | Return | OperationalLogContext(request_id=REQUEST_ID.get(), exception_type=type(error).__name__, status=None, code=(error.code if isinstance(error, Problem) else 'external_failure') if message_id == MessageId.INDEX_FAILED else None, message=CATALOG[message_id].response) |
-| kotorelay.operations.images.upload_image.functions.assets_insert | 131 | Return | q.assets_insert(ctx.db, q.AssetsInsertParams.model_validate(asset, from_attributes=True)) |
-| kotorelay.operations.images.upload_image.functions.build_asset | 115 | Return | models.AssetsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, object_key=key, sha256=key, media_type='image/png', width=width, height=height, size=len(value), created_at=now()) |
-| kotorelay.operations.images.upload_image.functions.build_run | 147 | Return | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, asset_id=asset.id, result_key=result_key, result_hash=result_key, engine=result.engine, status=result.status, confirmed=False, created_at=now()) |
-| kotorelay.operations.images.upload_image.functions.build_upload_image | 177 | Return | {'asset': asset, 'ocr_run': run, 'ocr': result} |
-| kotorelay.operations.images.upload_image.functions.check_concurrent_access | 170 | Return | ctx.fence() |
-| kotorelay.operations.images.upload_image.functions.document_doc | 84 | Return | ctx.document(str(document_id), 'author') |
-| kotorelay.operations.images.upload_image.functions.enforce_attachment_limit | 98 | Return | require(len(assets) < ctx.settings.max_document_images, 'limit', 422) |
-| kotorelay.operations.images.upload_image.functions.normalize_image | 26 | Try | Try |
-| kotorelay.operations.images.upload_image.functions.normalize_image | 42 | Return | (value, image.width, image.height) |
-| kotorelay.operations.images.upload_image.functions.normalize_image | 43 | ExceptHandler | (UnidentifiedImageError, OSError, Image.DecompressionBombError) |
-| kotorelay.operations.images.upload_image.functions.normalize_image | 44 | Raise | Raise |
-| kotorelay.operations.images.upload_image.functions.ocr_runs_insert | 163 | Return | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
-| kotorelay.operations.images.upload_image.functions.put_key | 103 | Return | ctx.objects.put(value, 'image/png') |
-| kotorelay.operations.images.upload_image.functions.put_result_key | 136 | Return | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
-| kotorelay.operations.images.upload_image.functions.run_ocr | 51 | Try | Try |
-| kotorelay.operations.images.upload_image.functions.run_ocr | 58 | ExceptHandler | (OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError) |
-| kotorelay.operations.images.upload_image.functions.run_ocr | 62 | Return | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
-| kotorelay.operations.images.upload_image.functions.run_ocr | 64 | For | For |
-| kotorelay.operations.images.upload_image.functions.run_ocr | 66 | If | text |
-| kotorelay.operations.images.upload_image.functions.run_ocr | 79 | Return | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
-| kotorelay.operations.images.upload_image.functions.select_assets | 89 | Return | [a for a in q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) if a.document_id == doc.id] |
+| kotorelay.operations.images.upload_image.functions.assets_insert | 133 | Return | q.assets_insert(ctx.db, q.AssetsInsertParams.model_validate(asset, from_attributes=True)) |
+| kotorelay.operations.images.upload_image.functions.build_asset | 117 | Return | models.AssetsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, object_key=key, sha256=key, media_type='image/png', width=width, height=height, size=len(value), created_at=now()) |
+| kotorelay.operations.images.upload_image.functions.build_run | 149 | Return | models.OcrRunsRow(id=new_id(), organization_id=ctx.org, document_id=doc.id, asset_id=asset.id, result_key=result_key, result_hash=result_key, engine=result.engine, status=result.status, confirmed=False, created_at=now()) |
+| kotorelay.operations.images.upload_image.functions.build_upload_image | 179 | Return | {'asset': asset, 'ocr_run': run, 'ocr': result} |
+| kotorelay.operations.images.upload_image.functions.check_concurrent_access | 172 | Return | ctx.fence() |
+| kotorelay.operations.images.upload_image.functions.document_doc | 86 | Return | ctx.document(str(document_id), 'author') |
+| kotorelay.operations.images.upload_image.functions.enforce_attachment_limit | 100 | Return | require(len(assets) < ctx.settings.max_document_images, 'limit', 422) |
+| kotorelay.operations.images.upload_image.functions.normalize_image | 27 | Try | Try |
+| kotorelay.operations.images.upload_image.functions.normalize_image | 43 | Return | (value, image.width, image.height) |
+| kotorelay.operations.images.upload_image.functions.normalize_image | 44 | ExceptHandler | (UnidentifiedImageError, OSError, Image.DecompressionBombError) |
+| kotorelay.operations.images.upload_image.functions.normalize_image | 45 | Raise | Raise |
+| kotorelay.operations.images.upload_image.functions.ocr_runs_insert | 165 | Return | q.ocr_runs_insert(ctx.db, q.OcrRunsInsertParams.model_validate(run, from_attributes=True)) |
+| kotorelay.operations.images.upload_image.functions.put_key | 105 | Return | ctx.objects.put(value, 'image/png') |
+| kotorelay.operations.images.upload_image.functions.put_result_key | 138 | Return | ctx.objects.put(result.model_dump_json().encode(), 'application/json') |
+| kotorelay.operations.images.upload_image.functions.run_ocr | 53 | Try | Try |
+| kotorelay.operations.images.upload_image.functions.run_ocr | 60 | ExceptHandler | (OSError, subprocess.TimeoutExpired, subprocess.CalledProcessError) |
+| kotorelay.operations.images.upload_image.functions.run_ocr | 64 | Return | OcrResult(regions=[], engine='tesseract-jpn-eng-v1', status='failed') |
+| kotorelay.operations.images.upload_image.functions.run_ocr | 66 | For | For |
+| kotorelay.operations.images.upload_image.functions.run_ocr | 68 | If | text |
+| kotorelay.operations.images.upload_image.functions.run_ocr | 81 | Return | OcrResult(regions=regions, engine='tesseract-jpn-eng-v1', status='ready') |
+| kotorelay.operations.images.upload_image.functions.select_assets | 91 | Return | [a for a in q.assets_list(ctx.db, q.AssetsListParams(organization_id=ctx.org)) if a.document_id == doc.id] |
 | kotorelay.operations.images.upload_image.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
 | kotorelay.operations.images.upload_image.router.upload_image | 42 | Return | build_response(f.build_upload_image(asset, run, result)) |

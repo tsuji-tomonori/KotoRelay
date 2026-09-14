@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: 7ce322b2bb5c68dab4c51499ae55d5e49bae34d22b47e21dd6264975362b5d49 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: 0ce2ee5ffefd1f44a0c3da213ceff59dfb82649c9add5715e204664ffd05fd84 -->
 
 # 現行認可で会話履歴を再表示 — シーケンス
 
@@ -48,7 +48,7 @@ sequenceDiagram
     A->>D: 現在の組織に属する回答履歴を識別子順に一覧取得する。
     loop sorted(q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)), key=lambda a： a.created_at)
     opt a.conversation_id == str(conversation_id)
-    A->>F: present
+    A->>F: 現在の根拠の有効性に応じて回答履歴と引用の表示を組み立てる。
     opt 検証不成立：answer.user_id == ctx.user.id
     break エラー応答を返して終了（後続の正常処理は実行しない）
     A->>E: Problemまたは依存先例外をHTTP応答へ変換・transactionはrollback
@@ -57,7 +57,7 @@ sequenceDiagram
     end
     end
     loop evidence.citations
-    A->>F: validate_citation
+    A->>F: 閲覧権限・現行版・根拠の実体とハッシュが現在も有効かを判定する。
     A->>D: 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。
     A->>F: can_read
     A->>D: 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。
@@ -147,22 +147,22 @@ sequenceDiagram
 | kotorelay.operations.chat.chat_history.functions.select_chat_history | 34 | Return | [present(ctx, a) for a in sorted(q.answers_list(ctx.db, q.AnswersListParams(organization_id=ctx.org)), key=lambda a: a.created_at) if a.conversation_id == str(conversation_id)] |
 | kotorelay.operations.chat.chat_history.response_builders.build_response | 10 | Return | TypeAdapter(ResponseData).validate_python(value) |
 | kotorelay.operations.chat.chat_history.router.chat_history | 28 | Return | build_response(f.select_chat_history(ctx, conversation_id)) |
-| kotorelay.operations.chat.shared.functions.present | 79 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 20 | If | not docs |
-| kotorelay.operations.chat.shared.functions.validate_citation | 21 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 23 | If | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision |
-| kotorelay.operations.chat.shared.functions.validate_citation | 28 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 33 | If | not versions or not chunks |
-| kotorelay.operations.chat.shared.functions.validate_citation | 34 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 36 | If | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 45 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 46 | Try | Try |
-| kotorelay.operations.chat.shared.functions.validate_citation | 51 | If | placements - {image.placement.id for image in manifest.images} |
-| kotorelay.operations.chat.shared.functions.validate_citation | 52 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 53 | For | For |
-| kotorelay.operations.chat.shared.functions.validate_citation | 54 | If | image.placement.id in json.loads(chunk.placements) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 62 | If | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') |
-| kotorelay.operations.chat.shared.functions.validate_citation | 63 | Return | False |
-| kotorelay.operations.chat.shared.functions.validate_citation | 66 | Return | True |
-| kotorelay.operations.chat.shared.functions.validate_citation | 67 | ExceptHandler | (Problem, ValueError) |
-| kotorelay.operations.chat.shared.functions.validate_citation | 72 | Return | False |
+| kotorelay.operations.chat.shared.functions.present | 81 | Return | AnswerView(id=answer.id, conversation_id=answer.conversation_id, question=ctx.objects.get(answer.question_key).decode(), answer=ctx.objects.get(answer.answer_key).decode() if valid else '権限または公開版が変更されたため、この回答は表示できません。', status=answer.status if valid else 'hidden', citations=evidence.citations if valid else [], model=answer.model, created_at=answer.created_at) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 21 | If | not docs |
+| kotorelay.operations.chat.shared.functions.validate_citation | 22 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 24 | If | not ctx.can_read(doc) or doc.latest_version_id != citation.version_id or doc.revision != citation.document_revision |
+| kotorelay.operations.chat.shared.functions.validate_citation | 29 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 34 | If | not versions or not chunks |
+| kotorelay.operations.chat.shared.functions.validate_citation | 35 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 37 | If | not (digest(version.manifest.encode()) == version.manifest_hash and version.document_id == doc.id and chunk.ready and (chunk.version_id == version.id) and (chunk.document_id == doc.id) and (chunk.manifest_hash == version.manifest_hash == citation.manifest_hash) and (chunk.sha256 == citation.chunk_hash)) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 46 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 47 | Try | Try |
+| kotorelay.operations.chat.shared.functions.validate_citation | 52 | If | placements - {image.placement.id for image in manifest.images} |
+| kotorelay.operations.chat.shared.functions.validate_citation | 53 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 54 | For | For |
+| kotorelay.operations.chat.shared.functions.validate_citation | 55 | If | image.placement.id in json.loads(chunk.placements) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 63 | If | not assets or not runs or (not runs[0].confirmed) or (runs[0].status != 'ready') |
+| kotorelay.operations.chat.shared.functions.validate_citation | 64 | Return | False |
+| kotorelay.operations.chat.shared.functions.validate_citation | 67 | Return | True |
+| kotorelay.operations.chat.shared.functions.validate_citation | 68 | ExceptHandler | (Problem, ValueError) |
+| kotorelay.operations.chat.shared.functions.validate_citation | 73 | Return | False |
