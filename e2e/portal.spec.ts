@@ -353,7 +353,9 @@ test('DB探索で図を拡大移動しDDLと複合外部キーを確認する', 
   await expect(detail.getByRole('heading', { name: 'documents', exact: true })).toBeVisible();
   await expect(detail.getByRole('table')).toContainText('latest_version_id');
   await detail.getByText('DDL原文', { exact: true }).click();
-  await expect(detail.locator('.db-sql pre')).toContainText('CREATE TABLE documents');
+  await expect(detail.locator('.db-sql:not(.db-annotated) pre')).toContainText(
+    'CREATE TABLE documents',
+  );
   const before = await page.getByLabel('ER図の倍率').textContent();
   await page.getByRole('button', { name: 'ER図を拡大', exact: true }).click();
   expect(await page.getByLabel('ER図の倍率').textContent()).not.toBe(before);
@@ -364,6 +366,7 @@ test('DB探索で図を拡大移動しDDLと複合外部キーを確認する', 
   expect(await page.locator('.db-world').getAttribute('style')).not.toBe(transform);
   await page.keyboard.press('Home');
   await page.getByLabel('選択テーブルと直接の関係のみ').check();
+  await page.getByRole('button', { name: '全体表示', exact: true }).click();
   const node = page.getByRole('button', { name: 'テーブル departments', exact: true });
   await node.click();
   await expect(detail.getByRole('heading', { name: 'departments', exact: true })).toBeVisible();
@@ -476,4 +479,95 @@ test('DB探索をタッチのピンチで拡大しSQL一覧からカラムへ戻
   await expect(detail.locator('tbody tr')).toHaveCount(1);
   await expect(detail.locator('tbody tr')).toContainText('可');
   await capture(page, test.info(), 'When', 'タッチで図を拡大しSQLとカラムを同じ詳細画面で確認する');
+});
+
+test('ER閲覧で和名検索と名前表示を切り替え列から複合関係を追跡する', async ({ page }) => {
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  const detail = page.getByRole('article', { name: '選択テーブルの詳細' });
+  await page.getByLabel('テーブル・カラムを検索').fill('所有部署ID');
+  await expect(page.getByLabel('テーブル一覧').getByRole('button')).toHaveCount(1);
+  await page
+    .getByLabel('テーブル一覧')
+    .getByRole('button', { name: 'documents', exact: true })
+    .click();
+  const node = page
+    .locator('.db-node')
+    .filter({ has: page.getByRole('button', { name: 'テーブル documents', exact: true }) });
+  await expect(node).toContainText('所有部署ID');
+  await page.getByLabel('図の名前表示').selectOption('physical');
+  await expect(node).not.toContainText('所有部署ID');
+  await expect(node).toContainText('department_id');
+  await page.getByLabel('図の名前表示').selectOption('logical');
+  await expect(node).toContainText('所有部署ID');
+  await expect(node).not.toContainText('department_id');
+  await page.getByLabel('図の名前表示').selectOption('both');
+  await page.getByRole('button', { name: 'カラム documents.department_id', exact: true }).click();
+  await expect(detail.getByLabel('選択カラムの詳細')).toContainText('文書を所有する部署');
+  await detail.getByRole('button', { name: '関係: documents → departments', exact: true }).click();
+  await expect(detail.locator('.db-relation')).toHaveCount(1);
+  await expect(detail.locator('.db-relation')).toContainText(
+    'FOREIGN KEY (organization_id, department_id)',
+  );
+  await detail
+    .locator('.db-relation')
+    .getByRole('button', { name: 'departments', exact: true })
+    .click();
+  await expect(detail.getByRole('heading', { name: 'departments', exact: true })).toBeVisible();
+  await capture(page, test.info(), 'When', '和名で列を探し、図から対応する複合外部キーをたどる');
+});
+
+test('ER閲覧で表を配置し集中表示から説明付きDDLを確認する', async ({ page }) => {
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  const title = page.getByRole('button', { name: 'テーブル documents', exact: true });
+  const node = page.locator('.db-node').filter({ has: title });
+  const before = await node.getAttribute('style');
+  const box = (await title.boundingBox())!;
+  await page.mouse.move(box.x + 25, box.y + 20);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 75, box.y + 50, { steps: 5 });
+  await page.mouse.up();
+  await expect(node).not.toHaveAttribute('style', before!);
+  await page.getByRole('button', { name: '配置を初期化', exact: true }).click();
+  await expect(node).toHaveAttribute('style', before!);
+  await page.getByRole('button', { name: '図に集中', exact: true }).click();
+  await expect(page.getByLabel('オブジェクト一覧')).toBeHidden();
+  await expect(page.getByRole('article', { name: '選択テーブルの詳細' })).toBeHidden();
+  await page.getByRole('button', { name: 'パネルを表示', exact: true }).click();
+  const detail = page.getByRole('article', { name: '選択テーブルの詳細' });
+  await detail.getByText('和名・説明付きDDL', { exact: true }).click();
+  const ddl = detail.locator('.db-annotated');
+  await expect(ddl).toContainText('-- 文書 (documents)');
+  await expect(ddl).toContainText('department_id: 所有部署ID');
+  await expect(ddl).toContainText('CREATE TABLE documents');
+  await expect(ddl.getByRole('link', { name: '説明付きDDLを保存' })).toHaveAttribute(
+    'download',
+    'documents-ja.sql',
+  );
+  await capture(
+    page,
+    test.info(),
+    'When',
+    '表の配置と集中表示を操作し、和名・説明付きDDLを表示する',
+  );
+});
+
+test('ER関係線をキーボードで選択し対応する列の詳細を開く', async ({ page }) => {
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  const edge = page.getByRole('button', {
+    name: '関係 documents (organization_id, department_id) → departments (organization_id, id)',
+    exact: true,
+  });
+  await edge.focus();
+  await page.keyboard.press('Enter');
+  const detail = page.getByRole('article', { name: '選択テーブルの詳細' });
+  await expect(detail.locator('.db-relation')).toHaveCount(1);
+  await detail
+    .locator('.db-relation')
+    .getByRole('button', { name: '所有部署ID department_id', exact: true })
+    .click();
+  await expect(detail.getByLabel('選択カラムの詳細')).toContainText('所有部署ID');
+  await expect(
+    page.getByRole('button', { name: 'カラム documents.department_id', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await capture(page, test.info(), 'When', '関係線から外部キーの対応列を選択する');
 });

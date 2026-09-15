@@ -320,7 +320,7 @@ function Portal() {
           <time>{new Date(data.generatedAt).toLocaleString('ja-JP')}</time>
         </div>
       </aside>
-      <main className="content">
+      <main className={'content' + (category === 'database' ? ' db-page' : '')}>
         <header>
           <p className="eyebrow">KOTORELAY / ENGINEERING</p>
           <h1>{labels[category]}</h1>

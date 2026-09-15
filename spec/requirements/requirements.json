@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 11,
+  "catalog_revision": 12,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -6321,7 +6321,7 @@
         {
           "given": "実装のDDLとAPI別SQLが存在する",
           "id": "AC-DESIGN-21",
-          "then": "拡大縮小・移動・全体表示とテーブル選択をマウス・タッチ・キーボードで操作できる",
+          "then": "拡大縮小・移動・全体表示とテーブル選択をマウス・タッチ・キーボードで操作でき、カラムを含むER図から列・関係の詳細へ移動し、閲覧用の配置を調整できる",
           "when": "品質PagesのDB探索を操作する"
         }
       ],
@@ -6332,10 +6332,11 @@
       "object": "ER図を自由に操作してテーブルを選択する",
       "rationale": "GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。",
       "retirement_reason": "",
-      "revision": 1,
+      "revision": 2,
       "scope": "project",
       "source_refs": [
-        "docs/planning/REQUESTS.md#u-db-explorer"
+        "docs/planning/REQUESTS.md#u-db-explorer",
+        "docs/planning/REQUESTS.md#u-er-viewer"
       ],
       "status": "active",
       "subject": "設計閲覧者",
@@ -6347,7 +6348,9 @@
         ],
         "implementation": [
           "tools/project/database_explorer.py",
-          "frontend/portal/DatabaseExplorer.tsx"
+          "frontend/portal/DatabaseExplorer.tsx",
+          "frontend/portal/DatabaseGraph.tsx",
+          "backend/schema-labels.json"
         ],
         "standards": [
           "AGENTS.md"
@@ -6368,7 +6371,7 @@
         {
           "given": "実装のDDLとAPI別SQLが存在する",
           "id": "AC-DESIGN-22",
-          "then": "DDLに由来する全カラムの型・NULL・既定値・キー・制約とDDL原文を閲覧し、複合外部キーの対応を確認して関連テーブルへ移動できる",
+          "then": "全テーブル・全カラムの和名と物理名を確認・検索でき、図の名前表示を切り替えられる。DDL由来の型・NULL・既定値・キー・制約・原文と和名説明付きDDLを閲覧し、複合外部キーの列対応から関連テーブルへ移動できる",
           "when": "品質PagesのDB探索を操作する"
         }
       ],
@@ -6379,10 +6382,11 @@
       "object": "テーブルのカラムと参照関係を確認する",
       "rationale": "GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。",
       "retirement_reason": "",
-      "revision": 1,
+      "revision": 2,
       "scope": "project",
       "source_refs": [
-        "docs/planning/REQUESTS.md#u-db-explorer"
+        "docs/planning/REQUESTS.md#u-db-explorer",
+        "docs/planning/REQUESTS.md#u-er-viewer"
       ],
       "status": "active",
       "subject": "設計閲覧者",
@@ -6394,7 +6398,9 @@
         ],
         "implementation": [
           "tools/project/database_explorer.py",
-          "frontend/portal/DatabaseExplorer.tsx"
+          "frontend/portal/DatabaseExplorer.tsx",
+          "frontend/portal/DatabaseGraph.tsx",
+          "backend/schema-labels.json"
         ],
         "standards": [
           "AGENTS.md"

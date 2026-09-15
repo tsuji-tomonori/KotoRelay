@@ -103,3 +103,53 @@ def test_公開DBデータのAPI集合とCRUDが既存帳票と完全一致す�
         assert t["ddl"] == Path(t["source"]).read_text()
     for q in data["queries"]:
         assert q["sql"] == Path(q["source"]).read_text()
+
+
+def test_和名と説明は全DDL項目に対応しSQLの構造を変えない():
+    from tools.project.database_explorer import apply_labels
+
+    data = json.loads(Path("docs/design/generated/DATABASE.gen.json").read_text())
+    labels = json.loads(Path("backend/schema-labels.json").read_text())
+    apply_labels(data, labels)
+    assert data["schemaVersion"] == 2
+    assert len(data["tables"]) == 17
+    assert sum(len(t["columns"]) for t in data["tables"]) == 144
+    documents = next(t for t in data["tables"] if t["name"] == "documents")
+    assert documents["logicalName"] == "文書"
+    assert (
+        next(c for c in documents["columns"] if c["name"] == "department_id")["logicalName"]
+        == "所有部署ID"
+    )
+    for table in data["tables"]:
+        assert table["annotatedDdl"].endswith(Path(table["source"]).read_text())
+        original = sqlglot.parse_one(table["ddl"], read="postgres")
+        annotated = sqlglot.parse_one(table["annotatedDdl"], read="postgres")
+        assert original.sql(comments=False) == annotated.sql(comments=False)
+        for column in table["columns"]:
+            assert f"-- {column['name']}: {column['logicalName']}" in table["annotatedDdl"]
+            assert column["description"]
+
+
+@pytest.mark.parametrize(
+    "defect",
+    ["missing_table", "extra_table", "missing_column", "extra_column", "empty", "multiline"],
+)
+def test_和名辞書の欠落と余剰と不正な説明を拒否する(defect):
+    from tools.project.database_explorer import apply_labels
+
+    data = json.loads(Path("docs/design/generated/DATABASE.gen.json").read_text())
+    labels = json.loads(Path("backend/schema-labels.json").read_text())
+    if defect == "missing_table":
+        del labels["documents"]
+    elif defect == "extra_table":
+        labels["missing"] = {}
+    elif defect == "missing_column":
+        del labels["documents"]["columns"]["title"]
+    elif defect == "extra_column":
+        labels["documents"]["columns"]["missing"] = {}
+    elif defect == "empty":
+        labels["documents"]["columns"]["title"]["logicalName"] = ""
+    else:
+        labels["documents"]["description"] = "文書\nDROP TABLE documents;"
+    with pytest.raises(ValueError, match="和名"):
+        apply_labels(data, labels)

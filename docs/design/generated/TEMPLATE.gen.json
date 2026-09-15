@@ -90,7 +90,7 @@
         ],
         "Code": {
           "ImageUri": {
-            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:a2d3a3b049a9947e0440595b3daa6ff51124c8eb2ae7a4eeac6061b2a9b7fd81"
+            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:14164c27d9938ff05f5cfa22425424f4f219953f617a919d4e4fe9b5b38d05ab"
           }
         },
         "Environment": {
@@ -992,7 +992,7 @@
         ],
         "Code": {
           "ImageUri": {
-            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:a2d3a3b049a9947e0440595b3daa6ff51124c8eb2ae7a4eeac6061b2a9b7fd81"
+            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:14164c27d9938ff05f5cfa22425424f4f219953f617a919d4e4fe9b5b38d05ab"
           }
         },
         "Environment": {

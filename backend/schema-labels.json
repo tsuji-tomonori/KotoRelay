@@ -1,0 +1,697 @@
+{
+  "organizations": {
+    "logicalName": "組織",
+    "description": "組織の名称、改訂番号、利用停止状態を管理します。",
+    "group": "組織・権限",
+    "columns": {
+      "id": {
+        "logicalName": "組織ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "name": {
+        "logicalName": "名称",
+        "description": "表示に使用する名称です。"
+      },
+      "revision": {
+        "logicalName": "改訂番号",
+        "description": "更新の競合を検出するための改訂番号です。"
+      },
+      "suspended": {
+        "logicalName": "利用停止",
+        "description": "組織の利用が停止されているかを表します。"
+      }
+    }
+  },
+  "users": {
+    "logicalName": "利用者",
+    "description": "組織に属する認証利用者と運用権限を管理します。",
+    "group": "組織・権限",
+    "columns": {
+      "id": {
+        "logicalName": "利用者ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "subject": {
+        "logicalName": "認証主体",
+        "description": "認証トークンの主体に対応する値です。"
+      },
+      "display_name": {
+        "logicalName": "表示名",
+        "description": "利用者の表示名です。"
+      },
+      "active": {
+        "logicalName": "有効状態",
+        "description": "利用可能な状態かを表します。"
+      },
+      "operator": {
+        "logicalName": "運用者権限",
+        "description": "組織の運用操作を許可するかを表します。"
+      }
+    }
+  },
+  "departments": {
+    "logicalName": "部署",
+    "description": "文書の所有・共有と利用者の所属に使う部署です。",
+    "group": "組織・権限",
+    "columns": {
+      "id": {
+        "logicalName": "部署ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "name": {
+        "logicalName": "名称",
+        "description": "表示に使用する名称です。"
+      },
+      "active": {
+        "logicalName": "有効状態",
+        "description": "利用可能な状態かを表します。"
+      }
+    }
+  },
+  "memberships": {
+    "logicalName": "部署所属",
+    "description": "部署と利用者を結び、執筆・承認の権限を管理します。",
+    "group": "組織・権限",
+    "columns": {
+      "id": {
+        "logicalName": "部署所属ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "department_id": {
+        "logicalName": "部署ID",
+        "description": "対象部署の識別子です。"
+      },
+      "user_id": {
+        "logicalName": "利用者ID",
+        "description": "対象利用者の識別子です。"
+      },
+      "leader": {
+        "logicalName": "部署責任者",
+        "description": "部署責任者として扱うかを表します。"
+      },
+      "can_author": {
+        "logicalName": "執筆権限",
+        "description": "この部署で文書を執筆できるかを表します。"
+      },
+      "can_review": {
+        "logicalName": "承認権限",
+        "description": "この部署で文書を承認できるかを表します。"
+      },
+      "active": {
+        "logicalName": "有効状態",
+        "description": "利用可能な状態かを表します。"
+      }
+    }
+  },
+  "documents": {
+    "logicalName": "文書",
+    "description": "文書の公開範囲、状態、最新版への参照を管理します。",
+    "group": "文書・承認",
+    "columns": {
+      "id": {
+        "logicalName": "文書ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "department_id": {
+        "logicalName": "所有部署ID",
+        "description": "文書を所有する部署の識別子です。"
+      },
+      "title": {
+        "logicalName": "文書タイトル",
+        "description": "文書の表示タイトルです。"
+      },
+      "created_by": {
+        "logicalName": "作成者ID",
+        "description": "作成した利用者の識別子です。"
+      },
+      "visibility": {
+        "logicalName": "公開範囲",
+        "description": "department（所有部署）、selected（指定部署）、organization（組織全体）を区別します。"
+      },
+      "shared_departments": {
+        "logicalName": "共有先部署",
+        "description": "指定部署へ公開するときの部署一覧をJSONで保持します。"
+      },
+      "status": {
+        "logicalName": "文書状態",
+        "description": "active（有効）、withdrawn（撤回）、deleted（削除）を区別します。"
+      },
+      "revision": {
+        "logicalName": "改訂番号",
+        "description": "更新の競合を検出するための改訂番号です。"
+      },
+      "next_version": {
+        "logicalName": "次回版番号",
+        "description": "次に作成する文書版の番号です。"
+      },
+      "latest_version_id": {
+        "logicalName": "最新版ID",
+        "description": "文書の最新版の識別子です。DDLでは外部キーが宣言されていません。"
+      },
+      "updated_at": {
+        "logicalName": "更新日時",
+        "description": "最後に更新した日時です。"
+      }
+    }
+  },
+  "drafts": {
+    "logicalName": "下書き",
+    "description": "編集可能な本文と画像配置を文書ごとに保持します。",
+    "group": "文書・承認",
+    "columns": {
+      "id": {
+        "logicalName": "下書きID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "body_key": {
+        "logicalName": "本文保存キー",
+        "description": "オブジェクト保存先にある本文のキーです。"
+      },
+      "body_hash": {
+        "logicalName": "本文ハッシュ",
+        "description": "本文の整合性を確認するハッシュ値です。"
+      },
+      "placements": {
+        "logicalName": "画像配置",
+        "description": "本文内の画像配置情報をJSONで保持します。"
+      },
+      "revision": {
+        "logicalName": "改訂番号",
+        "description": "更新の競合を検出するための改訂番号です。"
+      },
+      "updated_by": {
+        "logicalName": "更新者ID",
+        "description": "最後に更新した利用者の識別子です。"
+      }
+    }
+  },
+  "versions": {
+    "logicalName": "文書版",
+    "description": "承認対象となる本文とマニフェストの版を保持します。",
+    "group": "文書・承認",
+    "columns": {
+      "id": {
+        "logicalName": "文書版ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "number": {
+        "logicalName": "版番号",
+        "description": "文書内で一意となる版の番号です。"
+      },
+      "title": {
+        "logicalName": "文書タイトル",
+        "description": "文書の表示タイトルです。"
+      },
+      "body_key": {
+        "logicalName": "本文保存キー",
+        "description": "オブジェクト保存先にある本文のキーです。"
+      },
+      "body_hash": {
+        "logicalName": "本文ハッシュ",
+        "description": "本文の整合性を確認するハッシュ値です。"
+      },
+      "manifest": {
+        "logicalName": "マニフェスト",
+        "description": "本文・画像などの版構成をJSONで保持します。"
+      },
+      "manifest_hash": {
+        "logicalName": "マニフェストハッシュ",
+        "description": "版構成の整合性を確認するハッシュ値です。"
+      },
+      "created_by": {
+        "logicalName": "作成者ID",
+        "description": "作成した利用者の識別子です。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  },
+  "submissions": {
+    "logicalName": "承認申請",
+    "description": "文書版の申請と承認・却下の判断を記録します。",
+    "group": "文書・承認",
+    "columns": {
+      "id": {
+        "logicalName": "承認申請ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "version_id": {
+        "logicalName": "文書版ID",
+        "description": "対象文書版の識別子です。"
+      },
+      "requested_by": {
+        "logicalName": "申請者ID",
+        "description": "承認を申請した利用者の識別子です。"
+      },
+      "status": {
+        "logicalName": "申請状態",
+        "description": "pending（申請中）、approved（承認）、rejected（却下）を区別します。"
+      },
+      "manifest_hash": {
+        "logicalName": "マニフェストハッシュ",
+        "description": "版構成の整合性を確認するハッシュ値です。"
+      },
+      "decided_by": {
+        "logicalName": "判断者ID",
+        "description": "承認または却下を判断した利用者の識別子です。"
+      },
+      "reason": {
+        "logicalName": "理由",
+        "description": "操作または判断の理由です。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      },
+      "decided_at": {
+        "logicalName": "判断日時",
+        "description": "承認または却下を判断した日時です。"
+      }
+    }
+  },
+  "assets": {
+    "logicalName": "添付画像",
+    "description": "文書に添付する画像の保存先と属性を管理します。",
+    "group": "画像・検索索引",
+    "columns": {
+      "id": {
+        "logicalName": "添付画像ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "object_key": {
+        "logicalName": "画像保存キー",
+        "description": "オブジェクト保存先にある画像のキーです。"
+      },
+      "sha256": {
+        "logicalName": "SHA-256ハッシュ",
+        "description": "内容の整合性を確認するSHA-256ハッシュ値です。"
+      },
+      "media_type": {
+        "logicalName": "メディア種別",
+        "description": "画像のメディア種別です。"
+      },
+      "width": {
+        "logicalName": "画像幅",
+        "description": "画像の横幅をピクセル数で表します。"
+      },
+      "height": {
+        "logicalName": "画像高さ",
+        "description": "画像の高さをピクセル数で表します。"
+      },
+      "size": {
+        "logicalName": "画像サイズ",
+        "description": "画像のデータ量をバイト数で表します。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  },
+  "ocr_runs": {
+    "logicalName": "OCR実行",
+    "description": "添付画像の文字認識結果と確認状態を管理します。",
+    "group": "画像・検索索引",
+    "columns": {
+      "id": {
+        "logicalName": "OCR実行ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "asset_id": {
+        "logicalName": "添付画像ID",
+        "description": "文字認識の対象となる画像の識別子です。"
+      },
+      "result_key": {
+        "logicalName": "認識結果保存キー",
+        "description": "文字認識結果のオブジェクト保存キーです。"
+      },
+      "result_hash": {
+        "logicalName": "認識結果ハッシュ",
+        "description": "文字認識結果の整合性を確認するハッシュ値です。"
+      },
+      "engine": {
+        "logicalName": "OCRエンジン",
+        "description": "文字認識に使用したエンジンです。"
+      },
+      "status": {
+        "logicalName": "OCR処理状態",
+        "description": "文字認識処理の結果状態です。"
+      },
+      "confirmed": {
+        "logicalName": "確認済み",
+        "description": "文字認識結果が確認済みかを表します。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  },
+  "chunks": {
+    "logicalName": "検索チャンク",
+    "description": "公開版を分割した検索用本文と画像配置を管理します。",
+    "group": "画像・検索索引",
+    "columns": {
+      "id": {
+        "logicalName": "検索チャンクID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "version_id": {
+        "logicalName": "文書版ID",
+        "description": "対象文書版の識別子です。"
+      },
+      "body_key": {
+        "logicalName": "本文保存キー",
+        "description": "オブジェクト保存先にある本文のキーです。"
+      },
+      "sha256": {
+        "logicalName": "SHA-256ハッシュ",
+        "description": "内容の整合性を確認するSHA-256ハッシュ値です。"
+      },
+      "heading": {
+        "logicalName": "見出し",
+        "description": "検索チャンクに対応する見出しです。"
+      },
+      "placements": {
+        "logicalName": "画像配置",
+        "description": "本文内の画像配置情報をJSONで保持します。"
+      },
+      "manifest_hash": {
+        "logicalName": "マニフェストハッシュ",
+        "description": "版構成の整合性を確認するハッシュ値です。"
+      },
+      "ready": {
+        "logicalName": "検索準備完了",
+        "description": "検索に使用できる状態かを表します。"
+      }
+    }
+  },
+  "outbox": {
+    "logicalName": "非同期処理キュー",
+    "description": "索引更新などの配送対象と試行状態を管理します。",
+    "group": "画像・検索索引",
+    "columns": {
+      "id": {
+        "logicalName": "非同期処理キューID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "version_id": {
+        "logicalName": "文書版ID",
+        "description": "対象文書版の識別子です。"
+      },
+      "kind": {
+        "logicalName": "配送種別",
+        "description": "索引への登録・削除などの配送処理の種類です。"
+      },
+      "status": {
+        "logicalName": "配送状態",
+        "description": "配送処理の進行状態です。"
+      },
+      "attempts": {
+        "logicalName": "試行回数",
+        "description": "処理の試行回数です。"
+      },
+      "error_code": {
+        "logicalName": "エラーコード",
+        "description": "処理失敗の理由を識別するコードです。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  },
+  "conversations": {
+    "logicalName": "会話",
+    "description": "利用者の質問・回答をまとめる会話です。",
+    "group": "質問・記録",
+    "columns": {
+      "id": {
+        "logicalName": "会話ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "user_id": {
+        "logicalName": "利用者ID",
+        "description": "対象利用者の識別子です。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  },
+  "answers": {
+    "logicalName": "回答",
+    "description": "質問、生成回答、根拠と利用モデルを記録します。",
+    "group": "質問・記録",
+    "columns": {
+      "id": {
+        "logicalName": "回答ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "conversation_id": {
+        "logicalName": "会話ID",
+        "description": "この回答を含む会話の識別子です。"
+      },
+      "user_id": {
+        "logicalName": "利用者ID",
+        "description": "対象利用者の識別子です。"
+      },
+      "department_id": {
+        "logicalName": "部署ID",
+        "description": "対象部署の識別子です。"
+      },
+      "question_key": {
+        "logicalName": "質問保存キー",
+        "description": "質問本文のオブジェクト保存キーです。"
+      },
+      "answer_key": {
+        "logicalName": "回答保存キー",
+        "description": "回答本文のオブジェクト保存キーです。"
+      },
+      "evidence": {
+        "logicalName": "回答根拠",
+        "description": "回答の根拠となる文書・引用情報をJSONで保持します。"
+      },
+      "status": {
+        "logicalName": "回答状態",
+        "description": "回答生成の結果状態です。"
+      },
+      "model": {
+        "logicalName": "生成モデル",
+        "description": "回答の生成に使用したモデルです。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  },
+  "events": {
+    "logicalName": "利用イベント",
+    "description": "利用者の操作種別と結果を記録します。",
+    "group": "質問・記録",
+    "columns": {
+      "id": {
+        "logicalName": "利用イベントID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "user_id": {
+        "logicalName": "利用者ID",
+        "description": "対象利用者の識別子です。"
+      },
+      "department_id": {
+        "logicalName": "部署ID",
+        "description": "対象部署の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "answer_id": {
+        "logicalName": "回答ID",
+        "description": "対象回答の識別子です。"
+      },
+      "kind": {
+        "logicalName": "種別",
+        "description": "処理またはイベントの種類を表します。"
+      },
+      "outcome": {
+        "logicalName": "操作結果",
+        "description": "イベントに対応する操作の結果です。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  },
+  "idempotency": {
+    "logicalName": "冪等性記録",
+    "description": "同一要求の再実行時に応答を再利用するための記録です。",
+    "group": "質問・記録",
+    "columns": {
+      "id": {
+        "logicalName": "冪等性記録ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "user_id": {
+        "logicalName": "利用者ID",
+        "description": "対象利用者の識別子です。"
+      },
+      "operation": {
+        "logicalName": "API操作",
+        "description": "冪等性を管理するAPI操作の識別名です。"
+      },
+      "request_hash": {
+        "logicalName": "要求ハッシュ",
+        "description": "同じキーで異なる要求が送られたことを検出するハッシュ値です。"
+      },
+      "response": {
+        "logicalName": "保存応答",
+        "description": "再送時に返す応答をJSONで保持します。"
+      }
+    }
+  },
+  "audit": {
+    "logicalName": "監査記録",
+    "description": "操作前後の状態と操作理由を記録します。",
+    "group": "質問・記録",
+    "columns": {
+      "id": {
+        "logicalName": "監査記録ID",
+        "description": "このレコードを一意に識別します。"
+      },
+      "organization_id": {
+        "logicalName": "組織ID",
+        "description": "所属する組織の識別子です。"
+      },
+      "user_id": {
+        "logicalName": "利用者ID",
+        "description": "対象利用者の識別子です。"
+      },
+      "document_id": {
+        "logicalName": "文書ID",
+        "description": "対象文書の識別子です。"
+      },
+      "version_id": {
+        "logicalName": "文書版ID",
+        "description": "対象文書版の識別子です。"
+      },
+      "action": {
+        "logicalName": "監査操作",
+        "description": "監査対象となる操作の種類です。"
+      },
+      "before_state": {
+        "logicalName": "変更前状態",
+        "description": "操作前の状態をJSONで保持します。"
+      },
+      "after_state": {
+        "logicalName": "変更後状態",
+        "description": "操作後の状態をJSONで保持します。"
+      },
+      "reason": {
+        "logicalName": "理由",
+        "description": "操作または判断の理由です。"
+      },
+      "created_at": {
+        "logicalName": "作成日時",
+        "description": "レコードを作成した日時です。"
+      }
+    }
+  }
+}

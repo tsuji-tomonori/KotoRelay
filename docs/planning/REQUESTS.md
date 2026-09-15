@@ -483,3 +483,7 @@ TypeScript/Astro、Python/FastAPI/uv、Python CDKを使用する。DBはAWSでDS
 ## U-DB-EXPLORER
 
 GitHub Pagesに、ER図の拡大縮小・移動・テーブル選択を追加する。DDLからカラム・制約・関係を確認し、CRUD図から利用APIと実装のSQL本文をその場で追跡できるようにする。
+
+## U-ER-VIEWER
+
+A5:SQL Mk-2およびDDLからER図を扱うソフトのUI/UXを調査し、その閲覧版としてDB探索画面を作り直す。テーブル名・カラム名の和名をDDLの説明などにも入れる。マージと公開後の動作確認まで実施する。
