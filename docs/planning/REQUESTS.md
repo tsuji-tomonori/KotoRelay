@@ -478,3 +478,8 @@ S3 Vectorsは保存・PUT・検索等に応じて課金される。公式の米�
 ## u16 実装と品質公開の指定（2026-09-12）
 
 TypeScript/Astro、Python/FastAPI/uv、Python CDKを使用する。DBはAWSでDSQL、ローカルでPostgreSQL。各言語の静的解析・整形・単体テストを行い、C0相当95%、C1相当90%を検査する。Docker Composeで起動し、PlaywrightのGiven/When/Then各段階のスクリーンショットと必要なDB状態を保存する。CDKはcdk-nag・スナップショット・アサーションで検査し、固定費を増やす対策は理由付きで対象限定除外する。設計・静的解析・カバレッジ・日本語テスト一覧・E2E画像をGitHub Pagesの単一SPAで公開し、Gitへ順次pushする。
+
+
+## U-DB-EXPLORER
+
+GitHub Pagesに、ER図の拡大縮小・移動・テーブル選択を追加する。DDLからカラム・制約・関係を確認し、CRUD図から利用APIと実装のSQL本文をその場で追跡できるようにする。

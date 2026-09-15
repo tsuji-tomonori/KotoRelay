@@ -433,6 +433,7 @@
       ],
       "markdown": [
         "docs/design/generated/DATA.md",
+        "docs/design/generated/DATABASE-EXPLORER.md",
         "docs/design/generated/crud/db.md",
         "docs/design/generated/crud/objects.md",
         "docs/design/generated/crud/vectors.md",

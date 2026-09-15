@@ -76,6 +76,7 @@ def sources() -> list[Path]:
                 ROOT / "tools/project/error_design.py",
                 ROOT / "tools/project/exception_flow.py",
                 ROOT / "tools/project/test_narrative.py",
+                ROOT / "tools/project/database_explorer.py",
             ]
         )
     )
@@ -226,11 +227,14 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     queries = {}
     descriptions = {}
     ddl = {}
+    ddl_sources = {}
+    database_operations = []
     for path in sorted((ROOT / "backend/migrations").glob("*.sql")):
         node = sqlglot.parse_one(path.read_text(), read="postgres")
         if not isinstance(node, exp.Create) or not isinstance(node.this, exp.Schema):
             raise ValueError(f"未対応DDL: {path}")
         ddl[node.this.this.name] = node
+        ddl_sources[node.this.this.name] = path
     for path in sorted((ROOT / "backend/src").rglob("*.sql")):
         node = sqlglot.parse_one(re.sub(r"%\((\w+)\)s", r":\1", path.read_text()), read="postgres")
         if not isinstance(node, (exp.Select, exp.Insert, exp.Update, exp.Delete)):
@@ -304,6 +308,16 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
         base = f"api/{segment}/{operation_id}"
         docs = {kind: f"docs/design/generated/{base}/{kind}.md" for kind in KINDS}
         operations[operation_id] = docs
+        database_operations.append(
+            {
+                "id": operation_id,
+                "method": method.upper(),
+                "path": route.path,
+                "summary": summary,
+                "queries": sql_names,
+                "documents": docs,
+            }
+        )
         entry = [method.upper(), route.path, summary, f"[{operation_id}]({base}/README.md)"]
         rows.append(entry)
         groups.setdefault(segment, []).append((operation_id, summary))
@@ -691,6 +705,11 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             ]
         )
     )
+    from tools.project.database_explorer import build_database, describe_database
+
+    database = build_database(ddl, ddl_sources, queries, database_operations, ROOT)
+    output["DATABASE.gen.json"] = dump(database)
+    output["DATABASE-EXPLORER.md"] = header + describe_database(database)
     data_rows = []
     er = ["erDiagram"]
     for name, node in ddl.items():
@@ -854,7 +873,11 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             "data": {
                 "status": "required",
                 "sources": ["backend/migrations"],
-                "markdown": ["docs/design/generated/DATA.md"] + markdown("crud/"),
+                "markdown": [
+                    "docs/design/generated/DATA.md",
+                    "docs/design/generated/DATABASE-EXPLORER.md",
+                ]
+                + markdown("crud/"),
                 "generate": command,
                 "check": command + ["--check"],
             },
