@@ -76,6 +76,9 @@ def sources() -> list[Path]:
                 ROOT / "tools/project/error_design.py",
                 ROOT / "tools/project/exception_flow.py",
                 ROOT / "tools/project/test_narrative.py",
+                ROOT / "tools/video/capture-intro.mjs",
+                ROOT / "tools/video/design.mjs",
+                ROOT / ".github/workflows/intro-capture.yml",
                 ROOT / "tools/project/database_explorer.py",
             ]
         )
@@ -829,6 +832,12 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             ],
         )
     )
+    # 同じ生成先を所有するため、収録設計も読み取り専用の生成結果として合成する。
+    output["INTRO-CAPTURE.md"] = subprocess.check_output(
+        [shutil.which("node") or "/usr/bin/node", "tools/video/design.mjs", "--stdout"],
+        cwd=ROOT,
+        text=True,
+    )
     output["manifest.json"] = dump(
         {
             "source_sha256": hashes,
@@ -850,6 +859,13 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     contract = {
         "schema_version": 1,
         "surfaces": {
+            "intro_capture": {
+                "status": "required",
+                "sources": ["tools/video", ".github/workflows/intro-capture.yml"],
+                "markdown": ["docs/design/generated/INTRO-CAPTURE.md"],
+                "generate": command,
+                "check": command + ["--check"],
+            },
             "tooling": {
                 "status": "required",
                 "sources": ["tools/project"],

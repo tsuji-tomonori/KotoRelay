@@ -263,8 +263,9 @@ test('添付画像をOCRで読み取り確認した版を申請する', async ({
       await page
         .getByLabel('画像を添付')
         .setInputFiles({ name: 'release.png', mimeType: 'image/png', buffer: png });
-      await expect(page.getByLabel('図1・領域1の文字')).toBeVisible();
+      // 初回OCRは5秒を超えるため、結果の内容を既定の30秒枠で待つ。
       await expect(page.getByLabel('図1・領域1の文字')).toHaveValue(/RELEASE/, { timeout: 30000 });
+      await expect(page.getByLabel('図1・領域1の文字')).toBeVisible();
       await page.getByLabel('図1の代替テキスト').fill('承認後に開発を開始するリリース手順');
       await page.getByRole('button', { name: 'OCRを確認して確定' }).click();
       await expect(page.getByText('OCRを確認しました。文書を保存してください。')).toBeVisible();

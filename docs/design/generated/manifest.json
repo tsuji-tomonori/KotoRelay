@@ -211,6 +211,7 @@
     }
   },
   "source_sha256": {
+    ".github/workflows/intro-capture.yml": "2896c62c4a63822c713efb0e613be245cbf9d2c4a2d3212b3293209204d8568e",
     "backend/migrations/001_organizations.sql": "e359c4cd080b4c54afb1db502f9b54fdb7ae333a3f90294f4e8207912c64471b",
     "backend/migrations/002_users.sql": "45fa24e6b2b7bb175f26fc754e334ce9390d9ed0b363b0e002c03b5240a94988",
     "backend/migrations/003_departments.sql": "fc3cb4a9e032bde81bda0aa4d0ba3ca2efe3ad99104d5793337b3fac18d0081f",
@@ -642,7 +643,7 @@
     "backend/tests/test_workflow.py": "fdbf843fe659bfd0fc6646b56efef03b5de0daf8f68aac587af80e803033ea38",
     "e2e/portal.config.ts": "17dd937e11b8ae0358b4d98a9fc6a032bb5f218853d86c656faaa3e30af3d4fa",
     "e2e/portal.spec.ts": "1d29162dc217d7b3334ebb7e2aa179b2833019b2791f16f5b818df236a0fa805",
-    "e2e/workflow.spec.ts": "02899a76499caec7f5e83990ac78d4e6535b608b6437ead424f974b7f3db38f5",
+    "e2e/workflow.spec.ts": "e32369667085af9ef96b0f0094b4f070f01c3ba513461e0fbe0dd9de33b18c60",
     "frontend/portal/App.tsx": "30bdf77b289b63ec2eddb669a2ae3a1dc4eab58eeccbe7200e651bc002f18b46",
     "frontend/portal/DatabaseExplorer.tsx": "83d04b71a6602aafc26199ee942d6e3055aa81ca1b3e0b49acadaf3458433c48",
     "frontend/portal/database.css": "056a3c94648f4c2a19c8c2b02eb402d1eb48a6319063e772a51956c39180779d",
@@ -681,7 +682,7 @@
     "tools/project/api_layout.py": "0e97d7f25fb4ffd2117ec4628aa0f66a6c71c302b18942ab64dff5165b430058",
     "tools/project/condition_labels.py": "c049045751d33380df7a3f545291912c3f773c01d2e6a3be07f3145b1bc75de5",
     "tools/project/database_explorer.py": "ede3c1b603049c4a49d83ec5b1b77d8160e334d296018689abd1cc7de0a3535c",
-    "tools/project/design.py": "caa8e46b4fc1e05d335739f68bd4b975e107b1587504cbdf986c143c737baf95",
+    "tools/project/design.py": "ee3d9d15e0f0e1061e7438ec6b9122e03fe82b9ff8a902d12407ccfff632068b",
     "tools/project/error_design.py": "cd4dcfdfb090e2f1908234001f9a80b796dd4b2f439db3308a0fa6105b05ccf7",
     "tools/project/evidence.py": "46f0c477f03f3030e5c88523c4ddf0a0f4981231180f2678b3c503739fbcf31f",
     "tools/project/exception_flow.py": "0c8b947a2b569c775c99e649e865e00ca752a21c33fcc02b9fa980f3196c51e8",
@@ -691,7 +692,9 @@
     "tools/project/test_narrative.py": "2bc1069670471f9ff2ca66666b97be03e884596e4726ddab56f565a1436824bb",
     "tools/project/tool_adoption.json": "46781fedb2866c3ce6bf10b993d8cf2e80f5396f759f563195270d70755f0ba9",
     "tools/project/verify.py": "0e9b902734460d40dc3191e68a81b2f04938cf11e517532129ad9be84d41e8e5",
-    "tools/quintflow.py": "402028bc7d1f87632e77bb961df96ddda8513105d2ea40281f26e8703b2c248e"
+    "tools/quintflow.py": "402028bc7d1f87632e77bb961df96ddda8513105d2ea40281f26e8703b2c248e",
+    "tools/video/capture-intro.mjs": "bb43a22a431361033fa052f7488ad0dc1e769c95d2f732734ab975717ac90a87",
+    "tools/video/design.mjs": "86aae09390dda43287b30afec62f54548f1bfbec147f99d7b9d4bcc07913e111"
   },
   "sql": [
     "kotorelay.operations.chat.ask_question.generated.queries.answers_get",

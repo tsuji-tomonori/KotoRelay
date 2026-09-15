@@ -480,6 +480,25 @@
       ],
       "status": "required"
     },
+    "intro_capture": {
+      "check": [
+        ".venv/bin/python",
+        "tools/project/design.py",
+        "--check"
+      ],
+      "generate": [
+        ".venv/bin/python",
+        "tools/project/design.py"
+      ],
+      "markdown": [
+        "docs/design/generated/INTRO-CAPTURE.md"
+      ],
+      "sources": [
+        "tools/video",
+        ".github/workflows/intro-capture.yml"
+      ],
+      "status": "required"
+    },
     "tooling": {
       "check": [
         ".venv/bin/python",
