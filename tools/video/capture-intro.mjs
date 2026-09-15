@@ -116,7 +116,7 @@ try {
   await expect(reader.page.getByText(title, { exact: true })).toBeVisible();
   await reader.mark('library'); await reader.shot('library'); await reader.hold(1600);
   await reader.page.getByPlaceholder('タイトルを入力').pressSequentially('出張', { delay: 220 });
-  await reader.click(reader.page.getByRole('button', { name: '検索', exact: true }));
+  await reader.click(reader.page.getByRole('button', { name: '検索する', exact: true }));
   await expect(reader.page.getByText('経費精算ガイド', { exact: true })).toHaveCount(0);
   await reader.shot('filtered'); await reader.hold(1800);
   await reader.mark('chat');
