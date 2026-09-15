@@ -77,6 +77,7 @@ def sources() -> list[Path]:
                 ROOT / "tools/project/exception_flow.py",
                 ROOT / "tools/project/test_narrative.py",
                 ROOT / "tools/project/database_explorer.py",
+                ROOT / "backend/schema-labels.json",
             ]
         )
     )
@@ -710,12 +711,26 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
     database = build_database(ddl, ddl_sources, queries, database_operations, ROOT)
     output["DATABASE.gen.json"] = dump(database)
     output["DATABASE-EXPLORER.md"] = header + describe_database(database)
+    labels = {t["name"]: t for t in database["tables"]}
     data_rows = []
     er = ["erDiagram"]
     for name, node in ddl.items():
         body = []
         for item in node.this.expressions:
-            body.append([item.key, item.sql(dialect="postgres")])
+            body.append(
+                [
+                    item.key,
+                    next(
+                        (
+                            c["logicalName"]
+                            for c in labels[name]["columns"]
+                            if c["name"] == item.name
+                        ),
+                        "制約",
+                    ),
+                    item.sql(dialect="postgres"),
+                ]
+            )
             if isinstance(item, exp.ForeignKey):
                 ref = item.args["reference"].this.this.name
                 er.append(f"    {ref} ||--o{{ {name} : references")
@@ -725,8 +740,13 @@ def build() -> tuple[dict[str, str], dict[str, object]]:
             if name in {t.name for t in qnode.find_all(exp.Table)}
         ]
         data_rows += [
-            f"## {name}\n\n"
-            + table(["属性・制約", "DDL"], body)
+            f"## {labels[name]['logicalName']}（{name}）\n\n"
+            + labels[name]["description"]
+            + "\n\n"
+            + table(["属性・制約", "和名", "DDL"], body)
+            + "\n\n```sql\n"
+            + labels[name]["annotatedDdl"]
+            + "\n```\n"
             + "\n"
             + table(["access pattern", "操作"], crud)
         ]

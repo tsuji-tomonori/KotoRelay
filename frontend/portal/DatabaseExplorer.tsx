@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './database.css';
+import { Graph } from './DatabaseGraph';
 
-type Column = {
+export type Column = {
+  logicalName: string;
+  description: string;
   name: string;
   type: string;
   nullable: boolean;
@@ -9,7 +12,11 @@ type Column = {
   default: string | null;
   definition: string;
 };
-type Table = {
+export type Table = {
+  logicalName: string;
+  description: string;
+  group: string;
+  annotatedDdl: string;
   name: string;
   columns: Column[];
   primaryKey: string[];
@@ -17,7 +24,7 @@ type Table = {
   source: string;
   ddl: string;
 };
-type Relationship = {
+export type Relationship = {
   id: string;
   from: string;
   to: string;
@@ -47,7 +54,7 @@ type Database = {
   queries: Query[];
   operations: Operation[];
 };
-type View = { x: number; y: number; scale: number };
+
 const actions = { C: '作成', R: '参照', U: '更新', D: '削除' };
 function Crud({ value }: { value: string }) {
   return (
@@ -58,224 +65,6 @@ function Crud({ value }: { value: string }) {
         </span>
       ))}
     </span>
-  );
-}
-
-function Graph({
-  tables,
-  relationships,
-  selected,
-  onSelect,
-}: {
-  tables: Table[];
-  relationships: Relationship[];
-  selected: string;
-  onSelect: (name: string) => void;
-}) {
-  const viewport = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<View>({ x: 20, y: 20, scale: 1 });
-  const points = useRef(new Map<number, { x: number; y: number }>());
-  const positions = useMemo(
-    () =>
-      new Map(
-        tables.map((table, i) => [
-          table.name,
-          { x: (i % 3) * 300 + 25, y: Math.floor(i / 3) * 140 + 25 },
-        ]),
-      ),
-    [tables],
-  );
-  const width = Math.min(tables.length, 3) * 300 + 20;
-  const height = Math.ceil(tables.length / 3) * 140 + 20;
-  function fit() {
-    const box = viewport.current;
-    if (!box) return;
-    const scale = Math.min((box.clientWidth - 32) / width, (box.clientHeight - 32) / height, 1);
-    setView({
-      x: (box.clientWidth - width * scale) / 2,
-      y: (box.clientHeight - height * scale) / 2,
-      scale,
-    });
-  }
-  useEffect(() => {
-    const box = viewport.current;
-    if (!box) return;
-    const observer = new ResizeObserver(() => {
-      const scale = Math.min((box.clientWidth - 32) / width, (box.clientHeight - 32) / height, 1);
-      setView({
-        x: (box.clientWidth - width * scale) / 2,
-        y: (box.clientHeight - height * scale) / 2,
-        scale,
-      });
-    });
-    observer.observe(box);
-    return () => observer.disconnect();
-  }, [width, height]);
-  function zoom(factor: number, x?: number, y?: number) {
-    const cx = x ?? (viewport.current?.clientWidth ?? 0) / 2;
-    const cy = y ?? (viewport.current?.clientHeight ?? 0) / 2;
-    setView((v) => {
-      const scale = Math.max(0.15, Math.min(3, v.scale * factor));
-      return {
-        x: cx - ((cx - v.x) * scale) / v.scale,
-        y: cy - ((cy - v.y) * scale) / v.scale,
-        scale,
-      };
-    });
-  }
-  useEffect(() => {
-    const box = viewport.current;
-    if (!box) return;
-    const wheel = (event: WheelEvent) => {
-      event.preventDefault();
-      const rect = box.getBoundingClientRect();
-      zoom(Math.exp(-event.deltaY * 0.002), event.clientX - rect.left, event.clientY - rect.top);
-    };
-    box.addEventListener('wheel', wheel, { passive: false });
-    return () => box.removeEventListener('wheel', wheel);
-  }, []);
-  function center() {
-    const p = positions.get(selected);
-    const box = viewport.current;
-    if (p && box)
-      setView({ scale: 1, x: box.clientWidth / 2 - p.x - 125, y: box.clientHeight / 2 - p.y - 48 });
-  }
-  return (
-    <section className="db-graph-panel" aria-label="テーブル関係図">
-      <div className="db-toolbar">
-        <button onClick={() => zoom(1.25)} aria-label="ER図を拡大">
-          ＋
-        </button>
-        <button onClick={() => zoom(0.8)} aria-label="ER図を縮小">
-          −
-        </button>
-        <output aria-label="ER図の倍率">{Math.round(view.scale * 100)}%</output>
-        <button onClick={fit}>全体表示</button>
-        <button onClick={center}>選択テーブルへ</button>
-      </div>
-      <p id="db-graph-help">
-        ドラッグで移動・ホイール／ピンチで拡大縮小。キーボードは矢印・＋・−・Home。矢印は参照先へ向かいます。
-      </p>
-      <div
-        ref={viewport}
-        className="db-viewport"
-        tabIndex={0}
-        role="region"
-        aria-label="操作できるER図"
-        aria-describedby="db-graph-help"
-        onKeyDown={(e) => {
-          if (e.target !== e.currentTarget) return;
-          if (
-            ['+', '=', '-', 'Home', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(
-              e.key,
-            )
-          )
-            e.preventDefault();
-          if (['+', '='].includes(e.key)) zoom(1.25);
-          if (e.key === '-') zoom(0.8);
-          if (e.key === 'Home') fit();
-          const delta: Record<string, [number, number]> = {
-            ArrowLeft: [50, 0],
-            ArrowRight: [-50, 0],
-            ArrowUp: [0, 50],
-            ArrowDown: [0, -50],
-          };
-          if (delta[e.key])
-            setView((v) => ({ ...v, x: v.x + delta[e.key][0], y: v.y + delta[e.key][1] }));
-        }}
-        onPointerDown={(e) => {
-          if ((e.target as HTMLElement).closest('button') || e.button > 0) return;
-          points.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-          e.currentTarget.setPointerCapture(e.pointerId);
-        }}
-        onPointerMove={(e) => {
-          const old = points.current.get(e.pointerId);
-          if (!old) return;
-          const before = [...points.current.values()];
-          points.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-          const after = [...points.current.values()];
-          if (before.length === 2) {
-            const distance = (p: typeof before) => Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
-            const rect = e.currentTarget.getBoundingClientRect();
-            const bx = (before[0].x + before[1].x) / 2 - rect.left;
-            const by = (before[0].y + before[1].y) / 2 - rect.top;
-            const ax = (after[0].x + after[1].x) / 2 - rect.left;
-            const ay = (after[0].y + after[1].y) / 2 - rect.top;
-            setView((v) => {
-              const scale = Math.max(
-                0.15,
-                Math.min(3, (v.scale * distance(after)) / Math.max(1, distance(before))),
-              );
-              return {
-                scale,
-                x: ax - ((bx - v.x) * scale) / v.scale,
-                y: ay - ((by - v.y) * scale) / v.scale,
-              };
-            });
-          } else setView((v) => ({ ...v, x: v.x + e.clientX - old.x, y: v.y + e.clientY - old.y }));
-        }}
-        onPointerUp={(e) => points.current.delete(e.pointerId)}
-        onPointerCancel={(e) => points.current.delete(e.pointerId)}
-        onLostPointerCapture={(e) => points.current.delete(e.pointerId)}
-      >
-        <div
-          className="db-world"
-          style={{
-            width,
-            height,
-            transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
-          }}
-        >
-          <svg width={width} height={height} aria-hidden="true">
-            <defs>
-              <marker
-                id="db-arrow"
-                viewBox="0 0 10 10"
-                refX="9"
-                refY="5"
-                markerWidth="7"
-                markerHeight="7"
-                orient="auto-start-reverse"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="context-stroke" />
-              </marker>
-            </defs>
-            {relationships.map((r, i) => {
-              const from = positions.get(r.from),
-                to = positions.get(r.to);
-              if (!from || !to) return null;
-              const sx = from.x + 125,
-                sy = from.y + 96,
-                tx = to.x + 125,
-                ty = to.y;
-              const bend = 30 + (i % 4) * 12;
-              return (
-                <path
-                  key={r.id}
-                  d={`M ${sx} ${sy} C ${sx} ${sy + bend}, ${tx - 60} ${ty - bend}, ${tx} ${ty}`}
-                  className={r.from === selected || r.to === selected ? 'selected' : ''}
-                  markerEnd="url(#db-arrow)"
-                />
-              );
-            })}
-          </svg>
-          {tables.map((t) => (
-            <button
-              key={t.name}
-              className="db-node"
-              aria-label={'テーブル ' + t.name}
-              aria-pressed={selected === t.name}
-              style={{ left: positions.get(t.name)!.x, top: positions.get(t.name)!.y }}
-              onClick={() => onSelect(t.name)}
-            >
-              <strong>{t.name}</strong>
-              <span>PK {t.primaryKey.join(', ') || 'なし'}</span>
-              <small>{t.columns.length} カラム</small>
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -295,6 +84,10 @@ export function DatabaseExplorer({
   const [apiSearch, setApiSearch] = useState('');
   const [action, setAction] = useState('');
   const [columnSearch, setColumnSearch] = useState('');
+  const [column, setColumn] = useState('');
+  const [relation, setRelation] = useState('');
+  const [nameMode, setNameMode] = useState('both');
+  const [focus, setFocus] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     void fetch('./design-data/DATABASE.gen.json', { signal: controller.signal })
@@ -304,7 +97,7 @@ export function DatabaseExplorer({
       })
       .then((value: Database) => {
         if (
-          value.schemaVersion !== 1 ||
+          value.schemaVersion !== 2 ||
           !value.tables.length ||
           !Array.isArray(value.queries) ||
           !Array.isArray(value.operations) ||
@@ -331,6 +124,8 @@ export function DatabaseExplorer({
   const operations = data.operations.filter((op) => op.queries.some((id) => queryMap.has(id)));
   function select(name: string) {
     setSelected(name);
+    setColumn('');
+    setRelation('');
     setColumnSearch('');
     setApiSearch('');
     setAction('');
@@ -368,59 +163,127 @@ export function DatabaseExplorer({
     );
   }
   return (
-    <div className="db-explorer">
-      <p className="db-intro">
-        {data.tables.length}テーブル · {data.relationships.length}外部キー ·{' '}
-        {data.operations.length} API
-        <br />
-        DDL・API別CRUD・SQL正本をつないで確認できます。SQLは条件分岐・認証・共有処理を含む呼び出し候補です。実行ログではありません。
-      </p>
-      <div className="db-filters">
-        <label>
-          テーブル・カラムを検索
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="documents / organization_id"
-          />
-        </label>
-        <label className="db-checkbox">
-          <input
-            type="checkbox"
-            checked={relatedOnly}
-            onChange={(e) => setRelatedOnly(e.target.checked)}
-          />
-          選択テーブルと直接の関係のみ
-        </label>
-      </div>
-      <div className="db-chips" aria-label="テーブル一覧">
-        {data.tables
-          .filter((t) =>
-            [t.name, ...t.columns.map((c) => c.name)].some((s) =>
-              s.toLowerCase().includes(search.toLowerCase()),
-            ),
-          )
-          .map((t) => (
-            <button key={t.name} aria-pressed={selected === t.name} onClick={() => select(t.name)}>
-              {t.name}
-            </button>
-          ))}
-        {!data.tables.some((t) =>
-          [t.name, ...t.columns.map((c) => c.name)].some((s) =>
-            s.toLowerCase().includes(search.toLowerCase()),
-          ),
-        ) && <p role="status">一致するテーブルはありません。</p>}
+    <div className={'db-explorer' + (focus ? ' db-focus' : '')}>
+      <div className="db-topbar">
+        <div>
+          <strong>スキーマ閲覧</strong>
+          <span>
+            {data.tables.length}テーブル · {data.relationships.length}外部キー ·{' '}
+            {data.operations.length} API
+          </span>
+        </div>
+        <div className="db-toolbar">
+          <label>
+            図の名前表示
+            <select value={nameMode} onChange={(e) => setNameMode(e.target.value)}>
+              <option value="both">論理名 / 物理名</option>
+              <option value="logical">論理名（和名）</option>
+              <option value="physical">物理名</option>
+            </select>
+          </label>
+          <button aria-pressed={focus} onClick={() => setFocus(!focus)}>
+            {focus ? 'パネルを表示' : '図に集中'}
+          </button>
+        </div>
       </div>
       <div className="db-workspace">
-        <Graph
-          tables={visible}
-          relationships={data.relationships}
-          selected={selected}
-          onSelect={select}
-        />
+        <aside className="db-objects" aria-label="オブジェクト一覧">
+          <h2>テーブル</h2>
+          <label>
+            テーブル・カラムを検索
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="和名 / テーブル / カラム"
+            />
+          </label>
+          <div aria-label="テーブル一覧">
+            {[...new Set(data.tables.map((t) => t.group))].map((group) => {
+              const found = data.tables.filter(
+                (t) =>
+                  t.group === group &&
+                  [
+                    t.name,
+                    t.logicalName,
+                    ...t.columns.flatMap((c) => [c.name, c.logicalName]),
+                  ].some((s) => s.toLowerCase().includes(search.toLowerCase())),
+              );
+              return found.length ? (
+                <section key={group}>
+                  <h3>
+                    {group} <small>{found.length}</small>
+                  </h3>
+                  {found.map((t) => (
+                    <button
+                      key={t.name}
+                      aria-label={t.name}
+                      aria-pressed={selected === t.name}
+                      onClick={() => select(t.name)}
+                    >
+                      <strong>{t.logicalName}</strong>
+                      <span>{t.name}</span>
+                      <small>{t.columns.length}</small>
+                    </button>
+                  ))}
+                </section>
+              ) : null;
+            })}
+            {!data.tables.some((t) =>
+              [t.name, t.logicalName, ...t.columns.flatMap((c) => [c.name, c.logicalName])].some(
+                (s) => s.toLowerCase().includes(search.toLowerCase()),
+              ),
+            ) && <p role="status">一致するテーブルはありません。</p>}
+          </div>
+        </aside>
+        <div className="db-canvas">
+          <div className="db-canvas-heading">
+            <span>
+              ER DIAGRAM <small>閲覧専用</small>
+            </span>
+            <label className="db-checkbox">
+              <input
+                type="checkbox"
+                checked={relatedOnly}
+                onChange={(e) => setRelatedOnly(e.target.checked)}
+              />
+              選択テーブルと直接の関係のみ
+            </label>
+          </div>
+          <Graph
+            tables={data.tables}
+            visible={visible}
+            relationships={data.relationships}
+            selected={selected}
+            column={column}
+            relation={relation}
+            nameMode={nameMode}
+            onSelect={select}
+            onColumn={(name, c) => {
+              select(name);
+              setColumn(c);
+              setTab('columns');
+              setFocus(false);
+            }}
+            onRelation={(r) => {
+              select(r.from);
+              setRelation(r.id);
+              setTab('relations');
+              setFocus(false);
+            }}
+          />
+          <p className="db-status">
+            {table.logicalName} / {selected}
+            {column ? '.' + column : ''} · PK 主キー / FK 外部キー · 線は外部キーの列 → 参照先の列
+          </p>
+        </div>
         <article className="db-detail" aria-label="選択テーブルの詳細">
-          <h2>{selected}</h2>
+          <div className="db-detail-heading">
+            <span>プロパティ</span>
+            <h2>{selected}</h2>
+            <strong>{table.logicalName}</strong>
+            <p>{table.description}</p>
+          </div>
           <p>
             {table.columns.length} カラム · {relations.length} 関係 · {operations.length} 利用API
           </p>
@@ -436,6 +299,35 @@ export function DatabaseExplorer({
               </button>
             ))}
           </div>
+          {column && tab === 'columns' && (
+            <section className="db-column-detail" aria-label="選択カラムの詳細">
+              <h3>
+                {table.columns.find((c) => c.name === column)!.logicalName} <code>{column}</code>
+              </h3>
+              <p>{table.columns.find((c) => c.name === column)!.description}</p>
+              <code>{table.columns.find((c) => c.name === column)!.definition}</code>
+              <div className="db-chips">
+                {relations
+                  .filter(
+                    (r) =>
+                      (r.from === selected && r.columns.includes(column)) ||
+                      (r.to === selected && r.targetColumns.includes(column)),
+                  )
+                  .map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => {
+                        setRelation(r.id);
+                        setTab('relations');
+                      }}
+                    >
+                      関係: {r.from} → {r.to}
+                    </button>
+                  ))}
+              </div>
+              <button onClick={() => setColumn('')}>カラム選択を解除</button>
+            </section>
+          )}
           {tab === 'columns' && (
             <>
               <label>
@@ -459,17 +351,23 @@ export function DatabaseExplorer({
                   </thead>
                   <tbody>
                     {table.columns
-                      .filter((c) => c.name.toLowerCase().includes(columnSearch.toLowerCase()))
+                      .filter((c) =>
+                        (c.name + c.logicalName).toLowerCase().includes(columnSearch.toLowerCase()),
+                      )
                       .map((c) => (
-                        <tr key={c.name}>
+                        <tr key={c.name} className={column === c.name ? 'db-current-column' : ''}>
                           <th scope="row">
-                            {c.name}
+                            <button className="db-column-link" onClick={() => setColumn(c.name)}>
+                              {c.logicalName}
+                              <small>{c.name}</small>
+                            </button>
                             {c.primaryKey && <b className="db-key">PK</b>}
                             {relations.some(
                               (r) => r.from === selected && r.columns.includes(c.name),
                             ) && <b className="db-key">FK</b>}
                             <details>
                               <summary>列のDDL</summary>
+                              <p>{c.description}</p>
                               <code>{c.definition}</code>
                             </details>
                           </th>
@@ -481,6 +379,19 @@ export function DatabaseExplorer({
                   </tbody>
                 </table>
               </div>
+              <details className="db-sql db-annotated">
+                <summary>和名・説明付きDDL</summary>
+                <p>論理名と説明をコメントとして付けた閲覧用DDLです。</p>
+                <a
+                  download={table.name + '-ja.sql'}
+                  href={'data:text/plain;charset=utf-8,' + encodeURIComponent(table.annotatedDdl)}
+                >
+                  説明付きDDLを保存
+                </a>
+                <pre>
+                  <code>{table.annotatedDdl}</code>
+                </pre>
+              </details>
               <h3>テーブル制約</h3>
               {table.constraints.map((c) => (
                 <pre key={c}>{c}</pre>
@@ -502,24 +413,65 @@ export function DatabaseExplorer({
                 子 →
                 参照先。複合キーは同じ位置のカラム同士が対応します。DDLにない関係は推測しません。
               </p>
-              {relations.map((r) => (
-                <section className="db-relation" key={r.id}>
-                  <button onClick={() => select(r.from)}>{r.from}</button> →{' '}
-                  <button onClick={() => select(r.to)}>{r.to}</button>
-                  <p>{r.from === selected ? '参照先' : 'このテーブルを参照する側'}</p>
-                  {r.columns.map((c, i) => (
-                    <div key={c}>
-                      <code>{c}</code> → <code>{r.targetColumns[i]}</code>
-                    </div>
-                  ))}
-                  <pre>{r.definition}</pre>
-                </section>
-              ))}
+              {relation && <button onClick={() => setRelation('')}>すべての関係を表示</button>}
+              {relations
+                .filter((r) => !relation || r.id === relation)
+                .map((r) => (
+                  <section className="db-relation" key={r.id}>
+                    <button aria-label={r.from} onClick={() => select(r.from)}>
+                      {data.tables.find((t) => t.name === r.from)!.logicalName} / {r.from}
+                    </button>{' '}
+                    →{' '}
+                    <button aria-label={r.to} onClick={() => select(r.to)}>
+                      {data.tables.find((t) => t.name === r.to)!.logicalName} / {r.to}
+                    </button>
+                    <p>{r.from === selected ? '参照先' : 'このテーブルを参照する側'}</p>
+                    {r.columns.map((c, i) => (
+                      <div key={c}>
+                        <button
+                          className="db-column-link"
+                          onClick={() => {
+                            select(r.from);
+                            setColumn(c);
+                            setTab('columns');
+                          }}
+                        >
+                          {
+                            data.tables
+                              .find((t) => t.name === r.from)!
+                              .columns.find((col) => col.name === c)!.logicalName
+                          }
+                          <small>{c}</small>
+                        </button>{' '}
+                        →{' '}
+                        <button
+                          className="db-column-link"
+                          onClick={() => {
+                            select(r.to);
+                            setColumn(r.targetColumns[i]);
+                            setTab('columns');
+                          }}
+                        >
+                          {
+                            data.tables
+                              .find((t) => t.name === r.to)!
+                              .columns.find((col) => col.name === r.targetColumns[i])!.logicalName
+                          }
+                          <small>{r.targetColumns[i]}</small>
+                        </button>
+                      </div>
+                    ))}
+                    <pre>{r.definition}</pre>
+                  </section>
+                ))}
               {!relations.length && <p>DDLに外部キー関係はありません。</p>}
             </>
           )}
           {tab === 'apis' && (
             <>
+              <p>
+                SQLは認証・共有処理・条件分岐を含む静的な呼び出し候補です。実行ログではありません。
+              </p>
               <div className="db-filters">
                 <label>
                   APIを検索
@@ -598,8 +550,8 @@ export function DatabaseExplorer({
           {tab === 'sql' && (
             <>
               <p>
-                このテーブルにアクセスするSQL {queries.length}{' '}
-                件。SQL内の別テーブルもクリックして移動できます。
+                静的解析で確認した呼び出し候補です。実行ログではありません。このテーブルにアクセスするSQL{' '}
+                {queries.length} 件。SQL内の別テーブルもクリックして移動できます。
               </p>
               {queries.map(sqlCard)}
               {!queries.length && <p>このテーブルを利用するSQLはありません。</p>}

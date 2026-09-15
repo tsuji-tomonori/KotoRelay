@@ -2337,13 +2337,16 @@
       "to": "organizations"
     }
   ],
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "tables": [
     {
+      "annotatedDdl": "-- 回答 (answers)\n-- 質問、生成回答、根拠と利用モデルを記録します。\n-- id: 回答ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- conversation_id: 会話ID — この回答を含む会話の識別子です。\n-- user_id: 利用者ID — 対象利用者の識別子です。\n-- department_id: 部署ID — 対象部署の識別子です。\n-- question_key: 質問保存キー — 質問本文のオブジェクト保存キーです。\n-- answer_key: 回答保存キー — 回答本文のオブジェクト保存キーです。\n-- evidence: 回答根拠 — 回答の根拠となる文書・引用情報をJSONで保持します。\n-- status: 回答状態 — 回答生成の結果状態です。\n-- model: 生成モデル — 回答の生成に使用したモデルです。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- answersの正本と組織内参照整合性を定義する。\nCREATE TABLE answers (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    conversation_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    question_key text NOT NULL,\n    answer_key text NOT NULL,\n    evidence text NOT NULL,\n    status varchar(20) NOT NULL,\n    model text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, conversation_id) REFERENCES conversations (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "回答ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2352,6 +2355,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2360,6 +2365,8 @@
         {
           "default": null,
           "definition": "conversation_id VARCHAR(36) NOT NULL",
+          "description": "この回答を含む会話の識別子です。",
+          "logicalName": "会話ID",
           "name": "conversation_id",
           "nullable": false,
           "primaryKey": false,
@@ -2368,6 +2375,8 @@
         {
           "default": null,
           "definition": "user_id VARCHAR(36) NOT NULL",
+          "description": "対象利用者の識別子です。",
+          "logicalName": "利用者ID",
           "name": "user_id",
           "nullable": false,
           "primaryKey": false,
@@ -2376,6 +2385,8 @@
         {
           "default": null,
           "definition": "department_id VARCHAR(36) NOT NULL",
+          "description": "対象部署の識別子です。",
+          "logicalName": "部署ID",
           "name": "department_id",
           "nullable": false,
           "primaryKey": false,
@@ -2384,6 +2395,8 @@
         {
           "default": null,
           "definition": "question_key TEXT NOT NULL",
+          "description": "質問本文のオブジェクト保存キーです。",
+          "logicalName": "質問保存キー",
           "name": "question_key",
           "nullable": false,
           "primaryKey": false,
@@ -2392,6 +2405,8 @@
         {
           "default": null,
           "definition": "answer_key TEXT NOT NULL",
+          "description": "回答本文のオブジェクト保存キーです。",
+          "logicalName": "回答保存キー",
           "name": "answer_key",
           "nullable": false,
           "primaryKey": false,
@@ -2400,6 +2415,8 @@
         {
           "default": null,
           "definition": "evidence TEXT NOT NULL",
+          "description": "回答の根拠となる文書・引用情報をJSONで保持します。",
+          "logicalName": "回答根拠",
           "name": "evidence",
           "nullable": false,
           "primaryKey": false,
@@ -2408,6 +2425,8 @@
         {
           "default": null,
           "definition": "status VARCHAR(20) NOT NULL",
+          "description": "回答生成の結果状態です。",
+          "logicalName": "回答状態",
           "name": "status",
           "nullable": false,
           "primaryKey": false,
@@ -2416,6 +2435,8 @@
         {
           "default": null,
           "definition": "model TEXT NOT NULL",
+          "description": "回答の生成に使用したモデルです。",
+          "logicalName": "生成モデル",
           "name": "model",
           "nullable": false,
           "primaryKey": false,
@@ -2424,6 +2445,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -2439,6 +2462,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- answersの正本と組織内参照整合性を定義する。\nCREATE TABLE answers (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    conversation_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    question_key text NOT NULL,\n    answer_key text NOT NULL,\n    evidence text NOT NULL,\n    status varchar(20) NOT NULL,\n    model text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, conversation_id) REFERENCES conversations (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "質問、生成回答、根拠と利用モデルを記録します。",
+      "group": "質問・記録",
+      "logicalName": "回答",
       "name": "answers",
       "primaryKey": [
         "id"
@@ -2446,10 +2472,13 @@
       "source": "backend/migrations/014_answers.sql"
     },
     {
+      "annotatedDdl": "-- 添付画像 (assets)\n-- 文書に添付する画像の保存先と属性を管理します。\n-- id: 添付画像ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- object_key: 画像保存キー — オブジェクト保存先にある画像のキーです。\n-- sha256: SHA-256ハッシュ — 内容の整合性を確認するSHA-256ハッシュ値です。\n-- media_type: メディア種別 — 画像のメディア種別です。\n-- width: 画像幅 — 画像の横幅をピクセル数で表します。\n-- height: 画像高さ — 画像の高さをピクセル数で表します。\n-- size: 画像サイズ — 画像のデータ量をバイト数で表します。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- assetsの正本と組織内参照整合性を定義する。\nCREATE TABLE assets (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    object_key text NOT NULL,\n    sha256 varchar(64) NOT NULL,\n    media_type varchar(20) NOT NULL,\n    width bigint NOT NULL,\n    height bigint NOT NULL,\n    size bigint NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "添付画像ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2458,6 +2487,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2466,6 +2497,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36) NOT NULL",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": false,
           "primaryKey": false,
@@ -2474,6 +2507,8 @@
         {
           "default": null,
           "definition": "object_key TEXT NOT NULL",
+          "description": "オブジェクト保存先にある画像のキーです。",
+          "logicalName": "画像保存キー",
           "name": "object_key",
           "nullable": false,
           "primaryKey": false,
@@ -2482,6 +2517,8 @@
         {
           "default": null,
           "definition": "sha256 VARCHAR(64) NOT NULL",
+          "description": "内容の整合性を確認するSHA-256ハッシュ値です。",
+          "logicalName": "SHA-256ハッシュ",
           "name": "sha256",
           "nullable": false,
           "primaryKey": false,
@@ -2490,6 +2527,8 @@
         {
           "default": null,
           "definition": "media_type VARCHAR(20) NOT NULL",
+          "description": "画像のメディア種別です。",
+          "logicalName": "メディア種別",
           "name": "media_type",
           "nullable": false,
           "primaryKey": false,
@@ -2498,6 +2537,8 @@
         {
           "default": null,
           "definition": "width BIGINT NOT NULL",
+          "description": "画像の横幅をピクセル数で表します。",
+          "logicalName": "画像幅",
           "name": "width",
           "nullable": false,
           "primaryKey": false,
@@ -2506,6 +2547,8 @@
         {
           "default": null,
           "definition": "height BIGINT NOT NULL",
+          "description": "画像の高さをピクセル数で表します。",
+          "logicalName": "画像高さ",
           "name": "height",
           "nullable": false,
           "primaryKey": false,
@@ -2514,6 +2557,8 @@
         {
           "default": null,
           "definition": "size BIGINT NOT NULL",
+          "description": "画像のデータ量をバイト数で表します。",
+          "logicalName": "画像サイズ",
           "name": "size",
           "nullable": false,
           "primaryKey": false,
@@ -2522,6 +2567,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -2536,6 +2583,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- assetsの正本と組織内参照整合性を定義する。\nCREATE TABLE assets (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    object_key text NOT NULL,\n    sha256 varchar(64) NOT NULL,\n    media_type varchar(20) NOT NULL,\n    width bigint NOT NULL,\n    height bigint NOT NULL,\n    size bigint NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "文書に添付する画像の保存先と属性を管理します。",
+      "group": "画像・検索索引",
+      "logicalName": "添付画像",
       "name": "assets",
       "primaryKey": [
         "id"
@@ -2543,10 +2593,13 @@
       "source": "backend/migrations/009_assets.sql"
     },
     {
+      "annotatedDdl": "-- 監査記録 (audit)\n-- 操作前後の状態と操作理由を記録します。\n-- id: 監査記録ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- user_id: 利用者ID — 対象利用者の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- version_id: 文書版ID — 対象文書版の識別子です。\n-- action: 監査操作 — 監査対象となる操作の種類です。\n-- before_state: 変更前状態 — 操作前の状態をJSONで保持します。\n-- after_state: 変更後状態 — 操作後の状態をJSONで保持します。\n-- reason: 理由 — 操作または判断の理由です。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- auditの正本と組織内参照整合性を定義する。\nCREATE TABLE audit (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    document_id varchar(36),\n    version_id varchar(36),\n    action varchar(30) NOT NULL,\n    before_state text NOT NULL,\n    after_state text NOT NULL,\n    reason text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, version_id) REFERENCES versions (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "監査記録ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2555,6 +2608,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2563,6 +2618,8 @@
         {
           "default": null,
           "definition": "user_id VARCHAR(36) NOT NULL",
+          "description": "対象利用者の識別子です。",
+          "logicalName": "利用者ID",
           "name": "user_id",
           "nullable": false,
           "primaryKey": false,
@@ -2571,6 +2628,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36)",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": true,
           "primaryKey": false,
@@ -2579,6 +2638,8 @@
         {
           "default": null,
           "definition": "version_id VARCHAR(36)",
+          "description": "対象文書版の識別子です。",
+          "logicalName": "文書版ID",
           "name": "version_id",
           "nullable": true,
           "primaryKey": false,
@@ -2587,6 +2648,8 @@
         {
           "default": null,
           "definition": "action VARCHAR(30) NOT NULL",
+          "description": "監査対象となる操作の種類です。",
+          "logicalName": "監査操作",
           "name": "action",
           "nullable": false,
           "primaryKey": false,
@@ -2595,6 +2658,8 @@
         {
           "default": null,
           "definition": "before_state TEXT NOT NULL",
+          "description": "操作前の状態をJSONで保持します。",
+          "logicalName": "変更前状態",
           "name": "before_state",
           "nullable": false,
           "primaryKey": false,
@@ -2603,6 +2668,8 @@
         {
           "default": null,
           "definition": "after_state TEXT NOT NULL",
+          "description": "操作後の状態をJSONで保持します。",
+          "logicalName": "変更後状態",
           "name": "after_state",
           "nullable": false,
           "primaryKey": false,
@@ -2611,6 +2678,8 @@
         {
           "default": null,
           "definition": "reason TEXT NOT NULL",
+          "description": "操作または判断の理由です。",
+          "logicalName": "理由",
           "name": "reason",
           "nullable": false,
           "primaryKey": false,
@@ -2619,6 +2688,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -2634,6 +2705,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- auditの正本と組織内参照整合性を定義する。\nCREATE TABLE audit (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    document_id varchar(36),\n    version_id varchar(36),\n    action varchar(30) NOT NULL,\n    before_state text NOT NULL,\n    after_state text NOT NULL,\n    reason text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, version_id) REFERENCES versions (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "操作前後の状態と操作理由を記録します。",
+      "group": "質問・記録",
+      "logicalName": "監査記録",
       "name": "audit",
       "primaryKey": [
         "id"
@@ -2641,10 +2715,13 @@
       "source": "backend/migrations/017_audit.sql"
     },
     {
+      "annotatedDdl": "-- 検索チャンク (chunks)\n-- 公開版を分割した検索用本文と画像配置を管理します。\n-- id: 検索チャンクID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- version_id: 文書版ID — 対象文書版の識別子です。\n-- body_key: 本文保存キー — オブジェクト保存先にある本文のキーです。\n-- sha256: SHA-256ハッシュ — 内容の整合性を確認するSHA-256ハッシュ値です。\n-- heading: 見出し — 検索チャンクに対応する見出しです。\n-- placements: 画像配置 — 本文内の画像配置情報をJSONで保持します。\n-- manifest_hash: マニフェストハッシュ — 版構成の整合性を確認するハッシュ値です。\n-- ready: 検索準備完了 — 検索に使用できる状態かを表します。\n-- chunksの正本と組織内参照整合性を定義する。\nCREATE TABLE chunks (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36) NOT NULL,\n    body_key text NOT NULL,\n    sha256 varchar(64) NOT NULL,\n    heading text NOT NULL,\n    placements text NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    ready boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "検索チャンクID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2653,6 +2730,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2661,6 +2740,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36) NOT NULL",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": false,
           "primaryKey": false,
@@ -2669,6 +2750,8 @@
         {
           "default": null,
           "definition": "version_id VARCHAR(36) NOT NULL",
+          "description": "対象文書版の識別子です。",
+          "logicalName": "文書版ID",
           "name": "version_id",
           "nullable": false,
           "primaryKey": false,
@@ -2677,6 +2760,8 @@
         {
           "default": null,
           "definition": "body_key TEXT NOT NULL",
+          "description": "オブジェクト保存先にある本文のキーです。",
+          "logicalName": "本文保存キー",
           "name": "body_key",
           "nullable": false,
           "primaryKey": false,
@@ -2685,6 +2770,8 @@
         {
           "default": null,
           "definition": "sha256 VARCHAR(64) NOT NULL",
+          "description": "内容の整合性を確認するSHA-256ハッシュ値です。",
+          "logicalName": "SHA-256ハッシュ",
           "name": "sha256",
           "nullable": false,
           "primaryKey": false,
@@ -2693,6 +2780,8 @@
         {
           "default": null,
           "definition": "heading TEXT NOT NULL",
+          "description": "検索チャンクに対応する見出しです。",
+          "logicalName": "見出し",
           "name": "heading",
           "nullable": false,
           "primaryKey": false,
@@ -2701,6 +2790,8 @@
         {
           "default": null,
           "definition": "placements TEXT NOT NULL",
+          "description": "本文内の画像配置情報をJSONで保持します。",
+          "logicalName": "画像配置",
           "name": "placements",
           "nullable": false,
           "primaryKey": false,
@@ -2709,6 +2800,8 @@
         {
           "default": null,
           "definition": "manifest_hash VARCHAR(64) NOT NULL",
+          "description": "版構成の整合性を確認するハッシュ値です。",
+          "logicalName": "マニフェストハッシュ",
           "name": "manifest_hash",
           "nullable": false,
           "primaryKey": false,
@@ -2717,6 +2810,8 @@
         {
           "default": null,
           "definition": "ready BOOLEAN NOT NULL",
+          "description": "検索に使用できる状態かを表します。",
+          "logicalName": "検索準備完了",
           "name": "ready",
           "nullable": false,
           "primaryKey": false,
@@ -2731,6 +2826,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- chunksの正本と組織内参照整合性を定義する。\nCREATE TABLE chunks (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36) NOT NULL,\n    body_key text NOT NULL,\n    sha256 varchar(64) NOT NULL,\n    heading text NOT NULL,\n    placements text NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    ready boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "公開版を分割した検索用本文と画像配置を管理します。",
+      "group": "画像・検索索引",
+      "logicalName": "検索チャンク",
       "name": "chunks",
       "primaryKey": [
         "id"
@@ -2738,10 +2836,13 @@
       "source": "backend/migrations/011_chunks.sql"
     },
     {
+      "annotatedDdl": "-- 会話 (conversations)\n-- 利用者の質問・回答をまとめる会話です。\n-- id: 会話ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- user_id: 利用者ID — 対象利用者の識別子です。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- conversationsの正本と組織内参照整合性を定義する。\nCREATE TABLE conversations (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "会話ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2750,6 +2851,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2758,6 +2861,8 @@
         {
           "default": null,
           "definition": "user_id VARCHAR(36) NOT NULL",
+          "description": "対象利用者の識別子です。",
+          "logicalName": "利用者ID",
           "name": "user_id",
           "nullable": false,
           "primaryKey": false,
@@ -2766,6 +2871,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -2779,6 +2886,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- conversationsの正本と組織内参照整合性を定義する。\nCREATE TABLE conversations (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "利用者の質問・回答をまとめる会話です。",
+      "group": "質問・記録",
+      "logicalName": "会話",
       "name": "conversations",
       "primaryKey": [
         "id"
@@ -2786,10 +2896,13 @@
       "source": "backend/migrations/013_conversations.sql"
     },
     {
+      "annotatedDdl": "-- 部署 (departments)\n-- 文書の所有・共有と利用者の所属に使う部署です。\n-- id: 部署ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- name: 名称 — 表示に使用する名称です。\n-- active: 有効状態 — 利用可能な状態かを表します。\n-- departmentsの正本と組織内参照整合性を定義する。\nCREATE TABLE departments (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    name text NOT NULL,\n    active boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "部署ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2798,6 +2911,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2806,6 +2921,8 @@
         {
           "default": null,
           "definition": "name TEXT NOT NULL",
+          "description": "表示に使用する名称です。",
+          "logicalName": "名称",
           "name": "name",
           "nullable": false,
           "primaryKey": false,
@@ -2814,6 +2931,8 @@
         {
           "default": null,
           "definition": "active BOOLEAN NOT NULL",
+          "description": "利用可能な状態かを表します。",
+          "logicalName": "有効状態",
           "name": "active",
           "nullable": false,
           "primaryKey": false,
@@ -2826,6 +2945,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- departmentsの正本と組織内参照整合性を定義する。\nCREATE TABLE departments (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    name text NOT NULL,\n    active boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "文書の所有・共有と利用者の所属に使う部署です。",
+      "group": "組織・権限",
+      "logicalName": "部署",
       "name": "departments",
       "primaryKey": [
         "id"
@@ -2833,10 +2955,13 @@
       "source": "backend/migrations/003_departments.sql"
     },
     {
+      "annotatedDdl": "-- 文書 (documents)\n-- 文書の公開範囲、状態、最新版への参照を管理します。\n-- id: 文書ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- department_id: 所有部署ID — 文書を所有する部署の識別子です。\n-- title: 文書タイトル — 文書の表示タイトルです。\n-- created_by: 作成者ID — 作成した利用者の識別子です。\n-- visibility: 公開範囲 — department（所有部署）、selected（指定部署）、organization（組織全体）を区別します。\n-- shared_departments: 共有先部署 — 指定部署へ公開するときの部署一覧をJSONで保持します。\n-- status: 文書状態 — active（有効）、withdrawn（撤回）、deleted（削除）を区別します。\n-- revision: 改訂番号 — 更新の競合を検出するための改訂番号です。\n-- next_version: 次回版番号 — 次に作成する文書版の番号です。\n-- latest_version_id: 最新版ID — 文書の最新版の識別子です。DDLでは外部キーが宣言されていません。\n-- updated_at: 更新日時 — 最後に更新した日時です。\n-- documentsの正本と組織内参照整合性を定義する。\nCREATE TABLE documents (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    title text NOT NULL,\n    created_by varchar(36) NOT NULL,\n    visibility varchar(20) NOT NULL,\n    shared_departments text NOT NULL,\n    status varchar(20) NOT NULL,\n    revision bigint NOT NULL,\n    next_version bigint NOT NULL,\n    latest_version_id varchar(36),\n    updated_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id),\n    CHECK (visibility IN ('department', 'selected', 'organization')),\n    CHECK (status IN ('active', 'withdrawn', 'deleted')),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "文書ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2845,6 +2970,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2853,6 +2980,8 @@
         {
           "default": null,
           "definition": "department_id VARCHAR(36) NOT NULL",
+          "description": "文書を所有する部署の識別子です。",
+          "logicalName": "所有部署ID",
           "name": "department_id",
           "nullable": false,
           "primaryKey": false,
@@ -2861,6 +2990,8 @@
         {
           "default": null,
           "definition": "title TEXT NOT NULL",
+          "description": "文書の表示タイトルです。",
+          "logicalName": "文書タイトル",
           "name": "title",
           "nullable": false,
           "primaryKey": false,
@@ -2869,6 +3000,8 @@
         {
           "default": null,
           "definition": "created_by VARCHAR(36) NOT NULL",
+          "description": "作成した利用者の識別子です。",
+          "logicalName": "作成者ID",
           "name": "created_by",
           "nullable": false,
           "primaryKey": false,
@@ -2877,6 +3010,8 @@
         {
           "default": null,
           "definition": "visibility VARCHAR(20) NOT NULL",
+          "description": "department（所有部署）、selected（指定部署）、organization（組織全体）を区別します。",
+          "logicalName": "公開範囲",
           "name": "visibility",
           "nullable": false,
           "primaryKey": false,
@@ -2885,6 +3020,8 @@
         {
           "default": null,
           "definition": "shared_departments TEXT NOT NULL",
+          "description": "指定部署へ公開するときの部署一覧をJSONで保持します。",
+          "logicalName": "共有先部署",
           "name": "shared_departments",
           "nullable": false,
           "primaryKey": false,
@@ -2893,6 +3030,8 @@
         {
           "default": null,
           "definition": "status VARCHAR(20) NOT NULL",
+          "description": "active（有効）、withdrawn（撤回）、deleted（削除）を区別します。",
+          "logicalName": "文書状態",
           "name": "status",
           "nullable": false,
           "primaryKey": false,
@@ -2901,6 +3040,8 @@
         {
           "default": null,
           "definition": "revision BIGINT NOT NULL",
+          "description": "更新の競合を検出するための改訂番号です。",
+          "logicalName": "改訂番号",
           "name": "revision",
           "nullable": false,
           "primaryKey": false,
@@ -2909,6 +3050,8 @@
         {
           "default": null,
           "definition": "next_version BIGINT NOT NULL",
+          "description": "次に作成する文書版の番号です。",
+          "logicalName": "次回版番号",
           "name": "next_version",
           "nullable": false,
           "primaryKey": false,
@@ -2917,6 +3060,8 @@
         {
           "default": null,
           "definition": "latest_version_id VARCHAR(36)",
+          "description": "文書の最新版の識別子です。DDLでは外部キーが宣言されていません。",
+          "logicalName": "最新版ID",
           "name": "latest_version_id",
           "nullable": true,
           "primaryKey": false,
@@ -2925,6 +3070,8 @@
         {
           "default": null,
           "definition": "updated_at TIMESTAMPTZ NOT NULL",
+          "description": "最後に更新した日時です。",
+          "logicalName": "更新日時",
           "name": "updated_at",
           "nullable": false,
           "primaryKey": false,
@@ -2941,6 +3088,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- documentsの正本と組織内参照整合性を定義する。\nCREATE TABLE documents (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    title text NOT NULL,\n    created_by varchar(36) NOT NULL,\n    visibility varchar(20) NOT NULL,\n    shared_departments text NOT NULL,\n    status varchar(20) NOT NULL,\n    revision bigint NOT NULL,\n    next_version bigint NOT NULL,\n    latest_version_id varchar(36),\n    updated_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id),\n    CHECK (visibility IN ('department', 'selected', 'organization')),\n    CHECK (status IN ('active', 'withdrawn', 'deleted')),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "文書の公開範囲、状態、最新版への参照を管理します。",
+      "group": "文書・承認",
+      "logicalName": "文書",
       "name": "documents",
       "primaryKey": [
         "id"
@@ -2948,10 +3098,13 @@
       "source": "backend/migrations/005_documents.sql"
     },
     {
+      "annotatedDdl": "-- 下書き (drafts)\n-- 編集可能な本文と画像配置を文書ごとに保持します。\n-- id: 下書きID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- body_key: 本文保存キー — オブジェクト保存先にある本文のキーです。\n-- body_hash: 本文ハッシュ — 本文の整合性を確認するハッシュ値です。\n-- placements: 画像配置 — 本文内の画像配置情報をJSONで保持します。\n-- revision: 改訂番号 — 更新の競合を検出するための改訂番号です。\n-- updated_by: 更新者ID — 最後に更新した利用者の識別子です。\n-- draftsの正本と組織内参照整合性を定義する。\nCREATE TABLE drafts (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    body_key text NOT NULL,\n    body_hash varchar(64) NOT NULL,\n    placements text NOT NULL,\n    revision bigint NOT NULL,\n    updated_by varchar(36) NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, updated_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "下書きID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -2960,6 +3113,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -2968,6 +3123,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36) NOT NULL",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": false,
           "primaryKey": false,
@@ -2976,6 +3133,8 @@
         {
           "default": null,
           "definition": "body_key TEXT NOT NULL",
+          "description": "オブジェクト保存先にある本文のキーです。",
+          "logicalName": "本文保存キー",
           "name": "body_key",
           "nullable": false,
           "primaryKey": false,
@@ -2984,6 +3143,8 @@
         {
           "default": null,
           "definition": "body_hash VARCHAR(64) NOT NULL",
+          "description": "本文の整合性を確認するハッシュ値です。",
+          "logicalName": "本文ハッシュ",
           "name": "body_hash",
           "nullable": false,
           "primaryKey": false,
@@ -2992,6 +3153,8 @@
         {
           "default": null,
           "definition": "placements TEXT NOT NULL",
+          "description": "本文内の画像配置情報をJSONで保持します。",
+          "logicalName": "画像配置",
           "name": "placements",
           "nullable": false,
           "primaryKey": false,
@@ -3000,6 +3163,8 @@
         {
           "default": null,
           "definition": "revision BIGINT NOT NULL",
+          "description": "更新の競合を検出するための改訂番号です。",
+          "logicalName": "改訂番号",
           "name": "revision",
           "nullable": false,
           "primaryKey": false,
@@ -3008,6 +3173,8 @@
         {
           "default": null,
           "definition": "updated_by VARCHAR(36) NOT NULL",
+          "description": "最後に更新した利用者の識別子です。",
+          "logicalName": "更新者ID",
           "name": "updated_by",
           "nullable": false,
           "primaryKey": false,
@@ -3023,6 +3190,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- draftsの正本と組織内参照整合性を定義する。\nCREATE TABLE drafts (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    body_key text NOT NULL,\n    body_hash varchar(64) NOT NULL,\n    placements text NOT NULL,\n    revision bigint NOT NULL,\n    updated_by varchar(36) NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, updated_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "編集可能な本文と画像配置を文書ごとに保持します。",
+      "group": "文書・承認",
+      "logicalName": "下書き",
       "name": "drafts",
       "primaryKey": [
         "id"
@@ -3030,10 +3200,13 @@
       "source": "backend/migrations/006_drafts.sql"
     },
     {
+      "annotatedDdl": "-- 利用イベント (events)\n-- 利用者の操作種別と結果を記録します。\n-- id: 利用イベントID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- user_id: 利用者ID — 対象利用者の識別子です。\n-- department_id: 部署ID — 対象部署の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- answer_id: 回答ID — 対象回答の識別子です。\n-- kind: 種別 — 処理またはイベントの種類を表します。\n-- outcome: 操作結果 — イベントに対応する操作の結果です。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- eventsの正本と組織内参照整合性を定義する。\nCREATE TABLE events (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    document_id varchar(36),\n    answer_id varchar(36),\n    kind varchar(20) NOT NULL,\n    outcome varchar(20) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, answer_id) REFERENCES answers (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "利用イベントID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3042,6 +3215,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3050,6 +3225,8 @@
         {
           "default": null,
           "definition": "user_id VARCHAR(36) NOT NULL",
+          "description": "対象利用者の識別子です。",
+          "logicalName": "利用者ID",
           "name": "user_id",
           "nullable": false,
           "primaryKey": false,
@@ -3058,6 +3235,8 @@
         {
           "default": null,
           "definition": "department_id VARCHAR(36) NOT NULL",
+          "description": "対象部署の識別子です。",
+          "logicalName": "部署ID",
           "name": "department_id",
           "nullable": false,
           "primaryKey": false,
@@ -3066,6 +3245,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36)",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": true,
           "primaryKey": false,
@@ -3074,6 +3255,8 @@
         {
           "default": null,
           "definition": "answer_id VARCHAR(36)",
+          "description": "対象回答の識別子です。",
+          "logicalName": "回答ID",
           "name": "answer_id",
           "nullable": true,
           "primaryKey": false,
@@ -3082,6 +3265,8 @@
         {
           "default": null,
           "definition": "kind VARCHAR(20) NOT NULL",
+          "description": "処理またはイベントの種類を表します。",
+          "logicalName": "種別",
           "name": "kind",
           "nullable": false,
           "primaryKey": false,
@@ -3090,6 +3275,8 @@
         {
           "default": null,
           "definition": "outcome VARCHAR(20) NOT NULL",
+          "description": "イベントに対応する操作の結果です。",
+          "logicalName": "操作結果",
           "name": "outcome",
           "nullable": false,
           "primaryKey": false,
@@ -3098,6 +3285,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -3114,6 +3303,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- eventsの正本と組織内参照整合性を定義する。\nCREATE TABLE events (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    document_id varchar(36),\n    answer_id varchar(36),\n    kind varchar(20) NOT NULL,\n    outcome varchar(20) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, answer_id) REFERENCES answers (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "利用者の操作種別と結果を記録します。",
+      "group": "質問・記録",
+      "logicalName": "利用イベント",
       "name": "events",
       "primaryKey": [
         "id"
@@ -3121,10 +3313,13 @@
       "source": "backend/migrations/015_events.sql"
     },
     {
+      "annotatedDdl": "-- 冪等性記録 (idempotency)\n-- 同一要求の再実行時に応答を再利用するための記録です。\n-- id: 冪等性記録ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- user_id: 利用者ID — 対象利用者の識別子です。\n-- operation: API操作 — 冪等性を管理するAPI操作の識別名です。\n-- request_hash: 要求ハッシュ — 同じキーで異なる要求が送られたことを検出するハッシュ値です。\n-- response: 保存応答 — 再送時に返す応答をJSONで保持します。\n-- idempotencyの正本と組織内参照整合性を定義する。\nCREATE TABLE idempotency (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    operation text NOT NULL,\n    request_hash varchar(64) NOT NULL,\n    response text NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "冪等性記録ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3133,6 +3328,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3141,6 +3338,8 @@
         {
           "default": null,
           "definition": "user_id VARCHAR(36) NOT NULL",
+          "description": "対象利用者の識別子です。",
+          "logicalName": "利用者ID",
           "name": "user_id",
           "nullable": false,
           "primaryKey": false,
@@ -3149,6 +3348,8 @@
         {
           "default": null,
           "definition": "operation TEXT NOT NULL",
+          "description": "冪等性を管理するAPI操作の識別名です。",
+          "logicalName": "API操作",
           "name": "operation",
           "nullable": false,
           "primaryKey": false,
@@ -3157,6 +3358,8 @@
         {
           "default": null,
           "definition": "request_hash VARCHAR(64) NOT NULL",
+          "description": "同じキーで異なる要求が送られたことを検出するハッシュ値です。",
+          "logicalName": "要求ハッシュ",
           "name": "request_hash",
           "nullable": false,
           "primaryKey": false,
@@ -3165,6 +3368,8 @@
         {
           "default": null,
           "definition": "response TEXT NOT NULL",
+          "description": "再送時に返す応答をJSONで保持します。",
+          "logicalName": "保存応答",
           "name": "response",
           "nullable": false,
           "primaryKey": false,
@@ -3178,6 +3383,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- idempotencyの正本と組織内参照整合性を定義する。\nCREATE TABLE idempotency (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    operation text NOT NULL,\n    request_hash varchar(64) NOT NULL,\n    response text NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "同一要求の再実行時に応答を再利用するための記録です。",
+      "group": "質問・記録",
+      "logicalName": "冪等性記録",
       "name": "idempotency",
       "primaryKey": [
         "id"
@@ -3185,10 +3393,13 @@
       "source": "backend/migrations/016_idempotency.sql"
     },
     {
+      "annotatedDdl": "-- 部署所属 (memberships)\n-- 部署と利用者を結び、執筆・承認の権限を管理します。\n-- id: 部署所属ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- department_id: 部署ID — 対象部署の識別子です。\n-- user_id: 利用者ID — 対象利用者の識別子です。\n-- leader: 部署責任者 — 部署責任者として扱うかを表します。\n-- can_author: 執筆権限 — この部署で文書を執筆できるかを表します。\n-- can_review: 承認権限 — この部署で文書を承認できるかを表します。\n-- active: 有効状態 — 利用可能な状態かを表します。\n-- membershipsの正本と組織内参照整合性を定義する。\nCREATE TABLE memberships (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    leader boolean NOT NULL,\n    can_author boolean NOT NULL,\n    can_review boolean NOT NULL,\n    active boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, department_id, user_id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "部署所属ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3197,6 +3408,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3205,6 +3418,8 @@
         {
           "default": null,
           "definition": "department_id VARCHAR(36) NOT NULL",
+          "description": "対象部署の識別子です。",
+          "logicalName": "部署ID",
           "name": "department_id",
           "nullable": false,
           "primaryKey": false,
@@ -3213,6 +3428,8 @@
         {
           "default": null,
           "definition": "user_id VARCHAR(36) NOT NULL",
+          "description": "対象利用者の識別子です。",
+          "logicalName": "利用者ID",
           "name": "user_id",
           "nullable": false,
           "primaryKey": false,
@@ -3221,6 +3438,8 @@
         {
           "default": null,
           "definition": "leader BOOLEAN NOT NULL",
+          "description": "部署責任者として扱うかを表します。",
+          "logicalName": "部署責任者",
           "name": "leader",
           "nullable": false,
           "primaryKey": false,
@@ -3229,6 +3448,8 @@
         {
           "default": null,
           "definition": "can_author BOOLEAN NOT NULL",
+          "description": "この部署で文書を執筆できるかを表します。",
+          "logicalName": "執筆権限",
           "name": "can_author",
           "nullable": false,
           "primaryKey": false,
@@ -3237,6 +3458,8 @@
         {
           "default": null,
           "definition": "can_review BOOLEAN NOT NULL",
+          "description": "この部署で文書を承認できるかを表します。",
+          "logicalName": "承認権限",
           "name": "can_review",
           "nullable": false,
           "primaryKey": false,
@@ -3245,6 +3468,8 @@
         {
           "default": null,
           "definition": "active BOOLEAN NOT NULL",
+          "description": "利用可能な状態かを表します。",
+          "logicalName": "有効状態",
           "name": "active",
           "nullable": false,
           "primaryKey": false,
@@ -3260,6 +3485,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- membershipsの正本と組織内参照整合性を定義する。\nCREATE TABLE memberships (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    leader boolean NOT NULL,\n    can_author boolean NOT NULL,\n    can_review boolean NOT NULL,\n    active boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, department_id, user_id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "部署と利用者を結び、執筆・承認の権限を管理します。",
+      "group": "組織・権限",
+      "logicalName": "部署所属",
       "name": "memberships",
       "primaryKey": [
         "id"
@@ -3267,10 +3495,13 @@
       "source": "backend/migrations/004_memberships.sql"
     },
     {
+      "annotatedDdl": "-- OCR実行 (ocr_runs)\n-- 添付画像の文字認識結果と確認状態を管理します。\n-- id: OCR実行ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- asset_id: 添付画像ID — 文字認識の対象となる画像の識別子です。\n-- result_key: 認識結果保存キー — 文字認識結果のオブジェクト保存キーです。\n-- result_hash: 認識結果ハッシュ — 文字認識結果の整合性を確認するハッシュ値です。\n-- engine: OCRエンジン — 文字認識に使用したエンジンです。\n-- status: OCR処理状態 — 文字認識処理の結果状態です。\n-- confirmed: 確認済み — 文字認識結果が確認済みかを表します。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- ocr_runsの正本と組織内参照整合性を定義する。\nCREATE TABLE ocr_runs (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    asset_id varchar(36) NOT NULL,\n    result_key text NOT NULL,\n    result_hash varchar(64) NOT NULL,\n    engine text NOT NULL,\n    status varchar(20) NOT NULL,\n    confirmed boolean NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, asset_id)\n    REFERENCES assets (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "OCR実行ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3279,6 +3510,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3287,6 +3520,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36) NOT NULL",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": false,
           "primaryKey": false,
@@ -3295,6 +3530,8 @@
         {
           "default": null,
           "definition": "asset_id VARCHAR(36) NOT NULL",
+          "description": "文字認識の対象となる画像の識別子です。",
+          "logicalName": "添付画像ID",
           "name": "asset_id",
           "nullable": false,
           "primaryKey": false,
@@ -3303,6 +3540,8 @@
         {
           "default": null,
           "definition": "result_key TEXT NOT NULL",
+          "description": "文字認識結果のオブジェクト保存キーです。",
+          "logicalName": "認識結果保存キー",
           "name": "result_key",
           "nullable": false,
           "primaryKey": false,
@@ -3311,6 +3550,8 @@
         {
           "default": null,
           "definition": "result_hash VARCHAR(64) NOT NULL",
+          "description": "文字認識結果の整合性を確認するハッシュ値です。",
+          "logicalName": "認識結果ハッシュ",
           "name": "result_hash",
           "nullable": false,
           "primaryKey": false,
@@ -3319,6 +3560,8 @@
         {
           "default": null,
           "definition": "engine TEXT NOT NULL",
+          "description": "文字認識に使用したエンジンです。",
+          "logicalName": "OCRエンジン",
           "name": "engine",
           "nullable": false,
           "primaryKey": false,
@@ -3327,6 +3570,8 @@
         {
           "default": null,
           "definition": "status VARCHAR(20) NOT NULL",
+          "description": "文字認識処理の結果状態です。",
+          "logicalName": "OCR処理状態",
           "name": "status",
           "nullable": false,
           "primaryKey": false,
@@ -3335,6 +3580,8 @@
         {
           "default": null,
           "definition": "confirmed BOOLEAN NOT NULL",
+          "description": "文字認識結果が確認済みかを表します。",
+          "logicalName": "確認済み",
           "name": "confirmed",
           "nullable": false,
           "primaryKey": false,
@@ -3343,6 +3590,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -3357,6 +3606,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- ocr_runsの正本と組織内参照整合性を定義する。\nCREATE TABLE ocr_runs (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    asset_id varchar(36) NOT NULL,\n    result_key text NOT NULL,\n    result_hash varchar(64) NOT NULL,\n    engine text NOT NULL,\n    status varchar(20) NOT NULL,\n    confirmed boolean NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, asset_id)\n    REFERENCES assets (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "添付画像の文字認識結果と確認状態を管理します。",
+      "group": "画像・検索索引",
+      "logicalName": "OCR実行",
       "name": "ocr_runs",
       "primaryKey": [
         "id"
@@ -3364,10 +3616,13 @@
       "source": "backend/migrations/010_ocr_runs.sql"
     },
     {
+      "annotatedDdl": "-- 組織 (organizations)\n-- 組織の名称、改訂番号、利用停止状態を管理します。\n-- id: 組織ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- name: 名称 — 表示に使用する名称です。\n-- revision: 改訂番号 — 更新の競合を検出するための改訂番号です。\n-- suspended: 利用停止 — 組織の利用が停止されているかを表します。\n-- organizationsの正本と組織内参照整合性を定義する。\nCREATE TABLE organizations (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    name text NOT NULL,\n    revision bigint NOT NULL,\n    suspended boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "組織ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3376,6 +3631,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3384,6 +3641,8 @@
         {
           "default": null,
           "definition": "name TEXT NOT NULL",
+          "description": "表示に使用する名称です。",
+          "logicalName": "名称",
           "name": "name",
           "nullable": false,
           "primaryKey": false,
@@ -3392,6 +3651,8 @@
         {
           "default": null,
           "definition": "revision BIGINT NOT NULL",
+          "description": "更新の競合を検出するための改訂番号です。",
+          "logicalName": "改訂番号",
           "name": "revision",
           "nullable": false,
           "primaryKey": false,
@@ -3400,6 +3661,8 @@
         {
           "default": null,
           "definition": "suspended BOOLEAN NOT NULL",
+          "description": "組織の利用が停止されているかを表します。",
+          "logicalName": "利用停止",
           "name": "suspended",
           "nullable": false,
           "primaryKey": false,
@@ -3411,6 +3674,9 @@
         "UNIQUE (organization_id, id)"
       ],
       "ddl": "-- organizationsの正本と組織内参照整合性を定義する。\nCREATE TABLE organizations (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    name text NOT NULL,\n    revision bigint NOT NULL,\n    suspended boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id)\n);\n",
+      "description": "組織の名称、改訂番号、利用停止状態を管理します。",
+      "group": "組織・権限",
+      "logicalName": "組織",
       "name": "organizations",
       "primaryKey": [
         "id"
@@ -3418,10 +3684,13 @@
       "source": "backend/migrations/001_organizations.sql"
     },
     {
+      "annotatedDdl": "-- 非同期処理キュー (outbox)\n-- 索引更新などの配送対象と試行状態を管理します。\n-- id: 非同期処理キューID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- version_id: 文書版ID — 対象文書版の識別子です。\n-- kind: 配送種別 — 索引への登録・削除などの配送処理の種類です。\n-- status: 配送状態 — 配送処理の進行状態です。\n-- attempts: 試行回数 — 処理の試行回数です。\n-- error_code: エラーコード — 処理失敗の理由を識別するコードです。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- outboxの正本と組織内参照整合性を定義する。\nCREATE TABLE outbox (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36),\n    kind varchar(20) NOT NULL,\n    status varchar(20) NOT NULL,\n    attempts bigint NOT NULL,\n    error_code text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "非同期処理キューID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3430,6 +3699,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3438,6 +3709,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36) NOT NULL",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": false,
           "primaryKey": false,
@@ -3446,6 +3719,8 @@
         {
           "default": null,
           "definition": "version_id VARCHAR(36)",
+          "description": "対象文書版の識別子です。",
+          "logicalName": "文書版ID",
           "name": "version_id",
           "nullable": true,
           "primaryKey": false,
@@ -3454,6 +3729,8 @@
         {
           "default": null,
           "definition": "kind VARCHAR(20) NOT NULL",
+          "description": "索引への登録・削除などの配送処理の種類です。",
+          "logicalName": "配送種別",
           "name": "kind",
           "nullable": false,
           "primaryKey": false,
@@ -3462,6 +3739,8 @@
         {
           "default": null,
           "definition": "status VARCHAR(20) NOT NULL",
+          "description": "配送処理の進行状態です。",
+          "logicalName": "配送状態",
           "name": "status",
           "nullable": false,
           "primaryKey": false,
@@ -3470,6 +3749,8 @@
         {
           "default": null,
           "definition": "attempts BIGINT NOT NULL",
+          "description": "処理の試行回数です。",
+          "logicalName": "試行回数",
           "name": "attempts",
           "nullable": false,
           "primaryKey": false,
@@ -3478,6 +3759,8 @@
         {
           "default": null,
           "definition": "error_code TEXT NOT NULL",
+          "description": "処理失敗の理由を識別するコードです。",
+          "logicalName": "エラーコード",
           "name": "error_code",
           "nullable": false,
           "primaryKey": false,
@@ -3486,6 +3769,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -3500,6 +3785,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- outboxの正本と組織内参照整合性を定義する。\nCREATE TABLE outbox (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36),\n    kind varchar(20) NOT NULL,\n    status varchar(20) NOT NULL,\n    attempts bigint NOT NULL,\n    error_code text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "索引更新などの配送対象と試行状態を管理します。",
+      "group": "画像・検索索引",
+      "logicalName": "非同期処理キュー",
       "name": "outbox",
       "primaryKey": [
         "id"
@@ -3507,10 +3795,13 @@
       "source": "backend/migrations/012_outbox.sql"
     },
     {
+      "annotatedDdl": "-- 承認申請 (submissions)\n-- 文書版の申請と承認・却下の判断を記録します。\n-- id: 承認申請ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- version_id: 文書版ID — 対象文書版の識別子です。\n-- requested_by: 申請者ID — 承認を申請した利用者の識別子です。\n-- status: 申請状態 — pending（申請中）、approved（承認）、rejected（却下）を区別します。\n-- manifest_hash: マニフェストハッシュ — 版構成の整合性を確認するハッシュ値です。\n-- decided_by: 判断者ID — 承認または却下を判断した利用者の識別子です。\n-- reason: 理由 — 操作または判断の理由です。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- decided_at: 判断日時 — 承認または却下を判断した日時です。\n-- submissionsの正本と組織内参照整合性を定義する。\nCREATE TABLE submissions (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36) NOT NULL,\n    requested_by varchar(36) NOT NULL,\n    status varchar(20) NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    decided_by varchar(36),\n    reason text NOT NULL,\n    created_at timestamptz NOT NULL,\n    decided_at timestamptz,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, version_id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id, requested_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, decided_by) REFERENCES users (organization_id, id),\n    CHECK (status IN ('pending', 'approved', 'rejected')),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "承認申請ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3519,6 +3810,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3527,6 +3820,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36) NOT NULL",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": false,
           "primaryKey": false,
@@ -3535,6 +3830,8 @@
         {
           "default": null,
           "definition": "version_id VARCHAR(36) NOT NULL",
+          "description": "対象文書版の識別子です。",
+          "logicalName": "文書版ID",
           "name": "version_id",
           "nullable": false,
           "primaryKey": false,
@@ -3543,6 +3840,8 @@
         {
           "default": null,
           "definition": "requested_by VARCHAR(36) NOT NULL",
+          "description": "承認を申請した利用者の識別子です。",
+          "logicalName": "申請者ID",
           "name": "requested_by",
           "nullable": false,
           "primaryKey": false,
@@ -3551,6 +3850,8 @@
         {
           "default": null,
           "definition": "status VARCHAR(20) NOT NULL",
+          "description": "pending（申請中）、approved（承認）、rejected（却下）を区別します。",
+          "logicalName": "申請状態",
           "name": "status",
           "nullable": false,
           "primaryKey": false,
@@ -3559,6 +3860,8 @@
         {
           "default": null,
           "definition": "manifest_hash VARCHAR(64) NOT NULL",
+          "description": "版構成の整合性を確認するハッシュ値です。",
+          "logicalName": "マニフェストハッシュ",
           "name": "manifest_hash",
           "nullable": false,
           "primaryKey": false,
@@ -3567,6 +3870,8 @@
         {
           "default": null,
           "definition": "decided_by VARCHAR(36)",
+          "description": "承認または却下を判断した利用者の識別子です。",
+          "logicalName": "判断者ID",
           "name": "decided_by",
           "nullable": true,
           "primaryKey": false,
@@ -3575,6 +3880,8 @@
         {
           "default": null,
           "definition": "reason TEXT NOT NULL",
+          "description": "操作または判断の理由です。",
+          "logicalName": "理由",
           "name": "reason",
           "nullable": false,
           "primaryKey": false,
@@ -3583,6 +3890,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -3591,6 +3900,8 @@
         {
           "default": null,
           "definition": "decided_at TIMESTAMPTZ",
+          "description": "承認または却下を判断した日時です。",
+          "logicalName": "判断日時",
           "name": "decided_at",
           "nullable": true,
           "primaryKey": false,
@@ -3609,6 +3920,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- submissionsの正本と組織内参照整合性を定義する。\nCREATE TABLE submissions (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36) NOT NULL,\n    requested_by varchar(36) NOT NULL,\n    status varchar(20) NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    decided_by varchar(36),\n    reason text NOT NULL,\n    created_at timestamptz NOT NULL,\n    decided_at timestamptz,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, version_id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id, requested_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, decided_by) REFERENCES users (organization_id, id),\n    CHECK (status IN ('pending', 'approved', 'rejected')),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "文書版の申請と承認・却下の判断を記録します。",
+      "group": "文書・承認",
+      "logicalName": "承認申請",
       "name": "submissions",
       "primaryKey": [
         "id"
@@ -3616,10 +3930,13 @@
       "source": "backend/migrations/008_submissions.sql"
     },
     {
+      "annotatedDdl": "-- 利用者 (users)\n-- 組織に属する認証利用者と運用権限を管理します。\n-- id: 利用者ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- subject: 認証主体 — 認証トークンの主体に対応する値です。\n-- display_name: 表示名 — 利用者の表示名です。\n-- active: 有効状態 — 利用可能な状態かを表します。\n-- operator: 運用者権限 — 組織の運用操作を許可するかを表します。\n-- usersの正本と組織内参照整合性を定義する。\nCREATE TABLE users (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    subject text NOT NULL,\n    display_name text NOT NULL,\n    active boolean NOT NULL,\n    operator boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, subject),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "利用者ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3628,6 +3945,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3636,6 +3955,8 @@
         {
           "default": null,
           "definition": "subject TEXT NOT NULL",
+          "description": "認証トークンの主体に対応する値です。",
+          "logicalName": "認証主体",
           "name": "subject",
           "nullable": false,
           "primaryKey": false,
@@ -3644,6 +3965,8 @@
         {
           "default": null,
           "definition": "display_name TEXT NOT NULL",
+          "description": "利用者の表示名です。",
+          "logicalName": "表示名",
           "name": "display_name",
           "nullable": false,
           "primaryKey": false,
@@ -3652,6 +3975,8 @@
         {
           "default": null,
           "definition": "active BOOLEAN NOT NULL",
+          "description": "利用可能な状態かを表します。",
+          "logicalName": "有効状態",
           "name": "active",
           "nullable": false,
           "primaryKey": false,
@@ -3660,6 +3985,8 @@
         {
           "default": null,
           "definition": "operator BOOLEAN NOT NULL",
+          "description": "組織の運用操作を許可するかを表します。",
+          "logicalName": "運用者権限",
           "name": "operator",
           "nullable": false,
           "primaryKey": false,
@@ -3673,6 +4000,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- usersの正本と組織内参照整合性を定義する。\nCREATE TABLE users (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    subject text NOT NULL,\n    display_name text NOT NULL,\n    active boolean NOT NULL,\n    operator boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, subject),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "組織に属する認証利用者と運用権限を管理します。",
+      "group": "組織・権限",
+      "logicalName": "利用者",
       "name": "users",
       "primaryKey": [
         "id"
@@ -3680,10 +4010,13 @@
       "source": "backend/migrations/002_users.sql"
     },
     {
+      "annotatedDdl": "-- 文書版 (versions)\n-- 承認対象となる本文とマニフェストの版を保持します。\n-- id: 文書版ID — このレコードを一意に識別します。\n-- organization_id: 組織ID — 所属する組織の識別子です。\n-- document_id: 文書ID — 対象文書の識別子です。\n-- number: 版番号 — 文書内で一意となる版の番号です。\n-- title: 文書タイトル — 文書の表示タイトルです。\n-- body_key: 本文保存キー — オブジェクト保存先にある本文のキーです。\n-- body_hash: 本文ハッシュ — 本文の整合性を確認するハッシュ値です。\n-- manifest: マニフェスト — 本文・画像などの版構成をJSONで保持します。\n-- manifest_hash: マニフェストハッシュ — 版構成の整合性を確認するハッシュ値です。\n-- created_by: 作成者ID — 作成した利用者の識別子です。\n-- created_at: 作成日時 — レコードを作成した日時です。\n-- versionsの正本と組織内参照整合性を定義する。\nCREATE TABLE versions (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    number bigint NOT NULL,\n    title text NOT NULL,\n    body_key text NOT NULL,\n    body_hash varchar(64) NOT NULL,\n    manifest text NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    created_by varchar(36) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id, id),\n    UNIQUE (organization_id, document_id, number),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
       "columns": [
         {
           "default": null,
           "definition": "id VARCHAR(36) NOT NULL",
+          "description": "このレコードを一意に識別します。",
+          "logicalName": "文書版ID",
           "name": "id",
           "nullable": false,
           "primaryKey": true,
@@ -3692,6 +4025,8 @@
         {
           "default": null,
           "definition": "organization_id VARCHAR(36) NOT NULL",
+          "description": "所属する組織の識別子です。",
+          "logicalName": "組織ID",
           "name": "organization_id",
           "nullable": false,
           "primaryKey": false,
@@ -3700,6 +4035,8 @@
         {
           "default": null,
           "definition": "document_id VARCHAR(36) NOT NULL",
+          "description": "対象文書の識別子です。",
+          "logicalName": "文書ID",
           "name": "document_id",
           "nullable": false,
           "primaryKey": false,
@@ -3708,6 +4045,8 @@
         {
           "default": null,
           "definition": "number BIGINT NOT NULL",
+          "description": "文書内で一意となる版の番号です。",
+          "logicalName": "版番号",
           "name": "number",
           "nullable": false,
           "primaryKey": false,
@@ -3716,6 +4055,8 @@
         {
           "default": null,
           "definition": "title TEXT NOT NULL",
+          "description": "文書の表示タイトルです。",
+          "logicalName": "文書タイトル",
           "name": "title",
           "nullable": false,
           "primaryKey": false,
@@ -3724,6 +4065,8 @@
         {
           "default": null,
           "definition": "body_key TEXT NOT NULL",
+          "description": "オブジェクト保存先にある本文のキーです。",
+          "logicalName": "本文保存キー",
           "name": "body_key",
           "nullable": false,
           "primaryKey": false,
@@ -3732,6 +4075,8 @@
         {
           "default": null,
           "definition": "body_hash VARCHAR(64) NOT NULL",
+          "description": "本文の整合性を確認するハッシュ値です。",
+          "logicalName": "本文ハッシュ",
           "name": "body_hash",
           "nullable": false,
           "primaryKey": false,
@@ -3740,6 +4085,8 @@
         {
           "default": null,
           "definition": "manifest TEXT NOT NULL",
+          "description": "本文・画像などの版構成をJSONで保持します。",
+          "logicalName": "マニフェスト",
           "name": "manifest",
           "nullable": false,
           "primaryKey": false,
@@ -3748,6 +4095,8 @@
         {
           "default": null,
           "definition": "manifest_hash VARCHAR(64) NOT NULL",
+          "description": "版構成の整合性を確認するハッシュ値です。",
+          "logicalName": "マニフェストハッシュ",
           "name": "manifest_hash",
           "nullable": false,
           "primaryKey": false,
@@ -3756,6 +4105,8 @@
         {
           "default": null,
           "definition": "created_by VARCHAR(36) NOT NULL",
+          "description": "作成した利用者の識別子です。",
+          "logicalName": "作成者ID",
           "name": "created_by",
           "nullable": false,
           "primaryKey": false,
@@ -3764,6 +4115,8 @@
         {
           "default": null,
           "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "description": "レコードを作成した日時です。",
+          "logicalName": "作成日時",
           "name": "created_at",
           "nullable": false,
           "primaryKey": false,
@@ -3780,6 +4133,9 @@
         "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
       ],
       "ddl": "-- versionsの正本と組織内参照整合性を定義する。\nCREATE TABLE versions (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    number bigint NOT NULL,\n    title text NOT NULL,\n    body_key text NOT NULL,\n    body_hash varchar(64) NOT NULL,\n    manifest text NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    created_by varchar(36) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id, id),\n    UNIQUE (organization_id, document_id, number),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "description": "承認対象となる本文とマニフェストの版を保持します。",
+      "group": "文書・承認",
+      "logicalName": "文書版",
       "name": "versions",
       "primaryKey": [
         "id"

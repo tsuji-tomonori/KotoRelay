@@ -2,11 +2,46 @@
 
 from __future__ import annotations
 
+import json
+import re
 from pathlib import Path
 
 from sqlglot import exp
 
 from tools.project.api_documents import sql_access, sql_description
+
+
+def apply_labels(data, labels):
+    """全テーブル・全カラムの和名を必須とし、DDL原文から説明付きDDLを生成する。"""
+    if set(labels) != {t["name"] for t in data["tables"]}:
+        raise ValueError("和名辞書のテーブル集合がDDLと一致しません")
+    for table in data["tables"]:
+        label = labels[table["name"]]
+        if set(label["columns"]) != {c["name"] for c in table["columns"]}:
+            raise ValueError(f"和名辞書のカラム集合がDDLと一致しません: {table['name']}")
+        for item, metadata in [(table, label)] + [
+            (column, label["columns"][column["name"]]) for column in table["columns"]
+        ]:
+            for key in ["logicalName", "description"]:
+                value = metadata.get(key, "")
+                if (
+                    not isinstance(value, str)
+                    or not re.search(r"[ぁ-んァ-ヶ一-龯]", value)
+                    or "\n" in value
+                ):
+                    raise ValueError(f"和名・説明が不正です: {table['name']}.{item['name']}.{key}")
+                item[key] = value
+        if not label.get("group"):
+            raise ValueError(f"テーブル分類がありません: {table['name']}")
+        table["group"] = label["group"]
+        comments = [f"-- {table['logicalName']} ({table['name']})", f"-- {table['description']}"]
+        for column in table["columns"]:
+            comments.append(
+                f"-- {column['name']}: {column['logicalName']} — {column['description']}"
+            )
+        table["annotatedDdl"] = "\n".join(comments) + "\n" + table["ddl"]
+    data["schemaVersion"] = 2
+    return data
 
 
 def build_database(ddl, ddl_sources, queries, operations, root: Path):
@@ -104,20 +139,30 @@ def build_database(ddl, ddl_sources, queries, operations, root: Path):
     for operation in operations:
         if set(operation["queries"]) - set(queries):
             raise ValueError(f"APIが未知SQLを参照: {operation['id']}")
-    return {
+    data = {
         "schemaVersion": 1,
         "tables": tables,
         "relationships": relationships,
         "queries": query_data,
         "operations": sorted(operations, key=lambda op: op["id"]),
     }
+    labels_path = root / "backend/schema-labels.json"
+    if labels_path.exists():
+        apply_labels(data, json.loads(labels_path.read_text()))
+    return data
 
 
 def describe_database(data):
     """公開画面の入力件数と操作仕様を、実データから設計書へ投影する。"""
     return (
         "# DBエクスプローラー\n\n"
-        "品質ポータルの「DB探索」で、テーブル検索、ER図の拡大縮小・移動、"
+        "品質ポータルの「DB探索」は、オブジェクト一覧・カラムを含むER図・プロパティの閲覧画面です。"
+        "全テーブル・全カラムの和名と説明を `backend/schema-labels.json` から取得し、"
+        "DDLとの集合一致を生成時に検査します。物理名・論理名・併記を切り替え、"
+        "和名でも検索できます。説明付きDDLは原文の前にSQLコメントを追加した閲覧用です。"
+        "既存の移行DDLの本文とchecksumは変更しません。\n\n"
+        "カラム行と関係線の選択、テーブル配置の移動・初期化、ミニマップ、全画面に近い図への集中表示、"
+        "ER図の拡大縮小・移動、"
         "テーブル選択、関連テーブルへの移動、カラム型・NULL・既定値・キー・制約・"
         "DDL原文、API別CRUDとSQL原文を確認できます。\n\n"
         f"{len(data['tables'])}テーブル、{len(data['relationships'])}外部キー、"
