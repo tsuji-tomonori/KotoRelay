@@ -295,6 +295,9 @@ def main() -> None:
                 "path": "design/index.html",
             }
         )
+    database_target = PUBLIC / "design-data/DATABASE.gen.json"
+    database_target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(ROOT / "docs/design/generated/DATABASE.gen.json", database_target)
     for path in (ROOT / "docs/design/generated/crud").glob("*.csv"):
         target = PUBLIC / "design-data/crud" / path.name
         target.parent.mkdir(parents=True, exist_ok=True)

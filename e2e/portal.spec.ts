@@ -346,3 +346,134 @@ test('例外応答と型付きログを日本語のテスト手順から照合�
     '409を返し、先に保存した本文を上書きしない。',
   );
 });
+
+test('DB探索で図を拡大移動しDDLと複合外部キーを確認する', async ({ page }) => {
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  const detail = page.getByRole('article', { name: '選択テーブルの詳細' });
+  await expect(detail.getByRole('heading', { name: 'documents', exact: true })).toBeVisible();
+  await expect(detail.getByRole('table')).toContainText('latest_version_id');
+  await detail.getByText('DDL原文', { exact: true }).click();
+  await expect(detail.locator('.db-sql pre')).toContainText('CREATE TABLE documents');
+  const before = await page.getByLabel('ER図の倍率').textContent();
+  await page.getByRole('button', { name: 'ER図を拡大', exact: true }).click();
+  expect(await page.getByLabel('ER図の倍率').textContent()).not.toBe(before);
+  const viewport = page.getByRole('region', { name: '操作できるER図' });
+  await viewport.focus();
+  const transform = await page.locator('.db-world').getAttribute('style');
+  await page.keyboard.press('ArrowRight');
+  expect(await page.locator('.db-world').getAttribute('style')).not.toBe(transform);
+  await page.keyboard.press('Home');
+  await page.getByLabel('選択テーブルと直接の関係のみ').check();
+  const node = page.getByRole('button', { name: 'テーブル departments', exact: true });
+  await node.click();
+  await expect(detail.getByRole('heading', { name: 'departments', exact: true })).toBeVisible();
+  await page
+    .getByLabel('テーブル一覧')
+    .getByRole('button', { name: 'documents', exact: true })
+    .click();
+  await detail.getByRole('button', { name: '関係', exact: true }).click();
+  const relation = detail
+    .locator('.db-relation')
+    .filter({ hasText: 'FOREIGN KEY (organization_id, department_id)' });
+  await expect(relation).toContainText('REFERENCES departments (organization_id, id)');
+  await relation.getByRole('button', { name: 'departments', exact: true }).click();
+  await expect(detail.getByRole('heading', { name: 'departments', exact: true })).toBeVisible();
+  await capture(page, test.info(), 'When', 'ER図を操作し複合外部キーから参照先へ移動する');
+});
+
+test('DB探索でAPIとCRUDを絞り込みSQL原文と呼び出し帳票を開く', async ({ page }) => {
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  const detail = page.getByRole('article', { name: '選択テーブルの詳細' });
+  await detail.getByRole('button', { name: 'API・CRUD', exact: true }).click();
+  await page.getByLabel('APIを検索', { exact: true }).fill('create_document');
+  await page.getByLabel('CRUD', { exact: true }).selectOption('C');
+  await expect(detail.locator('.db-operation')).toHaveCount(1);
+  await expect(detail.locator('.db-operation')).toContainText('POST /api/documents');
+  await detail.locator('.db-sql summary').click();
+  await expect(detail.locator('.db-sql pre')).toContainText('INSERT INTO documents');
+  await expect(detail.locator('.db-sql pre')).toContainText('%(organization_id)s');
+  await expect(detail.locator('.db-sql a')).toHaveAttribute(
+    'href',
+    /\/blob\/[a-f0-9]+\/backend\/src\/.+\.sql$/,
+  );
+  await capture(page, test.info(), 'When', '文書作成APIがこのテーブルへ実行するSQL原文を確認する');
+  await detail.getByRole('button', { name: 'APIのクエリ帳票', exact: true }).click();
+  await expect(page.locator('.detail-heading')).toContainText('文書を作成 — クエリ');
+  await expect(page.locator('.markdown')).toContainText('DocumentsInsertParams');
+});
+
+test('DB探索はモバイル幅と検索なしの結果を扱い図をドラッグとホイールで操作する', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'テーブル documents', exact: true }),
+  ).toBeAttached();
+  await page.getByLabel('テーブル・カラムを検索').fill('not_a_table');
+  await expect(page.getByText('一致するテーブルはありません。')).toBeVisible();
+  await page.getByLabel('テーブル・カラムを検索').fill('next_version');
+  await expect(page.getByLabel('テーブル一覧').getByRole('button')).toHaveCount(1);
+  await page.getByLabel('テーブル・カラムを検索').fill('');
+  const viewport = page.getByRole('region', { name: '操作できるER図' });
+  await viewport.scrollIntoViewIfNeeded();
+  const box = (await viewport.boundingBox())!;
+  const before = await page.locator('.db-world').getAttribute('style');
+  await page.mouse.move(box.x + 5, box.y + 5);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 45, box.y + 25);
+  await page.mouse.up();
+  expect(await page.locator('.db-world').getAttribute('style')).not.toBe(before);
+  const zoom = await page.getByLabel('ER図の倍率').textContent();
+  await page.mouse.wheel(0, -200);
+  await expect(page.getByLabel('ER図の倍率')).not.toHaveText(zoom!);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await capture(page, test.info(), 'When', '390px幅で検索と図のパン・ズームを操作する');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
+test('DB探索の取得失敗を空の設計として表示しない', async ({ page }) => {
+  await page.route('**/design-data/DATABASE.gen.json', (route) =>
+    route.fulfill({ status: 404, body: 'missing' }),
+  );
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('DB設計データを読み込めませんでした');
+  await expect(page.getByRole('region', { name: '操作できるER図' })).toHaveCount(0);
+  await capture(page, test.info(), 'When', 'DB設計データが取得できない場合はエラーを表示する');
+});
+
+test('DB探索をタッチのピンチで拡大しSQL一覧からカラムへ戻る', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'DB探索', exact: true }).click();
+  const viewport = page.getByRole('region', { name: '操作できるER図' });
+  await viewport.scrollIntoViewIfNeeded();
+  const box = (await viewport.boundingBox())!;
+  const before = await page.getByLabel('ER図の倍率').textContent();
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [
+      { x: box.x + 100, y: box.y + 10, id: 1 },
+      { x: box.x + 200, y: box.y + 10, id: 2 },
+    ],
+  });
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchMove',
+    touchPoints: [
+      { x: box.x + 60, y: box.y + 10, id: 1 },
+      { x: box.x + 240, y: box.y + 10, id: 2 },
+    ],
+  });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await expect(page.getByLabel('ER図の倍率')).not.toHaveText(before!);
+  await cdp.detach();
+  const detail = page.getByRole('article', { name: '選択テーブルの詳細' });
+  await detail.getByRole('button', { name: 'SQL一覧', exact: true }).click();
+  await detail.locator('.db-sql summary').first().click();
+  await expect(detail.locator('.db-sql pre').first()).toBeVisible();
+  await detail.getByRole('button', { name: 'カラム・DDL', exact: true }).click();
+  await detail.getByLabel('カラムを検索').fill('latest_version_id');
+  await expect(detail.locator('tbody tr')).toHaveCount(1);
+  await expect(detail.locator('tbody tr')).toContainText('可');
+  await capture(page, test.info(), 'When', 'タッチで図を拡大しSQLとカラムを同じ詳細画面で確認する');
+});

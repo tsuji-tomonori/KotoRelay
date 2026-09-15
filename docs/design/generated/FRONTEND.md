@@ -1,4 +1,4 @@
-<!-- 実装から生成。直接編集しない。入力SHA256: ac3b8a89c10fb6f4c0a9456ea4fb59251414105722d4188a0beaca0d8b493f26 -->
+<!-- 実装から生成。直接編集しない。入力SHA256: a4642be092686b22c6cb0bbcfdd011c0a0c93352fc1191e08d5c7dfccac4e973 -->
 
 # フロントエンド
 
@@ -6,6 +6,13 @@ Astroの単一ルート `/` がReactワークスペースを起動します。Ty
 
 | コンポーネント | 実装 | 行 |
 | --- | --- | --- |
+| Diagram | frontend/portal/App.tsx | 63 |
+| DesignTree | frontend/portal/App.tsx | 96 |
+| Documentation | frontend/portal/App.tsx | 144 |
+| Portal | frontend/portal/App.tsx | 235 |
+| Crud | frontend/portal/DatabaseExplorer.tsx | 52 |
+| Graph | frontend/portal/DatabaseExplorer.tsx | 64 |
+| DatabaseExplorer | frontend/portal/DatabaseExplorer.tsx | 282 |
 | App | frontend/src/components/App.tsx | 37 |
 | Markdown | frontend/src/components/Markdown.tsx | 33 |
 | Login | frontend/src/components/layout/Login.tsx | 4 |
@@ -26,6 +33,40 @@ Astroの単一ルート `/` がReactワークスペースを起動します。Ty
 
 | 実装 | 行 | 処理 |
 | --- | --- | --- |
+| frontend/portal/App.tsx | 75 | setError('図の描画に失敗しました。定義を確認してください。') |
+| frontend/portal/App.tsx | 251 | setError('検証データを読み込めませんでした。') |
+| frontend/portal/App.tsx | 279 | setCategory(value) |
+| frontend/portal/App.tsx | 280 | setQuery('') |
+| frontend/portal/App.tsx | 281 | setSelected('') |
+| frontend/portal/App.tsx | 333 | setCategory('design') |
+| frontend/portal/App.tsx | 334 | setQuery('') |
+| frontend/portal/App.tsx | 335 | setSelected(id) |
+| frontend/portal/App.tsx | 395 | setQuery(e.target.value) |
+| frontend/portal/App.tsx | 418 | setSelected(item.id) |
+| frontend/portal/App.tsx | 490 | setQuery('') |
+| frontend/portal/App.tsx | 491 | setSelected(id) |
+| frontend/portal/App.tsx | 506 | setZoom(step.image!) |
+| frontend/portal/App.tsx | 539 | setZoom('') |
+| frontend/portal/DatabaseExplorer.tsx | 94 | setView({<br>      x: (box.clientWidth - width * scale) / 2,<br>      y: (box.clientHeight - height * scale) / 2,<br>      scale,<br>    }) |
+| frontend/portal/DatabaseExplorer.tsx | 105 | setView({<br>        x: (box.clientWidth - width * scale) / 2,<br>        y: (box.clientHeight - height * scale) / 2,<br>        scale,<br>      }) |
+| frontend/portal/DatabaseExplorer.tsx | 117 | setView((v) => {<br>      const scale = Math.max(0.15, Math.min(3, v.scale * factor));<br>      return {<br>        x: cx - ((cx - v.x) * scale) / v.scale,<br>        y: cy - ((cy - v.y) * scale) / v.scale,<br>        scale,<br>      };<br>    }) |
+| frontend/portal/DatabaseExplorer.tsx | 141 | setView({ scale: 1, x: box.clientWidth / 2 - p.x - 125, y: box.clientHeight / 2 - p.y - 48 }) |
+| frontend/portal/DatabaseExplorer.tsx | 184 | setView((v) => ({ ...v, x: v.x + delta[e.key][0], y: v.y + delta[e.key][1] })) |
+| frontend/portal/DatabaseExplorer.tsx | 204 | setView((v) => {<br>              const scale = Math.max(<br>                0.15,<br>                Math.min(3, (v.scale * distance(after)) / Math.max(1, distance(before))),<br>              );<br>              return {<br>                scale,<br>                x: ax - ((bx - v.x) * scale) / v.scale,<br>                y: ay - ((by - v.y) * scale) / v.scale,<br>              };<br>            }) |
+| frontend/portal/DatabaseExplorer.tsx | 215 | setView((v) => ({ ...v, x: v.x + e.clientX - old.x, y: v.y + e.clientY - old.y })) |
+| frontend/portal/DatabaseExplorer.tsx | 314 | setData(value) |
+| frontend/portal/DatabaseExplorer.tsx | 315 | setSelected(value.tables[0].name) |
+| frontend/portal/DatabaseExplorer.tsx | 319 | setError('DB設計データを読み込めませんでした。ページを再読み込みしてください。') |
+| frontend/portal/DatabaseExplorer.tsx | 333 | setSelected(name) |
+| frontend/portal/DatabaseExplorer.tsx | 334 | setColumnSearch('') |
+| frontend/portal/DatabaseExplorer.tsx | 335 | setApiSearch('') |
+| frontend/portal/DatabaseExplorer.tsx | 336 | setAction('') |
+| frontend/portal/DatabaseExplorer.tsx | 384 | setSearch(e.target.value) |
+| frontend/portal/DatabaseExplorer.tsx | 392 | setRelatedOnly(e.target.checked) |
+| frontend/portal/DatabaseExplorer.tsx | 434 | setTab(key) |
+| frontend/portal/DatabaseExplorer.tsx | 446 | setColumnSearch(e.target.value) |
+| frontend/portal/DatabaseExplorer.tsx | 529 | setApiSearch(e.target.value) |
+| frontend/portal/DatabaseExplorer.tsx | 538 | setAction(e.target.value) |
 | frontend/src/components/App.tsx | 53 | setPending(() => action) |
 | frontend/src/components/App.tsx | 60 | api<Identity>('/groups/me') |
 | frontend/src/components/App.tsx | 63 | setIdentity(value) |
@@ -262,6 +303,42 @@ Astroの単一ルート `/` がReactワークスペースを起動します。Ty
 
 | 実装 | 行 | イベント | 処理 |
 | --- | --- | --- | --- |
+| frontend/portal/App.tsx | 119 | onClick | {() => select(item.id)} |
+| frontend/portal/App.tsx | 214 | onClick | {<br>                    internal<br>                      ? (e) => {<br>                          e.preventDefault();<br>                          onNavigate(internal.id);<br>                        }<br>                      : undefined<br>                  } |
+| frontend/portal/App.tsx | 288 | onClick | {() => navigate('overview')} |
+| frontend/portal/App.tsx | 300 | onClick | {() => navigate(key as keyof typeof labels)} |
+| frontend/portal/App.tsx | 332 | onNavigate | {(id) => {<br>              setCategory('design');<br>              setQuery('');<br>              setSelected(id);<br>            }} |
+| frontend/portal/App.tsx | 353 | onClick | {() => navigate(k)} |
+| frontend/portal/App.tsx | 395 | onChange | {(e) => setQuery(e.target.value)} |
+| frontend/portal/App.tsx | 418 | onClick | {() => setSelected(item.id)} |
+| frontend/portal/App.tsx | 489 | onNavigate | {(id) => {<br>                        setQuery('');<br>                        setSelected(id);<br>                      }} |
+| frontend/portal/App.tsx | 504 | onClick | {(e) => {<br>                              origin.current = e.currentTarget;<br>                              setZoom(step.image!);<br>                            }} |
+| frontend/portal/App.tsx | 538 | onClose | {() => {<br>          setZoom('');<br>          origin.current?.focus();<br>        }} |
+| frontend/portal/App.tsx | 544 | onClick | {() => modal.current?.close()} |
+| frontend/portal/DatabaseExplorer.tsx | 146 | onClick | {() => zoom(1.25)} |
+| frontend/portal/DatabaseExplorer.tsx | 149 | onClick | {() => zoom(0.8)} |
+| frontend/portal/DatabaseExplorer.tsx | 153 | onClick | {fit} |
+| frontend/portal/DatabaseExplorer.tsx | 154 | onClick | {center} |
+| frontend/portal/DatabaseExplorer.tsx | 166 | onKeyDown | {(e) => {<br>          if (e.target !== e.currentTarget) return;<br>          if (<br>            ['+', '=', '-', 'Home', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(<br>              e.key,<br>            )<br>          )<br>            e.preventDefault();<br>          if (['+', '='].includes(e.key)) zoom(1.25);<br>          if (e.key === '-') zoom(0.8);<br>          if (e.key === 'Home') fit();<br>          const delta: Record<string, [number, number]> = {<br>            ArrowLeft: [50, 0],<br>            ArrowRight: [-50, 0],<br>            ArrowUp: [0, 50],<br>            ArrowDown: [0, -50],<br>          };<br>          if (delta[e.key])<br>            setView((v) => ({ ...v, x: v.x + delta[e.key][0], y: v.y + delta[e.key][1] }));<br>        }} |
+| frontend/portal/DatabaseExplorer.tsx | 186 | onPointerDown | {(e) => {<br>          if ((e.target as HTMLElement).closest('button') &#124;&#124; e.button > 0) return;<br>          points.current.set(e.pointerId, { x: e.clientX, y: e.clientY });<br>          e.currentTarget.setPointerCapture(e.pointerId);<br>        }} |
+| frontend/portal/DatabaseExplorer.tsx | 191 | onPointerMove | {(e) => {<br>          const old = points.current.get(e.pointerId);<br>          if (!old) return;<br>          const before = [...points.current.values()];<br>          points.current.set(e.pointerId, { x: e.clientX, y: e.clientY });<br>          const after = [...points.current.values()];<br>          if (before.length === 2) {<br>            const distance = (p: typeof before) => Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);<br>            const rect = e.currentTarget.getBoundingClientRect();<br>            const bx = (before[0].x + before[1].x) / 2 - rect.left;<br>            const by = (before[0].y + before[1].y) / 2 - rect.top;<br>            const ax = (after[0].x + after[1].x) / 2 - rect.left;<br>            const ay = (after[0].y + after[1].y) / 2 - rect.top;<br>            setView((v) => {<br>              const scale = Math.max(<br>                0.15,<br>                Math.min(3, (v.scale * distance(after)) / Math.max(1, distance(before))),<br>              );<br>              return {<br>                scale,<br>                x: ax - ((bx - v.x) * scale) / v.scale,<br>                y: ay - ((by - v.y) * scale) / v.scale,<br>              };<br>            });<br>          } else setView((v) => ({ ...v, x: v.x + e.clientX - old.x, y: v.y + e.clientY - old.y }));<br>        }} |
+| frontend/portal/DatabaseExplorer.tsx | 217 | onPointerUp | {(e) => points.current.delete(e.pointerId)} |
+| frontend/portal/DatabaseExplorer.tsx | 218 | onPointerCancel | {(e) => points.current.delete(e.pointerId)} |
+| frontend/portal/DatabaseExplorer.tsx | 219 | onLostPointerCapture | {(e) => points.current.delete(e.pointerId)} |
+| frontend/portal/DatabaseExplorer.tsx | 269 | onClick | {() => onSelect(t.name)} |
+| frontend/portal/DatabaseExplorer.tsx | 356 | onClick | {() => select(name)} |
+| frontend/portal/DatabaseExplorer.tsx | 384 | onChange | {(e) => setSearch(e.target.value)} |
+| frontend/portal/DatabaseExplorer.tsx | 392 | onChange | {(e) => setRelatedOnly(e.target.checked)} |
+| frontend/portal/DatabaseExplorer.tsx | 405 | onClick | {() => select(t.name)} |
+| frontend/portal/DatabaseExplorer.tsx | 420 | onSelect | {select} |
+| frontend/portal/DatabaseExplorer.tsx | 434 | onClick | {() => setTab(key)} |
+| frontend/portal/DatabaseExplorer.tsx | 446 | onChange | {(e) => setColumnSearch(e.target.value)} |
+| frontend/portal/DatabaseExplorer.tsx | 507 | onClick | {() => select(r.from)} |
+| frontend/portal/DatabaseExplorer.tsx | 508 | onClick | {() => select(r.to)} |
+| frontend/portal/DatabaseExplorer.tsx | 529 | onChange | {(e) => setApiSearch(e.target.value)} |
+| frontend/portal/DatabaseExplorer.tsx | 538 | onChange | {(e) => setAction(e.target.value)} |
+| frontend/portal/DatabaseExplorer.tsx | 580 | onClick | {() => onNavigate(op.documents.query)} |
+| frontend/portal/DatabaseExplorer.tsx | 583 | onClick | {() => onNavigate(op.documents.sequence)} |
 | frontend/src/components/App.tsx | 114 | onLogin | {(value) => {<br>          sessionStorage.setItem('kotorelay-token', value);<br>          setIdentity(null);<br>          setToken(value);<br>          setSelected(null);<br>        }} |
 | frontend/src/components/App.tsx | 145 | onClick | {(e) => {<br>              e.preventDefault();<br>              move('library');<br>            }} |
 | frontend/src/components/App.tsx | 161 | onClick | {() => setMenu(!menu)} |

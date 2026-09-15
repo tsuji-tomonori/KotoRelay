@@ -433,6 +433,7 @@
       ],
       "markdown": [
         "docs/design/generated/DATA.md",
+        "docs/design/generated/DATABASE-EXPLORER.md",
         "docs/design/generated/crud/db.md",
         "docs/design/generated/crud/objects.md",
         "docs/design/generated/crud/vectors.md",
@@ -476,6 +477,25 @@
       ],
       "sources": [
         "infra/src"
+      ],
+      "status": "required"
+    },
+    "intro_capture": {
+      "check": [
+        ".venv/bin/python",
+        "tools/project/design.py",
+        "--check"
+      ],
+      "generate": [
+        ".venv/bin/python",
+        "tools/project/design.py"
+      ],
+      "markdown": [
+        "docs/design/generated/INTRO-CAPTURE.md"
+      ],
+      "sources": [
+        "tools/video",
+        ".github/workflows/intro-capture.yml"
       ],
       "status": "required"
     },

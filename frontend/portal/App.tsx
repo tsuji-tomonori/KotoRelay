@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
 import './style.css';
+import { DatabaseExplorer } from './DatabaseExplorer';
 
 type Item = {
   id: string;
@@ -39,6 +40,7 @@ type Evidence = {
 const labels = {
   overview: '概要',
   design: '設計書',
+  database: 'DB探索',
   static: '静的解析',
   coverage: 'カバレッジ',
   tests: '単体テスト',
@@ -265,7 +267,7 @@ function Portal() {
       </main>
     );
   const items =
-    category === 'overview'
+    category === 'overview' || category === 'database'
       ? []
       : data[category].items.filter((i) =>
           (i.name + ' ' + i.group + ' ' + (i.body ?? '') + ' ' + i.id)
@@ -298,7 +300,7 @@ function Portal() {
               onClick={() => navigate(key as keyof typeof labels)}
             >
               {label}
-              {key !== 'overview' && (
+              {key !== 'overview' && key !== 'database' && (
                 <span>
                   {
                     data[key as keyof Omit<Evidence, 'revision' | 'runId' | 'generatedAt'>].items
@@ -324,7 +326,16 @@ function Portal() {
           <h1>{labels[category]}</h1>
           <p>実装から生成した設計と、実際に実行した検証の記録。</p>
         </header>
-        {category === 'overview' ? (
+        {category === 'database' ? (
+          <DatabaseExplorer
+            revision={data.revision}
+            onNavigate={(id) => {
+              setCategory('design');
+              setQuery('');
+              setSelected(id);
+            }}
+          />
+        ) : category === 'overview' ? (
           <>
             <section className="hero">
               <span className="eyebrow">TRUST THROUGH EVIDENCE</span>

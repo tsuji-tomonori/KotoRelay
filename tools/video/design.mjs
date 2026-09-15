@@ -26,6 +26,8 @@ const text = [
   `- 収録コード SHA-256: ${createHash('sha256').update(script).digest('hex')}`,
   `- CI定義 SHA-256: ${createHash('sha256').update(workflow).digest('hex')}`, '',
 ].join('\n');
-if (process.argv.includes('--check')) {
+if (process.argv.includes('--stdout')) {
+  process.stdout.write(text);
+} else if (process.argv.includes('--check')) {
   if (await readFile(output, 'utf8').catch(()=>null) !== text) throw new Error('収録設計が欠落または変更されています。node tools/video/design.mjs を実行してください。');
 } else await writeFile(output, text);

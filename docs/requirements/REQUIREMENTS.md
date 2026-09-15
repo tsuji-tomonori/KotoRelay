@@ -2,9 +2,9 @@
 # KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG 要件一覧
 
 - スキーマ版: 1
-- カタログ版: 10
+- カタログ版: 11
 - Product(JSON): <code>"KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG"</code>
-- 更新日(JSON): <code>"2026-09-12"</code>
+- 更新日(JSON): <code>"2026-09-15"</code>
 - 正本: `spec/requirements/requirements.qnt`
 - 機械可読view: `spec/requirements/requirements.json`
 
@@ -139,6 +139,9 @@
 | <code>"REQ-DESIGN-18"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、業務例外のHTTP変換を共通境界に集約するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
 | <code>"REQ-DESIGN-19"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、APIフローの条件を説明付きbool関数へ分離するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
 | <code>"REQ-DESIGN-20"</code> | 1 | 有効 | 制約 | 開発プロジェクトは、シーケンスの条件を関数の日本語説明から生成するを**提供する**（<code>"provide"</code>） | 構文・型・依存の正例負例と実HTTP回帰試験 |
+| <code>"REQ-DESIGN-21"</code> | 1 | 有効 | 機能 | 設計閲覧者は、ER図を自由に操作してテーブルを選択するを**提供する**（<code>"provide"</code>） | DDL/CRUD整合検査とブラウザ操作試験 |
+| <code>"REQ-DESIGN-22"</code> | 1 | 有効 | 機能 | 設計閲覧者は、テーブルのカラムと参照関係を確認するを**提供する**（<code>"provide"</code>） | DDL/CRUD整合検査とブラウザ操作試験 |
+| <code>"REQ-DESIGN-23"</code> | 1 | 有効 | 機能 | 設計閲覧者は、テーブルから利用APIとSQLを追跡するを**提供する**（<code>"provide"</code>） | DDL/CRUD整合検査とブラウザ操作試験 |
 
 ## REQ-DOC-01: ブラウザでMarkdownを編集する
 
@@ -4264,6 +4267,102 @@
 - 設計: <code>["docs/planning/API-LAYOUT.md"]</code>
 - 実装: <code>["tools/project/condition_labels.py","tools/project/router_sequence.py"]</code>
 - テスト: <code>["tools/project/tests/test_condition_labels.py","backend/tests/test_workflow.py"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-21: ER図を自由に操作してテーブルを選択する
+
+要件ID(JSON): <code>"REQ-DESIGN-21"</code>
+タイトル(JSON): <code>"ER図を自由に操作してテーブルを選択する"</code>
+主体(JSON): <code>"設計閲覧者"</code>
+対象(JSON): <code>"ER図を自由に操作してテーブルを選択する"</code>
+設計閲覧者は、ER図を自由に操作してテーブルを選択するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。
+根拠(JSON): <code>"GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"database-explorer-2026-09-15"</code>
+分類: scope=<code>"project"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-21"</code> 前提: 実装のDDLとAPI別SQLが存在する。条件: 品質PagesのDB探索を操作する。期待結果: 拡大縮小・移動・全体表示とテーブル選択をマウス・タッチ・キーボードで操作できる。
+  - criterion(JSON Object): <code>{"given":"実装のDDLとAPI別SQLが存在する","id":"AC-DESIGN-21","then":"拡大縮小・移動・全体表示とテーブル選択をマウス・タッチ・キーボードで操作できる","when":"品質PagesのDB探索を操作する"}</code>
+
+要求源(JSON List): <code>["docs/planning/REQUESTS.md#u-db-explorer"]</code>
+検証方法: DDL/CRUD整合検査とブラウザ操作試験
+検証証跡: 生成差分検査とPages E2E
+検証(JSON Object): <code>{"evidence":"生成差分検査とPages E2E","method":"DDL/CRUD整合検査とブラウザ操作試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/DATABASE-EXPLORER.md"]</code>
+- 実装: <code>["tools/project/database_explorer.py","frontend/portal/DatabaseExplorer.tsx"]</code>
+- テスト: <code>["tools/project/tests/test_database_explorer.py","e2e/portal.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-22: テーブルのカラムと参照関係を確認する
+
+要件ID(JSON): <code>"REQ-DESIGN-22"</code>
+タイトル(JSON): <code>"テーブルのカラムと参照関係を確認する"</code>
+主体(JSON): <code>"設計閲覧者"</code>
+対象(JSON): <code>"テーブルのカラムと参照関係を確認する"</code>
+設計閲覧者は、テーブルのカラムと参照関係を確認するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。
+根拠(JSON): <code>"GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"database-explorer-2026-09-15"</code>
+分類: scope=<code>"project"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-22"</code> 前提: 実装のDDLとAPI別SQLが存在する。条件: 品質PagesのDB探索を操作する。期待結果: DDLに由来する全カラムの型・NULL・既定値・キー・制約とDDL原文を閲覧し、複合外部キーの対応を確認して関連テーブルへ移動できる。
+  - criterion(JSON Object): <code>{"given":"実装のDDLとAPI別SQLが存在する","id":"AC-DESIGN-22","then":"DDLに由来する全カラムの型・NULL・既定値・キー・制約とDDL原文を閲覧し、複合外部キーの対応を確認して関連テーブルへ移動できる","when":"品質PagesのDB探索を操作する"}</code>
+
+要求源(JSON List): <code>["docs/planning/REQUESTS.md#u-db-explorer"]</code>
+検証方法: DDL/CRUD整合検査とブラウザ操作試験
+検証証跡: 生成差分検査とPages E2E
+検証(JSON Object): <code>{"evidence":"生成差分検査とPages E2E","method":"DDL/CRUD整合検査とブラウザ操作試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/DATABASE-EXPLORER.md"]</code>
+- 実装: <code>["tools/project/database_explorer.py","frontend/portal/DatabaseExplorer.tsx"]</code>
+- テスト: <code>["tools/project/tests/test_database_explorer.py","e2e/portal.spec.ts"]</code>
+- 参照資料: <code>["AGENTS.md"]</code>
+廃止理由: <code>""</code>
+後継要件: <code>""</code>
+
+## REQ-DESIGN-23: テーブルから利用APIとSQLを追跡する
+
+要件ID(JSON): <code>"REQ-DESIGN-23"</code>
+タイトル(JSON): <code>"テーブルから利用APIとSQLを追跡する"</code>
+主体(JSON): <code>"設計閲覧者"</code>
+対象(JSON): <code>"テーブルから利用APIとSQLを追跡する"</code>
+設計閲覧者は、テーブルから利用APIとSQLを追跡するを**提供する**。
+行為enum: <code>"provide"</code>
+
+根拠: GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。
+根拠(JSON): <code>"GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。"</code>
+
+項目版: 1 / 状態: `active` / 種別: `functional`
+変更識別子: <code>"database-explorer-2026-09-15"</code>
+分類: scope=<code>"project"</code> / category=<code>"functional"</code>
+
+受入条件:
+- <code>"AC-DESIGN-23"</code> 前提: 実装のDDLとAPI別SQLが存在する。条件: 品質PagesのDB探索を操作する。期待結果: CRUD帳票と同じ到達解析に基づいて利用API・CRUD・SQL原文・他の対象テーブル・ソース・呼出条件の帳票を確認でき、静的な候補と実行履歴を区別できる。
+  - criterion(JSON Object): <code>{"given":"実装のDDLとAPI別SQLが存在する","id":"AC-DESIGN-23","then":"CRUD帳票と同じ到達解析に基づいて利用API・CRUD・SQL原文・他の対象テーブル・ソース・呼出条件の帳票を確認でき、静的な候補と実行履歴を区別できる","when":"品質PagesのDB探索を操作する"}</code>
+
+要求源(JSON List): <code>["docs/planning/REQUESTS.md#u-db-explorer"]</code>
+検証方法: DDL/CRUD整合検査とブラウザ操作試験
+検証証跡: 生成差分検査とPages E2E
+検証(JSON Object): <code>{"evidence":"生成差分検査とPages E2E","method":"DDL/CRUD整合検査とブラウザ操作試験"}</code>
+トレース(JSON List、順序保持):
+- 設計: <code>["docs/design/generated/DATABASE-EXPLORER.md"]</code>
+- 実装: <code>["tools/project/database_explorer.py","frontend/portal/DatabaseExplorer.tsx"]</code>
+- テスト: <code>["tools/project/tests/test_database_explorer.py","e2e/portal.spec.ts"]</code>
 - 参照資料: <code>["AGENTS.md"]</code>
 廃止理由: <code>""</code>
 後継要件: <code>""</code>
