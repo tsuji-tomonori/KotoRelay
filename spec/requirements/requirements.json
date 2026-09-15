@@ -1,5 +1,5 @@
 {
-  "catalog_revision": 10,
+  "catalog_revision": 11,
   "product": "KotoRelay（コトリレー）— 承認済み文書と画像に基づく部署対応RAG",
   "requirements": [
     {
@@ -6315,8 +6315,149 @@
         "evidence": "品質portalとローカル検証結果",
         "method": "構文・型・依存の正例負例と実HTTP回帰試験"
       }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "実装のDDLとAPI別SQLが存在する",
+          "id": "AC-DESIGN-21",
+          "then": "拡大縮小・移動・全体表示とテーブル選択をマウス・タッチ・キーボードで操作できる",
+          "when": "品質PagesのDB探索を操作する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-DESIGN-21",
+      "last_changed_by": "database-explorer-2026-09-15",
+      "object": "ER図を自由に操作してテーブルを選択する",
+      "rationale": "GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u-db-explorer"
+      ],
+      "status": "active",
+      "subject": "設計閲覧者",
+      "superseded_by": "",
+      "title": "ER図を自由に操作してテーブルを選択する",
+      "traces": {
+        "design": [
+          "docs/design/generated/DATABASE-EXPLORER.md"
+        ],
+        "implementation": [
+          "tools/project/database_explorer.py",
+          "frontend/portal/DatabaseExplorer.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_database_explorer.py",
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "生成差分検査とPages E2E",
+        "method": "DDL/CRUD整合検査とブラウザ操作試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "実装のDDLとAPI別SQLが存在する",
+          "id": "AC-DESIGN-22",
+          "then": "DDLに由来する全カラムの型・NULL・既定値・キー・制約とDDL原文を閲覧し、複合外部キーの対応を確認して関連テーブルへ移動できる",
+          "when": "品質PagesのDB探索を操作する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-DESIGN-22",
+      "last_changed_by": "database-explorer-2026-09-15",
+      "object": "テーブルのカラムと参照関係を確認する",
+      "rationale": "GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u-db-explorer"
+      ],
+      "status": "active",
+      "subject": "設計閲覧者",
+      "superseded_by": "",
+      "title": "テーブルのカラムと参照関係を確認する",
+      "traces": {
+        "design": [
+          "docs/design/generated/DATABASE-EXPLORER.md"
+        ],
+        "implementation": [
+          "tools/project/database_explorer.py",
+          "frontend/portal/DatabaseExplorer.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_database_explorer.py",
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "生成差分検査とPages E2E",
+        "method": "DDL/CRUD整合検査とブラウザ操作試験"
+      }
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "given": "実装のDDLとAPI別SQLが存在する",
+          "id": "AC-DESIGN-23",
+          "then": "CRUD帳票と同じ到達解析に基づいて利用API・CRUD・SQL原文・他の対象テーブル・ソース・呼出条件の帳票を確認でき、静的な候補と実行履歴を区別できる",
+          "when": "品質PagesのDB探索を操作する"
+        }
+      ],
+      "action": "provide",
+      "category": "functional",
+      "id": "REQ-DESIGN-23",
+      "last_changed_by": "database-explorer-2026-09-15",
+      "object": "テーブルから利用APIとSQLを追跡する",
+      "rationale": "GitHub Pages上でER図・DDL・API別CRUD・SQLを横断して調査するため。",
+      "retirement_reason": "",
+      "revision": 1,
+      "scope": "project",
+      "source_refs": [
+        "docs/planning/REQUESTS.md#u-db-explorer"
+      ],
+      "status": "active",
+      "subject": "設計閲覧者",
+      "superseded_by": "",
+      "title": "テーブルから利用APIとSQLを追跡する",
+      "traces": {
+        "design": [
+          "docs/design/generated/DATABASE-EXPLORER.md"
+        ],
+        "implementation": [
+          "tools/project/database_explorer.py",
+          "frontend/portal/DatabaseExplorer.tsx"
+        ],
+        "standards": [
+          "AGENTS.md"
+        ],
+        "tests": [
+          "tools/project/tests/test_database_explorer.py",
+          "e2e/portal.spec.ts"
+        ]
+      },
+      "type": "functional",
+      "verification": {
+        "evidence": "生成差分検査とPages E2E",
+        "method": "DDL/CRUD整合検査とブラウザ操作試験"
+      }
     }
   ],
   "schema_version": 1,
-  "updated_at": "2026-09-12"
+  "updated_at": "2026-09-15"
 }

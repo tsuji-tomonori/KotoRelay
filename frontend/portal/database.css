@@ -1,0 +1,260 @@
+.db-explorer {
+  min-width: 0;
+}
+.db-intro {
+  border-left: 3px solid #247354;
+  padding-left: 16px;
+}
+.db-filters,
+.db-toolbar,
+.db-tabs,
+.db-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.db-filters {
+  gap: 20px;
+}
+.db-explorer label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+.db-explorer input:not([type='checkbox']),
+.db-explorer select {
+  padding: 10px;
+  border: 1px solid #aebfb4;
+  border-radius: 6px;
+  background: white;
+  color: #263c35;
+  max-width: 100%;
+  min-width: 0;
+  font: inherit;
+}
+.db-explorer .db-checkbox {
+  display: flex;
+  align-items: center;
+}
+.db-checkbox input {
+  width: 18px;
+  height: 18px;
+}
+.db-chips button,
+.db-toolbar button,
+.db-tabs button,
+.db-relation button {
+  padding: 9px 12px;
+  border: 1px solid #bacbc1;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.db-explorer button[aria-pressed='true'] {
+  background: #205e46;
+  color: white;
+  border-color: #205e46;
+}
+.db-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.db-graph-panel {
+  min-width: 0;
+  position: sticky;
+  top: 20px;
+  border: 1px solid #d8e3dc;
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+}
+.db-toolbar {
+  padding: 12px;
+  margin: 0;
+}
+.db-toolbar output {
+  font-size: 13px;
+  min-width: 44px;
+}
+.db-graph-panel > p {
+  padding: 0 12px;
+  font-size: 12px;
+}
+.db-viewport {
+  position: relative;
+  height: 560px;
+  overflow: hidden;
+  touch-action: none;
+  background-color: #eef4f0;
+  background-image: radial-gradient(#c9d8ce 1px, transparent 1px);
+  background-size: 20px 20px;
+  cursor: grab;
+}
+.db-viewport:active {
+  cursor: grabbing;
+}
+.db-viewport:focus-visible,
+.db-explorer select:focus-visible {
+  outline: 3px solid #eba848;
+  outline-offset: -3px;
+}
+.db-world {
+  position: absolute;
+  transform-origin: 0 0;
+}
+.db-world svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.db-world svg > path {
+  fill: none;
+  stroke: #97aaa0;
+  stroke-width: 1.5;
+}
+.db-world svg > path.selected {
+  stroke: #176740;
+  stroke-width: 3;
+}
+.db-node {
+  position: absolute;
+  width: 250px;
+  height: 96px;
+  text-align: left;
+  background: white;
+  border: 1px solid #90ab9a;
+  border-radius: 9px;
+  padding: 12px 16px;
+  box-shadow: 0 3px 8px #203d3210;
+  display: grid;
+  gap: 5px;
+  user-select: none;
+}
+.db-node strong {
+  font-size: 18px;
+}
+.db-node span,
+.db-node small {
+  font-size: 12px;
+}
+.db-detail {
+  min-width: 0;
+  border: 1px solid #d8e3dc;
+  border-radius: 12px;
+  background: white;
+  padding: 20px;
+  overflow-wrap: anywhere;
+}
+.db-detail h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.db-detail h3 {
+  font-size: 15px;
+  margin-top: 18px;
+}
+.db-detail p {
+  font-size: 13px;
+}
+.db-tabs {
+  border-bottom: 1px solid #d8e3dc;
+  padding-bottom: 12px;
+}
+.db-table-scroll {
+  overflow: auto;
+  margin: 16px 0 24px;
+}
+.db-detail table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+.db-detail caption {
+  text-align: left;
+  padding: 8px 0;
+  color: #53695c;
+}
+.db-detail th,
+.db-detail td {
+  border-bottom: 1px solid #d8e3dc;
+  padding: 10px 6px;
+  vertical-align: top;
+}
+.db-detail thead {
+  background: #eff5f0;
+}
+.db-detail th {
+  font-weight: 500;
+}
+.db-detail th details {
+  margin-top: 6px;
+}
+.db-key {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 4px;
+  margin-left: 4px;
+  background: #e5eee8;
+}
+.db-sql,
+.db-relation,
+.db-operation {
+  border-top: 1px solid #d8e3dc;
+  padding: 14px 0;
+}
+.db-sql summary {
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.db-sql a {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.db-crud {
+  display: inline-flex;
+  gap: 3px;
+  vertical-align: middle;
+}
+.db-crud > span {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid #a6bfae;
+  border-radius: 3px;
+  background: #e9f2ed;
+  color: #20543b;
+  font-size: 11px;
+}
+@media (max-width: 1200px) {
+  .db-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .db-graph-panel {
+    position: static;
+  }
+  .db-viewport {
+    height: 450px;
+  }
+}
+@media (max-width: 750px) {
+  .db-detail {
+    padding: 14px;
+  }
+  .db-viewport {
+    height: 370px;
+  }
+  .db-explorer .db-filters {
+    align-items: stretch;
+  }
+  .db-explorer label {
+    max-width: 100%;
+  }
+}

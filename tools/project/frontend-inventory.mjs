@@ -13,7 +13,10 @@ function files(folder) {
   );
 }
 const result = { components: [], calls: [], interactions: [] };
-for (const path of files(join(root, 'frontend/src')).sort()) {
+for (const path of [
+  ...files(join(root, 'frontend/src')),
+  ...files(join(root, 'frontend/portal')),
+].sort()) {
   const file = ts.createSourceFile(
     path,
     readFileSync(path, 'utf8'),

@@ -1,0 +1,3790 @@
+{
+  "operations": [
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/chat/ask_question/detail-design.md",
+        "interface": "docs/design/generated/api/chat/ask_question/interface.md",
+        "messages": "docs/design/generated/api/chat/ask_question/messages.md",
+        "query": "docs/design/generated/api/chat/ask_question/query.md",
+        "sequence": "docs/design/generated/api/chat/ask_question/sequence.md",
+        "unit-test": "docs/design/generated/api/chat/ask_question/unit-test.md"
+      },
+      "id": "ask_question",
+      "method": "POST",
+      "path": "/api/chat",
+      "queries": [
+        "kotorelay.operations.chat.ask_question.generated.queries.answers_get",
+        "kotorelay.operations.chat.ask_question.generated.queries.answers_insert",
+        "kotorelay.operations.chat.ask_question.generated.queries.answers_list",
+        "kotorelay.operations.chat.ask_question.generated.queries.assets_get",
+        "kotorelay.operations.chat.ask_question.generated.queries.chunks_list",
+        "kotorelay.operations.chat.ask_question.generated.queries.conversations_get",
+        "kotorelay.operations.chat.ask_question.generated.queries.conversations_insert",
+        "kotorelay.operations.chat.ask_question.generated.queries.documents_list",
+        "kotorelay.operations.chat.ask_question.generated.queries.events_insert",
+        "kotorelay.operations.chat.ask_question.generated.queries.events_list",
+        "kotorelay.operations.chat.ask_question.generated.queries.versions_get",
+        "kotorelay.operations.chat.shared.generated.queries.assets_get",
+        "kotorelay.operations.chat.shared.generated.queries.chunks_get",
+        "kotorelay.operations.chat.shared.generated.queries.documents_get",
+        "kotorelay.operations.chat.shared.generated.queries.ocr_runs_get",
+        "kotorelay.operations.chat.shared.generated.queries.versions_get",
+        "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.idempotency_get",
+        "kotorelay.operations.system.authorization.generated.queries.idempotency_insert",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "最新承認版の根拠で回答"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/groups/change_membership/detail-design.md",
+        "interface": "docs/design/generated/api/groups/change_membership/interface.md",
+        "messages": "docs/design/generated/api/groups/change_membership/messages.md",
+        "query": "docs/design/generated/api/groups/change_membership/query.md",
+        "sequence": "docs/design/generated/api/groups/change_membership/sequence.md",
+        "unit-test": "docs/design/generated/api/groups/change_membership/unit-test.md"
+      },
+      "id": "change_membership",
+      "method": "PUT",
+      "path": "/api/groups/memberships",
+      "queries": [
+        "kotorelay.operations.groups.change_membership.generated.queries.departments_get",
+        "kotorelay.operations.groups.change_membership.generated.queries.memberships_insert",
+        "kotorelay.operations.groups.change_membership.generated.queries.memberships_list",
+        "kotorelay.operations.groups.change_membership.generated.queries.memberships_update",
+        "kotorelay.operations.groups.change_membership.generated.queries.users_get",
+        "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "部署の所属権限を変更"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/change_policy/detail-design.md",
+        "interface": "docs/design/generated/api/documents/change_policy/interface.md",
+        "messages": "docs/design/generated/api/documents/change_policy/messages.md",
+        "query": "docs/design/generated/api/documents/change_policy/query.md",
+        "sequence": "docs/design/generated/api/documents/change_policy/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/change_policy/unit-test.md"
+      },
+      "id": "change_policy",
+      "method": "PUT",
+      "path": "/api/documents/{document_id}/policy",
+      "queries": [
+        "kotorelay.operations.documents.change_policy.generated.queries.departments_list",
+        "kotorelay.operations.documents.change_policy.generated.queries.documents_update",
+        "kotorelay.operations.documents.change_policy.generated.queries.outbox_insert",
+        "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "リーダーが公開範囲・公開停止・削除を管理"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/chat/chat_history/detail-design.md",
+        "interface": "docs/design/generated/api/chat/chat_history/interface.md",
+        "messages": "docs/design/generated/api/chat/chat_history/messages.md",
+        "query": "docs/design/generated/api/chat/chat_history/query.md",
+        "sequence": "docs/design/generated/api/chat/chat_history/sequence.md",
+        "unit-test": "docs/design/generated/api/chat/chat_history/unit-test.md"
+      },
+      "id": "chat_history",
+      "method": "GET",
+      "path": "/api/chat/{conversation_id}",
+      "queries": [
+        "kotorelay.operations.chat.chat_history.generated.queries.answers_list",
+        "kotorelay.operations.chat.chat_history.generated.queries.conversations_get",
+        "kotorelay.operations.chat.shared.generated.queries.assets_get",
+        "kotorelay.operations.chat.shared.generated.queries.chunks_get",
+        "kotorelay.operations.chat.shared.generated.queries.documents_get",
+        "kotorelay.operations.chat.shared.generated.queries.ocr_runs_get",
+        "kotorelay.operations.chat.shared.generated.queries.versions_get",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "現行認可で会話履歴を再表示"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/images/correct_ocr/detail-design.md",
+        "interface": "docs/design/generated/api/images/correct_ocr/interface.md",
+        "messages": "docs/design/generated/api/images/correct_ocr/messages.md",
+        "query": "docs/design/generated/api/images/correct_ocr/query.md",
+        "sequence": "docs/design/generated/api/images/correct_ocr/sequence.md",
+        "unit-test": "docs/design/generated/api/images/correct_ocr/unit-test.md"
+      },
+      "id": "correct_ocr",
+      "method": "POST",
+      "path": "/api/images/{asset_id}/ocr",
+      "queries": [
+        "kotorelay.operations.images.correct_ocr.generated.queries.assets_get",
+        "kotorelay.operations.images.correct_ocr.generated.queries.ocr_runs_insert",
+        "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "OCRを訂正し新しいrunを保存"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/create_document/detail-design.md",
+        "interface": "docs/design/generated/api/documents/create_document/interface.md",
+        "messages": "docs/design/generated/api/documents/create_document/messages.md",
+        "query": "docs/design/generated/api/documents/create_document/query.md",
+        "sequence": "docs/design/generated/api/documents/create_document/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/create_document/unit-test.md"
+      },
+      "id": "create_document",
+      "method": "POST",
+      "path": "/api/documents",
+      "queries": [
+        "kotorelay.operations.documents.create_document.generated.queries.documents_insert",
+        "kotorelay.operations.documents.create_document.generated.queries.drafts_insert",
+        "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "文書を作成"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/reviews/decide_review/detail-design.md",
+        "interface": "docs/design/generated/api/reviews/decide_review/interface.md",
+        "messages": "docs/design/generated/api/reviews/decide_review/messages.md",
+        "query": "docs/design/generated/api/reviews/decide_review/query.md",
+        "sequence": "docs/design/generated/api/reviews/decide_review/sequence.md",
+        "unit-test": "docs/design/generated/api/reviews/decide_review/unit-test.md"
+      },
+      "id": "decide_review",
+      "method": "POST",
+      "path": "/api/reviews/{submission_id}/decision",
+      "queries": [
+        "kotorelay.operations.reviews.decide_review.generated.queries.documents_update",
+        "kotorelay.operations.reviews.decide_review.generated.queries.outbox_insert",
+        "kotorelay.operations.reviews.decide_review.generated.queries.submissions_get",
+        "kotorelay.operations.reviews.decide_review.generated.queries.submissions_update",
+        "kotorelay.operations.reviews.decide_review.generated.queries.versions_get",
+        "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.idempotency_get",
+        "kotorelay.operations.system.authorization.generated.queries.idempotency_insert",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list",
+        "kotorelay.operations.system.authorization.generated.queries.versions_get"
+      ],
+      "summary": "manifestを確認して承認・却下"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/metrics/department_metrics/detail-design.md",
+        "interface": "docs/design/generated/api/metrics/department_metrics/interface.md",
+        "messages": "docs/design/generated/api/metrics/department_metrics/messages.md",
+        "query": "docs/design/generated/api/metrics/department_metrics/query.md",
+        "sequence": "docs/design/generated/api/metrics/department_metrics/sequence.md",
+        "unit-test": "docs/design/generated/api/metrics/department_metrics/unit-test.md"
+      },
+      "id": "department_metrics",
+      "method": "GET",
+      "path": "/api/metrics/{department_id}",
+      "queries": [
+        "kotorelay.operations.metrics.department_metrics.generated.queries.documents_list",
+        "kotorelay.operations.metrics.department_metrics.generated.queries.events_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "部署の利用数と文書貢献を集計"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/get_draft/detail-design.md",
+        "interface": "docs/design/generated/api/documents/get_draft/interface.md",
+        "messages": "docs/design/generated/api/documents/get_draft/messages.md",
+        "query": "docs/design/generated/api/documents/get_draft/query.md",
+        "sequence": "docs/design/generated/api/documents/get_draft/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/get_draft/unit-test.md"
+      },
+      "id": "get_draft",
+      "method": "GET",
+      "path": "/api/documents/{document_id}/draft",
+      "queries": [
+        "kotorelay.operations.documents.shared.generated.queries.drafts_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "下書きを取得"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/groups/get_identity/detail-design.md",
+        "interface": "docs/design/generated/api/groups/get_identity/interface.md",
+        "messages": "docs/design/generated/api/groups/get_identity/messages.md",
+        "query": "docs/design/generated/api/groups/get_identity/query.md",
+        "sequence": "docs/design/generated/api/groups/get_identity/sequence.md",
+        "unit-test": "docs/design/generated/api/groups/get_identity/unit-test.md"
+      },
+      "id": "get_identity",
+      "method": "GET",
+      "path": "/api/groups/me",
+      "queries": [
+        "kotorelay.operations.groups.get_identity.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "本人と現在の所属権限を取得"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/images/get_image/detail-design.md",
+        "interface": "docs/design/generated/api/images/get_image/interface.md",
+        "messages": "docs/design/generated/api/images/get_image/messages.md",
+        "query": "docs/design/generated/api/images/get_image/query.md",
+        "sequence": "docs/design/generated/api/images/get_image/sequence.md",
+        "unit-test": "docs/design/generated/api/images/get_image/unit-test.md"
+      },
+      "id": "get_image",
+      "method": "GET",
+      "path": "/api/images/{asset_id}",
+      "queries": [
+        "kotorelay.operations.images.shared.generated.queries.assets_get",
+        "kotorelay.operations.images.shared.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list",
+        "kotorelay.operations.system.authorization.generated.queries.versions_get"
+      ],
+      "summary": "現在の認可で画像を配信"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/images/get_ocr/detail-design.md",
+        "interface": "docs/design/generated/api/images/get_ocr/interface.md",
+        "messages": "docs/design/generated/api/images/get_ocr/messages.md",
+        "query": "docs/design/generated/api/images/get_ocr/query.md",
+        "sequence": "docs/design/generated/api/images/get_ocr/sequence.md",
+        "unit-test": "docs/design/generated/api/images/get_ocr/unit-test.md"
+      },
+      "id": "get_ocr",
+      "method": "GET",
+      "path": "/api/images/ocr/{run_id}",
+      "queries": [
+        "kotorelay.operations.images.get_ocr.generated.queries.documents_get",
+        "kotorelay.operations.images.get_ocr.generated.queries.ocr_runs_get",
+        "kotorelay.operations.images.shared.generated.queries.assets_get",
+        "kotorelay.operations.images.shared.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list",
+        "kotorelay.operations.system.authorization.generated.queries.versions_get"
+      ],
+      "summary": "認可されたOCR領域を取得"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/health/health/detail-design.md",
+        "interface": "docs/design/generated/api/health/health/interface.md",
+        "messages": "docs/design/generated/api/health/health/messages.md",
+        "query": "docs/design/generated/api/health/health/query.md",
+        "sequence": "docs/design/generated/api/health/health/sequence.md",
+        "unit-test": "docs/design/generated/api/health/health/unit-test.md"
+      },
+      "id": "health",
+      "method": "GET",
+      "path": "/api/health",
+      "queries": [],
+      "summary": "死活確認"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/list_documents/detail-design.md",
+        "interface": "docs/design/generated/api/documents/list_documents/interface.md",
+        "messages": "docs/design/generated/api/documents/list_documents/messages.md",
+        "query": "docs/design/generated/api/documents/list_documents/query.md",
+        "sequence": "docs/design/generated/api/documents/list_documents/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/list_documents/unit-test.md"
+      },
+      "id": "list_documents",
+      "method": "GET",
+      "path": "/api/documents",
+      "queries": [
+        "kotorelay.operations.documents.list_documents.generated.queries.chunks_list",
+        "kotorelay.operations.documents.list_documents.generated.queries.documents_by_department",
+        "kotorelay.operations.documents.list_documents.generated.queries.documents_list",
+        "kotorelay.operations.documents.list_documents.generated.queries.submissions_list",
+        "kotorelay.operations.documents.list_documents.generated.queries.versions_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "閲覧可能な文書を検索"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/operations/list_jobs/detail-design.md",
+        "interface": "docs/design/generated/api/operations/list_jobs/interface.md",
+        "messages": "docs/design/generated/api/operations/list_jobs/messages.md",
+        "query": "docs/design/generated/api/operations/list_jobs/query.md",
+        "sequence": "docs/design/generated/api/operations/list_jobs/sequence.md",
+        "unit-test": "docs/design/generated/api/operations/list_jobs/unit-test.md"
+      },
+      "id": "list_jobs",
+      "method": "GET",
+      "path": "/api/operations/jobs",
+      "queries": [
+        "kotorelay.operations.indexing.list_jobs.generated.queries.documents_list",
+        "kotorelay.operations.indexing.list_jobs.generated.queries.outbox_list",
+        "kotorelay.operations.indexing.list_jobs.generated.queries.versions_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "反映ジョブと失敗理由を確認"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/groups/list_members/detail-design.md",
+        "interface": "docs/design/generated/api/groups/list_members/interface.md",
+        "messages": "docs/design/generated/api/groups/list_members/messages.md",
+        "query": "docs/design/generated/api/groups/list_members/query.md",
+        "sequence": "docs/design/generated/api/groups/list_members/sequence.md",
+        "unit-test": "docs/design/generated/api/groups/list_members/unit-test.md"
+      },
+      "id": "list_members",
+      "method": "GET",
+      "path": "/api/groups/{department_id}/members",
+      "queries": [
+        "kotorelay.operations.groups.list_members.generated.queries.memberships_list",
+        "kotorelay.operations.groups.list_members.generated.queries.users_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "自部署の所属を一覧"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/reviews/list_reviews/detail-design.md",
+        "interface": "docs/design/generated/api/reviews/list_reviews/interface.md",
+        "messages": "docs/design/generated/api/reviews/list_reviews/messages.md",
+        "query": "docs/design/generated/api/reviews/list_reviews/query.md",
+        "sequence": "docs/design/generated/api/reviews/list_reviews/sequence.md",
+        "unit-test": "docs/design/generated/api/reviews/list_reviews/unit-test.md"
+      },
+      "id": "list_reviews",
+      "method": "GET",
+      "path": "/api/reviews",
+      "queries": [
+        "kotorelay.operations.reviews.list_reviews.generated.queries.departments_list",
+        "kotorelay.operations.reviews.list_reviews.generated.queries.documents_list",
+        "kotorelay.operations.reviews.list_reviews.generated.queries.submissions_list",
+        "kotorelay.operations.reviews.list_reviews.generated.queries.users_list",
+        "kotorelay.operations.reviews.list_reviews.generated.queries.versions_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "審査状況を一覧"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/read_document/detail-design.md",
+        "interface": "docs/design/generated/api/documents/read_document/interface.md",
+        "messages": "docs/design/generated/api/documents/read_document/messages.md",
+        "query": "docs/design/generated/api/documents/read_document/query.md",
+        "sequence": "docs/design/generated/api/documents/read_document/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/read_document/unit-test.md"
+      },
+      "id": "read_document",
+      "method": "GET",
+      "path": "/api/documents/{document_id}",
+      "queries": [
+        "kotorelay.operations.documents.read_document.generated.queries.chunks_list",
+        "kotorelay.operations.documents.read_document.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list",
+        "kotorelay.operations.system.authorization.generated.queries.versions_get"
+      ],
+      "summary": "承認版または担当版を表示"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/operations/reconcile_index/detail-design.md",
+        "interface": "docs/design/generated/api/operations/reconcile_index/interface.md",
+        "messages": "docs/design/generated/api/operations/reconcile_index/messages.md",
+        "query": "docs/design/generated/api/operations/reconcile_index/query.md",
+        "sequence": "docs/design/generated/api/operations/reconcile_index/sequence.md",
+        "unit-test": "docs/design/generated/api/operations/reconcile_index/unit-test.md"
+      },
+      "id": "reconcile_index",
+      "method": "GET",
+      "path": "/api/operations/reconcile",
+      "queries": [
+        "kotorelay.operations.indexing.reconcile_index.generated.queries.chunks_list",
+        "kotorelay.operations.indexing.reconcile_index.generated.queries.documents_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "正本と索引の不一致を確認"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/metrics/record_view/detail-design.md",
+        "interface": "docs/design/generated/api/metrics/record_view/interface.md",
+        "messages": "docs/design/generated/api/metrics/record_view/messages.md",
+        "query": "docs/design/generated/api/metrics/record_view/query.md",
+        "sequence": "docs/design/generated/api/metrics/record_view/sequence.md",
+        "unit-test": "docs/design/generated/api/metrics/record_view/unit-test.md"
+      },
+      "id": "record_view",
+      "method": "POST",
+      "path": "/api/metrics/views/{document_id}",
+      "queries": [
+        "kotorelay.operations.metrics.record_view.generated.queries.events_get",
+        "kotorelay.operations.metrics.record_view.generated.queries.events_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "実閲覧を一意IDで記録"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/operations/retry_job/detail-design.md",
+        "interface": "docs/design/generated/api/operations/retry_job/interface.md",
+        "messages": "docs/design/generated/api/operations/retry_job/messages.md",
+        "query": "docs/design/generated/api/operations/retry_job/query.md",
+        "sequence": "docs/design/generated/api/operations/retry_job/sequence.md",
+        "unit-test": "docs/design/generated/api/operations/retry_job/unit-test.md"
+      },
+      "id": "retry_job",
+      "method": "POST",
+      "path": "/api/operations/jobs/{job_id}",
+      "queries": [
+        "kotorelay.operations.indexing.shared.generated.queries.answers_list",
+        "kotorelay.operations.indexing.shared.generated.queries.assets_delete",
+        "kotorelay.operations.indexing.shared.generated.queries.assets_get",
+        "kotorelay.operations.indexing.shared.generated.queries.assets_list",
+        "kotorelay.operations.indexing.shared.generated.queries.chunks_delete",
+        "kotorelay.operations.indexing.shared.generated.queries.chunks_insert",
+        "kotorelay.operations.indexing.shared.generated.queries.chunks_list",
+        "kotorelay.operations.indexing.shared.generated.queries.chunks_update",
+        "kotorelay.operations.indexing.shared.generated.queries.documents_get",
+        "kotorelay.operations.indexing.shared.generated.queries.documents_list",
+        "kotorelay.operations.indexing.shared.generated.queries.drafts_delete",
+        "kotorelay.operations.indexing.shared.generated.queries.drafts_list",
+        "kotorelay.operations.indexing.shared.generated.queries.ocr_runs_delete",
+        "kotorelay.operations.indexing.shared.generated.queries.ocr_runs_get",
+        "kotorelay.operations.indexing.shared.generated.queries.ocr_runs_list",
+        "kotorelay.operations.indexing.shared.generated.queries.outbox_get",
+        "kotorelay.operations.indexing.shared.generated.queries.outbox_update",
+        "kotorelay.operations.indexing.shared.generated.queries.versions_get",
+        "kotorelay.operations.indexing.shared.generated.queries.versions_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "反映ジョブを再処理"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/save_draft/detail-design.md",
+        "interface": "docs/design/generated/api/documents/save_draft/interface.md",
+        "messages": "docs/design/generated/api/documents/save_draft/messages.md",
+        "query": "docs/design/generated/api/documents/save_draft/query.md",
+        "sequence": "docs/design/generated/api/documents/save_draft/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/save_draft/unit-test.md"
+      },
+      "id": "save_draft",
+      "method": "PUT",
+      "path": "/api/documents/{document_id}/draft",
+      "queries": [
+        "kotorelay.operations.documents.save_draft.generated.queries.assets_get",
+        "kotorelay.operations.documents.save_draft.generated.queries.documents_update",
+        "kotorelay.operations.documents.save_draft.generated.queries.drafts_list",
+        "kotorelay.operations.documents.save_draft.generated.queries.drafts_update",
+        "kotorelay.operations.documents.save_draft.generated.queries.ocr_runs_get",
+        "kotorelay.operations.documents.shared.generated.queries.drafts_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "競合を検出して下書きを保存"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/submit_version/detail-design.md",
+        "interface": "docs/design/generated/api/documents/submit_version/interface.md",
+        "messages": "docs/design/generated/api/documents/submit_version/messages.md",
+        "query": "docs/design/generated/api/documents/submit_version/query.md",
+        "sequence": "docs/design/generated/api/documents/submit_version/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/submit_version/unit-test.md"
+      },
+      "id": "submit_version",
+      "method": "POST",
+      "path": "/api/documents/{document_id}/submissions",
+      "queries": [
+        "kotorelay.operations.documents.submit_version.generated.queries.assets_get",
+        "kotorelay.operations.documents.submit_version.generated.queries.documents_update",
+        "kotorelay.operations.documents.submit_version.generated.queries.drafts_list",
+        "kotorelay.operations.documents.submit_version.generated.queries.ocr_runs_get",
+        "kotorelay.operations.documents.submit_version.generated.queries.submissions_insert",
+        "kotorelay.operations.documents.submit_version.generated.queries.versions_insert",
+        "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.idempotency_get",
+        "kotorelay.operations.system.authorization.generated.queries.idempotency_insert",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "版を確定して承認申請"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/images/upload_image/detail-design.md",
+        "interface": "docs/design/generated/api/images/upload_image/interface.md",
+        "messages": "docs/design/generated/api/images/upload_image/messages.md",
+        "query": "docs/design/generated/api/images/upload_image/query.md",
+        "sequence": "docs/design/generated/api/images/upload_image/sequence.md",
+        "unit-test": "docs/design/generated/api/images/upload_image/unit-test.md"
+      },
+      "id": "upload_image",
+      "method": "POST",
+      "path": "/api/images/documents/{document_id}",
+      "queries": [
+        "kotorelay.operations.images.upload_image.generated.queries.assets_insert",
+        "kotorelay.operations.images.upload_image.generated.queries.assets_list",
+        "kotorelay.operations.images.upload_image.generated.queries.ocr_runs_insert",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "画像を添付して位置付きOCRを実行"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/version_diff/detail-design.md",
+        "interface": "docs/design/generated/api/documents/version_diff/interface.md",
+        "messages": "docs/design/generated/api/documents/version_diff/messages.md",
+        "query": "docs/design/generated/api/documents/version_diff/query.md",
+        "sequence": "docs/design/generated/api/documents/version_diff/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/version_diff/unit-test.md"
+      },
+      "id": "version_diff",
+      "method": "GET",
+      "path": "/api/documents/{document_id}/diff",
+      "queries": [
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list",
+        "kotorelay.operations.system.authorization.generated.queries.versions_get"
+      ],
+      "summary": "版IDを指定して本文差分を比較"
+    },
+    {
+      "documents": {
+        "detail-design": "docs/design/generated/api/documents/version_history/detail-design.md",
+        "interface": "docs/design/generated/api/documents/version_history/interface.md",
+        "messages": "docs/design/generated/api/documents/version_history/messages.md",
+        "query": "docs/design/generated/api/documents/version_history/query.md",
+        "sequence": "docs/design/generated/api/documents/version_history/sequence.md",
+        "unit-test": "docs/design/generated/api/documents/version_history/unit-test.md"
+      },
+      "id": "version_history",
+      "method": "GET",
+      "path": "/api/documents/{document_id}/history",
+      "queries": [
+        "kotorelay.operations.documents.version_history.generated.queries.submissions_list",
+        "kotorelay.operations.documents.version_history.generated.queries.versions_list",
+        "kotorelay.operations.system.authorization.generated.queries.departments_list",
+        "kotorelay.operations.system.authorization.generated.queries.documents_get",
+        "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+        "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+        "kotorelay.operations.system.authorization.generated.queries.users_list"
+      ],
+      "summary": "担当文書の版履歴"
+    }
+  ],
+  "queries": [
+    {
+      "access": {
+        "answers": "R"
+      },
+      "description": "現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.answers_get",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/001_answers_get.sql",
+      "sql": "-- 現在の組織に属する指定の回答履歴について、質問・回答の保存先と根拠・回答状態を取得する。\nSELECT\n    id,\n    organization_id,\n    conversation_id,\n    user_id,\n    department_id,\n    question_key,\n    answer_key,\n    evidence,\n    status,\n    model,\n    created_at\nFROM answers\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "answers": "C"
+      },
+      "description": "現在の組織の回答履歴として、質問者・利用部署・質問と回答の保存先・根拠を登録する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.answers_insert",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/002_answers_insert.sql",
+      "sql": "-- 現在の組織の回答履歴として、質問者・利用部署・質問と回答の保存先・根拠を登録する。\nINSERT INTO answers (\n    id,\n    organization_id,\n    conversation_id,\n    user_id,\n    department_id,\n    question_key,\n    answer_key,\n    evidence,\n    status,\n    model,\n    created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(conversation_id)s,\n    %(user_id)s,\n    %(department_id)s,\n    %(question_key)s,\n    %(answer_key)s,\n    %(evidence)s,\n    %(status)s,\n    %(model)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "answers": "R"
+      },
+      "description": "現在の組織に属する回答履歴を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.answers_list",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/003_answers_list.sql",
+      "sql": "-- 現在の組織に属する回答履歴を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    conversation_id,\n    user_id,\n    department_id,\n    question_key,\n    answer_key,\n    evidence,\n    status,\n    model,\n    created_at\nFROM answers\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.assets_get",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/004_assets_get.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "chunks": "R"
+      },
+      "description": "現在の組織に属する検索用の文書断片を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.chunks_list",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/005_chunks_list.sql",
+      "sql": "-- 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    body_key,\n    sha256,\n    heading,\n    placements,\n    manifest_hash,\n    ready\nFROM chunks\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "conversations": "R"
+      },
+      "description": "現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.conversations_get",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/006_conversations_get.sql",
+      "sql": "-- 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。\nSELECT\n    id,\n    organization_id,\n    user_id,\n    created_at\nFROM conversations\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "conversations": "C"
+      },
+      "description": "現在の組織の会話を、所有者と開始日時を指定して登録する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.conversations_insert",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/007_conversations_insert.sql",
+      "sql": "-- 現在の組織の会話を、所有者と開始日時を指定して登録する。\nINSERT INTO conversations (id, organization_id, user_id, created_at) VALUES (\n    %(id)s, %(organization_id)s, %(user_id)s, %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.documents_list",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/008_documents_list.sql",
+      "sql": "-- 現在の組織に属する文書を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "events": "C"
+      },
+      "description": "現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.events_insert",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/009_events_insert.sql",
+      "sql": "-- 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。\nINSERT INTO events (\n    id, organization_id, user_id, department_id, document_id, answer_id, kind, outcome, created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(user_id)s,\n    %(department_id)s,\n    %(document_id)s,\n    %(answer_id)s,\n    %(kind)s,\n    %(outcome)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "events": "R"
+      },
+      "description": "現在の組織に属する利用イベントを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.events_list",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/010_events_list.sql",
+      "sql": "-- 現在の組織に属する利用イベントを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    user_id,\n    department_id,\n    document_id,\n    answer_id,\n    kind,\n    outcome,\n    created_at\nFROM events\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.chat.ask_question.generated.queries.versions_get",
+      "source": "backend/src/kotorelay/operations/chat/ask_question/sql/011_versions_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "answers": "R"
+      },
+      "description": "現在の組織に属する回答履歴を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.chat.chat_history.generated.queries.answers_list",
+      "source": "backend/src/kotorelay/operations/chat/chat_history/sql/001_answers_list.sql",
+      "sql": "-- 現在の組織に属する回答履歴を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    conversation_id,\n    user_id,\n    department_id,\n    question_key,\n    answer_key,\n    evidence,\n    status,\n    model,\n    created_at\nFROM answers\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "conversations": "R"
+      },
+      "description": "現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。",
+      "id": "kotorelay.operations.chat.chat_history.generated.queries.conversations_get",
+      "source": "backend/src/kotorelay/operations/chat/chat_history/sql/002_conversations_get.sql",
+      "sql": "-- 現在の組織に属する指定の会話について、会話の所有者と開始日時を取得する。\nSELECT\n    id,\n    organization_id,\n    user_id,\n    created_at\nFROM conversations\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.chat.shared.generated.queries.assets_get",
+      "source": "backend/src/kotorelay/operations/chat/shared/sql/001_assets_get.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "chunks": "R"
+      },
+      "description": "現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。",
+      "id": "kotorelay.operations.chat.shared.generated.queries.chunks_get",
+      "source": "backend/src/kotorelay/operations/chat/shared/sql/002_chunks_get.sql",
+      "sql": "-- 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    body_key,\n    sha256,\n    heading,\n    placements,\n    manifest_hash,\n    ready\nFROM chunks\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。",
+      "id": "kotorelay.operations.chat.shared.generated.queries.documents_get",
+      "source": "backend/src/kotorelay/operations/chat/shared/sql/003_documents_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "R"
+      },
+      "description": "現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。",
+      "id": "kotorelay.operations.chat.shared.generated.queries.ocr_runs_get",
+      "source": "backend/src/kotorelay/operations/chat/shared/sql/004_ocr_runs_get.sql",
+      "sql": "-- 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\nFROM ocr_runs\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.chat.shared.generated.queries.versions_get",
+      "source": "backend/src/kotorelay/operations/chat/shared/sql/005_versions_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "departments": "R"
+      },
+      "description": "現在の組織に属する部署を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.change_policy.generated.queries.departments_list",
+      "source": "backend/src/kotorelay/operations/documents/change_policy/sql/001_departments_list.sql",
+      "sql": "-- 現在の組織に属する部署を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    name,\n    active\nFROM departments\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "documents": "U"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。",
+      "id": "kotorelay.operations.documents.change_policy.generated.queries.documents_update",
+      "source": "backend/src/kotorelay/operations/documents/change_policy/sql/002_documents_update.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。\nUPDATE documents SET\n    department_id = %(department_id)s,\n    title = %(title)s,\n    created_by = %(created_by)s,\n    visibility = %(visibility)s,\n    shared_departments = %(shared_departments)s,\n    status = %(status)s,\n    revision = %(revision)s,\n    next_version = %(next_version)s,\n    latest_version_id = %(latest_version_id)s,\n    updated_at = %(updated_at)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "outbox": "C"
+      },
+      "description": "現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。",
+      "id": "kotorelay.operations.documents.change_policy.generated.queries.outbox_insert",
+      "source": "backend/src/kotorelay/operations/documents/change_policy/sql/003_outbox_insert.sql",
+      "sql": "-- 現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。\nINSERT INTO outbox (\n    id, organization_id, document_id, version_id, kind, status, attempts, error_code, created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(version_id)s,\n    %(kind)s,\n    %(status)s,\n    %(attempts)s,\n    %(error_code)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "documents": "C"
+      },
+      "description": "現在の組織の文書を、所有部署・公開範囲・状態を指定して登録する。",
+      "id": "kotorelay.operations.documents.create_document.generated.queries.documents_insert",
+      "source": "backend/src/kotorelay/operations/documents/create_document/sql/001_documents_insert.sql",
+      "sql": "-- 現在の組織の文書を、所有部署・公開範囲・状態を指定して登録する。\nINSERT INTO documents (\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(department_id)s,\n    %(title)s,\n    %(created_by)s,\n    %(visibility)s,\n    %(shared_departments)s,\n    %(status)s,\n    %(revision)s,\n    %(next_version)s,\n    %(latest_version_id)s,\n    %(updated_at)s\n);\n"
+    },
+    {
+      "access": {
+        "drafts": "C"
+      },
+      "description": "現在の組織の文書の下書きを、本文の保存先・画像配置・改訂番号を指定して登録する。",
+      "id": "kotorelay.operations.documents.create_document.generated.queries.drafts_insert",
+      "source": "backend/src/kotorelay/operations/documents/create_document/sql/002_drafts_insert.sql",
+      "sql": "-- 現在の組織の文書の下書きを、本文の保存先・画像配置・改訂番号を指定して登録する。\nINSERT INTO drafts (\n    id, organization_id, document_id, body_key, body_hash, placements, revision, updated_by\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(body_key)s,\n    %(body_hash)s,\n    %(placements)s,\n    %(revision)s,\n    %(updated_by)s\n);\n"
+    },
+    {
+      "access": {
+        "chunks": "R"
+      },
+      "description": "現在の組織に属する検索用の文書断片を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.list_documents.generated.queries.chunks_list",
+      "source": "backend/src/kotorelay/operations/documents/list_documents/sql/001_chunks_list.sql",
+      "sql": "-- 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    body_key,\n    sha256,\n    heading,\n    placements,\n    manifest_hash,\n    ready\nFROM chunks\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を指定した所有部署で絞り込み、一覧の対象を取得する。",
+      "id": "kotorelay.operations.documents.list_documents.generated.queries.documents_by_department",
+      "source": "backend/src/kotorelay/operations/documents/list_documents/sql/002_documents_by_department.sql",
+      "sql": "-- 現在の組織に属する文書を指定した所有部署で絞り込み、一覧の対象を取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s AND department_id = %(department_id)s;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.list_documents.generated.queries.documents_list",
+      "source": "backend/src/kotorelay/operations/documents/list_documents/sql/003_documents_list.sql",
+      "sql": "-- 現在の組織に属する文書を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "submissions": "R"
+      },
+      "description": "現在の組織に属する承認申請を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.list_documents.generated.queries.submissions_list",
+      "source": "backend/src/kotorelay/operations/documents/list_documents/sql/004_submissions_list.sql",
+      "sql": "-- 現在の組織に属する承認申請を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    requested_by,\n    status,\n    manifest_hash,\n    decided_by,\n    reason,\n    created_at,\n    decided_at\nFROM submissions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する文書版を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.list_documents.generated.queries.versions_list",
+      "source": "backend/src/kotorelay/operations/documents/list_documents/sql/005_versions_list.sql",
+      "sql": "-- 現在の組織に属する文書版を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "chunks": "R"
+      },
+      "description": "現在の組織に属する検索用の文書断片を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.read_document.generated.queries.chunks_list",
+      "source": "backend/src/kotorelay/operations/documents/read_document/sql/001_chunks_list.sql",
+      "sql": "-- 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    body_key,\n    sha256,\n    heading,\n    placements,\n    manifest_hash,\n    ready\nFROM chunks\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。",
+      "id": "kotorelay.operations.documents.read_document.generated.queries.documents_get",
+      "source": "backend/src/kotorelay/operations/documents/read_document/sql/002_documents_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.documents.save_draft.generated.queries.assets_get",
+      "source": "backend/src/kotorelay/operations/documents/save_draft/sql/001_assets_get.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "documents": "U"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。",
+      "id": "kotorelay.operations.documents.save_draft.generated.queries.documents_update",
+      "source": "backend/src/kotorelay/operations/documents/save_draft/sql/002_documents_update.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。\nUPDATE documents SET\n    department_id = %(department_id)s,\n    title = %(title)s,\n    created_by = %(created_by)s,\n    visibility = %(visibility)s,\n    shared_departments = %(shared_departments)s,\n    status = %(status)s,\n    revision = %(revision)s,\n    next_version = %(next_version)s,\n    latest_version_id = %(latest_version_id)s,\n    updated_at = %(updated_at)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "drafts": "R"
+      },
+      "description": "現在の組織に属する下書きを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.save_draft.generated.queries.drafts_list",
+      "source": "backend/src/kotorelay/operations/documents/save_draft/sql/003_drafts_list.sql",
+      "sql": "-- 現在の組織に属する下書きを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    body_key,\n    body_hash,\n    placements,\n    revision,\n    updated_by\nFROM drafts\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "drafts": "U"
+      },
+      "description": "現在の組織に属する指定の下書きについて、本文の保存先・画像配置・改訂番号を更新する。",
+      "id": "kotorelay.operations.documents.save_draft.generated.queries.drafts_update",
+      "source": "backend/src/kotorelay/operations/documents/save_draft/sql/004_drafts_update.sql",
+      "sql": "-- 現在の組織に属する指定の下書きについて、本文の保存先・画像配置・改訂番号を更新する。\nUPDATE drafts SET\n    document_id = %(document_id)s,\n    body_key = %(body_key)s,\n    body_hash = %(body_hash)s,\n    placements = %(placements)s,\n    revision = %(revision)s,\n    updated_by = %(updated_by)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "R"
+      },
+      "description": "現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。",
+      "id": "kotorelay.operations.documents.save_draft.generated.queries.ocr_runs_get",
+      "source": "backend/src/kotorelay/operations/documents/save_draft/sql/005_ocr_runs_get.sql",
+      "sql": "-- 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\nFROM ocr_runs\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "drafts": "R"
+      },
+      "description": "現在の組織に属する下書きを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.shared.generated.queries.drafts_list",
+      "source": "backend/src/kotorelay/operations/documents/shared/sql/001_drafts_list.sql",
+      "sql": "-- 現在の組織に属する下書きを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    body_key,\n    body_hash,\n    placements,\n    revision,\n    updated_by\nFROM drafts\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.documents.submit_version.generated.queries.assets_get",
+      "source": "backend/src/kotorelay/operations/documents/submit_version/sql/001_assets_get.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "documents": "U"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。",
+      "id": "kotorelay.operations.documents.submit_version.generated.queries.documents_update",
+      "source": "backend/src/kotorelay/operations/documents/submit_version/sql/002_documents_update.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。\nUPDATE documents SET\n    department_id = %(department_id)s,\n    title = %(title)s,\n    created_by = %(created_by)s,\n    visibility = %(visibility)s,\n    shared_departments = %(shared_departments)s,\n    status = %(status)s,\n    revision = %(revision)s,\n    next_version = %(next_version)s,\n    latest_version_id = %(latest_version_id)s,\n    updated_at = %(updated_at)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "drafts": "R"
+      },
+      "description": "現在の組織に属する下書きを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.submit_version.generated.queries.drafts_list",
+      "source": "backend/src/kotorelay/operations/documents/submit_version/sql/003_drafts_list.sql",
+      "sql": "-- 現在の組織に属する下書きを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    body_key,\n    body_hash,\n    placements,\n    revision,\n    updated_by\nFROM drafts\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "R"
+      },
+      "description": "現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。",
+      "id": "kotorelay.operations.documents.submit_version.generated.queries.ocr_runs_get",
+      "source": "backend/src/kotorelay/operations/documents/submit_version/sql/004_ocr_runs_get.sql",
+      "sql": "-- 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\nFROM ocr_runs\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "submissions": "C"
+      },
+      "description": "現在の組織の承認申請を、対象の文書版・申請者・審査状態・検証用ハッシュとともに登録する。",
+      "id": "kotorelay.operations.documents.submit_version.generated.queries.submissions_insert",
+      "source": "backend/src/kotorelay/operations/documents/submit_version/sql/005_submissions_insert.sql",
+      "sql": "-- 現在の組織の承認申請を、対象の文書版・申請者・審査状態・検証用ハッシュとともに登録する。\nINSERT INTO submissions (\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    requested_by,\n    status,\n    manifest_hash,\n    decided_by,\n    reason,\n    created_at,\n    decided_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(version_id)s,\n    %(requested_by)s,\n    %(status)s,\n    %(manifest_hash)s,\n    %(decided_by)s,\n    %(reason)s,\n    %(created_at)s,\n    %(decided_at)s\n);\n"
+    },
+    {
+      "access": {
+        "versions": "C"
+      },
+      "description": "現在の組織の文書版を、版番号・本文の保存先・画像構成・検証用ハッシュを指定して登録する。",
+      "id": "kotorelay.operations.documents.submit_version.generated.queries.versions_insert",
+      "source": "backend/src/kotorelay/operations/documents/submit_version/sql/006_versions_insert.sql",
+      "sql": "-- 現在の組織の文書版を、版番号・本文の保存先・画像構成・検証用ハッシュを指定して登録する。\nINSERT INTO versions (\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(number)s,\n    %(title)s,\n    %(body_key)s,\n    %(body_hash)s,\n    %(manifest)s,\n    %(manifest_hash)s,\n    %(created_by)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "submissions": "R"
+      },
+      "description": "現在の組織に属する承認申請を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.version_history.generated.queries.submissions_list",
+      "source": "backend/src/kotorelay/operations/documents/version_history/sql/001_submissions_list.sql",
+      "sql": "-- 現在の組織に属する承認申請を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    requested_by,\n    status,\n    manifest_hash,\n    decided_by,\n    reason,\n    created_at,\n    decided_at\nFROM submissions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する文書版を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.documents.version_history.generated.queries.versions_list",
+      "source": "backend/src/kotorelay/operations/documents/version_history/sql/002_versions_list.sql",
+      "sql": "-- 現在の組織に属する文書版を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "departments": "R"
+      },
+      "description": "現在の組織に属する指定の部署について、部署名と有効状態を取得する。",
+      "id": "kotorelay.operations.groups.change_membership.generated.queries.departments_get",
+      "source": "backend/src/kotorelay/operations/groups/change_membership/sql/001_departments_get.sql",
+      "sql": "-- 現在の組織に属する指定の部署について、部署名と有効状態を取得する。\nSELECT\n    id,\n    organization_id,\n    name,\n    active\nFROM departments\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "memberships": "C"
+      },
+      "description": "現在の組織の利用者の部署所属を、所属部署・権限・有効状態を指定して登録する。",
+      "id": "kotorelay.operations.groups.change_membership.generated.queries.memberships_insert",
+      "source": "backend/src/kotorelay/operations/groups/change_membership/sql/002_memberships_insert.sql",
+      "sql": "-- 現在の組織の利用者の部署所属を、所属部署・権限・有効状態を指定して登録する。\nINSERT INTO memberships (\n    id, organization_id, department_id, user_id, leader, can_author, can_review, active\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(department_id)s,\n    %(user_id)s,\n    %(leader)s,\n    %(can_author)s,\n    %(can_review)s,\n    %(active)s\n);\n"
+    },
+    {
+      "access": {
+        "memberships": "R"
+      },
+      "description": "現在の組織に属する部署所属を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.groups.change_membership.generated.queries.memberships_list",
+      "source": "backend/src/kotorelay/operations/groups/change_membership/sql/003_memberships_list.sql",
+      "sql": "-- 現在の組織に属する部署所属を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    user_id,\n    leader,\n    can_author,\n    can_review,\n    active\nFROM memberships\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "memberships": "U"
+      },
+      "description": "現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を更新する。",
+      "id": "kotorelay.operations.groups.change_membership.generated.queries.memberships_update",
+      "source": "backend/src/kotorelay/operations/groups/change_membership/sql/004_memberships_update.sql",
+      "sql": "-- 現在の組織に属する指定の部署所属について、所属部署・利用者・執筆や審査の権限・有効状態を更新する。\nUPDATE memberships SET\n    department_id = %(department_id)s,\n    user_id = %(user_id)s,\n    leader = %(leader)s,\n    can_author = %(can_author)s,\n    can_review = %(can_review)s,\n    active = %(active)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "users": "R"
+      },
+      "description": "現在の組織に属する指定の利用者について、認証主体・表示名・有効状態・運用権限を取得する。",
+      "id": "kotorelay.operations.groups.change_membership.generated.queries.users_get",
+      "source": "backend/src/kotorelay/operations/groups/change_membership/sql/005_users_get.sql",
+      "sql": "-- 現在の組織に属する指定の利用者について、認証主体・表示名・有効状態・運用権限を取得する。\nSELECT\n    id,\n    organization_id,\n    subject,\n    display_name,\n    active,\n    operator\nFROM users\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "departments": "R"
+      },
+      "description": "現在の組織に属する部署を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.groups.get_identity.generated.queries.departments_list",
+      "source": "backend/src/kotorelay/operations/groups/get_identity/sql/001_departments_list.sql",
+      "sql": "-- 現在の組織に属する部署を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    name,\n    active\nFROM departments\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "memberships": "R"
+      },
+      "description": "現在の組織に属する部署所属を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.groups.list_members.generated.queries.memberships_list",
+      "source": "backend/src/kotorelay/operations/groups/list_members/sql/001_memberships_list.sql",
+      "sql": "-- 現在の組織に属する部署所属を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    user_id,\n    leader,\n    can_author,\n    can_review,\n    active\nFROM memberships\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "users": "R"
+      },
+      "description": "現在の組織に属する利用者を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.groups.list_members.generated.queries.users_list",
+      "source": "backend/src/kotorelay/operations/groups/list_members/sql/002_users_list.sql",
+      "sql": "-- 現在の組織に属する利用者を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    subject,\n    display_name,\n    active,\n    operator\nFROM users\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.images.correct_ocr.generated.queries.assets_get",
+      "source": "backend/src/kotorelay/operations/images/correct_ocr/sql/001_assets_get.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "C"
+      },
+      "description": "現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。",
+      "id": "kotorelay.operations.images.correct_ocr.generated.queries.ocr_runs_insert",
+      "source": "backend/src/kotorelay/operations/images/correct_ocr/sql/002_ocr_runs_insert.sql",
+      "sql": "-- 現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。\nINSERT INTO ocr_runs (\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(asset_id)s,\n    %(result_key)s,\n    %(result_hash)s,\n    %(engine)s,\n    %(status)s,\n    %(confirmed)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。",
+      "id": "kotorelay.operations.images.get_ocr.generated.queries.documents_get",
+      "source": "backend/src/kotorelay/operations/images/get_ocr/sql/001_documents_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "R"
+      },
+      "description": "現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。",
+      "id": "kotorelay.operations.images.get_ocr.generated.queries.ocr_runs_get",
+      "source": "backend/src/kotorelay/operations/images/get_ocr/sql/002_ocr_runs_get.sql",
+      "sql": "-- 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\nFROM ocr_runs\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.images.shared.generated.queries.assets_get",
+      "source": "backend/src/kotorelay/operations/images/shared/sql/001_assets_get.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。",
+      "id": "kotorelay.operations.images.shared.generated.queries.documents_get",
+      "source": "backend/src/kotorelay/operations/images/shared/sql/002_documents_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "assets": "C"
+      },
+      "description": "現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。",
+      "id": "kotorelay.operations.images.upload_image.generated.queries.assets_insert",
+      "source": "backend/src/kotorelay/operations/images/upload_image/sql/001_assets_insert.sql",
+      "sql": "-- 現在の組織の文書に添付した画像の保存先・形式・寸法・検証用ハッシュを登録する。\nINSERT INTO assets (\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(object_key)s,\n    %(sha256)s,\n    %(media_type)s,\n    %(width)s,\n    %(height)s,\n    %(size)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する添付画像を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.images.upload_image.generated.queries.assets_list",
+      "source": "backend/src/kotorelay/operations/images/upload_image/sql/002_assets_list.sql",
+      "sql": "-- 現在の組織に属する添付画像を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "C"
+      },
+      "description": "現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。",
+      "id": "kotorelay.operations.images.upload_image.generated.queries.ocr_runs_insert",
+      "source": "backend/src/kotorelay/operations/images/upload_image/sql/003_ocr_runs_insert.sql",
+      "sql": "-- 現在の組織の画像に対する文字認識の実行記録を、認識結果の保存先・検証用ハッシュ・確認状態とともに登録する。\nINSERT INTO ocr_runs (\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(asset_id)s,\n    %(result_key)s,\n    %(result_hash)s,\n    %(engine)s,\n    %(status)s,\n    %(confirmed)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.list_jobs.generated.queries.documents_list",
+      "source": "backend/src/kotorelay/operations/indexing/list_jobs/sql/001_documents_list.sql",
+      "sql": "-- 現在の組織に属する文書を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "outbox": "R"
+      },
+      "description": "現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.list_jobs.generated.queries.outbox_list",
+      "source": "backend/src/kotorelay/operations/indexing/list_jobs/sql/002_outbox_list.sql",
+      "sql": "-- 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    kind,\n    status,\n    attempts,\n    error_code,\n    created_at\nFROM outbox\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する文書版を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.list_jobs.generated.queries.versions_list",
+      "source": "backend/src/kotorelay/operations/indexing/list_jobs/sql/003_versions_list.sql",
+      "sql": "-- 現在の組織に属する文書版を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "chunks": "R"
+      },
+      "description": "現在の組織に属する検索用の文書断片を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.reconcile_index.generated.queries.chunks_list",
+      "source": "backend/src/kotorelay/operations/indexing/reconcile_index/sql/001_chunks_list.sql",
+      "sql": "-- 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    body_key,\n    sha256,\n    heading,\n    placements,\n    manifest_hash,\n    ready\nFROM chunks\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.reconcile_index.generated.queries.documents_list",
+      "source": "backend/src/kotorelay/operations/indexing/reconcile_index/sql/002_documents_list.sql",
+      "sql": "-- 現在の組織に属する文書を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "answers": "R"
+      },
+      "description": "現在の組織に属する回答履歴を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.answers_list",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/001_answers_list.sql",
+      "sql": "-- 現在の組織に属する回答履歴を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    conversation_id,\n    user_id,\n    department_id,\n    question_key,\n    answer_key,\n    evidence,\n    status,\n    model,\n    created_at\nFROM answers\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "assets": "D"
+      },
+      "description": "現在の組織に属する指定の添付画像の記録を削除する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.assets_delete",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/002_assets_delete.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像の記録を削除する。\nDELETE FROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.assets_get",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/003_assets_get.sql",
+      "sql": "-- 現在の組織に属する指定の添付画像について、画像の保存先・形式・寸法・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "assets": "R"
+      },
+      "description": "現在の組織に属する添付画像を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.assets_list",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/004_assets_list.sql",
+      "sql": "-- 現在の組織に属する添付画像を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    object_key,\n    sha256,\n    media_type,\n    width,\n    height,\n    size,\n    created_at\nFROM assets\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "chunks": "D"
+      },
+      "description": "現在の組織に属する指定の検索用の文書断片の記録を削除する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.chunks_delete",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/005_chunks_delete.sql",
+      "sql": "-- 現在の組織に属する指定の検索用の文書断片の記録を削除する。\nDELETE FROM chunks\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "chunks": "C"
+      },
+      "description": "現在の組織の検索用の文書断片を、出典の版・本文の保存先・画像配置とともに登録する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.chunks_insert",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/006_chunks_insert.sql",
+      "sql": "-- 現在の組織の検索用の文書断片を、出典の版・本文の保存先・画像配置とともに登録する。\nINSERT INTO chunks (\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    body_key,\n    sha256,\n    heading,\n    placements,\n    manifest_hash,\n    ready\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(version_id)s,\n    %(body_key)s,\n    %(sha256)s,\n    %(heading)s,\n    %(placements)s,\n    %(manifest_hash)s,\n    %(ready)s\n);\n"
+    },
+    {
+      "access": {
+        "chunks": "R"
+      },
+      "description": "現在の組織に属する検索用の文書断片を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.chunks_list",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/007_chunks_list.sql",
+      "sql": "-- 現在の組織に属する検索用の文書断片を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    body_key,\n    sha256,\n    heading,\n    placements,\n    manifest_hash,\n    ready\nFROM chunks\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "chunks": "U"
+      },
+      "description": "現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を更新する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.chunks_update",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/008_chunks_update.sql",
+      "sql": "-- 現在の組織に属する指定の検索用の文書断片について、本文の保存先・出典の版・画像配置・索引反映状態を更新する。\nUPDATE chunks SET\n    document_id = %(document_id)s,\n    version_id = %(version_id)s,\n    body_key = %(body_key)s,\n    sha256 = %(sha256)s,\n    heading = %(heading)s,\n    placements = %(placements)s,\n    manifest_hash = %(manifest_hash)s,\n    ready = %(ready)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.documents_get",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/009_documents_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.documents_list",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/010_documents_list.sql",
+      "sql": "-- 現在の組織に属する文書を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "drafts": "D"
+      },
+      "description": "現在の組織に属する指定の下書きの記録を削除する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.drafts_delete",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/011_drafts_delete.sql",
+      "sql": "-- 現在の組織に属する指定の下書きの記録を削除する。\nDELETE FROM drafts\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "drafts": "R"
+      },
+      "description": "現在の組織に属する下書きを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.drafts_list",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/012_drafts_list.sql",
+      "sql": "-- 現在の組織に属する下書きを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    body_key,\n    body_hash,\n    placements,\n    revision,\n    updated_by\nFROM drafts\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "D"
+      },
+      "description": "現在の組織に属する指定の文字認識の実行記録の記録を削除する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.ocr_runs_delete",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/013_ocr_runs_delete.sql",
+      "sql": "-- 現在の組織に属する指定の文字認識の実行記録の記録を削除する。\nDELETE FROM ocr_runs\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "R"
+      },
+      "description": "現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.ocr_runs_get",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/014_ocr_runs_get.sql",
+      "sql": "-- 現在の組織に属する指定の文字認識の実行記録について、認識結果の保存先・検証用ハッシュ・確認状態を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\nFROM ocr_runs\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "ocr_runs": "R"
+      },
+      "description": "現在の組織に属する文字認識の実行記録を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.ocr_runs_list",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/015_ocr_runs_list.sql",
+      "sql": "-- 現在の組織に属する文字認識の実行記録を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    asset_id,\n    result_key,\n    result_hash,\n    engine,\n    status,\n    confirmed,\n    created_at\nFROM ocr_runs\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "outbox": "R"
+      },
+      "description": "現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.outbox_get",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/016_outbox_get.sql",
+      "sql": "-- 現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    kind,\n    status,\n    attempts,\n    error_code,\n    created_at\nFROM outbox\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "outbox": "U"
+      },
+      "description": "現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を更新する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.outbox_update",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/017_outbox_update.sql",
+      "sql": "-- 現在の組織に属する指定の反映・削除ジョブについて、対象文書と版・処理種別・進行状態・試行回数を更新する。\nUPDATE outbox SET\n    document_id = %(document_id)s,\n    version_id = %(version_id)s,\n    kind = %(kind)s,\n    status = %(status)s,\n    attempts = %(attempts)s,\n    error_code = %(error_code)s,\n    created_at = %(created_at)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.versions_get",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/018_versions_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する文書版を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.indexing.shared.generated.queries.versions_list",
+      "source": "backend/src/kotorelay/operations/indexing/shared/sql/019_versions_list.sql",
+      "sql": "-- 現在の組織に属する文書版を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.metrics.department_metrics.generated.queries.documents_list",
+      "source": "backend/src/kotorelay/operations/metrics/department_metrics/sql/001_documents_list.sql",
+      "sql": "-- 現在の組織に属する文書を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "events": "R"
+      },
+      "description": "現在の組織に属する利用イベントを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.metrics.department_metrics.generated.queries.events_list",
+      "source": "backend/src/kotorelay/operations/metrics/department_metrics/sql/002_events_list.sql",
+      "sql": "-- 現在の組織に属する利用イベントを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    user_id,\n    department_id,\n    document_id,\n    answer_id,\n    kind,\n    outcome,\n    created_at\nFROM events\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "events": "R"
+      },
+      "description": "現在の組織に属する指定の利用イベントについて、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を取得する。",
+      "id": "kotorelay.operations.metrics.record_view.generated.queries.events_get",
+      "source": "backend/src/kotorelay/operations/metrics/record_view/sql/001_events_get.sql",
+      "sql": "-- 現在の組織に属する指定の利用イベントについて、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を取得する。\nSELECT\n    id,\n    organization_id,\n    user_id,\n    department_id,\n    document_id,\n    answer_id,\n    kind,\n    outcome,\n    created_at\nFROM events\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "events": "C"
+      },
+      "description": "現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。",
+      "id": "kotorelay.operations.metrics.record_view.generated.queries.events_insert",
+      "source": "backend/src/kotorelay/operations/metrics/record_view/sql/002_events_insert.sql",
+      "sql": "-- 現在の組織の利用イベントとして、利用者・帰属部署・閲覧や質問の対象・結果・発生日時を登録する。\nINSERT INTO events (\n    id, organization_id, user_id, department_id, document_id, answer_id, kind, outcome, created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(user_id)s,\n    %(department_id)s,\n    %(document_id)s,\n    %(answer_id)s,\n    %(kind)s,\n    %(outcome)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "documents": "U"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。",
+      "id": "kotorelay.operations.reviews.decide_review.generated.queries.documents_update",
+      "source": "backend/src/kotorelay/operations/reviews/decide_review/sql/001_documents_update.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を更新する。\nUPDATE documents SET\n    department_id = %(department_id)s,\n    title = %(title)s,\n    created_by = %(created_by)s,\n    visibility = %(visibility)s,\n    shared_departments = %(shared_departments)s,\n    status = %(status)s,\n    revision = %(revision)s,\n    next_version = %(next_version)s,\n    latest_version_id = %(latest_version_id)s,\n    updated_at = %(updated_at)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "outbox": "C"
+      },
+      "description": "現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。",
+      "id": "kotorelay.operations.reviews.decide_review.generated.queries.outbox_insert",
+      "source": "backend/src/kotorelay/operations/reviews/decide_review/sql/002_outbox_insert.sql",
+      "sql": "-- 現在の組織の反映・削除ジョブを、対象文書と版・処理種別を指定して登録する。\nINSERT INTO outbox (\n    id, organization_id, document_id, version_id, kind, status, attempts, error_code, created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(document_id)s,\n    %(version_id)s,\n    %(kind)s,\n    %(status)s,\n    %(attempts)s,\n    %(error_code)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "submissions": "R"
+      },
+      "description": "現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を取得する。",
+      "id": "kotorelay.operations.reviews.decide_review.generated.queries.submissions_get",
+      "source": "backend/src/kotorelay/operations/reviews/decide_review/sql/003_submissions_get.sql",
+      "sql": "-- 現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    requested_by,\n    status,\n    manifest_hash,\n    decided_by,\n    reason,\n    created_at,\n    decided_at\nFROM submissions\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "submissions": "U"
+      },
+      "description": "現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を更新する。",
+      "id": "kotorelay.operations.reviews.decide_review.generated.queries.submissions_update",
+      "source": "backend/src/kotorelay/operations/reviews/decide_review/sql/004_submissions_update.sql",
+      "sql": "-- 現在の組織に属する指定の承認申請について、対象の文書版・審査状態・判断者・理由を更新する。\nUPDATE submissions SET\n    document_id = %(document_id)s,\n    version_id = %(version_id)s,\n    requested_by = %(requested_by)s,\n    status = %(status)s,\n    manifest_hash = %(manifest_hash)s,\n    decided_by = %(decided_by)s,\n    reason = %(reason)s,\n    created_at = %(created_at)s,\n    decided_at = %(decided_at)s\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.reviews.decide_review.generated.queries.versions_get",
+      "source": "backend/src/kotorelay/operations/reviews/decide_review/sql/005_versions_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "departments": "R"
+      },
+      "description": "現在の組織に属する部署を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.reviews.list_reviews.generated.queries.departments_list",
+      "source": "backend/src/kotorelay/operations/reviews/list_reviews/sql/001_departments_list.sql",
+      "sql": "-- 現在の組織に属する部署を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    name,\n    active\nFROM departments\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する文書を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.reviews.list_reviews.generated.queries.documents_list",
+      "source": "backend/src/kotorelay/operations/reviews/list_reviews/sql/002_documents_list.sql",
+      "sql": "-- 現在の組織に属する文書を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "submissions": "R"
+      },
+      "description": "現在の組織に属する承認申請を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.reviews.list_reviews.generated.queries.submissions_list",
+      "source": "backend/src/kotorelay/operations/reviews/list_reviews/sql/003_submissions_list.sql",
+      "sql": "-- 現在の組織に属する承認申請を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    requested_by,\n    status,\n    manifest_hash,\n    decided_by,\n    reason,\n    created_at,\n    decided_at\nFROM submissions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "users": "R"
+      },
+      "description": "現在の組織に属する利用者を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.reviews.list_reviews.generated.queries.users_list",
+      "source": "backend/src/kotorelay/operations/reviews/list_reviews/sql/004_users_list.sql",
+      "sql": "-- 現在の組織に属する利用者を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    subject,\n    display_name,\n    active,\n    operator\nFROM users\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する文書版を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.reviews.list_reviews.generated.queries.versions_list",
+      "source": "backend/src/kotorelay/operations/reviews/list_reviews/sql/005_versions_list.sql",
+      "sql": "-- 現在の組織に属する文書版を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "audit": "C"
+      },
+      "description": "現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.audit_insert",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/001_audit_insert.sql",
+      "sql": "-- 現在の組織の監査記録として、操作した利用者・対象・変更前後の状態・理由を登録する。\nINSERT INTO audit (\n    id,\n    organization_id,\n    user_id,\n    document_id,\n    version_id,\n    action,\n    before_state,\n    after_state,\n    reason,\n    created_at\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(user_id)s,\n    %(document_id)s,\n    %(version_id)s,\n    %(action)s,\n    %(before_state)s,\n    %(after_state)s,\n    %(reason)s,\n    %(created_at)s\n);\n"
+    },
+    {
+      "access": {
+        "departments": "R"
+      },
+      "description": "現在の組織に属する部署を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.departments_list",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/002_departments_list.sql",
+      "sql": "-- 現在の組織に属する部署を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    name,\n    active\nFROM departments\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "documents": "R"
+      },
+      "description": "現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.documents_get",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/003_documents_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書について、文書の所有部署・公開範囲・状態・公開版の参照を取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    title,\n    created_by,\n    visibility,\n    shared_departments,\n    status,\n    revision,\n    next_version,\n    latest_version_id,\n    updated_at\nFROM documents\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "idempotency": "R"
+      },
+      "description": "現在の組織に属する指定の再送判定の記録について、実行済み操作の入力ハッシュと応答を取得する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.idempotency_get",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/004_idempotency_get.sql",
+      "sql": "-- 現在の組織に属する指定の再送判定の記録について、実行済み操作の入力ハッシュと応答を取得する。\nSELECT\n    id,\n    organization_id,\n    user_id,\n    operation,\n    request_hash,\n    response\nFROM idempotency\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "idempotency": "C"
+      },
+      "description": "現在の組織の操作の再送を判定するため、実行済み操作の入力ハッシュと応答を登録する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.idempotency_insert",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/005_idempotency_insert.sql",
+      "sql": "-- 現在の組織の操作の再送を判定するため、実行済み操作の入力ハッシュと応答を登録する。\nINSERT INTO idempotency (id, organization_id, user_id, operation, request_hash, response) VALUES (\n    %(id)s, %(organization_id)s, %(user_id)s, %(operation)s, %(request_hash)s, %(response)s\n);\n"
+    },
+    {
+      "access": {
+        "memberships": "R"
+      },
+      "description": "現在の組織に属する部署所属を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.memberships_list",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/006_memberships_list.sql",
+      "sql": "-- 現在の組織に属する部署所属を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    department_id,\n    user_id,\n    leader,\n    can_author,\n    can_review,\n    active\nFROM memberships\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "organizations": "U"
+      },
+      "description": "組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.organizations_fence",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/007_organizations_fence.sql",
+      "sql": "-- 組織の改訂番号が一致する場合だけ番号を進め、認可判定と権限失効の競合を検出する。\nUPDATE organizations SET revision = revision + 1\nWHERE organization_id = %(organization_id)s AND id = %(id)s AND revision = %(revision)s;\n"
+    },
+    {
+      "access": {
+        "organizations": "R"
+      },
+      "description": "現在の組織の組織名・改訂番号・利用停止状態を取得する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.organizations_get",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/008_organizations_get.sql",
+      "sql": "-- 現在の組織の組織名・改訂番号・利用停止状態を取得する。\nSELECT\n    id,\n    organization_id,\n    name,\n    revision,\n    suspended\nFROM organizations\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "users": "R"
+      },
+      "description": "現在の組織に属する利用者を識別子順に一覧取得する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.users_list",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/009_users_list.sql",
+      "sql": "-- 現在の組織に属する利用者を識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    subject,\n    display_name,\n    active,\n    operator\nFROM users\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    },
+    {
+      "access": {
+        "versions": "R"
+      },
+      "description": "現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。",
+      "id": "kotorelay.operations.system.authorization.generated.queries.versions_get",
+      "source": "backend/src/kotorelay/operations/system/authorization/sql/010_versions_get.sql",
+      "sql": "-- 現在の組織に属する指定の文書版について、確定した本文の保存先と画像構成・検証用ハッシュを取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    number,\n    title,\n    body_key,\n    body_hash,\n    manifest,\n    manifest_hash,\n    created_by,\n    created_at\nFROM versions\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "departments": "C"
+      },
+      "description": "現在の組織の部署を、部署名と有効状態を指定して登録する。",
+      "id": "kotorelay.operations.system.bootstrap.generated.queries.departments_insert",
+      "source": "backend/src/kotorelay/operations/system/bootstrap/sql/001_departments_insert.sql",
+      "sql": "-- 現在の組織の部署を、部署名と有効状態を指定して登録する。\nINSERT INTO departments (id, organization_id, name, active) VALUES (\n    %(id)s, %(organization_id)s, %(name)s, %(active)s\n);\n"
+    },
+    {
+      "access": {
+        "memberships": "C"
+      },
+      "description": "現在の組織の利用者の部署所属を、所属部署・権限・有効状態を指定して登録する。",
+      "id": "kotorelay.operations.system.bootstrap.generated.queries.memberships_insert",
+      "source": "backend/src/kotorelay/operations/system/bootstrap/sql/002_memberships_insert.sql",
+      "sql": "-- 現在の組織の利用者の部署所属を、所属部署・権限・有効状態を指定して登録する。\nINSERT INTO memberships (\n    id, organization_id, department_id, user_id, leader, can_author, can_review, active\n) VALUES (\n    %(id)s,\n    %(organization_id)s,\n    %(department_id)s,\n    %(user_id)s,\n    %(leader)s,\n    %(can_author)s,\n    %(can_review)s,\n    %(active)s\n);\n"
+    },
+    {
+      "access": {
+        "organizations": "R"
+      },
+      "description": "現在の組織の組織名・改訂番号・利用停止状態を取得する。",
+      "id": "kotorelay.operations.system.bootstrap.generated.queries.organizations_get",
+      "source": "backend/src/kotorelay/operations/system/bootstrap/sql/003_organizations_get.sql",
+      "sql": "-- 現在の組織の組織名・改訂番号・利用停止状態を取得する。\nSELECT\n    id,\n    organization_id,\n    name,\n    revision,\n    suspended\nFROM organizations\nWHERE organization_id = %(organization_id)s AND id = %(id)s;\n"
+    },
+    {
+      "access": {
+        "organizations": "C"
+      },
+      "description": "組織を、組織名・改訂番号・利用停止状態を指定して登録する。",
+      "id": "kotorelay.operations.system.bootstrap.generated.queries.organizations_insert",
+      "source": "backend/src/kotorelay/operations/system/bootstrap/sql/004_organizations_insert.sql",
+      "sql": "-- 組織を、組織名・改訂番号・利用停止状態を指定して登録する。\nINSERT INTO organizations (id, organization_id, name, revision, suspended) VALUES (\n    %(id)s, %(organization_id)s, %(name)s, %(revision)s, %(suspended)s\n);\n"
+    },
+    {
+      "access": {
+        "users": "C"
+      },
+      "description": "現在の組織の利用者を、認証主体・表示名・有効状態・運用権限を指定して登録する。",
+      "id": "kotorelay.operations.system.bootstrap.generated.queries.users_insert",
+      "source": "backend/src/kotorelay/operations/system/bootstrap/sql/005_users_insert.sql",
+      "sql": "-- 現在の組織の利用者を、認証主体・表示名・有効状態・運用権限を指定して登録する。\nINSERT INTO users (id, organization_id, subject, display_name, active, operator) VALUES (\n    %(id)s, %(organization_id)s, %(subject)s, %(display_name)s, %(active)s, %(operator)s\n);\n"
+    },
+    {
+      "access": {
+        "outbox": "R"
+      },
+      "description": "現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。",
+      "id": "kotorelay.operations.system.dispatch.generated.queries.outbox_list",
+      "source": "backend/src/kotorelay/operations/system/dispatch/sql/001_outbox_list.sql",
+      "sql": "-- 現在の組織に属する反映・削除ジョブを識別子順に一覧取得する。\nSELECT\n    id,\n    organization_id,\n    document_id,\n    version_id,\n    kind,\n    status,\n    attempts,\n    error_code,\n    created_at\nFROM outbox\nWHERE organization_id = %(organization_id)s\nORDER BY id;\n"
+    }
+  ],
+  "relationships": [
+    {
+      "columns": [
+        "organization_id",
+        "conversation_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, conversation_id) REFERENCES conversations (organization_id, id)",
+      "from": "answers",
+      "id": "answers-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "conversations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "user_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+      "from": "answers",
+      "id": "answers-1",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "department_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+      "from": "answers",
+      "id": "answers-2",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "departments"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "answers",
+      "id": "answers-3",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "assets",
+      "id": "assets-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "assets",
+      "id": "assets-1",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "user_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+      "from": "audit",
+      "id": "audit-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "audit",
+      "id": "audit-1",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "version_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, version_id) REFERENCES versions (organization_id, id)",
+      "from": "audit",
+      "id": "audit-2",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "versions"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "audit",
+      "id": "audit-3",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "chunks",
+      "id": "chunks-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id",
+        "version_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id, version_id) REFERENCES versions (organization_id, document_id, id)",
+      "from": "chunks",
+      "id": "chunks-1",
+      "targetColumns": [
+        "organization_id",
+        "document_id",
+        "id"
+      ],
+      "to": "versions"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "chunks",
+      "id": "chunks-2",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "user_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+      "from": "conversations",
+      "id": "conversations-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "conversations",
+      "id": "conversations-1",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "departments",
+      "id": "departments-0",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "department_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+      "from": "documents",
+      "id": "documents-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "departments"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "created_by"
+      ],
+      "definition": "FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id)",
+      "from": "documents",
+      "id": "documents-1",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "documents",
+      "id": "documents-2",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "drafts",
+      "id": "drafts-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "updated_by"
+      ],
+      "definition": "FOREIGN KEY (organization_id, updated_by) REFERENCES users (organization_id, id)",
+      "from": "drafts",
+      "id": "drafts-1",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "drafts",
+      "id": "drafts-2",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "user_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+      "from": "events",
+      "id": "events-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "department_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+      "from": "events",
+      "id": "events-1",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "departments"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "events",
+      "id": "events-2",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "answer_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, answer_id) REFERENCES answers (organization_id, id)",
+      "from": "events",
+      "id": "events-3",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "answers"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "events",
+      "id": "events-4",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "user_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+      "from": "idempotency",
+      "id": "idempotency-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "idempotency",
+      "id": "idempotency-1",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "department_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+      "from": "memberships",
+      "id": "memberships-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "departments"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "user_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+      "from": "memberships",
+      "id": "memberships-1",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "memberships",
+      "id": "memberships-2",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "ocr_runs",
+      "id": "ocr_runs-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id",
+        "asset_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id, asset_id) REFERENCES assets (organization_id, document_id, id)",
+      "from": "ocr_runs",
+      "id": "ocr_runs-1",
+      "targetColumns": [
+        "organization_id",
+        "document_id",
+        "id"
+      ],
+      "to": "assets"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "ocr_runs",
+      "id": "ocr_runs-2",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "outbox",
+      "id": "outbox-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id",
+        "version_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id, version_id) REFERENCES versions (organization_id, document_id, id)",
+      "from": "outbox",
+      "id": "outbox-1",
+      "targetColumns": [
+        "organization_id",
+        "document_id",
+        "id"
+      ],
+      "to": "versions"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "outbox",
+      "id": "outbox-2",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "submissions",
+      "id": "submissions-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id",
+        "version_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id, version_id) REFERENCES versions (organization_id, document_id, id)",
+      "from": "submissions",
+      "id": "submissions-1",
+      "targetColumns": [
+        "organization_id",
+        "document_id",
+        "id"
+      ],
+      "to": "versions"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "requested_by"
+      ],
+      "definition": "FOREIGN KEY (organization_id, requested_by) REFERENCES users (organization_id, id)",
+      "from": "submissions",
+      "id": "submissions-2",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "decided_by"
+      ],
+      "definition": "FOREIGN KEY (organization_id, decided_by) REFERENCES users (organization_id, id)",
+      "from": "submissions",
+      "id": "submissions-3",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "submissions",
+      "id": "submissions-4",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "users",
+      "id": "users-0",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "document_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+      "from": "versions",
+      "id": "versions-0",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "documents"
+    },
+    {
+      "columns": [
+        "organization_id",
+        "created_by"
+      ],
+      "definition": "FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id)",
+      "from": "versions",
+      "id": "versions-1",
+      "targetColumns": [
+        "organization_id",
+        "id"
+      ],
+      "to": "users"
+    },
+    {
+      "columns": [
+        "organization_id"
+      ],
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations (id)",
+      "from": "versions",
+      "id": "versions-2",
+      "targetColumns": [
+        "id"
+      ],
+      "to": "organizations"
+    }
+  ],
+  "schemaVersion": 1,
+  "tables": [
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "conversation_id VARCHAR(36) NOT NULL",
+          "name": "conversation_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "user_id VARCHAR(36) NOT NULL",
+          "name": "user_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "department_id VARCHAR(36) NOT NULL",
+          "name": "department_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "question_key TEXT NOT NULL",
+          "name": "question_key",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "answer_key TEXT NOT NULL",
+          "name": "answer_key",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "evidence TEXT NOT NULL",
+          "name": "evidence",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "status VARCHAR(20) NOT NULL",
+          "name": "status",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "model TEXT NOT NULL",
+          "name": "model",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, conversation_id) REFERENCES conversations (organization_id, id)",
+        "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- answersの正本と組織内参照整合性を定義する。\nCREATE TABLE answers (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    conversation_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    question_key text NOT NULL,\n    answer_key text NOT NULL,\n    evidence text NOT NULL,\n    status varchar(20) NOT NULL,\n    model text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, conversation_id) REFERENCES conversations (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "answers",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/014_answers.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36) NOT NULL",
+          "name": "document_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "object_key TEXT NOT NULL",
+          "name": "object_key",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "sha256 VARCHAR(64) NOT NULL",
+          "name": "sha256",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "media_type VARCHAR(20) NOT NULL",
+          "name": "media_type",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "width BIGINT NOT NULL",
+          "name": "width",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "height BIGINT NOT NULL",
+          "name": "height",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "size BIGINT NOT NULL",
+          "name": "size",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "UNIQUE (organization_id, document_id, id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- assetsの正本と組織内参照整合性を定義する。\nCREATE TABLE assets (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    object_key text NOT NULL,\n    sha256 varchar(64) NOT NULL,\n    media_type varchar(20) NOT NULL,\n    width bigint NOT NULL,\n    height bigint NOT NULL,\n    size bigint NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "assets",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/009_assets.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "user_id VARCHAR(36) NOT NULL",
+          "name": "user_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36)",
+          "name": "document_id",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "version_id VARCHAR(36)",
+          "name": "version_id",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "action VARCHAR(30) NOT NULL",
+          "name": "action",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(30)"
+        },
+        {
+          "default": null,
+          "definition": "before_state TEXT NOT NULL",
+          "name": "before_state",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "after_state TEXT NOT NULL",
+          "name": "after_state",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "reason TEXT NOT NULL",
+          "name": "reason",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, version_id) REFERENCES versions (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- auditの正本と組織内参照整合性を定義する。\nCREATE TABLE audit (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    document_id varchar(36),\n    version_id varchar(36),\n    action varchar(30) NOT NULL,\n    before_state text NOT NULL,\n    after_state text NOT NULL,\n    reason text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, version_id) REFERENCES versions (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "audit",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/017_audit.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36) NOT NULL",
+          "name": "document_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "version_id VARCHAR(36) NOT NULL",
+          "name": "version_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "body_key TEXT NOT NULL",
+          "name": "body_key",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "sha256 VARCHAR(64) NOT NULL",
+          "name": "sha256",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "heading TEXT NOT NULL",
+          "name": "heading",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "placements TEXT NOT NULL",
+          "name": "placements",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "manifest_hash VARCHAR(64) NOT NULL",
+          "name": "manifest_hash",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "ready BOOLEAN NOT NULL",
+          "name": "ready",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id, version_id) REFERENCES versions (organization_id, document_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- chunksの正本と組織内参照整合性を定義する。\nCREATE TABLE chunks (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36) NOT NULL,\n    body_key text NOT NULL,\n    sha256 varchar(64) NOT NULL,\n    heading text NOT NULL,\n    placements text NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    ready boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "chunks",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/011_chunks.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "user_id VARCHAR(36) NOT NULL",
+          "name": "user_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- conversationsの正本と組織内参照整合性を定義する。\nCREATE TABLE conversations (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "conversations",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/013_conversations.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "name TEXT NOT NULL",
+          "name": "name",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "active BOOLEAN NOT NULL",
+          "name": "active",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- departmentsの正本と組織内参照整合性を定義する。\nCREATE TABLE departments (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    name text NOT NULL,\n    active boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "departments",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/003_departments.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "department_id VARCHAR(36) NOT NULL",
+          "name": "department_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "title TEXT NOT NULL",
+          "name": "title",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "created_by VARCHAR(36) NOT NULL",
+          "name": "created_by",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "visibility VARCHAR(20) NOT NULL",
+          "name": "visibility",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "shared_departments TEXT NOT NULL",
+          "name": "shared_departments",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "status VARCHAR(20) NOT NULL",
+          "name": "status",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "revision BIGINT NOT NULL",
+          "name": "revision",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "next_version BIGINT NOT NULL",
+          "name": "next_version",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "latest_version_id VARCHAR(36)",
+          "name": "latest_version_id",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "updated_at TIMESTAMPTZ NOT NULL",
+          "name": "updated_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+        "FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id)",
+        "CHECK (visibility IN ('department', 'selected', 'organization'))",
+        "CHECK (status IN ('active', 'withdrawn', 'deleted'))",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- documentsの正本と組織内参照整合性を定義する。\nCREATE TABLE documents (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    title text NOT NULL,\n    created_by varchar(36) NOT NULL,\n    visibility varchar(20) NOT NULL,\n    shared_departments text NOT NULL,\n    status varchar(20) NOT NULL,\n    revision bigint NOT NULL,\n    next_version bigint NOT NULL,\n    latest_version_id varchar(36),\n    updated_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id),\n    CHECK (visibility IN ('department', 'selected', 'organization')),\n    CHECK (status IN ('active', 'withdrawn', 'deleted')),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "documents",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/005_documents.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36) NOT NULL",
+          "name": "document_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "body_key TEXT NOT NULL",
+          "name": "body_key",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "body_hash VARCHAR(64) NOT NULL",
+          "name": "body_hash",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "placements TEXT NOT NULL",
+          "name": "placements",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "revision BIGINT NOT NULL",
+          "name": "revision",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "updated_by VARCHAR(36) NOT NULL",
+          "name": "updated_by",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "UNIQUE (organization_id, document_id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, updated_by) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- draftsの正本と組織内参照整合性を定義する。\nCREATE TABLE drafts (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    body_key text NOT NULL,\n    body_hash varchar(64) NOT NULL,\n    placements text NOT NULL,\n    revision bigint NOT NULL,\n    updated_by varchar(36) NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, updated_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "drafts",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/006_drafts.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "user_id VARCHAR(36) NOT NULL",
+          "name": "user_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "department_id VARCHAR(36) NOT NULL",
+          "name": "department_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36)",
+          "name": "document_id",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "answer_id VARCHAR(36)",
+          "name": "answer_id",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "kind VARCHAR(20) NOT NULL",
+          "name": "kind",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "outcome VARCHAR(20) NOT NULL",
+          "name": "outcome",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, answer_id) REFERENCES answers (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- eventsの正本と組織内参照整合性を定義する。\nCREATE TABLE events (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    document_id varchar(36),\n    answer_id varchar(36),\n    kind varchar(20) NOT NULL,\n    outcome varchar(20) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, answer_id) REFERENCES answers (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "events",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/015_events.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "user_id VARCHAR(36) NOT NULL",
+          "name": "user_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "operation TEXT NOT NULL",
+          "name": "operation",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "request_hash VARCHAR(64) NOT NULL",
+          "name": "request_hash",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "response TEXT NOT NULL",
+          "name": "response",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- idempotencyの正本と組織内参照整合性を定義する。\nCREATE TABLE idempotency (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    operation text NOT NULL,\n    request_hash varchar(64) NOT NULL,\n    response text NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "idempotency",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/016_idempotency.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "department_id VARCHAR(36) NOT NULL",
+          "name": "department_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "user_id VARCHAR(36) NOT NULL",
+          "name": "user_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "leader BOOLEAN NOT NULL",
+          "name": "leader",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        },
+        {
+          "default": null,
+          "definition": "can_author BOOLEAN NOT NULL",
+          "name": "can_author",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        },
+        {
+          "default": null,
+          "definition": "can_review BOOLEAN NOT NULL",
+          "name": "can_review",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        },
+        {
+          "default": null,
+          "definition": "active BOOLEAN NOT NULL",
+          "name": "active",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "UNIQUE (organization_id, department_id, user_id)",
+        "FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id)",
+        "FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- membershipsの正本と組織内参照整合性を定義する。\nCREATE TABLE memberships (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    department_id varchar(36) NOT NULL,\n    user_id varchar(36) NOT NULL,\n    leader boolean NOT NULL,\n    can_author boolean NOT NULL,\n    can_review boolean NOT NULL,\n    active boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, department_id, user_id),\n    FOREIGN KEY (organization_id, department_id) REFERENCES departments (organization_id, id),\n    FOREIGN KEY (organization_id, user_id) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "memberships",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/004_memberships.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36) NOT NULL",
+          "name": "document_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "asset_id VARCHAR(36) NOT NULL",
+          "name": "asset_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "result_key TEXT NOT NULL",
+          "name": "result_key",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "result_hash VARCHAR(64) NOT NULL",
+          "name": "result_hash",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "engine TEXT NOT NULL",
+          "name": "engine",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "status VARCHAR(20) NOT NULL",
+          "name": "status",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "confirmed BOOLEAN NOT NULL",
+          "name": "confirmed",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id, asset_id) REFERENCES assets (organization_id, document_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- ocr_runsの正本と組織内参照整合性を定義する。\nCREATE TABLE ocr_runs (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    asset_id varchar(36) NOT NULL,\n    result_key text NOT NULL,\n    result_hash varchar(64) NOT NULL,\n    engine text NOT NULL,\n    status varchar(20) NOT NULL,\n    confirmed boolean NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, asset_id)\n    REFERENCES assets (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "ocr_runs",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/010_ocr_runs.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "name TEXT NOT NULL",
+          "name": "name",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "revision BIGINT NOT NULL",
+          "name": "revision",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "suspended BOOLEAN NOT NULL",
+          "name": "suspended",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)"
+      ],
+      "ddl": "-- organizationsの正本と組織内参照整合性を定義する。\nCREATE TABLE organizations (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    name text NOT NULL,\n    revision bigint NOT NULL,\n    suspended boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id)\n);\n",
+      "name": "organizations",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/001_organizations.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36) NOT NULL",
+          "name": "document_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "version_id VARCHAR(36)",
+          "name": "version_id",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "kind VARCHAR(20) NOT NULL",
+          "name": "kind",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "status VARCHAR(20) NOT NULL",
+          "name": "status",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "attempts BIGINT NOT NULL",
+          "name": "attempts",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "error_code TEXT NOT NULL",
+          "name": "error_code",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id, version_id) REFERENCES versions (organization_id, document_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- outboxの正本と組織内参照整合性を定義する。\nCREATE TABLE outbox (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36),\n    kind varchar(20) NOT NULL,\n    status varchar(20) NOT NULL,\n    attempts bigint NOT NULL,\n    error_code text NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "outbox",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/012_outbox.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36) NOT NULL",
+          "name": "document_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "version_id VARCHAR(36) NOT NULL",
+          "name": "version_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "requested_by VARCHAR(36) NOT NULL",
+          "name": "requested_by",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "status VARCHAR(20) NOT NULL",
+          "name": "status",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(20)"
+        },
+        {
+          "default": null,
+          "definition": "manifest_hash VARCHAR(64) NOT NULL",
+          "name": "manifest_hash",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "decided_by VARCHAR(36)",
+          "name": "decided_by",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "reason TEXT NOT NULL",
+          "name": "reason",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        },
+        {
+          "default": null,
+          "definition": "decided_at TIMESTAMPTZ",
+          "name": "decided_at",
+          "nullable": true,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "UNIQUE (organization_id, version_id)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, document_id, version_id) REFERENCES versions (organization_id, document_id, id)",
+        "FOREIGN KEY (organization_id, requested_by) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id, decided_by) REFERENCES users (organization_id, id)",
+        "CHECK (status IN ('pending', 'approved', 'rejected'))",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- submissionsの正本と組織内参照整合性を定義する。\nCREATE TABLE submissions (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    version_id varchar(36) NOT NULL,\n    requested_by varchar(36) NOT NULL,\n    status varchar(20) NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    decided_by varchar(36),\n    reason text NOT NULL,\n    created_at timestamptz NOT NULL,\n    decided_at timestamptz,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, version_id),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, document_id, version_id)\n    REFERENCES versions (organization_id, document_id, id),\n    FOREIGN KEY (organization_id, requested_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id, decided_by) REFERENCES users (organization_id, id),\n    CHECK (status IN ('pending', 'approved', 'rejected')),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "submissions",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/008_submissions.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "subject TEXT NOT NULL",
+          "name": "subject",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "display_name TEXT NOT NULL",
+          "name": "display_name",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "active BOOLEAN NOT NULL",
+          "name": "active",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        },
+        {
+          "default": null,
+          "definition": "operator BOOLEAN NOT NULL",
+          "name": "operator",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "UNIQUE (organization_id, subject)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- usersの正本と組織内参照整合性を定義する。\nCREATE TABLE users (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    subject text NOT NULL,\n    display_name text NOT NULL,\n    active boolean NOT NULL,\n    operator boolean NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, subject),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "users",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/002_users.sql"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "definition": "id VARCHAR(36) NOT NULL",
+          "name": "id",
+          "nullable": false,
+          "primaryKey": true,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "organization_id VARCHAR(36) NOT NULL",
+          "name": "organization_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "document_id VARCHAR(36) NOT NULL",
+          "name": "document_id",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "number BIGINT NOT NULL",
+          "name": "number",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "BIGINT"
+        },
+        {
+          "default": null,
+          "definition": "title TEXT NOT NULL",
+          "name": "title",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "body_key TEXT NOT NULL",
+          "name": "body_key",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "body_hash VARCHAR(64) NOT NULL",
+          "name": "body_hash",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "manifest TEXT NOT NULL",
+          "name": "manifest",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "definition": "manifest_hash VARCHAR(64) NOT NULL",
+          "name": "manifest_hash",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(64)"
+        },
+        {
+          "default": null,
+          "definition": "created_by VARCHAR(36) NOT NULL",
+          "name": "created_by",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "VARCHAR(36)"
+        },
+        {
+          "default": null,
+          "definition": "created_at TIMESTAMPTZ NOT NULL",
+          "name": "created_at",
+          "nullable": false,
+          "primaryKey": false,
+          "type": "TIMESTAMPTZ"
+        }
+      ],
+      "constraints": [
+        "PRIMARY KEY (id)",
+        "UNIQUE (organization_id, id)",
+        "UNIQUE (organization_id, document_id, id)",
+        "UNIQUE (organization_id, document_id, number)",
+        "FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id)",
+        "FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id)",
+        "FOREIGN KEY (organization_id) REFERENCES organizations (id)"
+      ],
+      "ddl": "-- versionsの正本と組織内参照整合性を定義する。\nCREATE TABLE versions (\n    id varchar(36) NOT NULL,\n    organization_id varchar(36) NOT NULL,\n    document_id varchar(36) NOT NULL,\n    number bigint NOT NULL,\n    title text NOT NULL,\n    body_key text NOT NULL,\n    body_hash varchar(64) NOT NULL,\n    manifest text NOT NULL,\n    manifest_hash varchar(64) NOT NULL,\n    created_by varchar(36) NOT NULL,\n    created_at timestamptz NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (organization_id, id),\n    UNIQUE (organization_id, document_id, id),\n    UNIQUE (organization_id, document_id, number),\n    FOREIGN KEY (organization_id, document_id) REFERENCES documents (organization_id, id),\n    FOREIGN KEY (organization_id, created_by) REFERENCES users (organization_id, id),\n    FOREIGN KEY (organization_id) REFERENCES organizations (id)\n);\n",
+      "name": "versions",
+      "primaryKey": [
+        "id"
+      ],
+      "source": "backend/migrations/007_versions.sql"
+    }
+  ]
+}
