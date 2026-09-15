@@ -48,6 +48,8 @@ async function actor(name, role) {
   const page = await context.newPage();
   const origin = Date.now();
   const marks = [];
+  const clicks = [];
+  context.setDefaultTimeout(15000);
   page.on('pageerror', (error) => { throw error; });
   await page.goto('/');
   await page.getByLabel('サンプルの役割').selectOption(role);
@@ -62,6 +64,7 @@ async function actor(name, role) {
     await locator.scrollIntoViewIfNeeded();
     const box = await locator.boundingBox();
     if (box) await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 15 });
+    if (box) clicks.push({ seconds: (Date.now() - origin) / 1000 + 0.35, x: box.x + box.width / 2, y: box.y + box.height / 2 });
     await hold(350);
     await locator.click();
   }
@@ -70,7 +73,7 @@ async function actor(name, role) {
     const video = page.video();
     await context.close();
     await video.saveAs(path.join(output, `${name}.webm`));
-    entries.push({ name, marks, video: `${name}.webm`, viewport: { width: 1600, height: 900 } });
+    entries.push({ name, marks, clicks, video: `${name}.webm`, viewport: { width: 1600, height: 900 } });
   }
   return { page, mark, shot, hold, click, finish };
 }
@@ -85,6 +88,8 @@ try {
   await author.shot('new-document'); await author.hold(650);
   await author.click(author.page.getByRole('button', { name: '作成して執筆する' }));
   await expect(author.page.getByLabel('Markdown本文')).toBeEnabled();
+  await author.page.getByLabel('Markdown本文').evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await author.hold(450);
   await author.mark('write');
   await author.page.getByLabel('Markdown本文').fill('');
   await author.page.getByLabel('Markdown本文').pressSequentially(body, { delay: 28 });
@@ -128,6 +133,8 @@ try {
   await reader.click(reader.page.getByRole('button', { name: '質問を送信' }));
   await expect(reader.page.getByText('回答済み', { exact: true })).toBeVisible();
   await expect(reader.page.locator('.answer-bubble')).toContainText('5営業日前');
+  await reader.page.locator('.answer-bubble').scrollIntoViewIfNeeded();
+  await reader.hold(450);
   await reader.mark('answer'); await reader.shot('answer'); await reader.hold(2800);
   await reader.mark('citation');
   await reader.click(reader.page.locator('.citations').getByRole('button').filter({ hasText: title }).first());
